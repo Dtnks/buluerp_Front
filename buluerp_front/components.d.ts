@@ -17,5 +17,6 @@ declare module 'vue' {
     ElText: typeof import('element-plus/es')['ElText']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SecBoard: typeof import('./src/components/board/SecBoard.vue')['default']
   }
 }
