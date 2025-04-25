@@ -1,6 +1,7 @@
 <script setup lang="ts">
-const data = []
 import numberCard from '../component/numberCard.vue'
+import boxShow from '../component/boxShow.vue'
+import pieChart from '../component/pieChart.vue'
 const number1 = 126650
 const number2 = 6560
 const number3 = 12
@@ -17,12 +18,12 @@ const number4 = 0.85
         :data-bottom="[12423]"
       ></numberCard>
       <numberCard
-        :data-top="[12, -21, 32]"
+        :data-top="[12, 21, 32, 43, 8, 34, 65, 43, 21, 75, 32, 43, 8, 34, 32, 43, 8]"
         text-top="已交付订单笔数"
         :number="number2.toLocaleString()"
       ></numberCard>
       <numberCard
-        :data-top="[12, -21, 23]"
+        :data-top="[12, 1, 23, 43, 8, 65, 23, 43, 8, 65, 23, 43, 8, 65, 23, 43, 8, 65]"
         text-top="未交付订单"
         :number="number3.toLocaleString()"
       ></numberCard>
@@ -33,20 +34,8 @@ const number4 = 0.85
         :data-bottom="[12, 31]"
       ></numberCard>
     </div>
-    <div id="boxShow"></div>
-    <div id="chart"></div>
+    <boxShow />
+    <pieChart />
   </div>
 </template>
-<style>
-#boxShow {
-  height: 40vh;
-  background-color: aquamarine;
-  margin: 30px;
-}
-#chart {
-  height: 60vh;
-  margin: 30px;
-  width: 45vw;
-  background-color: bisque;
-}
-</style>
+<style></style>

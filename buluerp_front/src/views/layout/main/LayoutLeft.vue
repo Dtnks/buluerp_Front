@@ -12,7 +12,6 @@ if (path == '/business/query' || path == '/business/detail') {
 } else if (path == '/production/query' || path == '/production/detail') {
   activeIndex.value = '2-1'
 }
-console.log(activeIndex.value, router.currentRoute.value)
 </script>
 <template>
   <el-menu
