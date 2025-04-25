@@ -8,48 +8,42 @@ const router = createRouter({
       component: () => import('@/views/layout/index.vue'),
       children: [
         {
-          path: '/business',
-          component: () => import('@/views/business/index.vue'),
+          path: '/orders',
+          component: () => import('@/views/orders/index.vue'),
           children: [
             {
-              path: '/business/detail',
-              component: () => import('@/views/business/main/Detail.vue'),
+              path: '/orders/detail',
+              component: () => import('@/views/orders/main/Detail.vue'),
             },
             {
-              path: '/business/query',
-              component: () => import('@/views/business/main/Query.vue'),
+              path: '/orders/customQuery',
+              component: () => import('@/views/orders/main/CustomQuery.vue'),
             },
             {
-              path: '/business/show',
-              component: () => import('@/views/business/main/Show.vue'),
-            },
-          ],
-        },
-        {
-          path: '/production',
-          component: () => import('@/views/production/index.vue'),
-          children: [
-            {
-              path: '/production/detail',
-              component: () => import('@/views/production/main/Detail.vue'),
+              path: '/orders/show',
+              component: () => import('@/views/orders/main/Show.vue'),
             },
             {
-              path: '/production/query',
-              component: () => import('@/views/production/main/Query.vue'),
+              path: '/orders/ProdQuery',
+              component: () => import('@/views/orders/main/ProdQuery.vue'),
             },
           ],
         },
         {
           path: '/personCenter',
           component: () => import('@/views/person/index.vue'),
+        },
+        {
+          path: '/admin',
+          component: () => import('@/views/admin/index.vue'),
           children: [
             {
-              path: '/production/detail',
-              component: () => import('@/views/production/main/Detail.vue'),
+              path: '/admin/manage',
+              component: () => import('@/views/admin/main/Manage.vue'),
             },
             {
-              path: '/production/query',
-              component: () => import('@/views/production/main/Query.vue'),
+              path: '/admin/authorization',
+              component: () => import('@/views/admin/main/Authorization.vue'),
             },
           ],
         },
