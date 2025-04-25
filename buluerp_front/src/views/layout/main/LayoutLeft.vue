@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const props = defineProps({ isCollapse: { type: Boolean } })
+import { User } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 const router = useRouter()
@@ -11,6 +12,8 @@ if (path == '/business/query' || path == '/business/detail') {
   activeIndex.value = '1-2'
 } else if (path == '/production/query' || path == '/production/detail') {
   activeIndex.value = '2-1'
+} else if (path == '/personCenter') {
+  activeIndex.value = '0'
 }
 </script>
 <template>
@@ -25,6 +28,10 @@ if (path == '/business/query' || path == '/business/detail') {
     router
   >
     <div class="col back"><img id="logo" src="@/assets/icon/logo.png" /></div>
+    <el-menu-item index="0" route="/personCenter">
+      <el-icon><User /></el-icon>
+      <span>个人中心</span>
+    </el-menu-item>
     <el-sub-menu index="1">
       <template #title>
         <el-icon><img src="@/assets/icon/u9.png" class="icon" /></el-icon>

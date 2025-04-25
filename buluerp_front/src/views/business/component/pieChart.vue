@@ -81,7 +81,7 @@ onMounted(() => {
 
   option && myChart.setOption(option)
 })
-const active = ref()
+const active = ref(0)
 const handleActive = (value) => {
   active.value = value
 }

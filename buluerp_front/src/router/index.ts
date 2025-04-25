@@ -39,7 +39,33 @@ const router = createRouter({
             },
           ],
         },
+        {
+          path: '/personCenter',
+          component: () => import('@/views/person/index.vue'),
+          children: [
+            {
+              path: '/production/detail',
+              component: () => import('@/views/production/main/Detail.vue'),
+            },
+            {
+              path: '/production/query',
+              component: () => import('@/views/production/main/Query.vue'),
+            },
+          ],
+        },
       ],
+    },
+    {
+      path: '/login',
+      component: () => import('@/views/login/index.vue'),
+    },
+    {
+      path: '/register',
+      component: () => import('@/views/register/index.vue'),
+    },
+    {
+      redirect: '/login',
+      path: '',
     },
   ],
 })
