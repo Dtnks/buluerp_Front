@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="col">
+  <div class="col" style="background-color: rgba(240, 242, 245, 1)">
     <div class="row center">
       <el-text>帮助</el-text>
       <el-text>隐私</el-text>

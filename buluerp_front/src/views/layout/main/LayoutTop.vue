@@ -12,7 +12,7 @@ const props = defineProps({ handleHiddenMenu: { type: Function } })
       <div class="center" style="flex: 1"><img class="icon" src="@/assets/icon/u39.png" /></div>
 
       <div class="center row" style="flex: 3; align-items: center">
-        <img id="head" src="@/assets/icon/u37.jpg" /><el-text>姓名</el-text>
+        <img id="head" src="@/assets/icon/u37.jpg" /><el-text style="flex: 1">姓名</el-text>
       </div>
     </div>
   </div>
@@ -22,7 +22,7 @@ const props = defineProps({ handleHiddenMenu: { type: Function } })
   padding: 10px;
   height: 52px;
   line-height: 60px;
-  border-bottom: 1px solid grey;
+  border-bottom: 1px solid rgba(240, 242, 245, 1);
 }
 .icon {
   width: 20px;
