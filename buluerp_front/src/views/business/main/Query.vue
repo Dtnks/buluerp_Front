@@ -49,8 +49,10 @@
             <a-button style="margin: 0 10px 0 40px">导入</a-button>
           </a-form-item>
         </div>
-        <div style="display: inline-block;">
-          <a-button type='link' style="text-decoration: underline; right: 20px; text-align: right;">下载导入模板</a-button>
+        <div style="display: flex; flex-direction: row; justify-content: end ;padding-bottom: 10px ">
+          <!-- <a-button type='link' style="text-decoration: underline !important;">下载导入模板</a-button> -->
+          <a-button type='link' style="text-decoration: underline !important;">下载导入模板</a-button>
+          <!-- <button style="text-decoration: underline;">下载导入模板</button> -->
         </div>
 
         <div>
@@ -266,7 +268,7 @@ const onShowSizeChange = (current: number, size: number) => {
 }
 
 .paginationCustom {
-  border: red solid 1px;
+  // border: red solid 1px;
 
   li:nth-of-type(1) {
     flex: 1;
