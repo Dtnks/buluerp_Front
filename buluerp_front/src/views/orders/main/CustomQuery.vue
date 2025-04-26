@@ -20,8 +20,7 @@
             </a-form-item>
             <!-- <a-form-item label="创建日期: " required name="date1"> -->
             <a-form-item label="创建日期: " name="date1" style="width: 400px;">
-              <a-date-picker v-model:value="formState.date1" show-time type="date" placeholder="Pick a date"
-                style="width:   100%" />
+              <a-range-picker v-model:value="datePicker" type="date" />
             </a-form-item>
           </a-form>
           <!-- </div> -->
@@ -58,9 +57,13 @@
         <div>
           <a-table :row-selection="rowSelection" :columns="columns" :data-source="paginatiedData" :pagination="false">
             <template #bodyCell="{ column, text }">
-              <template v-if="column.dataIndex === 'name'">
+              <!-- <template v-if="column.dataIndex === 'createTime'">
                 <a>{{ text }}</a>
-              </template>
+              </template> -->
+            </template>
+            <template #status="{ text }">
+              <span :style="{ color: getStatusColor(text) }">●</span>
+              {{ text }}
             </template>
             <template #action="{ text, record }">
               <a-button type="link" @click="onEdit(record)">编辑</a-button>
@@ -91,6 +94,7 @@ import type { TableProps, TableColumnType } from 'ant-design-vue';
 // import type Show from './Show.vue';
 import zhCn from 'ant-design-vue/es/locale/zh_CN';
 import { getOffsetOrSpace } from 'element-plus/es/components/message/src/instance.mjs';
+import { v4 as uuid, v4 } from 'uuid';
 
 interface FormState {
   name: string;
@@ -109,14 +113,18 @@ const wrapperCol = { span: 17, offset: 0 };
 const formState: UnwrapRef<FormState> = reactive({
   name: '',
   region: undefined,
-  date1: undefined,
   delivery: false,
   type: [],
   resource: '',
   desc: '',
   fieldB: '',
-
 });
+
+// 时间选择框
+type RangeValue = [Dayjs, Dayjs];
+const datePicker = ref<RangeValue>();
+
+
 const rules: Record<string, Rule[]> = {
   name: [
     { required: true, message: 'Please input Activity name', trigger: 'change' },
@@ -152,27 +160,32 @@ const resetForm = () => {
 // 列表的 script
 interface DataType {
   key: number;
-  name: string;
-  age: number;
-  address: string;
+  createTime: string;
+  orderId: string;
+  customerName: string;
+  orderStatus: string;
+  information: string;
 }
 
 const columns: TableColumnType<DataType>[] = [
   {
     title: '创建时间',
-    dataIndex: 'name',
+    dataIndex: 'createTime',
+
   },
   {
     title: '订单ID',
-    dataIndex: 'age',
+    dataIndex: 'orderId',
   },
   {
     title: '客户姓名',
-    dataIndex: 'address',
+    dataIndex: 'customerName',
   },
   {
     title: '订单状态',
-    dataIndex: 'address',
+    dataIndex: 'orderStatus',
+    slots: { customRender: 'orderStatusIcon' },
+
   },
   {
     title: '其他基本信息',
@@ -189,27 +202,47 @@ const columns: TableColumnType<DataType>[] = [
 
   {
     title: '操作',
-    dataIndex: 'address',
+    dataIndex: 'action',
     slots: { customRender: 'action' },
   },
 ];
+
 const data: DataType[] = [];
 for (let i = 0; i < 40; i++) {
   data.push({
     key: i,
-    name: `Edward King ${i}`,
-    age: 32,
-    address: `London, Park Lane no. ${i}`,
+    createTime: Date.now().toString(),
+    orderId: '3249hg284b14',
+    customerName: `John Brown ${i}`,
+    orderStatus: '初始状态',
+    information: `London, Park Lane no. ${i}`,
   });
 }
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case '初始状态':
+      return 'red';
+    case '设计中':
+      return 'blue';
+    case '已完成':
+      return 'green';
+    case '作废':
+      return 'gray';
+    case '布产中':
+      return 'orange';
+    default:
+      return 'black';
+  }
+};
+
 const rowSelection: TableProps['rowSelection'] = {
   onChange: (selectedRowKeys: string[], selectedRows: DataType[]) => {
     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
   },
-  getCheckboxProps: (record: DataType) => ({
-    // disabled: record.name === 'Disabled User', // Column configuration not to be checked
-    name: record.name,
-  }),
+  // getCheckboxProps: (record: DataType) => ({
+  //   // disabled: record.name === 'Disabled User', // Column configuration not to be checked
+  //   name: record.name,
+  // }),
 };
 const onEdit = (record: DataType) => {
   console.log('Edit:', record);
