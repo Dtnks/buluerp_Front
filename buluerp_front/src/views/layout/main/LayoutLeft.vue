@@ -28,63 +28,56 @@ if (path == '/orders/query' || path == '/orders/detail') {
     router
   >
     <div class="col back"><img id="logo" src="@/assets/icon/logo.png" /></div>
-    <el-menu-item index="0" route="/personCenter">
-      <el-icon><User /></el-icon>
-      <span>个人中心</span>
+    <el-menu-item index="0" route="/admin">
+      <el-icon><img src="@/assets/icon/u21.png" class="icon" /></el-icon>
+      <span>授权管理</span>
     </el-menu-item>
     <el-sub-menu index="1">
-      <template #title>
-        <el-icon><img src="@/assets/icon/u9.png" class="icon" /></el-icon>
-        <span>订单中心</span>
-      </template>
-      <el-menu-item index="1-1" route="/orders/customQuery">客户订单</el-menu-item>
-      <el-menu-item index="1-1" route="/orders/ProdQuery">产品订单</el-menu-item>
-      <el-menu-item index="1-2" route="/orders/show">看板</el-menu-item>
+      <template #title
+        ><el-icon><User /></el-icon> <span>用户中心</span></template
+      >
+      <el-menu-item index="1-1" route="/personCenter/information">我的信息</el-menu-item>
+      <el-menu-item index="1-2" route="/personCenter/custom">客户查询</el-menu-item>
+      <el-menu-item index="1-3" route="/personCenter/manufacturers">厂商查询</el-menu-item>
     </el-sub-menu>
     <el-sub-menu index="2">
-      <template #title
-        ><el-icon><img src="@/assets/icon/u15.png" class="icon" /></el-icon>
-        <span>设计部</span></template
-      >
-      <el-menu-item index="2-1" route="/production/query">设计总表</el-menu-item>
+      <template #title>
+        <el-icon><img src="@/assets/icon/u9.png" class="icon" /></el-icon>
+        <span>业务中心</span>
+      </template>
+      <el-menu-item index="2-1" route="/business/query">订单查询</el-menu-item>
+      <el-menu-item index="2-2" route="/business/show">看板</el-menu-item>
     </el-sub-menu>
-    <el-sub-menu index="3" route="/admin">
-      <template #title
-        ><el-icon><img src="@/assets/icon/u21.png" class="icon" /></el-icon>
-        <span>授权管理</span></template
-      >
-      <el-menu-item index="3-1" route="/admin/manage">管理</el-menu-item>
-      <el-menu-item index="3-2" route="/admin/authorization">授权</el-menu-item>
-    </el-sub-menu>
-    <el-sub-menu index="4" route="/admin">
+
+    <el-sub-menu index="3">
       <template #title
         ><el-icon><img src="@/assets/icon/u25.png" class="icon" /></el-icon>
-        <span>PMC</span></template
+        <span>产品中心</span></template
       >
-      <el-menu-item index="4-1" route="/admin/manage">布产表</el-menu-item>
-      <el-menu-item index="4-2" route="/admin/authorization">分包表</el-menu-item>
-      <el-menu-item index="4-3" route="/admin/manage">外购表</el-menu-item>
-      <el-menu-item index="4-4" route="/admin/authorization">外购资料表</el-menu-item>
-      <el-menu-item index="4-5" route="/admin/manage">物料资料表</el-menu-item>
+      <el-menu-item index="3-1" route="/production/query">产品查询</el-menu-item>
+      <el-menu-item index="3-2" route="/production/material">物料资料表</el-menu-item>
     </el-sub-menu>
-    <el-sub-menu index="5" route="/admin">
+    <el-sub-menu index="4">
       <template #title
         ><el-icon><img src="@/assets/icon/u29.png" class="icon" /></el-icon>
-        <span>仓库</span></template
+        <span>生产管理中心</span></template
       >
-      <el-menu-item index="5-1" route="/admin/manage">胶件库存表</el-menu-item>
-      <el-menu-item index="5-2" route="/admin/authorization">成品库存表</el-menu-item>
-      <el-menu-item index="5-1" route="/admin/manage">料包库存</el-menu-item>
-      <el-menu-item index="5-2" route="/admin/authorization">胶件参数表</el-menu-item>
-    </el-sub-menu>
-    <el-sub-menu index="6" route="/admin">
-      <template #title
-        ><el-icon><img src="@/assets/icon/u21.png" class="icon" /></el-icon>
-        <span>注塑部</span></template
-      >
-      <el-menu-item index="6-1" route="/admin/manage">排产表</el-menu-item>
-      <el-menu-item index="6-2" route="/admin/authorization">产品用料表</el-menu-item>
-      <el-menu-item index="6-3" route="/admin/manage">物料收发表</el-menu-item>
+      <el-sub-menu index="4-1">
+        <template #title><span>采购</span></template>
+        <el-menu-item index="4-1-1" route="/PMcenter/procurement/plan">采购计划</el-menu-item>
+        <el-menu-item index="4-1-2" route="/PMcenter/procurement/list">采购单</el-menu-item>
+      </el-sub-menu>
+      <el-sub-menu index="4-2">
+        <template #title><span>库存</span></template>
+        <el-menu-item index="4-2-1" route="/PMcenter/inventory/list">出入库单</el-menu-item>
+        <el-menu-item index="4-2-2" route="/PMcenter/inventory/query">库存查询</el-menu-item>
+      </el-sub-menu>
+      <el-sub-menu index="4-3">
+        <template #title><span>生产</span></template>
+        <el-menu-item index="4-3-1" route="/PMcenter/produce">布包表</el-menu-item>
+        <el-menu-item index="4-3-2" route="/PMcenter/produce">分包表</el-menu-item>
+        <el-menu-item index="4-3-2" route="/PMcenter/produce">排产表</el-menu-item>
+      </el-sub-menu>
     </el-sub-menu>
   </el-menu>
 </template>
