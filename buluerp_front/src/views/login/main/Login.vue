@@ -9,11 +9,6 @@ const handleLogin = () => {
     path: '/personCenter/information',
   })
 }
-const jumpRegister = () => {
-  router.push({
-    path: '/register',
-  })
-}
 </script>
 <template>
   <div class="row back">
@@ -36,9 +31,6 @@ const jumpRegister = () => {
           <el-text style="cursor: pointer">忘记密码</el-text>
         </div>
         <el-button type="primary" @click="handleLogin">登录</el-button>
-        <div class="row" style="justify-content: flex-end">
-          <el-text @click="jumpRegister" style="cursor: pointer">注册账户</el-text>
-        </div>
       </div>
     </div>
   </div>

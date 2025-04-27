@@ -27,7 +27,10 @@ if (path == '/orders/query' || path == '/orders/detail') {
     text-color="#fff"
     router
   >
-    <div class="col back"><img id="logo" src="@/assets/icon/logo.png" /></div>
+    <div class="row back">
+      <img id="logo" src="@/assets/img/logo.png" />
+      <div style="color: white; font-size: 25px; white-space: nowrap; overflow: hidden">布鲁科</div>
+    </div>
     <el-menu-item index="0" route="/admin">
       <el-icon><img src="@/assets/icon/u21.png" class="icon" /></el-icon>
       <span>授权管理</span>
@@ -101,12 +104,17 @@ if (path == '/orders/query' || path == '/orders/detail') {
 .back {
   background-color: rgba(0, 40, 77, 1);
   overflow: hidden;
+  height: 72px;
+  align-items: center;
 }
 #logo {
-  height: 60px;
-  width: 10vw;
+  height: 50px;
+  width: 50px;
   object-fit: contain;
   object-position: center;
   margin: 6px 15px 6px 15px;
+}
+.el-menu--collapse {
+  width: 80px !important;
 }
 </style>
