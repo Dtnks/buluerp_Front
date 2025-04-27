@@ -6,7 +6,12 @@ const autoLogin = ref()
 const router = useRouter()
 const handleLogin = () => {
   router.push({
-    path: '/personCenter',
+    path: '/personCenter/information',
+  })
+}
+const jumpRegister = () => {
+  router.push({
+    path: '/register',
   })
 }
 </script>
@@ -28,11 +33,11 @@ const handleLogin = () => {
         ></el-input>
         <div class="row" style="justify-content: space-between">
           <el-checkbox v-model="autoLogin" label="自动登录" size="large" />
-          <el-text>忘记密码</el-text>
+          <el-text style="cursor: pointer">忘记密码</el-text>
         </div>
         <el-button type="primary" @click="handleLogin">登录</el-button>
         <div class="row" style="justify-content: flex-end">
-          <el-text>注册账户</el-text>
+          <el-text @click="jumpRegister" style="cursor: pointer">注册账户</el-text>
         </div>
       </div>
     </div>
