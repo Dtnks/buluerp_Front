@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="information-card">
         <a-card>
             <a-card-meta :title='title'></a-card-meta>
             <a-divider></a-divider>
@@ -20,4 +20,8 @@ defineProps({
 })
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.information-card {
+    margin: 10px;
+}
+</style>
