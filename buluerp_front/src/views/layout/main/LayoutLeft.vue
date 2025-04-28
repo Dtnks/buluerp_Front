@@ -8,22 +8,26 @@ import BusinessShow from '@/views/business/main/Show.vue'
 import BusinessQuery from '@/views/business/main/Query.vue'
 import ProQuery from '@/views/production/main/Query.vue'
 import ProMaterial from '@/views/production/main/Material.vue'
-import Admin from '@/views/admin/index.vue'
+import Admin from '@/views/admin/Admin.vue'
+import PMInventoryList from '@/views/PMcenter/inventory/main/List.vue'
+import PMInventoryQuery from '@/views/PMcenter/inventory/main/Query.vue'
+import PMProcurementQuery from '@/views/PMcenter/procurement/main/List.vue'
+import PMProcurementPlan from '@/views/PMcenter/procurement/main/Plan.vue'
 </script>
 <template>
   <el-menu
     id="layout"
-    active-text-color="#fff"
     :collapse="isCollapse"
     background-color="rgba(0, 21, 41, 1)"
     class="el-menu-vertical-demo"
     text-color="#fff"
+    :collapse-transition="false"
   >
     <div class="row back">
       <img id="logo" src="@/assets/img/logo.png" />
-      <div style="color: white; font-size: 25px; white-space: nowrap; overflow: hidden">布鲁科</div>
+      <div style="color: white; font-size: 25px; white-space: nowrap">布鲁科</div>
     </div>
-    <el-menu-item @click="addTab('授权管理', Admin)">
+    <el-menu-item index="0" @click="addTab('授权管理', Admin)">
       <el-icon><img src="@/assets/icon/u21.png" class="icon" /></el-icon>
       <span>授权管理</span>
     </el-menu-item>
@@ -31,26 +35,26 @@ import Admin from '@/views/admin/index.vue'
       <template #title
         ><el-icon><User /></el-icon> <span>用户中心</span></template
       >
-      <el-menu-item @click="addTab('我的信息', UserInformation)">我的信息</el-menu-item>
-      <el-menu-item @click="addTab('客户信息', CustomQuery)">客户查询</el-menu-item>
-      <el-menu-item @click="addTab('厂商信息', Manufacturers)">厂商查询</el-menu-item>
+      <el-menu-item index="1-1" @click="addTab('我的信息', UserInformation)">我的信息</el-menu-item>
+      <el-menu-item index="1-2" @click="addTab('客户信息', CustomQuery)">客户查询</el-menu-item>
+      <el-menu-item index="1-3" @click="addTab('厂商信息', Manufacturers)">厂商查询</el-menu-item>
     </el-sub-menu>
     <el-sub-menu index="2">
       <template #title>
         <el-icon><img src="@/assets/icon/u9.png" class="icon" /></el-icon>
         <span>业务中心</span>
       </template>
-      <el-menu-item @click="addTab('订单查询', BusinessQuery)">订单查询</el-menu-item>
-      <el-menu-item @click="addTab('订单看板', BusinessShow)">看板</el-menu-item>
+      <el-menu-item index="2-1" @click="addTab('订单查询', BusinessQuery)">订单查询</el-menu-item>
+      <el-menu-item index="2-2" @click="addTab('订单看板', BusinessShow)">看板</el-menu-item>
     </el-sub-menu>
 
-    <el-sub-menu>
+    <el-sub-menu index="3">
       <template #title
         ><el-icon><img src="@/assets/icon/u25.png" class="icon" /></el-icon>
         <span>产品中心</span></template
       >
-      <el-menu-item @click="addTab('产品订单', ProQuery)">产品查询</el-menu-item>
-      <el-menu-item @click="addTab('物料资料表', ProMaterial)">物料资料表</el-menu-item>
+      <el-menu-item index="3-1" @click="addTab('产品订单', ProQuery)">产品查询</el-menu-item>
+      <el-menu-item index="3-2" @click="addTab('物料资料表', ProMaterial)">物料资料表</el-menu-item>
     </el-sub-menu>
     <el-sub-menu index="4">
       <template #title
@@ -59,19 +63,27 @@ import Admin from '@/views/admin/index.vue'
       >
       <el-sub-menu index="4-1">
         <template #title><span>采购</span></template>
-        <el-menu-item index="4-1-1">采购计划</el-menu-item>
-        <el-menu-item index="4-1-2">采购单</el-menu-item>
+        <el-menu-item index="4-1-1" @click="addTab('采购计划', PMProcurementPlan)"
+          >采购计划</el-menu-item
+        >
+        <el-menu-item index="4-1-2" @click="addTab('采购单', PMProcurementQuery)"
+          >采购单</el-menu-item
+        >
       </el-sub-menu>
       <el-sub-menu index="4-2">
         <template #title><span>库存</span></template>
-        <el-menu-item index="4-2-1">出入库单</el-menu-item>
-        <el-menu-item index="4-2-2">库存查询</el-menu-item>
+        <el-menu-item index="4-2-1" @click="addTab('出入库存', PMInventoryList)"
+          >出入库单</el-menu-item
+        >
+        <el-menu-item index="4-2-2" @click="addTab('库存查询', PMInventoryQuery)"
+          >库存查询</el-menu-item
+        >
       </el-sub-menu>
       <el-sub-menu index="4-3">
         <template #title><span>生产</span></template>
         <el-menu-item index="4-3-1">布包表</el-menu-item>
         <el-menu-item index="4-3-2">分包表</el-menu-item>
-        <el-menu-item index="4-3-2">排产表</el-menu-item>
+        <el-menu-item index="4-3-3">排产表</el-menu-item>
       </el-sub-menu>
     </el-sub-menu>
   </el-menu>
@@ -80,6 +92,7 @@ import Admin from '@/views/admin/index.vue'
 #layout {
   height: 100vh;
   overflow-y: scroll;
+  scrollbar-width: none;
 }
 .el-menu-item:hover {
   outline: 0 !important;
@@ -107,7 +120,7 @@ import Admin from '@/views/admin/index.vue'
   margin: 6px 15px 6px 15px;
 }
 .el-menu--collapse {
-  width: 80px !important;
+  width: 70px !important;
 }
 .el-menu-item.is-active {
   background-color: inherit !important;
