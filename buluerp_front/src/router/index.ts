@@ -8,42 +8,98 @@ const router = createRouter({
       component: () => import('@/views/layout/index.vue'),
       children: [
         {
-          path: '/orders',
-          component: () => import('@/views/orders/index.vue'),
-          children: [
-            {
-              path: '/orders/detail',
-              component: () => import('@/views/orders/main/Detail.vue'),
-            },
-            {
-              path: '/orders/customQuery',
-              component: () => import('@/views/orders/main/CustomQuery.vue'),
-            },
-            {
-              path: '/orders/show',
-              component: () => import('@/views/orders/main/Show.vue'),
-            },
-            {
-              path: '/orders/ProdQuery',
-              component: () => import('@/views/orders/main/ProdQuery.vue'),
-            },
-          ],
+          path: '/admin',
+          component: () => import('@/views/admin/index.vue'),
         },
         {
           path: '/personCenter',
           component: () => import('@/views/person/index.vue'),
-        },
-        {
-          path: '/admin',
-          component: () => import('@/views/admin/index.vue'),
           children: [
             {
-              path: '/admin/manage',
-              component: () => import('@/views/admin/main/Manage.vue'),
+              path: '/personCenter/information',
+              component: () => import('@/views/person/main/Information.vue'),
             },
             {
-              path: '/admin/authorization',
-              component: () => import('@/views/admin/main/Authorization.vue'),
+              path: '/personCenter/custom',
+              component: () => import('@/views/person/main/Custom.vue'),
+            },
+            {
+              path: '/personCenter/manufacturers',
+              component: () => import('@/views/person/main/Manufacturers.vue'),
+            },
+          ],
+        },
+        {
+          path: '/business',
+          component: () => import('@/views/business/index.vue'),
+          children: [
+            {
+              path: '/business/detail',
+              component: () => import('@/views/business/main/Detail.vue'),
+            },
+            {
+              path: '/business/query',
+              component: () => import('@/views/business/main/Query.vue'),
+            },
+            {
+              path: '/business/show',
+              component: () => import('@/views/business/main/Show.vue'),
+            },
+          ],
+        },
+        {
+          path: '/production',
+          component: () => import('@/views/production/index.vue'),
+          children: [
+            {
+              path: '/production/detail',
+              component: () => import('@/views/production/main/Detail.vue'),
+            },
+            {
+              path: '/production/query',
+              component: () => import('@/views/production/main/Query.vue'),
+            },
+            {
+              path: '/production/material',
+              component: () => import('@/views/production/main/Material.vue'),
+            },
+          ],
+        },
+        {
+          path: '/PMcenter',
+          component: () => import('@/views/PMcenter/index.vue'),
+          children: [
+            {
+              path: '/PMcenter/inventory',
+              component: () => import('@/views/PMcenter/inventory/index.vue'),
+              children: [
+                {
+                  path: '/PMcenter/inventory/query',
+                  component: () => import('@/views/PMcenter/inventory/main/Query.vue'),
+                },
+                {
+                  path: '/PMcenter/inventory/list',
+                  component: () => import('@/views/PMcenter/inventory/main/List.vue'),
+                },
+              ],
+            },
+            {
+              path: '/PMcenter/procurement',
+              component: () => import('@/views/PMcenter/procurement/index.vue'),
+              children: [
+                {
+                  path: '/PMcenter/procurement/plan',
+                  component: () => import('@/views/PMcenter/procurement/main/Plan.vue'),
+                },
+                {
+                  path: '/PMcenter/procurement/list',
+                  component: () => import('@/views/PMcenter/procurement/main/List.vue'),
+                },
+              ],
+            },
+            {
+              path: '/PMcenter/produce',
+              component: () => import('@/views/PMcenter/produce/index.vue'),
             },
           ],
         },
@@ -52,10 +108,6 @@ const router = createRouter({
     {
       path: '/login',
       component: () => import('@/views/login/index.vue'),
-    },
-    {
-      path: '/register',
-      component: () => import('@/views/register/index.vue'),
     },
     {
       redirect: '/login',
