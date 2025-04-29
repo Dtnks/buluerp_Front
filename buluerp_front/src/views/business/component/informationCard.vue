@@ -1,19 +1,20 @@
 <template>
     <div class="information-card">
-        <a-card>
-            <a-card-meta :title='title'></a-card-meta>
-            <a-divider></a-divider>
+        <el-card>
+            <div>
+                <h3>{{ title }}</h3>
+            </div>
+            <el-divider></el-divider>
             <div class="card-content">
                 <slot></slot>
             </div>
-        </a-card>
+        </el-card>
     </div>
 </template>
 
 <script setup lang="ts">
 import { reactive } from 'vue'
-import { Card, Divider } from 'ant-design-vue';
-import { useRoute } from 'vue-router'
+import { ElCard, ElDivider } from 'element-plus'
 
 defineProps({
     title: { type: String, }
