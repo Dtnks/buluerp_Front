@@ -1,20 +1,14 @@
 <script setup lang="ts">
-const props = defineProps({ isCollapse: { type: Boolean } })
+const props = defineProps({ isCollapse: { type: Boolean }, addTab: { type: Function } })
 import { User } from '@element-plus/icons-vue'
-import { useRouter } from 'vue-router'
-import { ref } from 'vue'
-const router = useRouter()
-const activeIndex = ref('1')
-const path = router.currentRoute.value.fullPath
-if (path == '/orders/query' || path == '/orders/detail') {
-  activeIndex.value = '1-1'
-} else if (path == '/orders/show') {
-  activeIndex.value = '1-2'
-} else if (path == '/production/query' || path == '/production/detail') {
-  activeIndex.value = '2-1'
-} else if (path == '/personCenter') {
-  activeIndex.value = '0'
-}
+import UserInformation from '@/views/person/main/Information.vue'
+import CustomQuery from '@/views/person/main/Custom.vue'
+import Manufacturers from '@/views/person/main/Manufacturers.vue'
+import BusinessShow from '@/views/business/main/Show.vue'
+import BusinessQuery from '@/views/business/main/Query.vue'
+import ProQuery from '@/views/production/main/Query.vue'
+import ProMaterial from '@/views/production/main/Material.vue'
+import Admin from '@/views/admin/index.vue'
 </script>
 <template>
   <el-menu
@@ -23,15 +17,13 @@ if (path == '/orders/query' || path == '/orders/detail') {
     :collapse="isCollapse"
     background-color="rgba(0, 21, 41, 1)"
     class="el-menu-vertical-demo"
-    :default-active="activeIndex"
     text-color="#fff"
-    router
   >
     <div class="row back">
       <img id="logo" src="@/assets/img/logo.png" />
       <div style="color: white; font-size: 25px; white-space: nowrap; overflow: hidden">布鲁科</div>
     </div>
-    <el-menu-item index="0" route="/admin">
+    <el-menu-item @click="addTab('授权管理', Admin)">
       <el-icon><img src="@/assets/icon/u21.png" class="icon" /></el-icon>
       <span>授权管理</span>
     </el-menu-item>
@@ -39,26 +31,26 @@ if (path == '/orders/query' || path == '/orders/detail') {
       <template #title
         ><el-icon><User /></el-icon> <span>用户中心</span></template
       >
-      <el-menu-item index="1-1" route="/personCenter/information">我的信息</el-menu-item>
-      <el-menu-item index="1-2" route="/personCenter/custom">客户查询</el-menu-item>
-      <el-menu-item index="1-3" route="/personCenter/manufacturers">厂商查询</el-menu-item>
+      <el-menu-item @click="addTab('我的信息', UserInformation)">我的信息</el-menu-item>
+      <el-menu-item @click="addTab('客户信息', CustomQuery)">客户查询</el-menu-item>
+      <el-menu-item @click="addTab('厂商信息', Manufacturers)">厂商查询</el-menu-item>
     </el-sub-menu>
     <el-sub-menu index="2">
       <template #title>
         <el-icon><img src="@/assets/icon/u9.png" class="icon" /></el-icon>
         <span>业务中心</span>
       </template>
-      <el-menu-item index="2-1" route="/business/query">订单查询</el-menu-item>
-      <el-menu-item index="2-2" route="/business/show">看板</el-menu-item>
+      <el-menu-item @click="addTab('订单查询', BusinessQuery)">订单查询</el-menu-item>
+      <el-menu-item @click="addTab('订单看板', BusinessShow)">看板</el-menu-item>
     </el-sub-menu>
 
-    <el-sub-menu index="3">
+    <el-sub-menu>
       <template #title
         ><el-icon><img src="@/assets/icon/u25.png" class="icon" /></el-icon>
         <span>产品中心</span></template
       >
-      <el-menu-item index="3-1" route="/production/query">产品查询</el-menu-item>
-      <el-menu-item index="3-2" route="/production/material">物料资料表</el-menu-item>
+      <el-menu-item @click="addTab('产品订单', ProQuery)">产品查询</el-menu-item>
+      <el-menu-item @click="addTab('物料资料表', ProMaterial)">物料资料表</el-menu-item>
     </el-sub-menu>
     <el-sub-menu index="4">
       <template #title
@@ -67,19 +59,19 @@ if (path == '/orders/query' || path == '/orders/detail') {
       >
       <el-sub-menu index="4-1">
         <template #title><span>采购</span></template>
-        <el-menu-item index="4-1-1" route="/PMcenter/procurement/plan">采购计划</el-menu-item>
-        <el-menu-item index="4-1-2" route="/PMcenter/procurement/list">采购单</el-menu-item>
+        <el-menu-item index="4-1-1">采购计划</el-menu-item>
+        <el-menu-item index="4-1-2">采购单</el-menu-item>
       </el-sub-menu>
       <el-sub-menu index="4-2">
         <template #title><span>库存</span></template>
-        <el-menu-item index="4-2-1" route="/PMcenter/inventory/list">出入库单</el-menu-item>
-        <el-menu-item index="4-2-2" route="/PMcenter/inventory/query">库存查询</el-menu-item>
+        <el-menu-item index="4-2-1">出入库单</el-menu-item>
+        <el-menu-item index="4-2-2">库存查询</el-menu-item>
       </el-sub-menu>
       <el-sub-menu index="4-3">
         <template #title><span>生产</span></template>
-        <el-menu-item index="4-3-1" route="/PMcenter/produce">布包表</el-menu-item>
-        <el-menu-item index="4-3-2" route="/PMcenter/produce">分包表</el-menu-item>
-        <el-menu-item index="4-3-2" route="/PMcenter/produce">排产表</el-menu-item>
+        <el-menu-item index="4-3-1">布包表</el-menu-item>
+        <el-menu-item index="4-3-2">分包表</el-menu-item>
+        <el-menu-item index="4-3-2">排产表</el-menu-item>
       </el-sub-menu>
     </el-sub-menu>
   </el-menu>
@@ -116,5 +108,9 @@ if (path == '/orders/query' || path == '/orders/detail') {
 }
 .el-menu--collapse {
   width: 80px !important;
+}
+.el-menu-item.is-active {
+  background-color: inherit !important;
+  border-bottom-color: transparent;
 }
 </style>

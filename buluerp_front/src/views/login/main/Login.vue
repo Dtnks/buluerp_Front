@@ -6,7 +6,7 @@ const autoLogin = ref()
 const router = useRouter()
 const handleLogin = () => {
   router.push({
-    path: '/personCenter/information',
+    path: '/main',
   })
 }
 </script>

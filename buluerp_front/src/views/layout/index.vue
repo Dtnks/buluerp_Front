@@ -3,6 +3,40 @@ import { RouterView } from 'vue-router'
 import LayoutLeft from '@/views/layout/main/LayoutLeft.vue'
 import LayoutTop from '@/views/layout/main/LayoutTop.vue'
 import { ref } from 'vue'
+import type { TabPaneName } from 'element-plus'
+import Show from '../business/main/Show.vue'
+const tabIndex = 0
+const editableTabsValue = ref('订单看板')
+const editableTabs = ref([])
+
+const addTab = (targetName: string, component) => {
+  if (editableTabs.value.filter((item) => item.title == targetName).length > 0) {
+    editableTabsValue.value = targetName
+    return
+  }
+  editableTabs.value.push({
+    title: targetName,
+    name: targetName,
+    component: component,
+  })
+  editableTabsValue.value = targetName
+}
+const removeTab = (targetName: TabPaneName) => {
+  const tabs = editableTabs.value
+  let activeName = editableTabsValue.value
+  if (activeName === targetName) {
+    tabs.forEach((tab, index) => {
+      if (tab.name === targetName) {
+        const nextTab = tabs[index + 1] || tabs[index - 1]
+        if (nextTab) {
+          activeName = nextTab.name
+        }
+      }
+    })
+  }
+  editableTabsValue.value = activeName
+  editableTabs.value = tabs.filter((tab) => tab.name !== targetName)
+}
 const isCollapse = ref(false)
 const handleHiddenMenu = () => {
   isCollapse.value = !isCollapse.value
@@ -10,10 +44,27 @@ const handleHiddenMenu = () => {
 </script>
 <template>
   <div class="row">
-    <LayoutLeft :isCollapse="isCollapse" />
+    <LayoutLeft :isCollapse="isCollapse" :addTab="addTab" />
     <div class="col" style="flex: 1; height: 100vh; overflow-y: scroll">
       <LayoutTop :handleHiddenMenu="handleHiddenMenu"></LayoutTop>
-      <RouterView />
+      <el-tabs
+        v-model="editableTabsValue"
+        type="card"
+        class="demo-tabs"
+        closable
+        @tab-remove="removeTab"
+      >
+        <el-tab-pane
+          v-for="item in editableTabs"
+          :key="item.name"
+          :label="item.title"
+          :name="item.name"
+        >
+          <KeepAlive>
+            <component :is="item.component" :addTab="addTab"></component>
+          </KeepAlive>
+        </el-tab-pane>
+      </el-tabs>
     </div>
   </div>
 </template>
