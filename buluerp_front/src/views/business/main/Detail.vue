@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import BordShow from '@/components/board/SecBoard.vue'
-import informationCard from '../component/informationCard.vue';
-import { reactive } from 'vue';
+import informationCard from '../component/informationCard.vue'
 </script>
 
 <template>
   <div class="col">
     <BordShow content="业务订单详情页" path="业务中心/详情" />
-    <div style="flex: 1; background-color: rgba(240, 242, 245, 1) ; padding: 20px 40px 0 40px;">
+    <div style="flex: 1; background-color: rgba(240, 242, 245, 1); padding: 20px 40px 0 40px">
       <informationCard title="业务订单基本信息">
         <a-row gutter="16" class="information-row">
           <!-- 订单ID -->
@@ -17,7 +16,6 @@ import { reactive } from 'vue';
               <div>1234567890000000</div>
             </div>
           </a-col>
-
           <!-- 创建日期 -->
           <a-col :span="6">
             <div class="field">
@@ -35,7 +33,7 @@ import { reactive } from 'vue';
           </a-col>
         </a-row>
 
-        <a-row gutter="16" style="margin: 46px 0 16px 0;" class="information-row">
+        <a-row gutter="16" style="margin: 46px 0 16px 0" class="information-row">
           <!-- 客户姓名 -->
           <a-col :span="6">
             <div class="field">
@@ -56,7 +54,7 @@ import { reactive } from 'vue';
           <a-col :span="6">
             <div class="field">
               <label>其他基本信息</label>
-              <a-select placeholder="请选择" style="width: 100%;">
+              <a-select placeholder="请选择" style="width: 100%">
                 <a-select-option value="1">选项1</a-select-option>
                 <a-select-option value="2">选项2</a-select-option>
               </a-select>
@@ -77,19 +75,15 @@ import { reactive } from 'vue';
           <div>内容</div>
         </template>
       </informationCard>
-
     </div>
-
   </div>
 </template>
 
 <style scoped lang="less">
 .information-row {
-
   padding-left: 4px;
 
   * {
-
     margin-right: 11px;
   }
 }
