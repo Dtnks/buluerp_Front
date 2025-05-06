@@ -2,12 +2,21 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Iphone, Lock } from '@element-plus/icons-vue'
+import {Login} from "@/apis/login.js"
+import { ElMessage } from 'element-plus'
 const autoLogin = ref()
+let account=ref()
+let password=ref()
 const router = useRouter()
 const handleLogin = () => {
-  router.push({
+  Login({username:account.value,password:password.value}).then((res)=>{
+    router.push({
     path: '/main',
   })
+  localStorage.setItem("token", res.data.data.token);
+    ElMessage({type:'success',message:"登录成功"})
+  })
+  
 }
 </script>
 <template>
@@ -18,11 +27,11 @@ const handleLogin = () => {
         <div style="font-size: 45px; margin-bottom: 3vh">欢迎</div>
         <el-text style="border-bottom: 2px solid #1991ff; padding: 1.5vh">账号密码登录</el-text>
         <div style="height: 3vh"></div>
-        <el-input placeholder="手机号"
+        <el-input placeholder="帐号" v-model="account"
           ><template #prefix>
             <el-icon class="el-input__icon"><Iphone /></el-icon> </template
         ></el-input>
-        <el-input placeholder="密码"
+        <el-input placeholder="密码" v-model="password"
           ><template #prefix>
             <el-icon class="el-input__icon"><Lock /></el-icon> </template
         ></el-input>
