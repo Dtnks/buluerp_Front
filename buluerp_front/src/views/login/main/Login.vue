@@ -14,7 +14,7 @@ const handleLogin = () => {
     router.push({
       path: '/main',
     })
-    localStorage.setItem('token', res.data.data.token)
+    localStorage.setItem('Authorization', res.data.token)
     ElMessage({ type: 'success', message: '登录成功' })
   })
 }
@@ -31,7 +31,7 @@ const handleLogin = () => {
           ><template #prefix>
             <el-icon class="el-input__icon"><Iphone /></el-icon> </template
         ></el-input>
-        <el-input placeholder="密码" v-model="password"
+        <el-input placeholder="密码" v-model="password" type="password"
           ><template #prefix>
             <el-icon class="el-input__icon"><Lock /></el-icon> </template
         ></el-input>

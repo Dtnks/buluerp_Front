@@ -9,7 +9,7 @@ const tabIndex = 0
 const editableTabsValue = ref('订单看板')
 const editableTabs = ref([])
 
-const addTab = (targetName: string, component) => {
+const addTab = (targetName: string, component, data = null) => {
   if (editableTabs.value.filter((item) => item.title == targetName).length > 0) {
     editableTabsValue.value = targetName
     return
@@ -18,6 +18,7 @@ const addTab = (targetName: string, component) => {
     title: targetName,
     name: targetName,
     component: component,
+    data: data,
   })
   editableTabsValue.value = targetName
 }
@@ -61,7 +62,7 @@ const handleHiddenMenu = () => {
           :name="item.name"
         >
           <KeepAlive>
-            <component :is="item.component" :addTab="addTab"></component>
+            <component :is="item.component" :addTab="addTab" :data="data"></component>
           </KeepAlive>
         </el-tab-pane>
       </el-tabs>

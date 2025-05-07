@@ -1,8 +1,17 @@
 import httpInstance from '@/utils/httpsInstance.js'
-let headers={token:localStorage.getItem('token')}
-export function getUnCheckArticleList() {
+let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
+// export function getPostList() {
+//   console.log(headers)
+//   return httpInstance({
+//     url: `system/post/optionselect`,
+//     method: 'get',
+//     headers: headers,
+//   })
+// }
+
+export function getRoleList() {
   return httpInstance({
-    url: `dev-api/test/user/list`,
+    url: `system/role/optionselect`,
     method: 'get',
     headers: headers,
   })
