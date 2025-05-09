@@ -9,9 +9,34 @@ let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
 //   })
 // }
 
-export function getRoleList() {
+// export function getRoleList() {
+//   return httpInstance({
+//     url: `system/role/optionselect`,
+//     method: 'get',
+//     headers: headers,
+//   })
+// }
+
+export function getOptionselect() {
   return httpInstance({
-    url: `system/role/optionselect`,
+    url: `system/role/list`,
+    method: 'get',
+    headers: headers,
+  })
+}
+
+export function newUser(data) {
+  return httpInstance({
+    url: `system/user`,
+    method: 'post',
+    headers: headers,
+    data: data,
+  })
+}
+
+export function getUserList(page) {
+  return httpInstance({
+    url: `system/user/list?pageNum=${page}&pageSize=8`,
     method: 'get',
     headers: headers,
   })
