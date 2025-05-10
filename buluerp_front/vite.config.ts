@@ -12,17 +12,25 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     AutoImport({
-      resolvers: [ElementPlusResolver(),
-      ],
+      resolvers: [ElementPlusResolver()],
     }),
     Components({
-      resolvers: [ElementPlusResolver(),
-      ],
+      resolvers: [ElementPlusResolver()],
     }),
   ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
+  server: {
+    proxy: {
+      '/dev-api': {
+        // target: 'http://localhost:8080', // 目标服务器的地址
+        target: 'http://154.201.77.135:8080',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/dev-api/, ''),
+      },
     },
   },
 })
