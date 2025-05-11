@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import BordShow from '@/components/board/SecBoard.vue'
 import informationCard from '../component/informationCard.vue'
+
+defineProps({
+  data: {
+    type: Object,
+
+  },
+
+})
 </script>
 
 <template>
@@ -13,7 +21,7 @@ import informationCard from '../component/informationCard.vue'
           <a-col :span="6">
             <div class="field">
               <label>订单ID</label>
-              <div>1234567890000000</div>
+              <div>{{ data.innerId }}</div>
             </div>
           </a-col>
           <!-- 创建日期 -->

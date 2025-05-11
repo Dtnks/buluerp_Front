@@ -5,11 +5,8 @@
       <div class="query-container">
         <el-card class="form-container">
           <QueryForm></QueryForm>
-          <QueryTable></QueryTable>
-
-
+          <QueryTable :addTab="addTab"></QueryTable>
         </el-card>
-
       </div>
     </el-config-provider>
   </div>
@@ -26,7 +23,9 @@ import BordShow from '@/components/board/SecBoard.vue';
 import QueryForm from '../component/queryForm.vue';
 import QueryTable from '../component/queryTable.vue';
 
-
+defineProps({
+  addTab: Function,
+});
 
 </script>
 
