@@ -41,3 +41,12 @@ export function getUserList(page) {
     headers: headers,
   })
 }
+
+export function changeStatus(data) {
+  return httpInstance({
+    url: `system/user/changeStatus`,
+    method: 'put',
+    headers: headers,
+    data: data,
+  })
+}

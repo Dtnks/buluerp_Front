@@ -40,7 +40,12 @@ const handleSubmit = () => {
   newUser(newSubmit.value).then((res) => {
     console.log(res)
     newDialogVisible.value = false
-    ElMessage({ type: 'success', message: '新增用户成功' })
+    if (res.data.code == 500) {
+      ElMessage({ type: 'error', message: '用户已存在' })
+    } else {
+      ElMessage({ type: 'success', message: '新增用户成功' })
+      setPage(1)
+    }
   })
 }
 interface User {

@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { changeStatus } from '@/apis/admin.js'
+import { messageBox } from '@/components/message/messageBox.js'
+import { ElMessage } from 'element-plus'
 defineProps(['tableData', 'total', 'setPage'])
 import { ref } from 'vue'
 const editPerson = ref({
@@ -10,8 +13,21 @@ const handleRole = (row) => {
   editPerson.value = row
   DialogVisible.value = true
 }
-const handleDelete = (index: number, row: User) => {
-  console.log(index, row)
+const handleDelete = (row) => {
+  const submitChange = { ...row }
+
+  const func = () => {
+    submitChange.status = 1
+    return changeStatus(submitChange).then((res) => {
+      console.log(res)
+      if (res.data.code == 500) {
+        throw new Error('权限不足')
+      } else {
+        row.status = '离职'
+      }
+    })
+  }
+  messageBox('warning', func, '用户成功离职', '用户权限不足', '确认离职该用户吗?')
 }
 
 const currentPage = ref(1)
@@ -57,7 +73,12 @@ const currentPage = ref(1)
       <el-table-column label="操作">
         <template #default="scope">
           <el-button size="small" @click="handleRole(scope.row)"> 授权 </el-button>
-          <el-button size="small" type="danger" @click="handleDelete(scope.row.userId)">
+          <el-button
+            size="small"
+            type="danger"
+            @click="handleDelete(scope.row)"
+            v-if="scope.row.status == '生效'"
+          >
             离职失效
           </el-button>
         </template>
