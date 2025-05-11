@@ -5,6 +5,10 @@ import LayoutTop from '@/views/layout/main/LayoutTop.vue'
 import { ref } from 'vue'
 import type { TabPaneName } from 'element-plus'
 import Show from '../business/main/Show.vue'
+import BusinessQuery from '../business/main/Query.vue'
+import queryTable from '../business/component/queryTable.vue'
+import QueryTable from '../business/component/queryTable.vue'
+
 const tabIndex = 0
 const editableTabsValue = ref('订单看板')
 const editableTabs = ref([])
@@ -67,5 +71,8 @@ const handleHiddenMenu = () => {
         </el-tab-pane>
       </el-tabs>
     </div>
+    <template >
+      <BusinessQuery :addTab="addTab" />
+    </template>
   </div>
 </template>
