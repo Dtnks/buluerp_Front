@@ -66,7 +66,7 @@ const handleHiddenMenu = () => {
           :name="item.name"
         >
           <KeepAlive>
-            <component :is="item.component" :addTab="addTab" :data="data"></component>
+            <component :is="item.component" :addTab="addTab" :data="item.data"></component>
           </KeepAlive>
         </el-tab-pane>
       </el-tabs>
