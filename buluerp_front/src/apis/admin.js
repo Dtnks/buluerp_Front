@@ -36,7 +36,7 @@ export function newUser(data) {
 
 export function getUserList(page) {
   return httpInstance({
-    url: `system/user/list?pageNum=${page}&pageSize=8`,
+    url: `system/user/urlist?pageNum=${page}&pageSize=8`,
     method: 'get',
     headers: headers,
   })
@@ -45,6 +45,24 @@ export function getUserList(page) {
 export function changeStatus(data) {
   return httpInstance({
     url: `system/user/changeStatus`,
+    method: 'put',
+    headers: headers,
+    data: data,
+  })
+}
+
+export function changeRoles(data) {
+  return httpInstance({
+    url: `system/user/authRole`,
+    method: 'put',
+    headers: headers,
+    data: data,
+  })
+}
+
+export function resetPassword(data) {
+  return httpInstance({
+    url: `system/user/resetPwd`,
     method: 'put',
     headers: headers,
     data: data,

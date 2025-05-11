@@ -1,21 +1,29 @@
 <script lang="ts" setup>
-import { changeStatus } from '@/apis/admin.js'
+import { changeStatus, changeRoles } from '@/apis/admin.js'
 import { messageBox } from '@/components/message/messageBox.js'
-import { ElMessage } from 'element-plus'
-defineProps(['tableData', 'total', 'setPage'])
+defineProps(['tableData', 'total', 'setPage', 'options'])
 import { ref } from 'vue'
 const editPerson = ref({
   userName: null,
   phonenumber: null,
+  userId: null,
+  roleIds: [],
 })
 const DialogVisible = ref(false)
 const handleRole = (row) => {
-  editPerson.value = row
+  editPerson.value = { ...row }
   DialogVisible.value = true
+}
+const submitRole = () => {
+  changeRoles({ userId: editPerson.value.userId, roleIds: editPerson.value.roleIds[0] }).then(
+    (res) => {
+      console.log({ userId: editPerson.value.userId, roleIds: editPerson.value.roleIds })
+      console.log(res)
+    },
+  )
 }
 const handleDelete = (row) => {
   const submitChange = { ...row }
-
   const func = () => {
     submitChange.status = 1
     return changeStatus(submitChange).then((res) => {
@@ -29,8 +37,6 @@ const handleDelete = (row) => {
   }
   messageBox('warning', func, '用户成功离职', '用户权限不足', '确认离职该用户吗?')
 }
-
-const currentPage = ref(1)
 </script>
 <template>
   <div>
@@ -59,7 +65,9 @@ const currentPage = ref(1)
       <el-table-column label="角色" width="180">
         <template #default="scope">
           <div style="display: flex; align-items: center">
-            <span style="margin-left: 10px">{{ scope.row.remark }}</span>
+            <el-tag style="margin-left: 10px" v-for="roleTag in scope.row.roleNames">{{
+              roleTag
+            }}</el-tag>
           </div>
         </template>
       </el-table-column>
@@ -72,7 +80,9 @@ const currentPage = ref(1)
       </el-table-column>
       <el-table-column label="操作">
         <template #default="scope">
-          <el-button size="small" @click="handleRole(scope.row)"> 授权 </el-button>
+          <el-button size="small" @click="handleRole(scope.row)" v-if="scope.row.status == '生效'">
+            授权
+          </el-button>
           <el-button
             size="small"
             type="danger"
@@ -84,27 +94,43 @@ const currentPage = ref(1)
         </template>
       </el-table-column>
     </el-table>
-    <div style="right: 40px; bottom: 20px">
-      <el-pagination
-        v-model:current-page="currentPage"
-        background
-        layout="prev, pager, next"
-        :total="total"
-        :page-size="8"
-        @prev-click="setPage(currentPage)"
-        @current-change="setPage(currentPage)"
-        @next-click="setPage(currentPage)"
-      />
-    </div>
-    <div style="height: 50px"></div>
+
     <el-dialog v-model="DialogVisible" title="系统账号授权" width="500" center>
-      <div>姓名:{{ editPerson.userName }}</div>
-      <div>账号:{{ editPerson.phonenumber }}</div>
+      <div style="margin: 20px 10px">姓名 : {{ editPerson.userName }}</div>
+      <div style="margin: 20px 10px">账号 : {{ editPerson.phonenumber }}</div>
+      <div style="margin: 20px 10px">
+        角色 :
+        <el-select
+          v-model="editPerson.roleIds"
+          multiple
+          collapse-tags
+          collapse-tags-tooltip
+          :max-collapse-tags="2"
+          placeholder="Select"
+          style="width: 280px"
+        >
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </div>
 
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary"> 确认 </el-button>
-          <el-button type="info"> 取消 </el-button>
+          <el-button type="primary" @click="submitRole"> 确认 </el-button>
+          <el-button
+            type="info"
+            @click="
+              () => {
+                DialogVisible = false
+              }
+            "
+          >
+            取消
+          </el-button>
         </div>
       </template>
     </el-dialog>

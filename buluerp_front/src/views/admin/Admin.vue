@@ -1,24 +1,27 @@
 <script setup lang="ts">
 import BordShow from '@/components/board/SecBoard.vue'
-import { getOptionselect, newUser, getUserList } from '@/apis/admin.js'
+import { getOptionselect, newUser, getUserList, resetPassword } from '@/apis/admin.js'
 import Table from './component/Table.vue'
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { toValidArray } from 'element-plus/es/components/tree-select/src/utils.mjs'
 const options = ref({})
 const role = ref()
-
+const currentPage = ref(1)
 const total = ref()
 const setPage = (pageNum) => {
   getUserList(pageNum).then((res) => {
     console.log(res)
-    tableData.value = res.data.rows.map(({ userId, phonenumber, userName, remark, status }) => ({
-      userId,
-      phonenumber,
-      userName,
-      remark,
-      status: status === '0' ? '生效' : '离职',
-    }))
+    tableData.value = res.data.rows.map(
+      ({ userId, phonenumber, userName, roleNames, status, roleIds }) => ({
+        userId,
+        phonenumber,
+        userName,
+        roleNames,
+        roleIds,
+        status: status === '0' ? '生效' : '离职',
+      }),
+    )
     total.value = res.data.total
   })
 }
@@ -33,7 +36,15 @@ const newSubmit = ref({
   roleIds: null,
   phonenumber: null,
 })
-
+const resetSubmit = () => {
+  newSubmit.value = {
+    userName: null,
+    nickName: null,
+    password: null,
+    roleIds: null,
+    phonenumber: null,
+  }
+}
 const handleSubmit = () => {
   newSubmit.value.nickName = newSubmit.value.phonenumber
   console.log(newSubmit.value)
@@ -44,6 +55,7 @@ const handleSubmit = () => {
       ElMessage({ type: 'error', message: '用户已存在' })
     } else {
       ElMessage({ type: 'success', message: '新增用户成功' })
+      currentPage.value = 1
       setPage(1)
     }
   })
@@ -71,9 +83,9 @@ const resetDialogVisible = ref(false)
             multiple
             collapse-tags
             collapse-tags-tooltip
-            :max-collapse-tags="3"
+            :max-collapse-tags="2"
             placeholder="Select"
-            style="width: 240px"
+            style="width: 280px"
           >
             <el-option
               v-for="item in options"
@@ -91,6 +103,7 @@ const resetDialogVisible = ref(false)
           type="primary"
           @click="
             () => {
+              resetSubmit()
               newDialogVisible = true
             }
           "
@@ -101,6 +114,7 @@ const resetDialogVisible = ref(false)
           type="primary"
           @click="
             () => {
+              resetSubmit()
               resetDialogVisible = true
             }
           "
@@ -125,7 +139,7 @@ const resetDialogVisible = ref(false)
                 multiple
                 collapse-tags
                 collapse-tags-tooltip
-                :max-collapse-tags="3"
+                :max-collapse-tags="2"
                 placeholder="Select"
                 style="width: 240px"
               >
@@ -154,7 +168,21 @@ const resetDialogVisible = ref(false)
             </div>
           </template>
         </el-dialog>
-        <el-dialog v-model="resetDialogVisible" title="系统账号密码重置" width="500" center>
+        <el-dialog
+          v-model="resetDialogVisible"
+          title="系统账号密码重置"
+          width="500"
+          center
+          @click="
+            () => {
+              console.log(222222)
+            }
+          "
+        >
+          <div style="margin: 20px 10px">
+            账号 : <el-input v-model="newSubmit.password" style="width: 240px" />
+          </div>
+          <div style="margin: 20px 10px">姓名 : {{ newSubmit.userName }}</div>
           <template #footer>
             <div class="dialog-footer">
               <el-button type="primary"> 确认 </el-button>
@@ -172,7 +200,20 @@ const resetDialogVisible = ref(false)
           </template>
         </el-dialog>
       </div>
-      <Table :tableData="tableData" :currentPage="currentPage" :total="total" :setPage="setPage" />
+      <Table :tableData="tableData" :options="options" />
+      <div style="right: 40px; bottom: 20px">
+        <el-pagination
+          v-model:current-page="currentPage"
+          background
+          layout="prev, pager, next"
+          :total="total"
+          :page-size="8"
+          @prev-click="setPage(currentPage)"
+          @current-change="setPage(currentPage)"
+          @next-click="setPage(currentPage)"
+        />
+      </div>
+      <div style="height: 50px"></div>
     </el-card>
   </div>
 </template>
