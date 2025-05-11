@@ -31,8 +31,8 @@ defineProps({
 
 <style scoped lang="less">
 .query-container {
-  background-color: rgba(240, 242, 245, 1);
-  padding: 20px;
+  background-color: white;
+  padding: 0 30px 20px 30px;
 
   .form-container {
     background-color: white;
