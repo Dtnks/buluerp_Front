@@ -5,8 +5,8 @@ defineProps(['tableData', 'total', 'setPage', 'options'])
 import { ref } from 'vue'
 const editPerson = ref({
   userName: null,
-  phonenumber: null,
   userId: null,
+  nickName: null,
   roleIds: [],
 })
 const DialogVisible = ref(false)
@@ -15,7 +15,7 @@ const handleRole = (row) => {
   DialogVisible.value = true
 }
 const submitRole = () => {
-  changeRoles({ userId: editPerson.value.userId, roleIds: editPerson.value.roleIds[0] }).then(
+  changeRoles({ userId: editPerson.value.userId, roleIds: editPerson.value.roleIds }).then(
     (res) => {
       console.log({ userId: editPerson.value.userId, roleIds: editPerson.value.roleIds })
       console.log(res)
@@ -28,7 +28,7 @@ const handleDelete = (row) => {
     submitChange.status = 1
     return changeStatus(submitChange).then((res) => {
       console.log(res)
-      if (res.data.code == 500) {
+      if (res.code == 500) {
         throw new Error('权限不足')
       } else {
         row.status = '离职'
@@ -51,14 +51,14 @@ const handleDelete = (row) => {
       <el-table-column label="帐号" width="180">
         <template #default="scope">
           <div style="display: flex; align-items: center">
-            <span style="margin-left: 10px">{{ scope.row.phonenumber }}</span>
+            <span style="margin-left: 10px">{{ scope.row.userName }}</span>
           </div>
         </template>
       </el-table-column>
       <el-table-column label="姓名" width="180">
         <template #default="scope">
           <div style="display: flex; align-items: center">
-            <span style="margin-left: 10px">{{ scope.row.userName }}</span>
+            <span style="margin-left: 10px">{{ scope.row.nickName }}</span>
           </div>
         </template>
       </el-table-column>
@@ -96,8 +96,8 @@ const handleDelete = (row) => {
     </el-table>
 
     <el-dialog v-model="DialogVisible" title="系统账号授权" width="500" center>
-      <div style="margin: 20px 10px">姓名 : {{ editPerson.userName }}</div>
-      <div style="margin: 20px 10px">账号 : {{ editPerson.phonenumber }}</div>
+      <div style="margin: 20px 10px">姓名 : {{ editPerson.nickName }}</div>
+      <div style="margin: 20px 10px">账号 : {{ editPerson.userName }}</div>
       <div style="margin: 20px 10px">
         角色 :
         <el-select

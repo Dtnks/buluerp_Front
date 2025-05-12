@@ -4,7 +4,6 @@ import { getOptionselect, newUser, getUserList, resetPassword } from '@/apis/adm
 import Table from './component/Table.vue'
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { toValidArray } from 'element-plus/es/components/tree-select/src/utils.mjs'
 const options = ref({})
 const role = ref()
 const currentPage = ref(1)
@@ -12,29 +11,28 @@ const total = ref()
 const setPage = (pageNum) => {
   getUserList(pageNum).then((res) => {
     console.log(res)
-    tableData.value = res.data.rows.map(
-      ({ userId, phonenumber, userName, roleNames, status, roleIds }) => ({
+    tableData.value = res.rows.map(
+      ({ userId, userName, nickName, roleNames, status, roleIds }) => ({
         userId,
-        phonenumber,
         userName,
+        nickName,
         roleNames,
         roleIds,
         status: status === '0' ? '生效' : '离职',
       }),
     )
-    total.value = res.data.total
+    total.value = res.total
   })
 }
 setPage(1)
 getOptionselect().then((res) => {
-  options.value = res.data.rows.map(({ roleName, roleId }) => ({ value: roleId, label: roleName }))
+  options.value = res.rows.map(({ roleName, roleId }) => ({ value: roleId, label: roleName }))
 })
 const newSubmit = ref({
   userName: null,
   nickName: null,
   password: null,
   roleIds: null,
-  phonenumber: null,
 })
 const resetSubmit = () => {
   newSubmit.value = {
@@ -42,16 +40,14 @@ const resetSubmit = () => {
     nickName: null,
     password: null,
     roleIds: null,
-    phonenumber: null,
   }
 }
 const handleSubmit = () => {
-  newSubmit.value.nickName = newSubmit.value.phonenumber
   console.log(newSubmit.value)
   newUser(newSubmit.value).then((res) => {
     console.log(res)
     newDialogVisible.value = false
-    if (res.data.code == 500) {
+    if (res.code == 500) {
       ElMessage({ type: 'error', message: '用户已存在' })
     } else {
       ElMessage({ type: 'success', message: '新增用户成功' })
@@ -60,12 +56,10 @@ const handleSubmit = () => {
     }
   })
 }
-interface User {
-  userId: string
-  phonenumber: string
-  userName: string
-  remark: string
-  state: string
+const handleResetPwd = () => {
+  resetPassword({ userName: newSubmit.value.userName, password: '123456' }).then((res) => {
+    console.log(res)
+  })
 }
 const tableData = ref([])
 const newDialogVisible = ref(false)
@@ -123,10 +117,10 @@ const resetDialogVisible = ref(false)
         <el-dialog v-model="newDialogVisible" title="新建系统账号" width="500" center>
           <div class="col cardCenter">
             <div class="input row">
-              <span>帐号:</span><el-input v-model="newSubmit.phonenumber" style="width: 240px" />
+              <span>帐号:</span><el-input v-model="newSubmit.userName" style="width: 240px" />
             </div>
             <div class="input row">
-              <span>姓名:</span><el-input v-model="newSubmit.userName" style="width: 240px" />
+              <span>姓名:</span><el-input v-model="newSubmit.nickName" style="width: 240px" />
             </div>
             <div class="input row">
               <span>密码:</span
@@ -180,12 +174,12 @@ const resetDialogVisible = ref(false)
           "
         >
           <div style="margin: 20px 10px">
-            账号 : <el-input v-model="newSubmit.password" style="width: 240px" />
+            账号 : <el-input v-model="newSubmit.userName" style="width: 240px" />
           </div>
-          <div style="margin: 20px 10px">姓名 : {{ newSubmit.userName }}</div>
+          <div style="margin: 20px 10px">姓名 : {{ newSubmit.nickName }}</div>
           <template #footer>
             <div class="dialog-footer">
-              <el-button type="primary"> 确认 </el-button>
+              <el-button type="primary" @click="handleResetPwd"> 确认 </el-button>
               <el-button
                 type="info"
                 @click="

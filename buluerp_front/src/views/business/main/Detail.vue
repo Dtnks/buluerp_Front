@@ -5,9 +5,7 @@ import informationCard from '../component/informationCard.vue'
 defineProps({
   data: {
     type: Object,
-
   },
-
 })
 </script>
 

@@ -11,14 +11,13 @@ const password = ref()
 const router = useRouter()
 const handleLogin = () => {
   Login({ username: account.value, password: password.value }).then((res) => {
-    if (res.data.msg != '操作成功') {
+    if (res.msg != '操作成功') {
       ElMessage({ type: 'error', message: '账号或密码错误' })
     } else {
-      localStorage.setItem('Authorization', res.data.token)
+      localStorage.setItem('Authorization', res.token)
       router.push({
         path: '/main',
       })
-      console.log(res)
 
       ElMessage({ type: 'success', message: '登录成功' })
     }
