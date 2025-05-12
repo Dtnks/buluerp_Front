@@ -9,9 +9,10 @@ const props = defineProps({ content: { type: String }, path: { type: String } })
     </div>
   </div>
 </template>
-<style>
+<style scoped>
 #board {
-  padding: 20px;
+  padding: 0px 15px 15px 15px;
+  height: 8vh;
 }
 .subTitle {
   margin: 10px;

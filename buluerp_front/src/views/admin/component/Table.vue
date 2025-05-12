@@ -80,7 +80,12 @@ const handleDelete = (row) => {
       </el-table-column>
       <el-table-column label="操作">
         <template #default="scope">
-          <el-button size="small" @click="handleRole(scope.row)" v-if="scope.row.status == '生效'">
+          <el-button
+            size="small"
+            type="primary"
+            @click="handleRole(scope.row)"
+            v-if="scope.row.status == '生效'"
+          >
             授权
           </el-button>
           <el-button
@@ -136,3 +141,8 @@ const handleDelete = (row) => {
     </el-dialog>
   </div>
 </template>
+<style scoped>
+span {
+  margin: 0 !important;
+}
+</style>

@@ -110,6 +110,8 @@ onMounted(() => {
   margin: 30px;
   height: 18vh;
   padding: 25px;
+
+  box-shadow: var(--el-box-shadow-light);
 }
 .el-text {
   margin-right: 10px;

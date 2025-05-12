@@ -76,6 +76,7 @@ const defaultTime = new Date(2000, 1, 1, 12, 0, 0)
   height: 50vh;
   background-color: white;
   margin: 30px;
+  box-shadow: var(--el-box-shadow-light);
 }
 .header {
   height: 6vh;
@@ -90,8 +91,9 @@ const defaultTime = new Date(2000, 1, 1, 12, 0, 0)
 .box {
   width: 8vw;
   height: 10vh;
-  border: 1px solid black;
+  border: var(--el-border);
   position: absolute;
+  box-shadow: var(--el-box-shadow-light);
   justify-content: center;
 }
 .box div {

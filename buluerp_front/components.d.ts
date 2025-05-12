@@ -60,6 +60,8 @@ declare module 'vue' {
     ElTag: typeof import('element-plus/es')['ElTag']
     ElText: typeof import('element-plus/es')['ElText']
     ElUpload: typeof import('element-plus/es')['ElUpload']
+    Form: typeof import('./src/components/form/Form.vue')['default']
+    InputForm: typeof import('./src/components/form/InputForm.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SecBoard: typeof import('./src/components/board/SecBoard.vue')['default']

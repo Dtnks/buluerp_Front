@@ -66,12 +66,12 @@ const newDialogVisible = ref(false)
 const resetDialogVisible = ref(false)
 </script>
 <template>
-  <BordShow content="用户管理" path="业务中心/详情" />
+  <BordShow content="用户管理" path="授权管理/用户管理" />
   <div style="flex: 1; background-color: rgba(240, 242, 245, 1); padding: 20px 40px 0 40px">
     <el-card class="col">
       <div class="row">
         <div class="input row">
-          <span>角色:</span
+          <span>角色 </span
           ><el-select
             v-model="role"
             multiple
@@ -89,8 +89,8 @@ const resetDialogVisible = ref(false)
             />
           </el-select>
         </div>
-        <div class="input row"><span>帐号:</span><el-input /></div>
-        <div class="input row"><span>姓名:</span><el-input /></div>
+        <div class="input row"><span>帐号 </span><el-input /></div>
+        <div class="input row"><span>姓名 </span><el-input /></div>
       </div>
       <div class="row" style="justify-content: flex-end; margin: 15px">
         <el-button
@@ -117,17 +117,17 @@ const resetDialogVisible = ref(false)
         <el-dialog v-model="newDialogVisible" title="新建系统账号" width="500" center>
           <div class="col cardCenter">
             <div class="input row">
-              <span>帐号:</span><el-input v-model="newSubmit.userName" style="width: 240px" />
+              <span>帐号 </span><el-input v-model="newSubmit.userName" style="width: 240px" />
             </div>
             <div class="input row">
-              <span>姓名:</span><el-input v-model="newSubmit.nickName" style="width: 240px" />
+              <span>姓名 </span><el-input v-model="newSubmit.nickName" style="width: 240px" />
             </div>
             <div class="input row">
-              <span>密码:</span
+              <span>密码 </span
               ><el-input v-model="newSubmit.password" style="width: 240px" type="password" />
             </div>
             <div class="input row">
-              <span>角色:</span
+              <span>角色 </span
               ><el-select
                 v-model="newSubmit.roleIds"
                 multiple
@@ -174,9 +174,9 @@ const resetDialogVisible = ref(false)
           "
         >
           <div style="margin: 20px 10px">
-            账号 : <el-input v-model="newSubmit.userName" style="width: 240px" />
+            账号 <el-input v-model="newSubmit.userName" style="width: 240px" />
           </div>
-          <div style="margin: 20px 10px">姓名 : {{ newSubmit.nickName }}</div>
+          <div style="margin: 20px 10px">姓名 {{ newSubmit.nickName }}</div>
           <template #footer>
             <div class="dialog-footer">
               <el-button type="primary" @click="handleResetPwd"> 确认 </el-button>
@@ -207,24 +207,25 @@ const resetDialogVisible = ref(false)
           @next-click="setPage(currentPage)"
         />
       </div>
-      <div style="height: 50px"></div>
     </el-card>
   </div>
 </template>
 <style scoped>
 .el-card {
   margin: 20px;
+  padding: 20px;
 }
 .input {
   flex: 1;
 }
 .input span {
-  width: 70px;
-  text-align: right;
+  width: 40px;
+  text-align: left;
   padding: 0 10px;
+  line-height: 32px;
 }
 .input .el-input {
-  width: 200px;
+  width: 240px;
 }
 .cardCenter .el-input {
   margin-bottom: 20px;

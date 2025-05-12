@@ -20,7 +20,7 @@ const props = defineProps({ handleHiddenMenu: { type: Function } })
 <style scoped>
 #menu {
   padding: 10px;
-  height: 52px;
+  height: 6vh;
   line-height: 52px;
   border-bottom: 1px solid rgba(240, 242, 245, 1);
 }
