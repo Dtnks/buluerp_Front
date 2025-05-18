@@ -30,6 +30,21 @@ export default defineConfig({
         target: 'http://154.201.77.135:8080',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/dev-api/, ''),
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            console.log(`➡ 代理请求: ${req.method} ${req.url}`)
+            console.log(`🧾 真实发送目标: ${proxyReq.getHeader('host')}`)
+            console.log(`🔗 Origin: ${proxyReq.getHeader('origin')}`)
+          })
+
+          proxy.on('proxyRes', (proxyRes, req, res) => {
+            console.log(`✅ 后端响应: ${req.method} ${req.url} → ${proxyRes.statusCode}`)
+          })
+
+          proxy.on('error', (err, req, res) => {
+            console.error(`❌ 代理错误: ${req.method} ${req.url}`, err)
+          })
+        },
       },
     },
   },

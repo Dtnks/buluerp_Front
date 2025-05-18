@@ -78,7 +78,7 @@
 <script setup lang="ts">
 import { reactive, computed, onMounted, ref } from 'vue';
 import { ElButton, ElTable, ElTableColumn, ElPagination } from 'element-plus';
-import { getOrdersList } from '@/apis/orders'
+import { getOderDetail, getOrdersList } from '@/apis/orders'
 // import request from '@/utils/request';
 // import { createIncrementalCompilerHost } from 'typescript';
 import type { TableDataType } from '@/types/orderResponse';
@@ -89,8 +89,9 @@ onMounted(() => {
 })
 
 // defineProps({ addTab: Function });
-defineProps<{
-  addTab: (tab: { title: string; name: string; component: any; data?: any }) => void;
+const props = defineProps<{
+  queryParams: Record<string, any>;
+  addTab: (targetName: string, component: any, data?: any) => void;
 }>();
 
 const tableData = ref<TableDataType[]>([]);
@@ -172,6 +173,16 @@ const getStatusText = (status: number) => {
 
 const onCheck = (row: TableDataType) => {
   console.log('查看：', row);
+  // getOderDetail(row.id).then(res => {
+  //   console.log('查看订单详情：', res);
+  // })
+  props.addTab('订单详情', BusinessDetail, {
+    innerId: row.innerId,
+    // customerName: row.customerName,
+    status: row.status,
+    // information: row.information,
+    createTime: row.createTime,
+})
 };
 
 const onDerive = (row: TableDataType) => {

@@ -23,7 +23,14 @@ export const deleteOrder = ( id: any) => {
   return request({
     url: `dev-api/system/orders/${id}`,
     method: 'post',
-    id,
+    headers: headers,
+  })
+}
+
+export const getOderDetail = ( id: any) => {
+  return request({
+    url: `dev-api/system/orders/${id}`,
+    method: 'get',
     headers: headers,
   })
 }
