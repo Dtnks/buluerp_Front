@@ -68,3 +68,11 @@ export function resetPassword(data) {
     data: data,
   })
 }
+
+export function getUser(id) {
+  return httpInstance({
+    url: `system/user?userId=${id}`,
+    method: 'get',
+    headers: headers,
+  })
+}

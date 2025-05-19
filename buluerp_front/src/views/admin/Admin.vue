@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BordShow from '@/components/board/SecBoard.vue'
-import { getOptionselect, newUser, getUserList, resetPassword } from '@/apis/admin.js'
+import { getOptionselect, newUser, getUserList, resetPassword, getUser } from '@/apis/admin.js'
 import Table from './component/Table.vue'
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
@@ -61,6 +61,8 @@ const handleResetPwd = () => {
     console.log(res)
   })
 }
+
+const search = () => {}
 const tableData = ref([])
 const newDialogVisible = ref(false)
 const resetDialogVisible = ref(false)
@@ -103,7 +105,7 @@ const resetDialogVisible = ref(false)
           "
           >新建</el-button
         >
-        <el-button type="primary">查询</el-button>
+        <el-button type="primary" @click="search">查询</el-button>
         <el-button
           type="primary"
           @click="
@@ -169,7 +171,9 @@ const resetDialogVisible = ref(false)
           center
           @click="
             () => {
-              console.log(222222)
+              getUser(newSubmit.userName).then((res) => {
+                console.log(res)
+              })
             }
           "
         >
