@@ -88,7 +88,6 @@ onMounted(() => {
   getOrders();
 })
 
-// defineProps({ addTab: Function });
 const props = defineProps<{
   queryParams: Record<string, any>;
   addTab: (targetName: string, component: any, data?: any) => void;
@@ -107,28 +106,6 @@ const columns = [
   },
   { prop: 'information', label: '其他基本信息' },
 ];
-
-// // 表格数据
-// interface DataType {
-//   key: number;
-//   createTime: string;
-//   orderId: string;
-//   customerName: string;
-//   orderStatus: string;
-//   information: string;
-// }
-
-// const data: DataType[] = [];
-// for (let i = 0; i < 40; i++) {
-//   data.push({
-//     key: i,
-//     createTime: Date.now().toString(),
-//     orderId: '3249hg284b14',
-//     customerName: `John Brown ${i}`,
-//     orderStatus: '初始状态',
-//     information: `London, Park Lane no. ${i}`,
-//   });
-// }
 
 const getOrders = async () => {
   try {

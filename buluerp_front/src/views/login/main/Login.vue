@@ -11,6 +11,8 @@ const password = ref()
 const router = useRouter()
 const handleLogin = () => {
   Login({ username: account.value, password: password.value }).then((res) => {
+    console.log('login-response' ,res);
+
     if (res.msg != '操作成功') {
       ElMessage({ type: 'error', message: '账号或密码错误' })
     } else {

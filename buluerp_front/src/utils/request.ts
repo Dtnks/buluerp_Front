@@ -6,7 +6,7 @@ const request = axios.create({
   // baseURL: 'http://154.201.77.135:8080/', // 基础 URL
   timeout: 8000, // 超时时间
 })
- 
+
 // 请求拦截器
 request.interceptors.request.use(
   (config) => {
