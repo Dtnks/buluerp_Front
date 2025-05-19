@@ -14,7 +14,9 @@ const handleLogin = () => {
     router.push({
       path: '/main',
     })
-    localStorage.setItem('Authorization', res.data.token)
+    console.log('登录成功', res.token);
+
+    localStorage.setItem('Authorization', res.token)
     ElMessage({ type: 'success', message: '登录成功' })
   })
 }

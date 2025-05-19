@@ -78,7 +78,7 @@
 <script setup lang="ts">
 import { reactive, computed, onMounted, ref } from 'vue';
 import { ElButton, ElTable, ElTableColumn, ElPagination } from 'element-plus';
-import { getOderDetail, getOrdersList } from '@/apis/orders'
+import { getOderDetail, getOrdersList } from '@/apis/orders';
 // import request from '@/utils/request';
 // import { createIncrementalCompilerHost } from 'typescript';
 import type { TableDataType } from '@/types/orderResponse';
