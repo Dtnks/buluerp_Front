@@ -65,5 +65,10 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SecBoard: typeof import('./src/components/board/SecBoard.vue')['default']
+    Table: typeof import('./src/components/table/table.vue')['default']
+    TableList: typeof import('./src/components/table/TableList.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

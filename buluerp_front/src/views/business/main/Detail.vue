@@ -2,13 +2,10 @@
 import BordShow from '@/components/board/SecBoard.vue'
 import informationCard from '../component/informationCard.vue'
 import { onMounted, ref } from 'vue'
-import {getOderDetail} from '@/apis/orders'
+import { getOderDetail } from '@/apis/orders'
 import DetailShow from '../component/detailShow.vue'
 
-const props = defineProps<{ data: { id: number}}>()
-
-
->>>>>>> dev_syf
+const props = defineProps<{ data: { id: number } }>()
 </script>
 
 <template>

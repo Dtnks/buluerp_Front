@@ -14,6 +14,7 @@ const handleLogin = () => {
     if (res.msg != '操作成功') {
       ElMessage({ type: 'error', message: '账号或密码错误' })
     } else {
+      console.log(res)
       localStorage.setItem('Authorization', res.token)
       router.push({
         path: '/main',

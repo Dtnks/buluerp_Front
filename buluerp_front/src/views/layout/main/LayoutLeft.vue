@@ -9,6 +9,7 @@ import BusinessQuery from '@/views/business/main/Query.vue'
 import ProQuery from '@/views/production/main/Query.vue'
 import ProMaterial from '@/views/production/main/Material.vue'
 import Admin from '@/views/admin/Admin.vue'
+import Role from '@/views/admin/Role.vue'
 import PMInventoryList from '@/views/PMcenter/inventory/main/List.vue'
 import PMInventoryQuery from '@/views/PMcenter/inventory/main/Query.vue'
 import PMProcurementQuery from '@/views/PMcenter/procurement/main/List.vue'
@@ -27,10 +28,14 @@ import PMProcurementPlan from '@/views/PMcenter/procurement/main/Plan.vue'
       <img id="logo" src="@/assets/img/logo.png" />
       <div style="color: white; font-size: 25px; white-space: nowrap">布鲁科</div>
     </div>
-    <el-menu-item index="0" @click="addTab('授权管理', Admin)">
-      <el-icon><img src="@/assets/icon/u21.png" class="icon" /></el-icon>
-      <span>授权管理</span>
-    </el-menu-item>
+    <el-sub-menu index="0">
+      <template #title
+        ><el-icon><img src="@/assets/icon/u21.png" class="icon" /></el-icon
+        ><span>管理员</span></template
+      >
+      <el-menu-item index="0-1" @click="addTab('授权管理', Admin)"> 授权管理 </el-menu-item>
+      <el-menu-item index="0-1" @click="addTab('角色管理', Role)"> 节点管理 </el-menu-item>
+    </el-sub-menu>
     <el-sub-menu index="1">
       <template #title
         ><el-icon><User /></el-icon> <span>用户中心</span></template
