@@ -5,7 +5,7 @@
       <div class="query-container">
         <el-card class="form-container">
           <QueryForm></QueryForm>
-          <QueryTable :addTab="addTab"></QueryTable>
+          <QueryTable :queryParams="searchParams" :addTab="props.addTab"></QueryTable>
         </el-card>
       </div>
     </el-config-provider>
@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-// import { reactive, ref, computed } from 'vue';
+import { reactive, ref, computed } from 'vue';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import BordShow from '@/components/board/SecBoard.vue';
 // import type { FormInstance } from 'element-plus';
@@ -23,10 +23,22 @@ import BordShow from '@/components/board/SecBoard.vue';
 import QueryForm from '../component/queryForm.vue';
 import QueryTable from '../component/queryTable.vue';
 
-defineProps({
-  addTab: Function,
-});
+// defineProps({
+//   addTab: Function,
+// });
+const props = defineProps<{
+  addTab: (targetName: string, component: any, data?: any) => void
+}>()
+const searchParams = ref<Record<string, any>>({}) // 初始为空对象
 
+const handleSearch = (params: Record<string, any>) => {
+
+  const filteredParams = {
+    productCode: params.productCode || null,
+    productName: params.productName || null,
+  }
+  searchParams.value = filteredParams
+}
 </script>
 
 <style scoped lang="less">
