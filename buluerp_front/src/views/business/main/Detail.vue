@@ -12,8 +12,9 @@ const detail = ref<any[]>([])
 const basicData = ref<any[]>([])
 
 onMounted(() => {
-  getDetail()
+  // getDetail()
 })
+
 </script>
 
 <template>
@@ -24,6 +25,4 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped lang="less">
-
-</style>
+<style scoped lang="less"></style>

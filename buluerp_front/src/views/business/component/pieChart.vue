@@ -105,6 +105,7 @@ const handleActive = (value) => {
   height: 60vh;
   margin: 30px;
   width: 36vw;
+  box-shadow: var(--el-box-shadow-light);
   background-color: white;
 }
 .chartDom {

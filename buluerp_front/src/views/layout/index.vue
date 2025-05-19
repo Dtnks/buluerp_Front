@@ -1,18 +1,12 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
 import LayoutLeft from '@/views/layout/main/LayoutLeft.vue'
 import LayoutTop from '@/views/layout/main/LayoutTop.vue'
 import { ref } from 'vue'
 import type { TabPaneName } from 'element-plus'
-import Show from '../business/main/Show.vue'
 import BusinessQuery from '../business/main/Query.vue'
-import queryTable from '../business/component/queryTable.vue'
-import QueryTable from '../business/component/queryTable.vue'
 
-const tabIndex = 0
 const editableTabsValue = ref('订单看板')
 const editableTabs = ref([])
-
 const addTab = (targetName: string, component, data = null) => {
   if (editableTabs.value.filter((item) => item.title == targetName).length > 0) {
     editableTabsValue.value = targetName
@@ -60,19 +54,29 @@ const handleHiddenMenu = () => {
         @tab-remove="removeTab"
       >
         <el-tab-pane
+          class="col"
           v-for="item in editableTabs"
           :key="item.name"
           :label="item.title"
           :name="item.name"
         >
           <KeepAlive>
-            <component :is="item.component" :addTab="addTab" :data="data"></component>
+            <component :is="item.component" :addTab="addTab" :data="item.data"></component>
           </KeepAlive>
         </el-tab-pane>
       </el-tabs>
     </div>
-    <template >
+    <template>
       <BusinessQuery :addTab="addTab" />
     </template>
   </div>
 </template>
+
+<style scoped>
+.el-tabs {
+  flex: 1;
+}
+.el-tab-pane {
+  height: 100%;
+}
+</style>
