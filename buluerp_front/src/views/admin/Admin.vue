@@ -5,7 +5,7 @@ import Table from './component/Table.vue'
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 const options = ref({})
-const searchContent = ref({ roleNames: null, userName: '', nickName: '', status: 0 })
+const searchContent = ref({ roleId: '', userName: '', nickName: '', status: 0 })
 const status = ref(true)
 const currentPage = ref(1)
 const total = ref()
@@ -77,8 +77,7 @@ const resetDialogVisible = ref(false)
         <div class="input row">
           <span>角色 </span
           ><el-select
-            v-model="searchContent.roleNames"
-            multiple
+            v-model="searchContent.roleId"
             collapse-tags
             collapse-tags-tooltip
             :max-collapse-tags="2"
@@ -192,16 +191,13 @@ const resetDialogVisible = ref(false)
           title="系统账号密码重置"
           width="500"
           center
-          @click="
-            () => {
+        >
+          <div style="margin: 20px 10px">
+            账号 <el-input v-model="newSubmit.userName" style="width: 240px" @blur="() => {
               getUser(newSubmit.userName).then((res) => {
                 console.log(res)
               })
-            }
-          "
-        >
-          <div style="margin: 20px 10px">
-            账号 <el-input v-model="newSubmit.userName" style="width: 240px" />
+            }" />
           </div>
           <div style="margin: 20px 10px">姓名 {{ newSubmit.nickName }}</div>
           <template #footer>

@@ -39,7 +39,7 @@ export function getUserList(
   searchContent = { roleNames: null, userName: '', nickName: '', status: '' },
 ) {
   return httpInstance({
-    url: `system/user/urlist?pageNum=${page}&pageSize=8&roleNames=${searchContent.roleNames}&userName=${searchContent.userName}&nickName=${searchContent.nickName}&status=${searchContent.status}`,
+    url: `system/user/urlist?pageNum=${page}&pageSize=8&roleId=${searchContent.roleId}&userName=${searchContent.userName}&nickName=${searchContent.nickName}&status=${searchContent.status}`,
     method: 'get',
     headers: headers,
   })
@@ -74,7 +74,7 @@ export function resetPassword(data) {
 
 export function getUser(id) {
   return httpInstance({
-    url: `system/user?userId=${id}`,
+    url: `system/user/${id}`,
     method: 'get',
     headers: headers,
   })

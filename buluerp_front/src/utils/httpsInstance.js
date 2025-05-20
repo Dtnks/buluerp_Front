@@ -4,7 +4,7 @@ import router from '@/router'
 
 
 const httpInstance = axios.create({
-  baseURL: 'http://154.201.77.135:8080/',
+  baseURL: 'http://10.236.174.189:8080/',
   timeout: 5000,
 })
 
