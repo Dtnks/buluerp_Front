@@ -5,24 +5,23 @@ import Table from './component/Table.vue'
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 const options = ref({})
-const role = ref()
+const searchContent = ref({ roleNames: null, userName: '', nickName: '', status: 0 })
+const status = ref(true)
 const currentPage = ref(1)
 const total = ref()
 const setPage = (pageNum) => {
-  getUserList(pageNum).then((res) => {
-    console.log(res)
-    tableData.value = res.rows.map(
-      ({ userId, userName, nickName, roleNames, status, roleIds }) => ({
-        userId,
-        userName,
-        nickName,
-        roleNames,
-        roleIds,
-        status: status === '0' ? '生效' : '离职',
-      }),
-    )
-    total.value = res.total
-  })
+  getUserList(pageNum, searchContent.value).then((res) => renderData(res))
+}
+const renderData = (res) => {
+  tableData.value = res.rows.map(({ userId, userName, nickName, roleNames, status, roleIds }) => ({
+    userId,
+    userName,
+    nickName,
+    roleNames,
+    roleIds,
+    status: status === '0' ? '生效' : '离职',
+  }))
+  total.value = res.total
 }
 setPage(1)
 getOptionselect().then((res) => {
@@ -43,7 +42,6 @@ const resetSubmit = () => {
   }
 }
 const handleSubmit = () => {
-  console.log(newSubmit.value)
   newUser(newSubmit.value).then((res) => {
     console.log(res)
     newDialogVisible.value = false
@@ -62,7 +60,11 @@ const handleResetPwd = () => {
   })
 }
 
-const search = () => {}
+const search = () => {
+  currentPage.value = 1
+  console.log(searchContent.value)
+  getUserList(currentPage.value, searchContent.value).then((res) => renderData(res))
+}
 const tableData = ref([])
 const newDialogVisible = ref(false)
 const resetDialogVisible = ref(false)
@@ -75,7 +77,7 @@ const resetDialogVisible = ref(false)
         <div class="input row">
           <span>角色 </span
           ><el-select
-            v-model="role"
+            v-model="searchContent.roleNames"
             multiple
             collapse-tags
             collapse-tags-tooltip
@@ -91,8 +93,8 @@ const resetDialogVisible = ref(false)
             />
           </el-select>
         </div>
-        <div class="input row"><span>帐号 </span><el-input /></div>
-        <div class="input row"><span>姓名 </span><el-input /></div>
+        <div class="input row"><span>帐号 </span><el-input v-model="searchContent.userName" /></div>
+        <div class="input row"><span>姓名 </span><el-input v-model="searchContent.nickName" /></div>
       </div>
       <div class="row" style="justify-content: flex-end; margin: 15px">
         <el-button
@@ -116,6 +118,27 @@ const resetDialogVisible = ref(false)
           "
           >密码重置</el-button
         >
+        <el-switch
+          v-model="status"
+          inline-prompt
+          size="large"
+          style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
+          active-text="在职"
+          inactive-text="离职"
+          @change="
+            () => {
+              searchContent.status = Number(!status)
+              search()
+            }
+          "
+        />
+        <!-- <el-switch
+          v-model="searchContent.status"
+          size="medium"
+          active-text="在职"
+          inactive-text="离职"
+          
+        /> -->
         <el-dialog v-model="newDialogVisible" title="新建系统账号" width="500" center>
           <div class="col cardCenter">
             <div class="input row">
@@ -233,5 +256,8 @@ const resetDialogVisible = ref(false)
 }
 .cardCenter .el-input {
   margin-bottom: 20px;
+}
+.row .el-button {
+  margin-right: 10px;
 }
 </style>
