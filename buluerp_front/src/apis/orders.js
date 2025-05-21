@@ -28,9 +28,9 @@ export const deleteOrder = ( id) => {
   })
 }
 
-export const getOderDetail = ( id) => {
+export const getOrderDetailById = ( id) => {
   return httpInstance({
-    url: `dev-api/system/orders/${id}`,
+    url: `system/orders/${id}`,
     method: 'get',
     headers: headers,
   })

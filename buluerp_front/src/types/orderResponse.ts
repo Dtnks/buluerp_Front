@@ -3,7 +3,7 @@ export interface TableDataType {
   id?: number;
   innerId: string;
   status: number;
-  customrName?: string;
+  customerName: string;
 
 }
 
