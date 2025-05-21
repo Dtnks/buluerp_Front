@@ -2,7 +2,7 @@
 import BordShow from '@/components/board/SecBoard.vue'
 import informationCard from '../component/informationCard.vue'
 import { onMounted, ref } from 'vue'
-import {getOderDetail} from '@/apis/orders.js'
+import {getOrderDetail} from '@/apis/orders.js'
 import DetailShow from '../component/detailShow.vue'
 
 const props = defineProps<{ data: { id: number}}>()

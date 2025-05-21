@@ -74,7 +74,7 @@
 <script setup lang="ts">
 import informationCard from './informationCard.vue'
 import { onMounted, ref } from 'vue'
-import {getOderDetail} from '@/apis/orders.js'
+import {getOrderDetail} from '@/apis/orders.js'
 </script>
 
 <style scoped lang="less">
