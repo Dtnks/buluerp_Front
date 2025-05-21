@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="formRef" :model="formState" label-width="100px" class="search-form">
+  <el-form :ref="formRef" :model="formState"  label-width="100px" class="search-form">
     <!-- 第一行 -->
     <el-row :gutter="20" align="middle" v-for="(list, index) in data" :key="index">
       <el-col :span="list.length == 3 ? 8 : 12" v-for="ele in list" :key="ele.label">
@@ -30,7 +30,7 @@
   </el-form>
 </template>
 <script lang="ts" setup>
-defineProps(['data', 'formState'])
+defineProps(['data', 'formState', 'formRef', 'searchForm'])
 </script>
 
 <style scoped>

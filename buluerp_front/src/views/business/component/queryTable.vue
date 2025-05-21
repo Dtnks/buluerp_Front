@@ -7,7 +7,7 @@
           <span>列表</span>
         </div>
       </template>
-      <el-table :data="tableData" border>
+      <el-table :data="paginatiedtableData" border>
         <el-table-column v-for="column in columns" :key="column.prop" :prop="column.prop" :label="column.label">
           <template v-if="column.slot" #default="{ row }">
             <span style="display: flex; align-items: center;">
@@ -73,9 +73,13 @@ import { getOrdersList } from '@/apis/orders';
 import type { TableDataType } from '@/types/orderResponse';
 import BusinessDetail from '@/views/business/main/Detail.vue';
 import { getCustomerNameById } from '../apis/oders';
+import { useQueryTableDataStore } from '@/stores/queryTableData';
 
+// 加载数据
 onMounted(() => {
-  getOrders();
+  // getOrders();
+  tableDataStore.getOrders();
+
 })
 
 const props = defineProps<{
@@ -83,7 +87,7 @@ const props = defineProps<{
   addTab: (targetName: string, component: any, data?: any) => void;
 }>();
 
-const tableData = ref<TableDataType[]>([]);
+// const tableData = ref<TableDataType[]>([]);
 
 const columns = [
   { prop: 'createTime', label: '创建时间' },
@@ -97,23 +101,29 @@ const columns = [
   { prop: 'information', label: '其他基本信息' },
 ];
 
-// getOders: 获取订单数据(不包括客户姓名)
-const getOrders = async () => {
-  try {
-    const res = await getOrdersList()
-    console.log('获取订单数据：', res);
-    tableData.value = res.rows;
-    for (let i = 0; i < res.rows.length; i++) {
-      const customerName = await getCustomerNameById(res.rows[i].id);
-      // console.log('获取客户姓名：', customerName);
-      tableData.value[i].customerName = customerName;
-    }
+// // getOders: 获取订单数据(不包括客户姓名)
+// const getOrders = async () => {
+//   try {
+//     const res = await getOrdersList()
+//     console.log('获取订单数据：', res);
+//     tableData.value = res.rows;
+//     // 设置分页数据总数量
+//     pagination.total = res.total;
+//     for (let i = 0; i < res.rows.length; i++) {
+//       const customerName = await getCustomerNameById(res.rows[i].id);
+//       // console.log('获取客户姓名：', customerName);
+//       tableData.value[i].customerName = customerName;
+//     }
 
-  }
-  catch (err) {
-    console.log('获取订单数据失败：', err);
-  }
-}
+//   }
+//   catch (err) {
+//     console.log('获取订单数据失败：', err);
+//   }
+// }
+
+const tableDataStore = useQueryTableDataStore();
+// 获取表格数据
+const tableData = computed(() => tableDataStore.tableData);
 
 
 
@@ -193,8 +203,6 @@ const onEdit = (row: TableDataType) => {
   editForm.createTime = row.createTime;
   // editForm.id = row.id;
 
-
-  // 打开编辑弹窗
   editDialogVisible.value = true;
 };
 
@@ -212,12 +220,12 @@ const onSaveEdit = () => {
 };
 // // 编辑弹窗 ---end
 
-//  //表格分页
+// //表格分页
 const pagination = reactive({
   current: 1,
   pageSize: 5,
-  total: tableData.value.length,
-
+  total: computed(() => tableData.value.length),
+  // pageSizes: [5, 10, 20, 50],
 });
 
 const paginatiedtableData = computed(() => {
