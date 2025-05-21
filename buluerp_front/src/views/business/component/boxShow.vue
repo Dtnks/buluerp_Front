@@ -126,5 +126,6 @@ const defaultTime = new Date(2000, 1, 1, 12, 0, 0)
   height: 8vh;
   background-color: gray;
   position: absolute;
+  top: 1px;
 }
 </style>
