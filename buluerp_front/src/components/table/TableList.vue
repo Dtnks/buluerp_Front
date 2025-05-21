@@ -1,12 +1,15 @@
 <template>
-  <el-card style="width: 100%; margin: 0 20px">
+  <el-card style="margin: 0 20px">
     <template #header>
       <div class="card-header">
         <span>展示</span>
+        <el-button type="primary" @click="exportFunc(select!.getSelectionRows())">导出</el-button>
       </div>
     </template>
     <div>
-      <el-table :data="listData" border style="width: 100%">
+      <el-table :data="listData" border style="width: 100%" ref="select">
+        <el-table-column type="selection" width="55" />
+
         <el-table-column
           :prop="item.value"
           :label="item.label"
@@ -34,5 +37,13 @@
 </template>
 
 <script lang="ts" setup>
-const props = defineProps(['tableData', 'operations', 'listData'])
+import { ref } from 'vue'
+defineProps(['tableData', 'operations', 'listData', 'exportFunc'])
+const select = ref()
 </script>
+<style scoped>
+.card-header {
+  display: flex;
+  justify-content: space-between;
+}
+</style>
