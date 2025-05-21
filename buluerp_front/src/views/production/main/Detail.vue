@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import BordShow from '@/components/board/SecBoard.vue'
 import basicInfomation from '../component/basicInfomation.vue'
 import { getProductDetail } from '@/apis/products.js' 
-import { getStyleList } from '@/apis/styles.js'
+import { getMaterialList } from '@/apis/materials.js'
 
 // 接收父组件传来的 id
 const props = defineProps<{ data: { id: number } }>()
@@ -18,7 +18,7 @@ onMounted(async () => {
       // 同时发起两个请求
       const [productResponse, materialResponse] = await Promise.all([
         getProductDetail(props.data.id),
-        getStyleList(props.data.id), 
+        getMaterialList(props.data.id), 
       ])
       
       detail.value = productResponse.data

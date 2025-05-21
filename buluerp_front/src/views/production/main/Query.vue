@@ -12,13 +12,20 @@ const props = defineProps<{
 const searchParams = ref<Record<string, any>>({}) // 初始为空对象
 
 const handleSearch = (params: Record<string, any>) => {
-
+  console.log('父组件收到搜索参数', params)
   const filteredParams = {
-    productCode: params.productCode || null,
-    productName: params.productName || null,
+    id: params.productCode || null,
+    name: params.productName || null,
+    design_status: params.productStatus || null,
+    createUsername: params.creatorName || null,
+    createTimeFrom: params.createDate?.[0] || null,
+    createTimeTo: params.createDate?.[1] || null,
+    otherSearch: params.otherSearch || null
   }
   searchParams.value = filteredParams
+  console.log('父组件发送搜索参数', searchParams.value)
 }
+
 </script>
 
 <template>

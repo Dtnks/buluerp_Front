@@ -8,7 +8,7 @@ import DetailShow from '../component/detailShow.vue'
 const props = defineProps<{ data: { id: number}}>()
 
 
->>>>>>> dev_syf
+
 </script>
 
 <template>
