@@ -98,13 +98,6 @@ const onCreate = () => {
   title.value = '新增'
   editDialogVisible.value = true
 }
-const onClear = () => {
-  formData.value.forEach((element) => {
-    element.forEach((ele) => {
-      ele.value = null
-    })
-  })
-}
 
 const onSubmit = () => {
   const searchContent = {}
@@ -166,7 +159,6 @@ listCustomer(page.value, pageSize.value).then((res) => {
       title="查询"
       :data="formData"
       :onCreate="onCreate"
-      :onClear="onClear"
       :onSubmit="onSubmit"
     />
     <TableList

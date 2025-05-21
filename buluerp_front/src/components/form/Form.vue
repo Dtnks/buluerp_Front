@@ -30,7 +30,13 @@
 <script lang="ts" setup>
 import InputForm from './InputForm.vue'
 import { defineProps } from 'vue'
-defineProps(['data', 'title', 'onSubmit', 'onClear', 'onImport', 'onCreate', 'onDownloadTemplate', 'formState'])
+const props = defineProps(['data', 'title', 'onSubmit', 'onImport', 'onCreate', 'onDownloadTemplate', 'formState'])
+const onClear=()=>{props.data.forEach((element) => {
+    element.forEach((ele) => {
+      ele.value = null
+    })
+  })}
+
 </script>
 
 <style scoped></style>
