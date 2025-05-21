@@ -34,10 +34,22 @@ export function deleteCustomer(id) {
   })
 }
 
-export function listCustomer(pageNum, pageSize) {
+export function listCustomer(
+  pageNum,
+  pageSize,
+  searchContent = { name: '', contact: '', email: '', remarks: '' },
+) {
   return httpInstance({
-    url: `system/customers/list?pageNum=${pageNum}&pageSize=${pageSize}`,
+    url: `system/customers/list?pageNum=${pageNum}&pageSize=${pageSize}&name=${searchContent.name}&contact=${searchContent.contact}&email=${searchContent.email}&remarks=${searchContent.remarks}`,
     method: 'get',
     headers: headers,
+  })
+}
+export function exportSelectTable(data) {
+  return httpInstance({
+    url: `system/customers/export`,
+    method: 'post',
+    headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
+    data: data,
   })
 }

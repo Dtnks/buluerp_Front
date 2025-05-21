@@ -1,18 +1,25 @@
 <script setup lang="ts">
 import FormSearch from '@/components/form/Form.vue'
-import { listCustomer, detailCustomer, changeCustomer, newCustomer } from '@/apis/custom.js'
+import {
+  listCustomer,
+  detailCustomer,
+  changeCustomer,
+  newCustomer,
+  exportSelectTable,
+} from '@/apis/custom.js'
+import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
 import { ref } from 'vue'
 //渲染页面
 const formData = ref([
   [
-    { type: 'input', value: null, label: '用户ID' },
-    { type: 'input', value: null, label: '姓名' },
+    { type: 'input', value: '', label: '姓名', key: 'name' },
+    { type: 'timer', value: null, label: '创建曰期' },
   ],
   [
-    { type: 'input', value: null, label: '联系方式' },
-    { type: 'input', value: null, label: '邮箱' },
-    { type: 'input', value: null, label: '客户备注' },
+    { type: 'input', value: '', label: '联系方式', key: 'contact' },
+    { type: 'input', value: '', label: '邮箱', key: 'email' },
+    { type: 'input', value: '', label: '客户备注', key: 'remarks' },
   ],
 ])
 const tableData = ref([
@@ -36,6 +43,7 @@ const tableData = ref([
     value: 'remarks',
     label: '备注',
   },
+  { value: 'creatTime', label: '创建时间' },
 ])
 const operation = ref([
   // {
@@ -58,7 +66,6 @@ const operation = ref([
     },
     value: '编辑',
   },
-  { func: () => {}, value: '导出' },
 ])
 
 //新增与修改
@@ -99,6 +106,34 @@ const onClear = () => {
   })
 }
 
+const onSubmit = () => {
+  const searchContent = {}
+  formData.value.forEach((element) => {
+    element.forEach((ele) => {
+      searchContent[ele.key] = ele.value
+    })
+  })
+
+  page.value = 1
+  listCustomer(page.value, pageSize.value, searchContent).then((res) => {
+    listData.value = res.rows
+    total.value = res.total
+  })
+}
+
+//传给table组件
+const exportFunc = (row) => {
+  const formData = new URLSearchParams()
+  const ids = row.map((ele) => {
+    return ele.id
+  })
+  // const idsString = Array.isArray(ids) ? ids.join(',') : ids
+  formData.append('ids', ids)
+  exportSelectTable(formData).then((res) => {
+    const now = new Date()
+    downloadBinaryFile(res, now.toLocaleDateString())
+  })
+}
 //分页
 const page = ref(1)
 const pageSize = ref(10)
@@ -127,8 +162,19 @@ listCustomer(page.value, pageSize.value).then((res) => {
 </script>
 <template>
   <div>
-    <FormSearch title="查询" :data="formData" :onCreate="onCreate" :onClear="onClear" />
-    <TableList :tableData="tableData" :operations="operation" :listData="listData">
+    <FormSearch
+      title="查询"
+      :data="formData"
+      :onCreate="onCreate"
+      :onClear="onClear"
+      :onSubmit="onSubmit"
+    />
+    <TableList
+      :tableData="tableData"
+      :operations="operation"
+      :listData="listData"
+      :exportFunc="exportFunc"
+    >
       <slot>
         <div
           style="

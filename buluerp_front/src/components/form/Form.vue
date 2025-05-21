@@ -1,5 +1,5 @@
 <template>
-  <el-card style="width: 100%; margin: 0 20px">
+  <el-card style="margin: 0 20px">
     <template #header>
       <div class="card-header">
         <span>{{ title }}</span>

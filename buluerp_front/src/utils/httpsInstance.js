@@ -2,7 +2,6 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
 
-
 const httpInstance = axios.create({
   baseURL: 'http://154.201.77.135:8080/',
   timeout: 5000,
@@ -26,7 +25,7 @@ httpInstance.interceptors.request.use(
 // 响应拦截器：统一处理错误、鉴权失败等
 httpInstance.interceptors.response.use(
   (res) => {
-    if (res.data.code === 200) {
+    if (res.data.code === 200 || res.status === 200) {
       return res.data
     } else {
       ElMessage.error(res.data.message || '请求失败')
