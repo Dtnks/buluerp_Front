@@ -8,17 +8,6 @@
         </div>
       </template>
       <el-table :data="tableData" border>
-        <!-- todo -->
-        <!-- <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column prop="innerId" label="订单ID" />
-        <el-table-column prop="customerName" label="客户姓名" />
-        <el-table-column prop="orderStatus" label="订单状态">
-          <template #default="{ row }">
-            <span :style="{ color: getStatusColor(row.orderStatus) }">●</span>
-            {{ row.orderStatus }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="information" label="其他基本信息" /> -->
         <el-table-column v-for="column in columns" :key="column.prop" :prop="column.prop" :label="column.label">
           <template v-if="column.slot" #default="{ row }">
             <span style="display: flex; align-items: center;">
@@ -46,7 +35,7 @@
         :page-size="pagination.pageSize" :current-page="pagination.current" @size-change="onShowSizeChange"
         @current-change="onPageChange" :page-sizes="[5, 10, 20, 50]" />
 
-              <!-- 编辑弹窗 -->
+      <!-- 编辑弹窗 -->
       <el-dialog title="编辑订单" v-model="editDialogVisible" width="500px">
         <el-form :model="editForm" label-width="100px">
           <el-form-item label="订单ID">
@@ -78,11 +67,12 @@
 <script setup lang="ts">
 import { reactive, computed, onMounted, ref } from 'vue';
 import { ElButton, ElTable, ElTableColumn, ElPagination } from 'element-plus';
-import { getOderDetail, getOrdersList } from '@/apis/orders';
+import { getOrdersList } from '@/apis/orders';
 // import request from '@/utils/request';
 // import { createIncrementalCompilerHost } from 'typescript';
 import type { TableDataType } from '@/types/orderResponse';
 import BusinessDetail from '@/views/business/main/Detail.vue';
+import { getCustomerNameById } from '../apis/oders';
 
 onMounted(() => {
   getOrders();
@@ -107,16 +97,26 @@ const columns = [
   { prop: 'information', label: '其他基本信息' },
 ];
 
+// getOders: 获取订单数据(不包括客户姓名)
 const getOrders = async () => {
   try {
     const res = await getOrdersList()
     console.log('获取订单数据：', res);
     tableData.value = res.rows;
+    for (let i = 0; i < res.rows.length; i++) {
+      const customerName = await getCustomerNameById(res.rows[i].id);
+      // console.log('获取客户姓名：', customerName);
+      tableData.value[i].customerName = customerName;
+    }
+
   }
   catch (err) {
     console.log('获取订单数据失败：', err);
   }
 }
+
+
+
 
 // 表格操作--start
 const getStatusColor = (status: number) => {
@@ -125,14 +125,14 @@ const getStatusColor = (status: number) => {
       return 'grey';
     case 1:
       return 'blue';
-    // case '已完成':
-    //   return 'green';
-    // case '作废':
-    //   return 'red';
-    // case '布产中':
-    //   return 'orange';
-    // default:
-    //   return 'black';
+    case 2:
+      return 'green';
+    case 3:
+      return 'red';
+    case 4:
+      return 'orange';
+    default:
+      return 'grey';
   }
 };
 const getStatusText = (status: number) => {
@@ -141,12 +141,15 @@ const getStatusText = (status: number) => {
       return '初始状态';
     case 1:
       return '设计中';
+    case 2:
+      return '已完成';
+    case 3:
+      return '作废';
+    case 4:
+      return '布产中';
   }
 };
 
-// const onEdit = (row: TableDataType) => {
-//   console.log('编辑：', row);
-// };
 
 const onCheck = (row: TableDataType) => {
   console.log('查看：', row);
@@ -159,14 +162,14 @@ const onCheck = (row: TableDataType) => {
     status: row.status,
     // information: row.information,
     createTime: row.createTime,
-})
+  })
 };
 
 const onDerive = (row: TableDataType) => {
   console.log('导出：', row);
 };
 
-// // 编辑弹窗
+// // 编辑弹窗 ---start
 // 编辑弹窗的显示状态
 const editDialogVisible = ref(false);
 
@@ -184,7 +187,7 @@ const editForm = reactive({
 const onEdit = (row: TableDataType) => {
   // 将选中的行数据复制到编辑表单中
   editForm.innerId = row.innerId;
-  // editForm.customerName = row.customerName;
+  editForm.customerName = row.customerName;
   editForm.status = row.status;
   // editForm.information = row.information;
   editForm.createTime = row.createTime;
@@ -207,6 +210,7 @@ const onSaveEdit = () => {
   editDialogVisible.value = false;
   console.log('保存后的数据：', tableData.value);
 };
+// // 编辑弹窗 ---end
 
 //  //表格分页
 const pagination = reactive({

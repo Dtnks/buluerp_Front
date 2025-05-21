@@ -6,7 +6,7 @@
       </div>
     </template>
     <el-row>
-      <InputForm :data="data" />
+      <InputForm :data="data" :formState="formState"/>
       <el-col :span="4" style="text-align: right; padding: 20px">
         <el-space direction="vertical">
           <el-row>
@@ -29,7 +29,8 @@
 
 <script lang="ts" setup>
 import InputForm from './InputForm.vue'
-defineProps(['data', 'title', 'onSubmit', 'onClear', 'onImport', 'onCreate', 'onDownloadTemplate'])
+import { defineProps } from 'vue'
+defineProps(['data', 'title', 'onSubmit', 'onClear', 'onImport', 'onCreate', 'onDownloadTemplate', 'formState'])
 </script>
 
 <style scoped></style>

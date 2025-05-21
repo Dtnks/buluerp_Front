@@ -30,7 +30,7 @@
   </el-form>
 </template>
 <script lang="ts" setup>
-defineProps(['data'])
+defineProps(['data', 'formState'])
 </script>
 
 <style scoped>
