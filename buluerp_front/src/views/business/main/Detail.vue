@@ -15,6 +15,10 @@ onMounted(() => {
   // getDetail()
 })
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 94d902e78fdc79ea6d45b57d589e64b71fb676d6
 </script>
 
 <template>

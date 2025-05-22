@@ -14,3 +14,30 @@ export function getProductDetail(id) {
     method: 'get',
   })
 }
+
+export function createProduct(formData) {
+  return httpInstance({
+    url: 'system/products',
+    method: 'post',
+    data: formData
+  })
+}
+
+export function deleteProduct(ids) {
+  const idStr = Array.isArray(ids) ? ids.join('-') : ids
+  return httpInstance({
+    url: `system/products/${idStr}`,
+    method: 'delete'
+  })
+}
+
+export function importProductFile(formData) {
+  return httpInstance({
+    url: '/system/products/import',
+    method: 'post',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
