@@ -117,7 +117,17 @@
           </div>
         </el-upload>
       </el-form-item>
-
+      <el-form-item label="材料ID" prop="materialIds">
+        <el-select
+          v-model="createForm.materialIds"
+          multiple
+          filterable
+          allow-create
+          default-first-option
+          placeholder="请输入材料ID，按回车确认"
+        >
+        </el-select>
+      </el-form-item>
     </el-form>
 
     <template #footer>
@@ -142,12 +152,16 @@ const createDialogVisible = ref(false)
 const createForm = reactive({
   name: '',
   image: '',
+  materialIds: [] as number[], 
 })
+
 const createFormRef = ref<FormInstance>()
 const createFormRules = {
   name: [{ required: true, message: '请输入产品名称', trigger: 'blur' }],
   image: [{ required: true, message: '请上传产品图片', trigger: 'change' }],
+  materialIds: [{ required: true, type: 'array', min: 1, message: '请至少输入一个原材料 ID', trigger: 'change' }],
 }
+
 
 const imageFile = ref<File | null>(null)
 
@@ -163,7 +177,11 @@ const handleCreateSubmit = async () => {
   try {
     const formData = new FormData()
     formData.append('name', createForm.name)
-    formData.append('picture', imageFile.value) 
+    formData.append('picture', imageFile.value)
+
+    createForm.materialIds.forEach(id => {
+      formData.append('materialIds', id) // ✅ 正确传数组形式
+    })
 
     await createProduct(formData)
 
@@ -177,9 +195,12 @@ const handleCreateSubmit = async () => {
 }
 
 
+
+
 const resetCreateForm = () => {
   createForm.name = ''
   createForm.image = ''
+  createForm.materialIds = []
   imageFile.value = null
   createFormRef.value?.clearValidate?.()
 }

@@ -1,9 +1,10 @@
 import httpInstance from "@/utils/httpsInstance.js"
 
-export function getMaterialList(id) {
+export function getMaterialList(params) {
   return httpInstance({
-    url: `system/style/${id}`,
+    url: 'system/material-info/list',
     method: 'get',
+    params
   })
 }
 

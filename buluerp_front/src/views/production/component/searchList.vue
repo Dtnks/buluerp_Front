@@ -47,8 +47,6 @@
         <el-table-column label="操作" fixed="right" width="250">
           <template #default="{ row }">
             <el-button size="small" type="primary" text @click="onView(row)">查看</el-button>
-            <el-button size="small" type="primary" text>编辑</el-button>
-            <el-button size="small" type="primary" text>导出</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -75,6 +73,7 @@
 import { ref, watch , onMounted} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getList_pro , deleteProduct} from '@/apis/products.js' 
+import { exportToExcel } from '@/utils/file/exportExcel'
 
 import Detail from '../main/Detail.vue' 
 const props = defineProps<{
@@ -158,8 +157,27 @@ const onDelete = async () => {
 }
 
 const onExport = () => {
-  console.log(props.queryParams)
+  if (selectedRows.value.length === 0) {
+    ElMessage.warning('请先选择要导出的产品')
+    return
+  }
+
+  const today = new Date()
+  const dateStr = today.toISOString().split('T')[0].replace(/-/g, '') 
+
+  const exportData = selectedRows.value.map(item => ({
+    产品ID: item.id,
+    产品名称: item.name,
+    创建时间: item.createTime,
+    更新时间: item.updateTime,
+    创建人: item.createUsername || '未知',
+    设计确认状态: item.designStatus === 1 ? '已完成' : '设计中',
+    图片URL: item.pictureUrl ? getFullImageUrl(item.pictureUrl) : '暂无',
+  }))
+
+  exportToExcel(exportData, `产品数据_${dateStr}`)
 }
+
 
 const onView = (row: any) => {
   props.addTab(`详情页-${row.name}`, Detail, {id : row.id})

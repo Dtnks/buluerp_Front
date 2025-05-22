@@ -15,19 +15,25 @@ const materialData = ref<any[]>([])
 onMounted(async () => {
   if (props.data?.id) {
     try {
-      // 同时发起两个请求
-      const [productResponse, materialResponse] = await Promise.all([
-        getProductDetail(props.data.id),
-        getMaterialList(props.data.id), 
-      ])
-      
+      const productResponse = await getProductDetail(props.data.id)
       detail.value = productResponse.data
-      materialData.value = materialResponse.data
+
+      const materialIds = productResponse.data.materialIds || []
+      
+      const materialPromises = materialIds.map(id =>
+        getMaterialList({ id }) 
+      )
+
+      const materialResponses = await Promise.all(materialPromises)
+
+      materialData.value = materialResponses.map(res => res.data)
+
     } catch (error) {
       console.error('获取数据失败：', error)
     }
   }
 })
+
 </script>
 
 <template>
