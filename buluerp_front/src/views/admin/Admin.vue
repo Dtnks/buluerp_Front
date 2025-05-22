@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import BordShow from '@/components/board/SecBoard.vue'
-import { getOptionselect, newUser, getUserList, resetPassword, getUser } from '@/apis/admin.js'
+import { getOptionselect, newUser, getUserList } from '@/apis/admin.js'
 import Table from './component/Table.vue'
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 const options = ref({})
-const searchContent = ref({ roleNames: null, userName: '', nickName: '', status: 0 })
-const status = ref(true)
+
+const searchContent = ref({ roleId: '', userName: '', nickName: '' })
 const currentPage = ref(1)
 const total = ref()
 const setPage = (pageNum) => {
@@ -54,11 +54,6 @@ const handleSubmit = () => {
     }
   })
 }
-const handleResetPwd = () => {
-  resetPassword({ userName: newSubmit.value.userName, password: '123456' }).then((res) => {
-    console.log(res)
-  })
-}
 
 const search = () => {
   currentPage.value = 1
@@ -67,7 +62,6 @@ const search = () => {
 }
 const tableData = ref([])
 const newDialogVisible = ref(false)
-const resetDialogVisible = ref(false)
 </script>
 <template>
   <BordShow content="用户管理" path="授权管理/用户管理" />
@@ -77,8 +71,7 @@ const resetDialogVisible = ref(false)
         <div class="input row">
           <span>角色 </span
           ><el-select
-            v-model="searchContent.roleNames"
-            multiple
+            v-model="searchContent.roleId"
             collapse-tags
             collapse-tags-tooltip
             :max-collapse-tags="2"
@@ -108,37 +101,6 @@ const resetDialogVisible = ref(false)
           >新建</el-button
         >
         <el-button type="primary" @click="search">查询</el-button>
-        <el-button
-          type="primary"
-          @click="
-            () => {
-              resetSubmit()
-              resetDialogVisible = true
-            }
-          "
-          >密码重置</el-button
-        >
-        <el-switch
-          v-model="status"
-          inline-prompt
-          size="large"
-          style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
-          active-text="在职"
-          inactive-text="离职"
-          @change="
-            () => {
-              searchContent.status = Number(!status)
-              search()
-            }
-          "
-        />
-        <!-- <el-switch
-          v-model="searchContent.status"
-          size="medium"
-          active-text="在职"
-          inactive-text="离职"
-          
-        /> -->
         <el-dialog v-model="newDialogVisible" title="新建系统账号" width="500" center>
           <div class="col cardCenter">
             <div class="input row">
@@ -179,39 +141,6 @@ const resetDialogVisible = ref(false)
                 @click="
                   () => {
                     newDialogVisible = false
-                  }
-                "
-              >
-                取消
-              </el-button>
-            </div>
-          </template>
-        </el-dialog>
-        <el-dialog
-          v-model="resetDialogVisible"
-          title="系统账号密码重置"
-          width="500"
-          center
-          @click="
-            () => {
-              getUser(newSubmit.userName).then((res) => {
-                console.log(res)
-              })
-            }
-          "
-        >
-          <div style="margin: 20px 10px">
-            账号 <el-input v-model="newSubmit.userName" style="width: 240px" />
-          </div>
-          <div style="margin: 20px 10px">姓名 {{ newSubmit.nickName }}</div>
-          <template #footer>
-            <div class="dialog-footer">
-              <el-button type="primary" @click="handleResetPwd"> 确认 </el-button>
-              <el-button
-                type="info"
-                @click="
-                  () => {
-                    resetDialogVisible = false
                   }
                 "
               >

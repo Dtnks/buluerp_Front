@@ -1,5 +1,5 @@
 <template>
-  <el-card style="width: 100%; margin: 0 20px">
+  <el-card style="margin: 0 20px">
     <template #header>
       <div class="card-header">
         <span>{{ title }}</span>
@@ -30,7 +30,13 @@
 <script lang="ts" setup>
 import InputForm from './InputForm.vue'
 import { defineProps } from 'vue'
-defineProps(['data', 'title', 'onSubmit', 'onClear', 'onImport', 'onCreate', 'onDownloadTemplate', 'formState', 'formRef', 'searchForm'])
+const props = defineProps(['data', 'title', 'onSubmit', 'onImport', 'onCreate', 'onDownloadTemplate', 'formState'])
+const onClear=()=>{props.data.forEach((element) => {
+    element.forEach((ele) => {
+      ele.value = null
+    })
+  })}
+
 </script>
 
 <style scoped></style>

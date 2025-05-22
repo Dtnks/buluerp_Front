@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { changeStatus, changeRoles } from '@/apis/admin.js'
+import { changeStatus, changeRoles, resetPassword } from '@/apis/admin.js'
 import { messageBox } from '@/components/message/messageBox.js'
 defineProps(['tableData', 'total', 'setPage', 'options'])
 import { ref } from 'vue'
@@ -22,20 +22,40 @@ const submitRole = () => {
     },
   )
 }
-const handleDelete = (row) => {
+const handleStatus = (row, status) => {
   const submitChange = { ...row }
   const func = () => {
-    submitChange.status = 1
+    submitChange.status = status
     return changeStatus(submitChange).then((res) => {
-      console.log(res)
       if (res.code == 500) {
         throw new Error('权限不足')
       } else {
-        row.status = '离职'
+        row.status = status ? '离职' : '生效'
       }
     })
   }
-  messageBox('warning', func, '用户成功离职', '用户权限不足', '确认离职该用户吗?')
+
+  messageBox(
+    'warning',
+    func,
+    status ? '用户成功离职' : '用户成功恢复',
+    '用户权限不足',
+    status ? '确认离职该用户吗?' : '确认恢复该用户吗?',
+  )
+}
+
+const handelResetPassword = (row) => {
+  const func = () => {
+    return resetPassword({ userId: row.userId, password: '123456' }).then((res) => {
+      if (res.code == 500) {
+        throw new Error('权限不足')
+      }
+    })
+  }
+  messageBox('warning', func, '用户成功修改密码', '用户权限不足', '确认重置该用户密码为123456吗?')
+}
+const filterHandler = (value: string, row: User, column: TableColumnCtx<User>) => {
+  return row['status'] === value
 }
 </script>
 <template>
@@ -71,7 +91,15 @@ const handleDelete = (row) => {
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="状态" width="180">
+      <el-table-column
+        label="状态"
+        width="180"
+        :filters="[
+          { text: '生效', value: '生效' },
+          { text: '离职', value: '离职' },
+        ]"
+        :filter-method="filterHandler"
+      >
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span style="margin-left: 10px">{{ scope.row.status }}</span>
@@ -89,12 +117,23 @@ const handleDelete = (row) => {
             授权
           </el-button>
           <el-button
+            type="primary"
+            size="small"
+            @click="handelResetPassword(scope.row)"
+            v-if="scope.row.status == '生效'"
+          >
+            重置密码
+          </el-button>
+          <el-button
             size="small"
             type="danger"
-            @click="handleDelete(scope.row)"
+            @click="handleStatus(scope.row, 1)"
             v-if="scope.row.status == '生效'"
           >
             离职失效
+          </el-button>
+          <el-button size="small" type="primary" @click="handleStatus(scope.row, 0)" v-else>
+            恢复
           </el-button>
         </template>
       </el-table-column>
@@ -126,6 +165,7 @@ const handleDelete = (row) => {
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="submitRole"> 确认 </el-button>
+
           <el-button
             type="info"
             @click="
