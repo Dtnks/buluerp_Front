@@ -10,11 +10,12 @@ import {
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
 import { ref } from 'vue'
+import { parseTime } from '@/utils/ruoyi'
 //渲染页面
 const formData = ref([
   [
     { type: 'input', value: '', label: '姓名', key: 'name' },
-    { type: 'timer', value: null, label: '创建曰期' },
+    { type: 'timer', value: '', label: '创建曰期', timerType: 'date', key: 'creatTime' },
   ],
   [
     { type: 'input', value: '', label: '联系方式', key: 'contact' },
@@ -56,7 +57,8 @@ const operation = ref([
   //   value: '查看',
   // },
   {
-    func: (id) => {
+    func: (row) => {
+      const id = row.id
       title.value = '编辑'
       editDialogVisible.value = true
       newSubmit.value = {}
@@ -78,6 +80,7 @@ const handleSubmit = () => {
       page.value = 1
       listCustomer(page.value, pageSize.value).then((res) => {
         listData.value = res.rows
+        total.value = res.total
       })
       editDialogVisible.value = false
     })
@@ -86,6 +89,7 @@ const handleSubmit = () => {
       page.value = 1
       listCustomer(page.value, pageSize.value).then((res) => {
         listData.value = res.rows
+        total.value = res.total
       })
       editDialogVisible.value = false
     })
@@ -103,12 +107,19 @@ const onSubmit = () => {
   const searchContent = {}
   formData.value.forEach((element) => {
     element.forEach((ele) => {
-      searchContent[ele.key] = ele.value
+      if (ele.key == 'creatTime') {
+        const formattedDate = parseTime(ele.value, '{y}-{m}-{d}')
+        searchContent[ele.key] = formattedDate
+      } else {
+        searchContent[ele.key] = ele.value
+      }
     })
   })
 
   page.value = 1
+  console.log(searchContent)
   listCustomer(page.value, pageSize.value, searchContent).then((res) => {
+    console.log(res)
     listData.value = res.rows
     total.value = res.total
   })
@@ -155,12 +166,7 @@ listCustomer(page.value, pageSize.value).then((res) => {
 </script>
 <template>
   <div>
-    <FormSearch
-      title="查询"
-      :data="formData"
-      :onCreate="onCreate"
-      :onSubmit="onSubmit"
-    />
+    <FormSearch title="查询" :data="formData" :onCreate="onCreate" :onSubmit="onSubmit" />
     <TableList
       :tableData="tableData"
       :operations="operation"
