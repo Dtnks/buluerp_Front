@@ -160,15 +160,16 @@ const getStatusText = (status: number) => {
   }
 };
 
-
+// onCheck: 点击查看按钮, 查看订单详情
 const onCheck = (row: TableDataType) => {
   console.log('查看：', row);
   // getOderDetail(row.id).then(res => {
   //   console.log('查看订单详情：', res);
   // })
-  props.addTab('订单详情', BusinessDetail, {
+  props.addTab(`订单详情 ${row.innerId}`, BusinessDetail, {
+    id: row.id,
     innerId: row.innerId,
-    // customerName: row.customerName,
+    customerName: row.customerName,
     status: row.status,
     // information: row.information,
     createTime: row.createTime,
@@ -190,7 +191,10 @@ const editForm = reactive({
   status: 0,
   information: '',
   createTime: '',
-  // id: 0,
+  quantity: 0, // 默认数量
+  customer_id: '', // 默认客户ID
+  product_id: '', // 默认产品ID
+  id: 0, // 默认ID
 });
 
 // 点击“编辑”按钮时触发
@@ -201,22 +205,20 @@ const onEdit = (row: TableDataType) => {
   editForm.status = row.status;
   // editForm.information = row.information;
   editForm.createTime = row.createTime;
-  // editForm.id = row.id;
+  editForm.id = row.id ||0;
 
   editDialogVisible.value = true;
 };
 
 // 保存编辑后的数据
-const onSaveEdit = () => {
-  // 在 tableData 中找到对应的行并更新数据
-  const index = tableData.value.findIndex((item) => item.innerId === editForm.innerId);
-  if (index !== -1) {
-    tableData.value[index] = { ...editForm };
+const onSaveEdit = async () => {
+  try {
+    await tableDataStore.editTableData({ ...editForm });
+    editDialogVisible.value = false;
+    console.log('保存后的数据：', tableData.value);
+  } catch (error) {
+    console.error('保存数据失败：', error);
   }
-
-  // 关闭弹窗
-  editDialogVisible.value = false;
-  console.log('保存后的数据：', tableData.value);
 };
 // // 编辑弹窗 ---end
 

@@ -18,12 +18,11 @@ export const getOrderDetail = async (id: number) => {
   try {
     const res = await getOrderDetailById(id)
     console.log('获取订单详情：', res.data);
+    return res.data;
 
   }
   catch (err) {
-
     console.log('获取订单详情失败：', err);
-
   }
 }
 
