@@ -27,6 +27,7 @@ const getEachPath = (ele) => {
   if (ele.id) {
     getMenu(ele.id).then((res) => {
       ele.path = res.data.path
+      console.log(res)
     })
   }
   if (Array.isArray(ele.children) && ele.children.length > 1) {
