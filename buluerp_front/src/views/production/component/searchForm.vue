@@ -1,5 +1,5 @@
 <template>
-  <el-card style="width: 100%; margin: 0 20px;">
+  <el-card style=" margin: 0 20px;">
     <template #header>
       <div class="card-header">
         <span>查询</span>
@@ -22,8 +22,8 @@
         <el-col :span="6">
           <el-form-item label="产品状态" prop="productStatus">
             <el-select v-model="formState.productStatus" placeholder="请选择产品状态">
-              <el-option label="设计中" value="doing" />
-              <el-option label="已完成" value="done" />
+              <el-option label="设计中" value="0" />
+              <el-option label="已完成" value="1" />
             </el-select>
           </el-form-item>
         </el-col>
@@ -90,15 +90,122 @@
       <div class="el-upload__tip" slot="tip">只能上传 xls/xlsx 文件，大小不超过 5MB</div>
     </el-upload>
   </el-dialog>
+  <el-dialog v-model="createDialogVisible" title="新建产品" width="500px">
+    <el-form
+      ref="createFormRef"
+      :model="createForm"
+      :rules="createFormRules"
+      label-width="100px"
+    >
+      <el-form-item label="产品名称" prop="name">
+        <el-input v-model="createForm.name" placeholder="请输入产品名称" />
+      </el-form-item>
+
+      <el-form-item label="产品图片" prop="image">
+        <el-upload
+          class="avatar-uploader"
+          :show-file-list="false"
+          :before-upload="beforeImageUpload"
+          :on-change="handleImageChange"
+        >
+          <div class="upload-box">
+            <img v-if="createForm.image" :src="createForm.image" class="avatar" />
+            <div v-else class="upload-placeholder">
+              <el-icon><Plus /></el-icon>
+              <div style="margin-top: 4px; font-size: 12px; color: #999;">点击上传</div>
+            </div>
+          </div>
+        </el-upload>
+      </el-form-item>
+      <el-form-item label="材料ID" prop="materialIds">
+        <el-select
+          v-model="createForm.materialIds"
+          multiple
+          filterable
+          allow-create
+          default-first-option
+          placeholder="请输入材料ID，按回车确认"
+        >
+        </el-select>
+      </el-form-item>
+    </el-form>
+
+    <template #footer>
+      <el-button @click="onCreateCancel">取消</el-button>
+      <el-button type="primary" @click="handleCreateSubmit">提交</el-button>
+    </template>
+  </el-dialog>
+
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { ElMessage } from "element-plus";
+import { createProduct , importProductFile} from '@/apis/products.js' 
+
+const emit = defineEmits(['search', 'created']) 
 
 
-const emit = defineEmits(['search']) // 关键：用于发送查询参数到父组件
+
+const createDialogVisible = ref(false)
+const createForm = reactive({
+  name: '',
+  image: '',
+  materialIds: [] as number[], 
+})
+
+const createFormRef = ref<FormInstance>()
+const createFormRules = {
+  name: [{ required: true, message: '请输入产品名称', trigger: 'blur' }],
+  image: [{ required: true, message: '请上传产品图片', trigger: 'change' }],
+  materialIds: [{ required: true, type: 'array', min: 1, message: '请至少输入一个原材料 ID', trigger: 'change' }],
+}
+
+
+const imageFile = ref<File | null>(null)
+
+const handleCreateSubmit = async () => {
+  const valid = await createFormRef.value?.validate().catch(() => false)
+  if (!valid) return
+
+  if (!imageFile.value) {
+    ElMessage.error('请上传产品图片')
+    return
+  }
+
+  try {
+    const formData = new FormData()
+    formData.append('name', createForm.name)
+    formData.append('picture', imageFile.value)
+
+    createForm.materialIds.forEach(id => {
+      formData.append('materialIds', id) // ✅ 正确传数组形式
+    })
+
+    await createProduct(formData)
+
+    ElMessage.success('产品创建成功')
+    createDialogVisible.value = false
+    resetCreateForm()
+    emit('created')
+  } catch (e) {
+    ElMessage.error('创建失败')
+  }
+}
+
+
+
+
+const resetCreateForm = () => {
+  createForm.name = ''
+  createForm.image = ''
+  createForm.materialIds = []
+  imageFile.value = null
+  createFormRef.value?.clearValidate?.()
+}
+
+
 
 const formRef = ref<FormInstance>()
 const formState = reactive({
@@ -114,19 +221,31 @@ const importDialogVisible = ref(false)
 
 const onSubmit = () => {
   const params = {
-    id: Number(formState.productCode) || undefined,
-    name: formState.productName || undefined,
+    productCode: formState.productCode || '',
+    productName: formState.productName || '',
+    productStatus: formState.productStatus || '',
+    creatorName: formState.creatorName || '',
+    createDate: formState.createDate || [],
+    otherSearch: formState.otherSearch || '',
   }
+  console.log('onSubmit params:', params)
   emit('search', params)
 }
+
 
 const onClear = () => {
   formRef.value?.resetFields()
 }
 
 const onCreate = () => {
-  console.log('点击新建')
+  createDialogVisible.value = true
 }
+
+const onCreateCancel = () => {
+  createDialogVisible.value = false
+  resetCreateForm()
+}
+
 
 const onImport = () => {
   importDialogVisible.value = true
@@ -147,25 +266,17 @@ const beforeUpload = (file: File) => {
   return true
 }
 
-// 上传处理（模拟/替换为真实接口）
+
 const handleUpload = async (option: any) => {
   const formData = new FormData()
   formData.append('file', option.file)
 
   try {
-    // 替换为你自己的上传接口
-    const res = await fetch('/api/import-excel', {
-      method: 'POST',
-      body: formData,
-    })
-    if (res.ok) {
-      ElMessage.success('导入成功')
-      importDialogVisible.value = false
-    } else {
-      ElMessage.error('导入失败')
-    }
+    await importProductFile(formData)
+    ElMessage.success('导入成功')
+    importDialogVisible.value = false
   } catch (e) {
-    ElMessage.error('上传出错')
+    ElMessage.error('导入失败')
   }
 }
 
@@ -177,6 +288,30 @@ const onDownloadTemplate = () => {
   link.click()
 }
 
+const beforeImageUpload = (file: File) => {
+  const isImage = file.type.startsWith('image/')
+  const isLt2M = file.size / 1024 / 1024 < 2
+  if (!isImage) {
+    ElMessage.error('只能上传图片文件')
+    return false
+  }
+  if (!isLt2M) {
+    ElMessage.error('图片大小不能超过 2MB')
+    return false
+  }
+
+  imageFile.value = file 
+
+  const reader = new FileReader()
+  reader.onload = () => {
+    createForm.image = reader.result as string 
+  }
+  reader.readAsDataURL(file)
+
+  return false  
+}
+
+
 </script>
 
 <style scoped>
@@ -186,4 +321,32 @@ const onDownloadTemplate = () => {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
+
+.avatar-uploader .upload-box {
+  width: 100px;
+  height: 100px;
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.avatar-uploader .avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #8c939d;
+}
+
 </style>

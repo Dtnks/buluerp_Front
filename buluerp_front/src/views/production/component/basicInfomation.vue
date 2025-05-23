@@ -2,28 +2,41 @@
 import { ref, reactive, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
-import axios from 'axios'
+import { updateProduct } from '@/apis/products.js' 
 
 const props = defineProps<{
   detail: any
   materialData: any[]
 }>()
 
+const tableData = ref<MaterialItem[]>([])
+const dialogVisible = ref(false)
+const editingIndex = ref<number | null>(null)
+const materialFormRef = ref<FormInstance>()
+const materialFormState = reactive<MaterialItem>({
+  materialCode: '',
+  materialName: '',
+  color: '',
+  size: '',
+  source: '',
+  quantity: 1,
+})
+
 const mainFormRef = ref<FormInstance>()
 const mainFormState = reactive({
   productPrice: '',
   productName: '',
   productIntro: '',
-  otherInfo: '',
+  designStatus: 0,
 })
 
-// ✅ 关键：包括 raw 原始文件
+
 const fileList = ref<{ url: string; raw?: File }[]>([])
 
 watch(() => props.detail, (val) => {
   if (val) {
     mainFormState.productName = val.name || ''
-    mainFormState.otherInfo = val.designStatus || ''
+    mainFormState.designStatus = Number(val.designStatus ?? 0)
   }
 }, { immediate: true })
 
@@ -40,50 +53,41 @@ const dummyRequest = (options: any) => {
   }, 1000)
 }
 
-// ✅ 关键：存储 raw 文件
+
 const handleChange = (file: any) => {
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    fileList.value = [{
-      url: e.target?.result as string,
-      raw: file.raw,
-    }]
-  }
-  reader.readAsDataURL(file.raw)
+  fileList.value = [{
+    url: URL.createObjectURL(file.raw),
+    raw: file.raw,
+  }]
 }
 
 const removeImage = (index: number) => {
   fileList.value.splice(index, 1)
 }
 
+
 const submitMainForm = async () => {
-  if (!mainFormRef.value) return
-  await mainFormRef.value.validate()
-
-  const formData = new FormData()
-  formData.append('id', props.detail?.id)
-  formData.append('name', mainFormState.productName)
-  // formData.append('productIntro', mainFormState.productIntro)
-  // formData.append('productPrice', mainFormState.productPrice)
-  // formData.append('otherInfo', mainFormState.otherInfo)
-
-  const rawFile = fileList.value[0]?.raw
-  if (rawFile) {
-    formData.append('picture', rawFile)
-  }
-
+  if (!mainFormRef.value) return;
   try {
-    const res = await axios.put('http://154.201.77.135:8080/system/products', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
-    ElMessage.success('提交成功')
+    await mainFormRef.value.validate();
+
+    const rawFile = fileList.value[0]?.raw;
+
+    await updateProduct({
+      id: Number(props.detail?.id), 
+      name: mainFormState.productName,
+      designStatus: Number(mainFormState.designStatus), 
+      pictureFile: rawFile,
+    });
+
+    ElMessage.success('提交成功');
   } catch (err) {
-    console.error('提交失败', err)
-    ElMessage.error('提交失败')
+    console.error('提交失败', err);
+    ElMessage.error('提交失败');
   }
-}
+};
+
+
 
 const onClear = () => {
   mainFormRef.value?.resetFields()
@@ -102,19 +106,6 @@ interface MaterialItem {
   source: string
   quantity: number
 }
-
-const tableData = ref<MaterialItem[]>([])
-const dialogVisible = ref(false)
-const editingIndex = ref<number | null>(null)
-const materialFormRef = ref<FormInstance>()
-const materialFormState = reactive<MaterialItem>({
-  materialCode: '',
-  materialName: '',
-  color: '',
-  size: '',
-  source: '',
-  quantity: 1,
-})
 
 const materialRules = reactive<FormRules>({
   materialCode: [{ required: true, message: '请输入物料编号', trigger: 'blur' }],
@@ -162,9 +153,8 @@ const resetMaterialForm = () => {
   materialFormState.source = ''
   materialFormState.quantity = 1
 }
-
-const active = ref(1)
 </script>
+
 
 <template>
   <el-form ref="mainFormRef" :model="mainFormState" label-width="120px" class="search-form">
@@ -201,10 +191,10 @@ const active = ref(1)
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item label="其他基本信息" prop="otherInfo">
-            <el-select v-model="mainFormState.otherInfo" placeholder="请选择">
-              <el-option label="设计中" value="doing" />
-              <el-option label="已完成" value="done" />
+          <el-form-item label="产品设计状态" prop="otherInfo">
+            <el-select v-model="mainFormState.designStatus" placeholder="请选择">
+              <el-option label="设计中" :value="0" />
+              <el-option label="已完成" :value="1" />
             </el-select>
           </el-form-item>
         </el-col>

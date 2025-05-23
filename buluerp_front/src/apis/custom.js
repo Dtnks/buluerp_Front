@@ -40,7 +40,7 @@ export function listCustomer(
   searchContent = { name: '', contact: '', email: '', remarks: '' },
 ) {
   return httpInstance({
-    url: `system/customers/list?pageNum=${pageNum}&pageSize=${pageSize}&name=${searchContent.name}&contact=${searchContent.contact}&email=${searchContent.email}&remarks=${searchContent.remarks}`,
+    url: `system/customers/list?pageNum=${pageNum}&pageSize=${pageSize}&name=${searchContent.name}&contact=${searchContent.contact}&email=${searchContent.email}&remarks=${searchContent.remarks}&creatTime=${searchContent.creatTime}`,
     method: 'get',
     headers: headers,
   })
@@ -50,7 +50,7 @@ export function exportSelectTable(data) {
     url: `system/customers/export`,
     method: 'post',
     headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
-    responseType:"blob",
+    responseType: 'blob',
     data: data,
   })
 }

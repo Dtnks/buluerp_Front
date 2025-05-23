@@ -22,7 +22,7 @@
               size="small"
               type="primary"
               text
-              @click="operation.func(row.id)"
+              @click="operation.func(row)"
               v-for="operation in operations"
               >{{ operation.value }}</el-button
             >

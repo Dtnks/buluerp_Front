@@ -3,10 +3,13 @@ import LayoutLeft from '@/views/layout/main/LayoutLeft.vue'
 import LayoutTop from '@/views/layout/main/LayoutTop.vue'
 import { ref } from 'vue'
 import type { TabPaneName } from 'element-plus'
+import { GetMenuInfo } from '@/apis/layout'
 import BusinessQuery from '../business/main/Query.vue'
+import { getMenu } from '@/apis/system/menu'
 
 const editableTabsValue = ref('订单看板')
 const editableTabs = ref([])
+const menuOptions = ref([])
 const addTab = (targetName: string, component, data = null) => {
   if (editableTabs.value.filter((item) => item.title == targetName).length > 0) {
     editableTabsValue.value = targetName
@@ -20,6 +23,21 @@ const addTab = (targetName: string, component, data = null) => {
   })
   editableTabsValue.value = targetName
 }
+const getEachPath = (ele) => {
+  if (ele.id) {
+    getMenu(ele.id).then((res) => {
+      ele.path = res.data.path
+    })
+  }
+  if (Array.isArray(ele.children) && ele.children.length > 1) {
+    ele.children.forEach(getEachPath)
+  }
+}
+GetMenuInfo().then((res) => {
+  res.forEach((ele) => getEachPath(ele))
+  menuOptions.value = res[0]
+  console.log(menuOptions.value)
+})
 const removeTab = (targetName: TabPaneName) => {
   const tabs = editableTabs.value
   let activeName = editableTabsValue.value
@@ -43,7 +61,7 @@ const handleHiddenMenu = () => {
 </script>
 <template>
   <div class="row">
-    <LayoutLeft :isCollapse="isCollapse" :addTab="addTab" />
+    <LayoutLeft :isCollapse="isCollapse" :addTab="addTab" :menuOptions="menuOptions" />
     <div class="col" style="flex: 1; height: 100vh; overflow-y: scroll">
       <LayoutTop :handleHiddenMenu="handleHiddenMenu"></LayoutTop>
       <el-tabs
