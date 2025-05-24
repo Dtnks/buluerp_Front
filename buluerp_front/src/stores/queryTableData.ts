@@ -25,9 +25,15 @@ const queryParams = reactive<Record<string, any>>({
   // getOders: 获取订单数据(支持查询和分页)
 const getOrders = async () => {
   try {
+       // 过滤掉空值或无效值
+    const validParams = Object.fromEntries(
+      Object.entries(queryParams).filter(([_, value]) => value !== '' && value !== null && value !== undefined)
+    );
+    console.log('有效的查询参数：', validParams);
+
     const res = await getOrdersList(
       {
-        ...queryParams,
+        ...validParams,
         page: pagination.current || 1,
         pageSize: pagination.pageSize || 5,
       }
