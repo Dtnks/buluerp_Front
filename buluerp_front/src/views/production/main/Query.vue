@@ -4,7 +4,6 @@ import BordShow from '@/components/board/SecBoard.vue'
 import SearchForm from '../component/searchForm.vue'
 import SearchList from '../component/searchList.vue'
 
-
 const props = defineProps<{
   addTab: (targetName: string, component: any, data?: any) => void
 }>()
@@ -20,27 +19,21 @@ const handleSearch = (params: Record<string, any>) => {
     createUsername: params.creatorName || null,
     createTimeFrom: params.createDate?.[0] || null,
     createTimeTo: params.createDate?.[1] || null,
-    otherSearch: params.otherSearch || null
+    otherSearch: params.otherSearch || null,
   }
   searchParams.value = filteredParams
   console.log('父组件发送搜索参数', searchParams.value)
 }
-
 </script>
 
 <template>
-  <div class="col">
+  <div>
     <BordShow content="产品查询列表" path="产品管理/查询" />
-    <div class="bgd">
+    <div class="greyBack">
       <SearchForm @search="handleSearch" />
       <SearchList :queryParams="searchParams" :addTab="props.addTab" />
     </div>
   </div>
 </template>
 
-<style scoped>
-.bgd {
-  padding-left: 20px;
-  padding-right: 6px;
-}
-</style>
+<style scoped></style>

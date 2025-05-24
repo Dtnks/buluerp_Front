@@ -53,10 +53,9 @@ export function changeStatus(data) {
 
 export function changeRoles(data) {
   return httpInstance({
-    url: `system/user/authRole`,
+    url: `system/user/authRole?userId=${data.userId}&roleIds=${data.roleIds.join('&roleIds=')}`,
     method: 'put',
     headers: headers,
-    data: data,
   })
 }
 

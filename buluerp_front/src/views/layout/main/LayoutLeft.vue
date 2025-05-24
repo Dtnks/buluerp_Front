@@ -2,9 +2,16 @@
 const props = defineProps({
   isCollapse: { type: Boolean },
   addTab: { type: Function },
-  menuOptions: { type: Object },
 })
-import {Grid, User } from '@element-plus/icons-vue'
+import useMenuState from '@/stores/modules/menu.js'
+import { ref, onMounted } from 'vue'
+import { Grid, Memo, CircleCheck, User, Menu } from '@element-plus/icons-vue'
+const menuStore = useMenuState()
+const menuOptions = ref([])
+onMounted(async () => {
+  await menuStore.refreshMenu()
+  menuOptions.value = menuStore.menu.children
+})
 
 import UserInformation from '@/views/person/main/Information.vue'
 import CustomQuery from '@/views/person/main/Custom.vue'
@@ -19,20 +26,22 @@ import PMInventoryList from '@/views/PMcenter/inventory/main/List.vue'
 import PMInventoryQuery from '@/views/PMcenter/inventory/main/Query.vue'
 import PMProcurementQuery from '@/views/PMcenter/procurement/main/List.vue'
 import PMProcurementPlan from '@/views/PMcenter/procurement/main/Plan.vue'
-const ComponentsGroup={UserInformation
-, CustomQuery
-, Manufacturers
-, BusinessShow
-, BusinessQuery
-, ProQuery
-, ProMaterial
-, Admin
-, Role
-, PMInventoryList
-, PMInventoryQuery
-, PMProcurementQuery
-, PMProcurementPlan,}
-const IconGroup={Conrtol:Grid,User:User,}
+const ComponentsGroup = {
+  UserInformation,
+  CustomQuery,
+  Manufacturers,
+  BusinessShow,
+  BusinessQuery,
+  ProQuery,
+  ProMaterial,
+  Admin,
+  Role,
+  PMInventoryList,
+  PMInventoryQuery,
+  PMProcurementQuery,
+  PMProcurementPlan,
+}
+const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
 </script>
 <template>
   <el-menu
@@ -47,20 +56,23 @@ const IconGroup={Conrtol:Grid,User:User,}
       <img id="logo" src="@/assets/img/logo.png" />
       <div style="color: white; font-size: 25px; white-space: nowrap">布鲁科</div>
     </div>
-    <el-sub-menu :index="item.id" v-for="item in menuOptions.children" :key="item.id">
-      <template #title
-        ><el-icon><img :src="/* @vite-ignore */ item.path" class="icon" /></el-icon
-        ><span>{{ item.label }}</span></template
-      >
-      <el-menu-item
-        :index="subItem.id"
-        @click="addTab(subItem.label,ComponentsGroup[subItem.path])"
-        v-for="subItem in item.children"
-        :key="subItem.id"
-      >
-        {{ subItem.label }}
-      </el-menu-item>
-    </el-sub-menu>
+    <div v-for="item in menuOptions" :key="item.id">
+      <el-sub-menu :index="item.id" v-if="!item.disabled">
+        <template #title
+          ><el-icon><component :is="IconGroup[item.path]"></component></el-icon
+          ><span>{{ item.label }}</span></template
+        >
+        <div v-for="subItem in item.children" :key="subItem.id">
+          <el-menu-item
+            :index="subItem.id"
+            @click="addTab(subItem.label, ComponentsGroup[subItem.path])"
+            v-if="!subItem.disabled"
+          >
+            {{ subItem.label }}
+          </el-menu-item>
+        </div>
+      </el-sub-menu>
+    </div>
 
     <el-sub-menu index="4">
       <template #title

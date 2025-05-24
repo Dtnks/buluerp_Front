@@ -2,7 +2,7 @@
 import { ref, reactive, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
-import { updateProduct } from '@/apis/products.js' 
+import { updateProduct } from '@/apis/products.js'
 
 const props = defineProps<{
   detail: any
@@ -30,21 +30,28 @@ const mainFormState = reactive({
   designStatus: 0,
 })
 
-
 const fileList = ref<{ url: string; raw?: File }[]>([])
 
-watch(() => props.detail, (val) => {
-  if (val) {
-    mainFormState.productName = val.name || ''
-    mainFormState.designStatus = Number(val.designStatus ?? 0)
-  }
-}, { immediate: true })
+watch(
+  () => props.detail,
+  (val) => {
+    if (val) {
+      mainFormState.productName = val.name || ''
+      mainFormState.designStatus = Number(val.designStatus ?? 0)
+    }
+  },
+  { immediate: true },
+)
 
-watch(() => props.materialData, (val) => {
-  if (val) {
-    tableData.value = val
-  }
-}, { immediate: true })
+watch(
+  () => props.materialData,
+  (val) => {
+    if (val) {
+      tableData.value = val
+    }
+  },
+  { immediate: true },
+)
 
 const dummyRequest = (options: any) => {
   const { onSuccess } = options
@@ -53,41 +60,39 @@ const dummyRequest = (options: any) => {
   }, 1000)
 }
 
-
 const handleChange = (file: any) => {
-  fileList.value = [{
-    url: URL.createObjectURL(file.raw),
-    raw: file.raw,
-  }]
+  fileList.value = [
+    {
+      url: URL.createObjectURL(file.raw),
+      raw: file.raw,
+    },
+  ]
 }
 
 const removeImage = (index: number) => {
   fileList.value.splice(index, 1)
 }
 
-
 const submitMainForm = async () => {
-  if (!mainFormRef.value) return;
+  if (!mainFormRef.value) return
   try {
-    await mainFormRef.value.validate();
+    await mainFormRef.value.validate()
 
-    const rawFile = fileList.value[0]?.raw;
+    const rawFile = fileList.value[0]?.raw
 
     await updateProduct({
-      id: Number(props.detail?.id), 
+      id: Number(props.detail?.id),
       name: mainFormState.productName,
-      designStatus: Number(mainFormState.designStatus), 
+      designStatus: Number(mainFormState.designStatus),
       pictureFile: rawFile,
-    });
+    })
 
-    ElMessage.success('提交成功');
+    ElMessage.success('提交成功')
   } catch (err) {
-    console.error('提交失败', err);
-    ElMessage.error('提交失败');
+    console.error('提交失败', err)
+    ElMessage.error('提交失败')
   }
-};
-
-
+}
 
 const onClear = () => {
   mainFormRef.value?.resetFields()
@@ -155,9 +160,8 @@ const resetMaterialForm = () => {
 }
 </script>
 
-
 <template>
-  <el-form ref="mainFormRef" :model="mainFormState" label-width="120px" class="search-form">
+  <el-form ref="mainFormRef" :model="mainFormState" label-width="120px" class="greyBack">
     <el-card>
       <template #header><div class="card-header">业务订单基础信息</div></template>
 
@@ -200,7 +204,7 @@ const resetMaterialForm = () => {
         </el-col>
       </el-row>
 
-      <el-row :gutter="20" style="margin-top: 20px;">
+      <el-row :gutter="20" style="margin-top: 20px">
         <el-col :span="8">
           <el-form-item label="上传图片" prop="uploadImage">
             <el-upload
@@ -245,59 +249,61 @@ const resetMaterialForm = () => {
         <el-table-column prop="quantity" label="数量" width="100" />
         <el-table-column fixed="right" label="操作" width="150">
           <template #default="scope">
-            <el-button link type="primary" size="small" @click="onEdit(scope.row, scope.$index)">编辑</el-button>
-            <el-button link type="danger" size="small" @click="onDelete(scope.$index)">删除</el-button>
+            <el-button link type="primary" size="small" @click="onEdit(scope.row, scope.$index)"
+              >编辑</el-button
+            >
+            <el-button link type="danger" size="small" @click="onDelete(scope.$index)"
+              >删除</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
 
       <el-button class="mt-4" style="width: 100%" @click="openDialog">新增物料</el-button>
-
-      <el-dialog v-model="dialogVisible" title="新建物料" width="600px">
-        <el-form ref="materialFormRef" :model="materialFormState" label-width="100px" :rules="materialRules">
-          <el-form-item label="物料编号" prop="materialCode">
-            <el-input v-model="materialFormState.materialCode" placeholder="请输入物料编号" />
-          </el-form-item>
-          <el-form-item label="物料名称" prop="materialName">
-            <el-input v-model="materialFormState.materialName" placeholder="请输入物料名称" />
-          </el-form-item>
-          <el-form-item label="颜色" prop="color">
-            <el-input v-model="materialFormState.color" placeholder="请输入颜色" />
-          </el-form-item>
-          <el-form-item label="物料尺寸" prop="size">
-            <el-input v-model="materialFormState.size" placeholder="请输入物料尺寸" />
-          </el-form-item>
-          <el-form-item label="物料来源" prop="source">
-            <el-input v-model="materialFormState.source" placeholder="请输入物料来源" />
-          </el-form-item>
-          <el-form-item label="数量" prop="quantity">
-            <el-input-number v-model="materialFormState.quantity" :min="1" />
-          </el-form-item>
-        </el-form>
-
-        <template #footer>
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitMaterial">确定</el-button>
-        </template>
-      </el-dialog>
+      <div style="text-align: right; margin-top: 20px">
+        <el-space>
+          <el-button @click="onCancel">取消</el-button>
+          <el-button type="primary" @click="submitMainForm">提交</el-button>
+          <el-button @click="onClear">重置</el-button>
+        </el-space>
+      </div>
     </el-card>
+    <el-dialog v-model="dialogVisible" title="新建物料" width="600px">
+      <el-form
+        ref="materialFormRef"
+        :model="materialFormState"
+        label-width="100px"
+        :rules="materialRules"
+      >
+        <el-form-item label="物料编号" prop="materialCode">
+          <el-input v-model="materialFormState.materialCode" placeholder="请输入物料编号" />
+        </el-form-item>
+        <el-form-item label="物料名称" prop="materialName">
+          <el-input v-model="materialFormState.materialName" placeholder="请输入物料名称" />
+        </el-form-item>
+        <el-form-item label="颜色" prop="color">
+          <el-input v-model="materialFormState.color" placeholder="请输入颜色" />
+        </el-form-item>
+        <el-form-item label="物料尺寸" prop="size">
+          <el-input v-model="materialFormState.size" placeholder="请输入物料尺寸" />
+        </el-form-item>
+        <el-form-item label="物料来源" prop="source">
+          <el-input v-model="materialFormState.source" placeholder="请输入物料来源" />
+        </el-form-item>
+        <el-form-item label="数量" prop="quantity">
+          <el-input-number v-model="materialFormState.quantity" :min="1" />
+        </el-form-item>
+      </el-form>
 
-    <div style="text-align: right; margin-top: 20px;">
-      <el-space>
-        <el-button @click="onCancel">取消</el-button>
-        <el-button type="primary" @click="submitMainForm">提交</el-button>
-        <el-button @click="onClear">重置</el-button>
-      </el-space>
-    </div>
+      <template #footer>
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitMaterial">确定</el-button>
+      </template>
+    </el-dialog>
   </el-form>
 </template>
 
 <style scoped>
-.search-form {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-}
 .card-header {
   font-weight: bold;
   font-size: 16px;

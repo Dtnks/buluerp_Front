@@ -7,12 +7,11 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import { useDict } from '@/utils/dict'
 import { download } from '@/utils/httpsInstance'
-import { parseTime, resetForm, addDateRange, handleTree, selectDictLabel, selectDictLabels } from '@/utils/ruoyi.js'
-const app = createApp(App)
+import { parseTime, resetForm, addDateRange } from '@/utils/ruoyi.js'
+const pinia = createPinia()
 
-app.use(createPinia())
-app.use(router)
-app.use(ElementPlus)
+const app = createApp(App)
+app.use(router).use(ElementPlus).use(pinia)
 app.mount('#app')
 app.config.globalProperties.useDict = useDict
 app.config.globalProperties.addDateRange = addDateRange

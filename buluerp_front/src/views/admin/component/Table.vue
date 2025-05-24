@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { changeStatus, changeRoles, resetPassword } from '@/apis/admin.js'
 import { messageBox } from '@/components/message/messageBox.js'
-defineProps(['tableData', 'total', 'setPage', 'options'])
+import { ElMessage } from 'element-plus'
+const props = defineProps(['tableData', 'total', 'setPage', 'options'])
 import { ref } from 'vue'
 const editPerson = ref({
   userName: null,
@@ -11,14 +12,18 @@ const editPerson = ref({
 })
 const DialogVisible = ref(false)
 const handleRole = (row) => {
-  editPerson.value = { ...row }
+  editPerson.value = row
   DialogVisible.value = true
 }
 const submitRole = () => {
   changeRoles({ userId: editPerson.value.userId, roleIds: editPerson.value.roleIds }).then(
     (res) => {
-      console.log({ userId: editPerson.value.userId, roleIds: editPerson.value.roleIds })
-      console.log(res)
+      console.log({ userId: editPerson.value.userId, roleIds: editPerson.value.roleIds }, res)
+      if (res.code === 200) {
+        DialogVisible.value = false
+        ElMessage({ type: 'success', message: '授权成功' })
+        props.setPage(1)
+      }
     },
   )
 }

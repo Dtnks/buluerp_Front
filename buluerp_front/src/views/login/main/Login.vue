@@ -2,26 +2,26 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Iphone, Lock } from '@element-plus/icons-vue'
-
+import useMenuState from '@/stores/modules/menu'
 import { Login } from '@/apis/login.js'
 import { ElMessage } from 'element-plus'
 const autoLogin = ref()
 const account = ref()
 const password = ref()
 const router = useRouter()
+const store = useMenuState()
 const handleLogin = () => {
-  Login({ username: account.value, password: password.value }).then((res) => {
-    console.log('login-response' ,res);
+  Login({ username: account.value, password: password.value }).then(async (res) => {
+    console.log('login-response', res)
 
     if (res.msg != '操作成功') {
       ElMessage({ type: 'error', message: '账号或密码错误' })
     } else {
-      console.log(res)
       localStorage.setItem('Authorization', res.token)
+      await store.refreshMenu()
       router.push({
         path: '/main',
       })
-
       ElMessage({ type: 'success', message: '登录成功' })
     }
   })
