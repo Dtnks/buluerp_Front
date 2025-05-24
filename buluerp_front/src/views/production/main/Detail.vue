@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import BordShow from '@/components/board/SecBoard.vue'
 import basicInfomation from '../component/basicInfomation.vue'
-import { getProductDetail } from '@/apis/products.js' 
+import { getProductDetail } from '@/apis/products.js'
 import { getMaterialList } from '@/apis/materials.js'
 
 // 接收父组件传来的 id
@@ -19,26 +19,22 @@ onMounted(async () => {
       detail.value = productResponse.data
 
       const materialIds = productResponse.data.materialIds || []
-      
-      const materialPromises = materialIds.map(id =>
-        getMaterialList({ id }) 
-      )
+
+      const materialPromises = materialIds.map((id) => getMaterialList({ id }))
 
       const materialResponses = await Promise.all(materialPromises)
 
-      materialData.value = materialResponses.map(res => res.data)
-
+      materialData.value = materialResponses.map((res) => res.data)
     } catch (error) {
       console.error('获取数据失败：', error)
     }
   }
 })
-
 </script>
 
 <template>
-  <div class="col">
+  <div>
     <BordShow content="产品详情页" path="产品管理/详情" />
-    <basicInfomation v-if="detail" :detail="detail" :materialData="materialData"/>
+    <basicInfomation v-if="detail" :detail="detail" :materialData="materialData" />
   </div>
 </template>

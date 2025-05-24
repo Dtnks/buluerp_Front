@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import FormSearch from '@/components/form/Form.vue'
+import BordShow from '@/components/board/SecBoard.vue'
 import {
   listCustomer,
   detailCustomer,
@@ -11,6 +12,8 @@ import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
 import { ref } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
+import { beforeUpload } from '@/utils/file/importExcel'
+import { importCustomFile } from '@/apis/custom.js'
 //渲染页面
 const formData = ref([
   [
@@ -125,8 +128,30 @@ const onSubmit = () => {
   })
 }
 
+const onImport = () => {
+  importDialogVisible.value = true
+}
+const handleUpload = async (option: any) => {
+  const formData = new FormData()
+  formData.append('file', option.file)
+
+  try {
+    importCustomFile(formData).then((res) => {
+      console.log(res)
+    })
+    ElMessage.success('导入成功')
+    importDialogVisible.value = false
+  } catch (e) {
+    ElMessage.error('导入失败')
+  }
+}
+
 //传给table组件
 const exportFunc = (row) => {
+  if (row.length === 0) {
+    ElMessage.warning('请先选择要导出的产品')
+    return
+  }
   const formData = new URLSearchParams()
   const ids = row.map((ele) => {
     return ele.id
@@ -138,6 +163,14 @@ const exportFunc = (row) => {
     downloadBinaryFile(res, now.toLocaleDateString())
   })
 }
+
+const DeleteFunc = (row) => {
+  const ids = row.map((ele) => {
+    return ele.id
+  })
+  console.log(ids)
+}
+
 //分页
 const page = ref(1)
 const pageSize = ref(10)
@@ -166,36 +199,46 @@ listCustomer(page.value, pageSize.value).then((res) => {
 </script>
 <template>
   <div>
-    <FormSearch title="查询" :data="formData" :onCreate="onCreate" :onSubmit="onSubmit" />
-    <TableList
-      :tableData="tableData"
-      :operations="operation"
-      :listData="listData"
-      :exportFunc="exportFunc"
-    >
-      <slot>
-        <div
-          style="
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          "
-        >
-          <div>共 {{ total }} 条</div>
-          <el-pagination
-            background
-            layout="prev, pager, next, jumper, ->, total, sizes"
-            :current-page="page"
-            :page-size="pageSize"
-            :page-sizes="[5, 10, 20, 50]"
-            :total="total"
-            @current-change="handlePageChange"
-            @size-change="handleSizeChange"
-          />
-        </div>
-      </slot>
-    </TableList>
+    <BordShow content="客户查询" path="用户中心/客户查询" />
+    <div class="greyBack">
+      <FormSearch
+        title="查询"
+        :data="formData"
+        :onCreate="onCreate"
+        :onSubmit="onSubmit"
+        :onImport="onImport"
+      />
+      <TableList
+        :tableData="tableData"
+        :operations="operation"
+        :listData="listData"
+        :DeleteFunc="DeleteFunc"
+        :exportFunc="exportFunc"
+      >
+        <slot>
+          <div
+            style="
+              margin-top: 20px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div>共 {{ total }} 条</div>
+            <el-pagination
+              background
+              layout="prev, pager, next, jumper, ->, total, sizes"
+              :current-page="page"
+              :page-size="pageSize"
+              :page-sizes="[5, 10, 20, 50]"
+              :total="total"
+              @current-change="handlePageChange"
+              @size-change="handleSizeChange"
+            />
+          </div>
+        </slot>
+      </TableList>
+    </div>
 
     <el-dialog v-model="editDialogVisible" :title="title" width="400px"
       ><div class="col cardCenter">

@@ -54,3 +54,14 @@ export function exportSelectTable(data) {
     data: data,
   })
 }
+
+export function importCustomFile(formData) {
+  return httpInstance({
+    url: 'system/customers/import',
+    method: 'post',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+}

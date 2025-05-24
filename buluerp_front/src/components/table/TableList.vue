@@ -4,6 +4,7 @@
       <div class="card-header">
         <span>展示</span>
         <el-button type="primary" @click="exportFunc(select!.getSelectionRows())">导出</el-button>
+        <el-button type="danger" @click="DeleteFunc(select!.getSelectionRows())">删除</el-button>
       </div>
     </template>
     <div>
@@ -38,7 +39,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-defineProps(['tableData', 'operations', 'listData', 'exportFunc'])
+defineProps(['tableData', 'operations', 'listData', 'exportFunc', 'DeleteFunc'])
 const select = ref()
 </script>
 <style scoped>

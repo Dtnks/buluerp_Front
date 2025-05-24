@@ -1,17 +1,12 @@
 <template>
-  <el-card style=" margin: 0 20px;">
+  <el-card style="margin: 0 20px">
     <template #header>
       <div class="card-header">
         <span>查询</span>
       </div>
     </template>
 
-    <el-form
-      ref="formRef"
-      :model="formState"
-      label-width="100px"
-      class="search-form"
-    >
+    <el-form ref="formRef" :model="formState" label-width="100px" class="search-form">
       <!-- 第一行 -->
       <el-row :gutter="20" align="middle">
         <el-col :span="6">
@@ -38,7 +33,7 @@
             />
           </el-form-item>
         </el-col>
-        <el-col :span="6" style="text-align: right;">
+        <el-col :span="6" style="text-align: right">
           <el-space>
             <el-button type="primary" @click="onSubmit">查询</el-button>
             <el-button @click="onClear">重置</el-button>
@@ -47,7 +42,7 @@
       </el-row>
 
       <!-- 第二行 -->
-      <el-row :gutter="20" align="middle" style="margin-top: 16px;">
+      <el-row :gutter="20" align="middle" style="margin-top: 16px">
         <el-col :span="6">
           <el-form-item label="产品名称" prop="productName">
             <el-input v-model="formState.productName" placeholder="请输入产品名称" />
@@ -63,7 +58,7 @@
             <el-input v-model="formState.otherSearch" placeholder="请输入其他搜索条件" />
           </el-form-item>
         </el-col>
-        <el-col :span="6" style="text-align: right;">
+        <el-col :span="6" style="text-align: right">
           <el-space>
             <el-button type="primary" @click="onCreate">新建</el-button>
             <el-button @click="onImport">导入</el-button>
@@ -71,7 +66,7 @@
         </el-col>
       </el-row>
 
-      <div style="text-align: right; margin-top: 8px;">
+      <div style="text-align: right; margin-top: 8px">
         <el-link type="primary" @click="onDownloadTemplate">下载导入模板</el-link>
       </div>
     </el-form>
@@ -87,16 +82,13 @@
     >
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
-      <div class="el-upload__tip" slot="tip">只能上传 xls/xlsx 文件，大小不超过 5MB</div>
+      <template v-slot:tip>
+        <div class="el-upload__tip">只能上传 xls/xlsx 文件，大小不超过 5MB</div>
+      </template>
     </el-upload>
   </el-dialog>
   <el-dialog v-model="createDialogVisible" title="新建产品" width="500px">
-    <el-form
-      ref="createFormRef"
-      :model="createForm"
-      :rules="createFormRules"
-      label-width="100px"
-    >
+    <el-form ref="createFormRef" :model="createForm" :rules="createFormRules" label-width="100px">
       <el-form-item label="产品名称" prop="name">
         <el-input v-model="createForm.name" placeholder="请输入产品名称" />
       </el-form-item>
@@ -112,7 +104,7 @@
             <img v-if="createForm.image" :src="createForm.image" class="avatar" />
             <div v-else class="upload-placeholder">
               <el-icon><Plus /></el-icon>
-              <div style="margin-top: 4px; font-size: 12px; color: #999;">点击上传</div>
+              <div style="margin-top: 4px; font-size: 12px; color: #999">点击上传</div>
             </div>
           </div>
         </el-upload>
@@ -135,33 +127,37 @@
       <el-button type="primary" @click="handleCreateSubmit">提交</el-button>
     </template>
   </el-dialog>
-
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue'
 import type { FormInstance } from 'element-plus'
-import { ElMessage } from "element-plus";
-import { createProduct , importProductFile} from '@/apis/products.js' 
+import { ElMessage } from 'element-plus'
+import { createProduct, importProductFile } from '@/apis/products.js'
 
-const emit = defineEmits(['search', 'created']) 
-
-
+const emit = defineEmits(['search', 'created'])
 
 const createDialogVisible = ref(false)
 const createForm = reactive({
   name: '',
   image: '',
-  materialIds: [] as number[], 
+  materialIds: [] as number[],
 })
 
 const createFormRef = ref<FormInstance>()
 const createFormRules = {
   name: [{ required: true, message: '请输入产品名称', trigger: 'blur' }],
   image: [{ required: true, message: '请上传产品图片', trigger: 'change' }],
-  materialIds: [{ required: true, type: 'array', min: 1, message: '请至少输入一个原材料 ID', trigger: 'change' }],
+  materialIds: [
+    {
+      required: true,
+      type: 'array',
+      min: 1,
+      message: '请至少输入一个原材料 ID',
+      trigger: 'change',
+    },
+  ],
 }
-
 
 const imageFile = ref<File | null>(null)
 
@@ -179,7 +175,7 @@ const handleCreateSubmit = async () => {
     formData.append('name', createForm.name)
     formData.append('picture', imageFile.value)
 
-    createForm.materialIds.forEach(id => {
+    createForm.materialIds.forEach((id) => {
       formData.append('materialIds', id) // ✅ 正确传数组形式
     })
 
@@ -194,9 +190,6 @@ const handleCreateSubmit = async () => {
   }
 }
 
-
-
-
 const resetCreateForm = () => {
   createForm.name = ''
   createForm.image = ''
@@ -204,8 +197,6 @@ const resetCreateForm = () => {
   imageFile.value = null
   createFormRef.value?.clearValidate?.()
 }
-
-
 
 const formRef = ref<FormInstance>()
 const formState = reactive({
@@ -232,7 +223,6 @@ const onSubmit = () => {
   emit('search', params)
 }
 
-
 const onClear = () => {
   formRef.value?.resetFields()
 }
@@ -246,14 +236,15 @@ const onCreateCancel = () => {
   resetCreateForm()
 }
 
-
 const onImport = () => {
   importDialogVisible.value = true
 }
 
 // 文件校验（限制大小）
 const beforeUpload = (file: File) => {
-  const isExcel = file.type === 'application/vnd.ms-excel' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  const isExcel =
+    file.type === 'application/vnd.ms-excel' ||
+    file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   const isLt5M = file.size / 1024 / 1024 < 5
   if (!isExcel) {
     ElMessage.error('只能上传 Excel 文件（xls/xlsx）')
@@ -266,13 +257,13 @@ const beforeUpload = (file: File) => {
   return true
 }
 
-
 const handleUpload = async (option: any) => {
   const formData = new FormData()
   formData.append('file', option.file)
 
   try {
-    await importProductFile(formData)
+    const res = await importProductFile(formData)
+    console.log(res)
     ElMessage.success('导入成功')
     importDialogVisible.value = false
   } catch (e) {
@@ -300,18 +291,16 @@ const beforeImageUpload = (file: File) => {
     return false
   }
 
-  imageFile.value = file 
+  imageFile.value = file
 
   const reader = new FileReader()
   reader.onload = () => {
-    createForm.image = reader.result as string 
+    createForm.image = reader.result as string
   }
   reader.readAsDataURL(file)
 
-  return false  
+  return false
 }
-
-
 </script>
 
 <style scoped>
@@ -348,5 +337,4 @@ const beforeImageUpload = (file: File) => {
   justify-content: center;
   color: #8c939d;
 }
-
 </style>
