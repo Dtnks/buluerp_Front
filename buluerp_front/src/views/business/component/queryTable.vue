@@ -7,7 +7,7 @@
           <span>列表</span>
         </div>
       </template>
-      <el-table :data="paginatiedtableData" border>
+      <el-table :data="tableDataStore.tableData" stripe style="width: 100%" border>
         <el-table-column v-for="column in columns" :key="column.prop" :prop="column.prop" :label="column.label">
           <template v-if="column.slot" #default="{ row }">
             <span style="display: flex; align-items: center;">
@@ -31,8 +31,8 @@
       </el-table>
 
       <!-- 分页 -->
-      <el-pagination background layout="prev, pager, next, sizes, total" :total="pagination.total"
-        :page-size="pagination.pageSize" :current-page="pagination.current" @size-change="onShowSizeChange"
+      <el-pagination background layout="prev, pager, next, sizes, total" :total="tableDataStore.total"
+        :page-size="tableDataStore.pagination.pageSize" :current-page="tableDataStore.pagination.current" @size-change="onShowSizeChange"
         @current-change="onPageChange" :page-sizes="[5, 10, 20, 50]" />
 
       <!-- 编辑弹窗 -->
@@ -222,26 +222,30 @@ const onSaveEdit = async () => {
 };
 // // 编辑弹窗 ---end
 
-// //表格分页
-const pagination = reactive({
-  current: 1,
-  pageSize: 5,
-  total: computed(() => tableData.value.length),
-  // pageSizes: [5, 10, 20, 50],
-});
+// // //表格分页
+// const pagination = reactive({
+//   current: 1,
+//   pageSize: 5,
+//   total: computed(() => tableData.value.length),
+//   // pageSizes: [5, 10, 20, 50],
+// });
 
-const paginatiedtableData = computed(() => {
-  const start = (pagination.current - 1) * pagination.pageSize;
-  const end = start + pagination.pageSize;
-  return tableData.value.slice(start, end);
-});
+// const paginatiedtableData = computed(() => {
+//   const start = (pagination.current - 1) * pagination.pageSize;
+//   const end = start + pagination.pageSize;
+//   return tableData.value.slice(start, end);
+// });
 
 const onPageChange = (page: number) => {
-  pagination.current = page;
+  // pagination.current = page;
+  tableDataStore.setPage(page);
+  tableDataStore.getOrders();
 };
 
 const onShowSizeChange = (size: number) => {
-  pagination.pageSize = size;
+  // pagination.pageSize = size;
+  tableDataStore.setPageSize(size);
+  tableDataStore.getOrders();
 };
 // 表格操作--end
 </script>

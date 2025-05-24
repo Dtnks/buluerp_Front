@@ -53,6 +53,10 @@ import { dayjs } from 'element-plus';
 import { useQueryTableDataStore } from '@/stores/queryTableData';
 import { number } from 'echarts';
 const dialogFormVisible = ref(false);
+const tableStores = useQueryTableDataStore();
+const tableData = computed(() => {
+  return tableStores.tableData;
+});
 
 const dialogForm = reactive({
   status: 0,
@@ -153,10 +157,13 @@ const searchForm = reactive({
 // onSubmit: 查询表单数据
 const onSubmit = () => {
   console.log('查询条件', searchForm);
-  searchOrders(searchForm).then((res) => {
-    console.log('查询结果', res);
-    // tableData.value = res.data;
-  });
+  // searchOrders(searchForm).then((res) => {
+  //   console.log('查询结果', res);
+  //   // tableData.value = res.data;
+  // });
+    tableStores.setQueryParams(searchForm); // 设置查询条件
+  tableStores.setPage(1); // 查询时重置页码为 1
+  tableStores.getOrders(); // 获取数据
 
 };
 
@@ -183,10 +190,7 @@ const onDownloadTemplate = () => {
 
 };
 
-const tableStores = useQueryTableDataStore();
-const tableData = computed(() => {
-  return tableStores.tableData;
-});
+
 // onAddConfirm: 添加确认, 将表单数据添加到表格中
 const onAddConfirm = async () => {
   // 格式化时间

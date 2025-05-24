@@ -15,14 +15,14 @@
         <el-col :span="6">
           <div class="field">
             <label>创建日期</label>
-            <div>{{ detail.createdTime }}</div>
+            <div>{{ detail.createTime || '暂无数据' }}</div>
           </div>
         </el-col>
         <!-- 订单状态 -->
         <el-col :span="6">
           <div class="field">
             <label>订单状态</label>
-            <div>{{ detail.status }}</div>
+            <div>{{ status }}</div>
           </div>
         </el-col>
       </el-row>
@@ -76,13 +76,25 @@
 
 <script setup lang="ts">
 import informationCard from './informationCard.vue';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import { getStatusText } from '../utils/statusMap';
+
 
 // Props
 // defineProps(['innerId', 'customerName', 'status', 'createdTime']);
 const props = defineProps<{
   detail: any;
 }>();
+
+
+onMounted(() => {
+
+  // 组件挂载后执行的逻辑
+  console.log('DetailShow.vue-mount');
+  console.log('DetailShow.vue-props.detail.createdTime', props.detail.createdTime);
+});
+// 订单状态
+const status = ref(getStatusText(props.detail.status));
 
 // 支付日期
 const payDate = ref([]);
