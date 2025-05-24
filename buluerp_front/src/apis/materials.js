@@ -1,13 +1,14 @@
 import httpInstance from "@/utils/httpsInstance.js"
 
-export function getStyleList(id) {
+export function getMaterialList(params) {
   return httpInstance({
-    url: `system/style/${id}`,
+    url: 'system/material-info/list',
     method: 'get',
+    params
   })
 }
 
-export function updateStyle(data) {
+export function updateMaterial(data) {
   return httpInstance({
     url: 'system/products',
     method: 'PUT',

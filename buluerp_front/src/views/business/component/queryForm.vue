@@ -188,21 +188,28 @@ const tableData = computed(() => {
   return tableStores.tableData;
 });
 // onAddConfirm: 添加确认, 将表单数据添加到表格中
-const onAddConfirm = () => {
+const onAddConfirm = async () => {
   // 格式化时间
   dialogForm.createTime = dayjs(dialogForm.createTime).format('YYYY-MM-DD HH:mm:ss');
-  // // 给customerId赋值
-  dialogForm.customerId = 0;
+
   console.log('添加确认', dialogForm);
 
-  addOrder(dialogForm).then((res) => {
-    console.log('添加结果', res);
-    // 将添加的订单数据添加到表格中
-    tableStores.addTableData(res.data);
-    // 重置表单
-    dialogFormVisible.value = false;
-    formRef.value?.resetFields();
-  });
+  const res = await addOrder(dialogForm);
+  console.log('添加结果', res);
+  // 重新获取表格数据
+  await tableStores.getOrders();
+  // 将添加的订单数据添加到表格中
+  // tableStores.addTableData({
+  //   ...dialogForm,
+  //   id: tableData.value.length + 1,
+  // } as any);
+  tableStores.tableData.unshift({
+    ...dialogForm,
+    id: tableData.value.length + 1,
+  } as any );
+  // 重置表单
+  dialogFormVisible.value = false;
+  formRef.value?.resetFields();
 
 };
 </script>

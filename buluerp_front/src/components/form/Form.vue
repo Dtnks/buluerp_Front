@@ -6,7 +6,7 @@
       </div>
     </template>
     <el-row>
-      <InputForm :data="data" :formState="formState" :ref="formRef" :searchForm="searchForm"/>
+      <InputForm :data="data" :formState="formState" />
       <el-col :span="4" style="text-align: right; padding: 20px">
         <el-space direction="vertical">
           <el-row>
@@ -33,10 +33,10 @@ import { defineProps } from 'vue'
 const props = defineProps(['data', 'title', 'onSubmit', 'onImport', 'onCreate', 'onDownloadTemplate', 'formState'])
 const onClear=()=>{props.data.forEach((element) => {
     element.forEach((ele) => {
-      ele.value = null
+      ele.value = ''
     })
-  })}
-
+  })
+}
 </script>
 
 <style scoped></style>

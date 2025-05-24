@@ -1,15 +1,20 @@
 <script setup lang="ts">
-const props = defineProps({ isCollapse: { type: Boolean }, addTab: { type: Function } })
+const props = defineProps({
+  isCollapse: { type: Boolean },
+  addTab: { type: Function },
+  menuOptions: { type: Object },
+})
 import { User } from '@element-plus/icons-vue'
-import UserInformation from '@/views/person/main/Information.vue'
-import CustomQuery from '@/views/person/main/Custom.vue'
-import Manufacturers from '@/views/person/main/Manufacturers.vue'
-import BusinessShow from '@/views/business/main/Show.vue'
-import BusinessQuery from '@/views/business/main/Query.vue'
-import ProQuery from '@/views/production/main/Query.vue'
-import ProMaterial from '@/views/production/main/Material.vue'
-import Admin from '@/views/admin/Admin.vue'
-import Role from '@/views/admin/Role.vue'
+
+// import UserInformation from '@/views/person/main/Information.vue'
+// import CustomQuery from '@/views/person/main/Custom.vue'
+// import Manufacturers from '@/views/person/main/Manufacturers.vue'
+// import BusinessShow from '@/views/business/main/Show.vue'
+// import BusinessQuery from '@/views/business/main/Query.vue'
+// import ProQuery from '@/views/production/main/Query.vue'
+// import ProMaterial from '@/views/production/main/Material.vue'
+// import Admin from '@/views/admin/Admin.vue'
+// import Role from '@/views/admin/Role.vue'
 import PMInventoryList from '@/views/PMcenter/inventory/main/List.vue'
 import PMInventoryQuery from '@/views/PMcenter/inventory/main/Query.vue'
 import PMProcurementQuery from '@/views/PMcenter/procurement/main/List.vue'
@@ -28,13 +33,19 @@ import PMProcurementPlan from '@/views/PMcenter/procurement/main/Plan.vue'
       <img id="logo" src="@/assets/img/logo.png" />
       <div style="color: white; font-size: 25px; white-space: nowrap">布鲁科</div>
     </div>
-    <el-sub-menu index="0">
+    <el-sub-menu :index="item.id" v-for="item in menuOptions.children" :key="item.id">
       <template #title
         ><el-icon><img src="@/assets/icon/u21.png" class="icon" /></el-icon
-        ><span>管理员</span></template
+        ><span>{{ item.label }}</span></template
       >
-      <el-menu-item index="0-1" @click="addTab('授权管理', Admin)"> 授权管理 </el-menu-item>
-      <el-menu-item index="0-1" @click="addTab('角色管理', Role)"> 节点管理 </el-menu-item>
+      <el-menu-item
+        index="0-1"
+        @click="addTab(subItem.label, Admin)"
+        v-for="subItem in item.children"
+        :key="subItem.id"
+      >
+        {{ subItem.label }}
+      </el-menu-item>
     </el-sub-menu>
     <el-sub-menu index="1">
       <template #title

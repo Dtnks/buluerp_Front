@@ -19,9 +19,10 @@
         <el-form-item :label="ele.label" v-else-if="ele.type == 'timer'">
           <el-date-picker
             v-model="ele.value"
-            type="daterange"
+            :type="ele.timerType"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
+            format="YYYY-MM-DD"
             style="width: 100%"
           />
         </el-form-item>
