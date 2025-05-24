@@ -4,11 +4,13 @@
 import httpInstance from "@/utils/httpsInstance"
 
 let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
-export function getOrdersList() {
+export function getOrdersList(params={}) {
   return httpInstance({
     url: 'system/orders/list',
     method: 'get',
     headers: headers,
+    params,
+
   })
 }
 
@@ -32,6 +34,24 @@ export const getOrderDetailById = ( id) => {
   return httpInstance({
     url: `system/orders/${id}`,
     method: 'get',
+    headers: headers,
+  })
+}
+
+export const postOrder = ( data) => {
+  return httpInstance({
+    url: 'system/orders',
+    method: 'post',
+    data,
+    headers: headers,
+  })
+}
+
+export const putOrder = ( data) => {
+  return httpInstance({
+    url: 'system/orders',
+    method: 'put',
+    data,
     headers: headers,
   })
 }

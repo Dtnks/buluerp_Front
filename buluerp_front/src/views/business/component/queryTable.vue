@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
   <!-- 表格 -->
   <el-card shadow="never" style="margin: 0px 20px">
     <template #header>
@@ -29,6 +30,67 @@
             <!-- {{ row[column.prop] }} -->
             {{ getStatusText(row[column.prop]) }}
           </span>
+=======
+  <div>
+    <!-- 表格 -->
+    <el-card shadow="never" style="margin-top: 10px" class="table-container">
+      <template #header>
+        <div>
+          <span>列表</span>
+        </div>
+      </template>
+      <el-table :data="tableDataStore.tableData" stripe style="width: 100%" border>
+        <el-table-column v-for="column in columns" :key="column.prop" :prop="column.prop" :label="column.label">
+          <template v-if="column.slot" #default="{ row }">
+            <span style="display: flex; align-items: center;">
+              <span :style="{
+                backgroundColor: getStatusColor(row[column.prop]), display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', margin: '0 5px 0 0', border: '1px solid #ccc'
+
+              }"></span>
+              <!-- {{ row[column.prop] }} -->
+              {{ getStatusText(row[column.prop]) }}
+            </span>
+
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template #default="{ row }">
+            <el-button link type="primary" @click="onEdit(row)">编辑</el-button>
+            <el-button link type="primary" @click="onCheck(row)">查看</el-button>
+            <el-button link type="primary" @click="onDerive(row)">导出</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <!-- 分页 -->
+      <el-pagination background layout="prev, pager, next, sizes, total" :total="tableDataStore.total"
+        :page-size="tableDataStore.pagination.pageSize" :current-page="tableDataStore.pagination.current" @size-change="onShowSizeChange"
+        @current-change="onPageChange" :page-sizes="[5, 10, 20, 50]" />
+
+      <!-- 编辑弹窗 -->
+      <el-dialog title="编辑订单" v-model="editDialogVisible" width="500px">
+        <el-form :model="editForm" label-width="100px">
+          <el-form-item label="订单ID">
+            <el-input v-model="editForm.innerId" disabled />
+          </el-form-item>
+          <el-form-item label="客户姓名">
+            <el-input v-model="editForm.customerName" />
+          </el-form-item>
+          <el-form-item label="订单状态">
+            <el-select v-model="editForm.status" placeholder="请选择">
+              <el-option label="初始状态" :value="0" />
+              <el-option label="设计中" :value="1" />
+              <el-option label="已完成" :value="2" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="其他信息">
+            <el-input v-model="editForm.information" />
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="onSaveEdit">保存</el-button>
+>>>>>>> 3fd9737a41b20e9369b4964877d44dac7339d7b5
         </template>
       </el-table-column>
       <el-table-column label="操作">
@@ -86,12 +148,26 @@ import { ElButton, ElTable, ElTableColumn, ElPagination } from 'element-plus'
 import { getOrdersList } from '@/apis/orders'
 // import request from '@/utils/request';
 // import { createIncrementalCompilerHost } from 'typescript';
+<<<<<<< HEAD
 import type { TableDataType } from '@/types/orderResponse'
 import BusinessDetail from '@/views/business/main/Detail.vue'
 import { getCustomerNameById } from '../apis/oders'
+=======
+import type { TableDataType } from '@/types/orderResponse';
+import BusinessDetail from '@/views/business/main/Detail.vue';
+import { getCustomerNameById } from '../apis/oders';
+import { useQueryTableDataStore } from '@/stores/queryTableData';
+>>>>>>> 3fd9737a41b20e9369b4964877d44dac7339d7b5
 
+// 加载数据
 onMounted(() => {
+<<<<<<< HEAD
   getOrders()
+=======
+  // getOrders();
+  tableDataStore.getOrders();
+
+>>>>>>> 3fd9737a41b20e9369b4964877d44dac7339d7b5
 })
 
 const props = defineProps<{
@@ -99,7 +175,11 @@ const props = defineProps<{
   addTab: (targetName: string, component: any, data?: any) => void
 }>()
 
+<<<<<<< HEAD
 const tableData = ref<TableDataType[]>([])
+=======
+// const tableData = ref<TableDataType[]>([]);
+>>>>>>> 3fd9737a41b20e9369b4964877d44dac7339d7b5
 
 const columns = [
   { prop: 'createTime', label: '创建时间' },
@@ -113,6 +193,7 @@ const columns = [
   { prop: 'information', label: '其他基本信息' },
 ]
 
+<<<<<<< HEAD
 // getOders: 获取订单数据(不包括客户姓名)
 const getOrders = async () => {
   try {
@@ -128,6 +209,31 @@ const getOrders = async () => {
     console.log('获取订单数据失败：', err)
   }
 }
+=======
+// // getOders: 获取订单数据(不包括客户姓名)
+// const getOrders = async () => {
+//   try {
+//     const res = await getOrdersList()
+//     console.log('获取订单数据：', res);
+//     tableData.value = res.rows;
+//     // 设置分页数据总数量
+//     pagination.total = res.total;
+//     for (let i = 0; i < res.rows.length; i++) {
+//       const customerName = await getCustomerNameById(res.rows[i].id);
+//       // console.log('获取客户姓名：', customerName);
+//       tableData.value[i].customerName = customerName;
+//     }
+
+//   }
+//   catch (err) {
+//     console.log('获取订单数据失败：', err);
+//   }
+// }
+
+const tableDataStore = useQueryTableDataStore();
+// 获取表格数据
+const tableData = computed(() => tableDataStore.tableData);
+>>>>>>> 3fd9737a41b20e9369b4964877d44dac7339d7b5
 
 // 表格操作--start
 const getStatusColor = (status: number) => {
@@ -159,16 +265,23 @@ const getStatusText = (status: number) => {
     case 4:
       return '布产中'
   }
+<<<<<<< HEAD
 }
 
+=======
+};
+
+// onCheck: 点击查看按钮, 查看订单详情
+>>>>>>> 3fd9737a41b20e9369b4964877d44dac7339d7b5
 const onCheck = (row: TableDataType) => {
   console.log('查看：', row)
   // getOderDetail(row.id).then(res => {
   //   console.log('查看订单详情：', res);
   // })
-  props.addTab('订单详情', BusinessDetail, {
+  props.addTab(`订单详情 ${row.innerId}`, BusinessDetail, {
+    id: row.id,
     innerId: row.innerId,
-    // customerName: row.customerName,
+    customerName: row.customerName,
     status: row.status,
     // information: row.information,
     createTime: row.createTime,
@@ -190,8 +303,16 @@ const editForm = reactive({
   status: 0,
   information: '',
   createTime: '',
+<<<<<<< HEAD
   // id: 0,
 })
+=======
+  quantity: 0, // 默认数量
+  customer_id: '', // 默认客户ID
+  product_id: '', // 默认产品ID
+  id: 0, // 默认ID
+});
+>>>>>>> 3fd9737a41b20e9369b4964877d44dac7339d7b5
 
 // 点击“编辑”按钮时触发
 const onEdit = (row: TableDataType) => {
@@ -200,6 +321,7 @@ const onEdit = (row: TableDataType) => {
   editForm.customerName = row.customerName
   editForm.status = row.status
   // editForm.information = row.information;
+<<<<<<< HEAD
   editForm.createTime = row.createTime
   // editForm.id = row.id;
 
@@ -241,6 +363,51 @@ const onPageChange = (page: number) => {
 const onShowSizeChange = (size: number) => {
   pagination.pageSize = size
 }
+=======
+  editForm.createTime = row.createTime;
+  editForm.id = row.id ||0;
+
+  editDialogVisible.value = true;
+};
+
+// 保存编辑后的数据
+const onSaveEdit = async () => {
+  try {
+    await tableDataStore.editTableData({ ...editForm });
+    editDialogVisible.value = false;
+    console.log('保存后的数据：', tableData.value);
+  } catch (error) {
+    console.error('保存数据失败：', error);
+  }
+};
+// // 编辑弹窗 ---end
+
+// // //表格分页
+// const pagination = reactive({
+//   current: 1,
+//   pageSize: 5,
+//   total: computed(() => tableData.value.length),
+//   // pageSizes: [5, 10, 20, 50],
+// });
+
+// const paginatiedtableData = computed(() => {
+//   const start = (pagination.current - 1) * pagination.pageSize;
+//   const end = start + pagination.pageSize;
+//   return tableData.value.slice(start, end);
+// });
+
+const onPageChange = (page: number) => {
+  // pagination.current = page;
+  tableDataStore.setPage(page);
+  tableDataStore.getOrders();
+};
+
+const onShowSizeChange = (size: number) => {
+  // pagination.pageSize = size;
+  tableDataStore.setPageSize(size);
+  tableDataStore.getOrders();
+};
+>>>>>>> 3fd9737a41b20e9369b4964877d44dac7339d7b5
 // 表格操作--end
 </script>
 
