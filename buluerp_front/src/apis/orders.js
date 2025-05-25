@@ -22,10 +22,11 @@ export const editOder = ( data) => {
     headers: headers,
   })
 }
-export const deleteOrder = ( id) => {
+export const deleteOrders = ( ids) => {
   return httpInstance({
-    url: `dev-api/system/orders/${id}`,
+    url: `dev-api/system/orders/${ids}`,
     method: 'post',
+    data: { ids },
     headers: headers,
   })
 }
@@ -38,6 +39,7 @@ export const getOrderDetailById = ( id) => {
   })
 }
 
+// 新增
 export const postOrder = ( data) => {
   return httpInstance({
     url: 'system/orders',
@@ -47,6 +49,7 @@ export const postOrder = ( data) => {
   })
 }
 
+// 修改
 export const putOrder = ( data) => {
   return httpInstance({
     url: 'system/orders',
@@ -55,6 +58,35 @@ export const putOrder = ( data) => {
     headers: headers,
   })
 }
+export function importOrderFile(formData) {
+  return httpInstance({
+    url: '/system/oders/import',
+    method: 'post',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
 
+export function updateOrder(data) {
+  const formData = new FormData();
+  formData.append('id', data.id);
+  formData.append('name', data.name);
+  formData.append('designStatus', data.designStatus);
+  if (data.pictureFile) {
+    console.log('上传图片文件：', data.pictureFile);
+    formData.append('picture', data.pictureFile);
+  }
+
+  return httpInstance({
+    url: 'system/orders',
+    method: 'put',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+}
 
 

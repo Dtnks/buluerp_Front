@@ -72,10 +72,10 @@
 <script lang="ts" setup>
 import { ref, watch , onMounted} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getList_pro , deleteProduct} from '@/apis/products.js' 
+import { getList_pro , deleteProduct} from '@/apis/products.js'
 import { exportToExcel } from '@/utils/file/exportExcel'
 
-import Detail from '../main/Detail.vue' 
+import Detail from '../main/Detail.vue'
 const props = defineProps<{
   queryParams: Record<string, any>
   addTab: (targetName: string, component: any, data?: any) => void
@@ -85,7 +85,7 @@ const data = ref([])
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
-const BASE_IMAGE_URL = 'http://154.201.77.135:8080' 
+const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
 
 const getFullImageUrl = (path: string) => {
   // 防止多余斜杠：/profile//2025/... => /profile/2025/...
@@ -147,10 +147,10 @@ const onDelete = async () => {
     })
 
     const ids = selectedRows.value.map(item => item.id)
-    await deleteProduct(ids) 
+    await deleteProduct(ids)
     ElMessage.success('删除成功')
-    fetchData() 
-    selectedRows.value = [] 
+    fetchData()
+    selectedRows.value = []
   } catch (err) {
     ElMessage.info('取消删除')
   }
@@ -163,7 +163,7 @@ const onExport = () => {
   }
 
   const today = new Date()
-  const dateStr = today.toISOString().split('T')[0].replace(/-/g, '') 
+  const dateStr = today.toISOString().split('T')[0].replace(/-/g, '')
 
   const exportData = selectedRows.value.map(item => ({
     产品ID: item.id,
