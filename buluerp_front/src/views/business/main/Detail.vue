@@ -15,7 +15,6 @@ const detail = ref<any>()
 const basicData = ref<any[]>([])
 
 onMounted(async () => {
-  // getDetail()
    console.log('Detail.vue -props.data.id', props.data.id);
   if (props.data.id) {
     // console.log('Detail.vue -props.data.id', props.data.id);

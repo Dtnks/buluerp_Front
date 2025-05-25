@@ -219,7 +219,7 @@ listCustomer(page.value, pageSize.value).then((res) => {
 })
 </script>
 <template>
-  <div>
+  <div class="col">
     <BordShow content="客户查询" path="用户中心/客户查询" />
     <div class="greyBack">
       <FormSearch

@@ -31,7 +31,7 @@ const handleCreated = () => {
 </script>
 
 <template>
-  <div>
+  <div class="col">
     <BordShow content="产品查询列表" path="产品管理/查询" />
     <div class="greyBack">
       <SearchForm @search="handleSearch" @created="handleCreated" />

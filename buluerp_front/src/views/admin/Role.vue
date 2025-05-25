@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="col">
     <BordShow content="角色配置" path="管理员/角色配置" />
     <div class="greyBack">
       <el-card class="col">

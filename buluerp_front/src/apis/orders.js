@@ -14,24 +14,24 @@ export function getOrdersList(params={}) {
   })
 }
 
-export const editOder = ( data) => {
+export const editOder = (data) => {
   return httpInstance({
-    url: 'dev-api/system/orders/edit',
+    url: 'system/orders/edit',
     method: 'post',
     data,
     headers: headers,
   })
 }
-export const deleteOrders = ( ids) => {
+export const deleteOrders = (ids) => {
   return httpInstance({
-    url: `dev-api/system/orders/${ids}`,
+    url: `system/orders/${ids}`,
     method: 'post',
     data: { ids },
     headers: headers,
   })
 }
 
-export const getOrderDetailById = ( id) => {
+export const getOrderDetailById = (id) => {
   return httpInstance({
     url: `system/orders/${id}`,
     method: 'get',
@@ -40,7 +40,7 @@ export const getOrderDetailById = ( id) => {
 }
 
 // 新增
-export const postOrder = ( data) => {
+export const postOrder = (data) => {
   return httpInstance({
     url: 'system/orders',
     method: 'post',
@@ -50,7 +50,7 @@ export const postOrder = ( data) => {
 }
 
 // 修改
-export const putOrder = ( data) => {
+export const putOrder = (data) => {
   return httpInstance({
     url: 'system/orders',
     method: 'put',

@@ -213,8 +213,8 @@ listManufacturers(page.value, pageSize.value).then((res) => {
 })
 </script>
 <template>
-  <div>
-    <BordShow content="客户查询" path="用户中心/客户查询" />
+  <div class="col">
+    <BordShow content="厂商查询" path="用户中心/厂商查询" />
     <div class="greyBack">
       <FormSearch
         title="查询"

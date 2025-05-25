@@ -93,6 +93,7 @@ import informationCard from './informationCard.vue'
 import { onMounted, ref } from 'vue'
 import { getStatusText } from '../utils/statusMap'
 import { getPackingListByOrderId } from '../apis/oders'
+import { getList_pro } from '@/apis/products.js'
 
 // Props
 // defineProps(['innerId', 'customerName', 'status', 'createdTime']);
@@ -105,6 +106,7 @@ onMounted(() => {
   console.log('DetailShow.vue-mount')
   console.log('DetailShow.vue-props.detail.createdTime', props.detail.createdTime)
   // getPackingList();
+  getOderDetails()
 })
 
 // 订单状态
@@ -114,13 +116,23 @@ const status = ref(getStatusText(props.detail.status))
 const payDate = ref([])
 
 // 订单详情数据
-const orderDetails = ref([
-  { productName: '产品1', quantity: 10, unitPrice: 100, totalPrice: 1000 },
-  { productName: '产品2', quantity: 5, unitPrice: 200, totalPrice: 1000 },
-])
+const orderDetails = ref([])
 
 // 订单ID
 const orderId = ref(props.detail.id)
+
+// 产品ID
+const productId = ref(props.detail.productId)
+
+const getOderDetails = async () => {
+  try {
+    const res = await getList_pro(productId.value)
+    console.log('获取订单详情数据(detailShow.vue):', res)
+    orderDetails.value = res.rows
+  } catch (error) {
+    console.error('获取订单详情数据失败:', error)
+  }
+}
 
 // 关联订单
 const relatedOrdersTable = ref([

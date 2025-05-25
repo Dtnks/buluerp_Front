@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="col">
     <el-config-provider :locale="zhCn">
       <BordShow content="业务订单查询列表" path="业务中心/查询" />
       <div class="greyBack">
