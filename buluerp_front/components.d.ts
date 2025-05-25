@@ -72,6 +72,7 @@ declare module 'vue' {
     SecBoard: typeof import('./src/components/board/SecBoard.vue')['default']
     Table: typeof import('./src/components/table/table.vue')['default']
     TableList: typeof import('./src/components/table/TableList.vue')['default']
+    Upload: typeof import('./src/components/upload/upload.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

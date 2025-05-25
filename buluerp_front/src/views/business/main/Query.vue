@@ -3,17 +3,6 @@
     <el-config-provider :locale="zhCn">
       <BordShow content="业务订单查询列表" path="业务中心/查询" />
       <div class="greyBack">
-        <<<<<<< HEAD
-        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd"></QueryForm>
-        <QueryTable
-          :queryParams="queryParams"
-          :addTab="props.addTab"
-          :pagination="pagination"
-          :tableData="tableData"
-          @onPageChange="handlePageChange"
-          @fetchData="fetchTableData"
-        ></QueryTable>
-        =======
         <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd"></QueryForm>
         <QueryTable
           :queryParams="queryParams"
@@ -24,7 +13,6 @@
           @onPageSizeChange="handleSizeChange"
           @fetchData="fetchTableData"
         ></QueryTable>
-        >>>>>>> 3f88342bc792a1372c1f87c00bd5e16b63aa84c1
       </div>
     </el-config-provider>
   </div>

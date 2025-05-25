@@ -151,7 +151,7 @@ const handleUpload = async (option: any) => {
     ElMessage.error('导入失败')
   }
 }
-
+let count = 1
 //传给table组件
 const exportFunc = (row) => {
   if (row.length === 0) {
@@ -166,7 +166,8 @@ const exportFunc = (row) => {
   formData.append('ids', ids)
   exportSelectTable(formData).then((res) => {
     const now = new Date()
-    downloadBinaryFile(res, now.toLocaleDateString())
+    downloadBinaryFile(res, '客户信息_' + now.toLocaleDateString() + '_' + count + '.xlsx')
+    count += 1
   })
 }
 
