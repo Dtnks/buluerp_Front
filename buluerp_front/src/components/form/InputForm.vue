@@ -7,7 +7,7 @@
           <el-input v-model="searchForm[ele.key]" />
         </el-form-item>
         <el-form-item :label="ele.label" v-else-if="ele.type === 'select'">
-          <el-select v-model="ele.value">
+          <el-select v-model="searchForm[ele.key]">
             <el-option
               v-for="option in ele.options"
               :key="option.value"

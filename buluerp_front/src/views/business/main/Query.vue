@@ -87,7 +87,7 @@ const fetchTableData = async () => {
     // 只传递分页参数
     const params = {
       pageNum: pagination.page,
-      pageSize: pagination.pageSize,
+      pageSize: pagination.pageSize ?? 5,
     }
 
     console.log('查询参数:', params)
@@ -95,6 +95,8 @@ const fetchTableData = async () => {
     const res = await getOrdersList(params)
     console.log('获取订单数据(queryTable.vue):', res)
     tableData.value = res.rows || []
+    console.log('tableData.value:', tableData.value)
+
     pagination.total = res.total || 0
   } catch (error) {
     console.error('获取订单数据失败(queryTable.vue):', error)

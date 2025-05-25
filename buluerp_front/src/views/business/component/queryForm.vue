@@ -114,13 +114,11 @@ const data = reactive([
       label: '业务订单ID',
       type: 'input', // 确保 type 不为空
       key: 'orderId', // 确保 key 对应 searchForm 的字段
-      value: '',
     },
     {
       label: '订单状态',
       type: 'select',
       key: 'status',
-      value: '',
       options: [
         { label: '初始状态', value: '0' },
         { label: '设计中', value: '1' },
@@ -133,7 +131,6 @@ const data = reactive([
       label: '创建日期',
       type: 'timer',
       key: 'createTime',
-      value: '',
       timerType: 'daterange',
     },
   ],
@@ -142,19 +139,16 @@ const data = reactive([
       label: '客户姓名',
       type: 'input',
       key: 'customerName',
-      value: '',
     },
     {
       label: '创建人姓名',
       type: 'input',
       key: 'createdBy',
-      value: '',
     },
     {
       label: '其他搜索框',
       type: 'input',
       key: 'otherInfo',
-      value: '',
     },
   ],
 ])
