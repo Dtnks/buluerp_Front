@@ -32,16 +32,31 @@ const mainFormState = reactive({
 
 const fileList = ref<{ url: string; raw?: File }[]>([])
 
+const BASE_URL = 'http://154.201.77.135:8080'
+
+function resolveImageUrl(path: string) {
+  if (!path) return ''
+  // 去掉多余的斜杠，拼接完整地址
+  return `${BASE_URL}${path.replace('//', '/')}`
+}
+
 watch(
   () => props.detail,
   (val) => {
+    console.log('接收到 props.detail：', val)
     if (val) {
       mainFormState.productName = val.name || ''
       mainFormState.designStatus = Number(val.designStatus ?? 0)
+      if (val.pictureUrl) {
+        const url = resolveImageUrl(val.pictureUrl)
+        fileList.value = [{ url }]
+      }
     }
   },
-  { immediate: true },
+  { immediate: true }
 )
+
+
 
 watch(
   () => props.materialData,
@@ -78,7 +93,7 @@ const submitMainForm = async () => {
   try {
     await mainFormRef.value.validate()
 
-    const rawFile = fileList.value[0]?.raw
+    const rawFile = fileList.value[0]?.raw ?? null
 
     await updateProduct({
       id: Number(props.detail?.id),
@@ -212,6 +227,7 @@ const resetMaterialForm = () => {
               action="#"
               :http-request="dummyRequest"
               :show-file-list="false"
+              :file-list="fileList" 
               :on-change="handleChange"
             >
               <el-button icon="el-icon-upload">点击上传</el-button>
@@ -228,8 +244,6 @@ const resetMaterialForm = () => {
         </el-col>
       </el-row>
     </el-card>
-
-    <el-divider></el-divider>
 
     <el-card>
       <template #header><div class="card-header">产品详情</div></template>

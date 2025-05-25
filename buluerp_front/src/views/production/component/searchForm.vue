@@ -17,8 +17,8 @@
         <el-col :span="6">
           <el-form-item label="产品状态" prop="productStatus">
             <el-select v-model="formState.productStatus" placeholder="请选择产品状态">
-              <el-option label="设计中" value="0" />
-              <el-option label="已完成" value="1" />
+              <el-option label="设计中" :value="0" />
+              <el-option label="已完成" :value="1" />
             </el-select>
           </el-form-item>
         </el-col>
@@ -26,10 +26,11 @@
           <el-form-item label="创建日期" prop="createDate">
             <el-date-picker
               v-model="formState.createDate"
-              type="daterange"
+              type="datetimerange"
+              value-format="YYYY-MM-DD HH:mm:ss"
+              range-separator="至"
               start-placeholder="开始日期"
               end-placeholder="结束日期"
-              style="width: 100%"
             />
           </el-form-item>
         </el-col>
