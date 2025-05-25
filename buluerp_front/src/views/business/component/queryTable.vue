@@ -10,7 +10,7 @@
         </div>
       </div>
     </template>
-    <el-table :data="paginatiedtableData" border @selection-change="handleSelectionChange" >
+    <el-table :data="props.tableData" border @selection-change="handleSelectionChange" >
       <el-table-column type="selection"  />
       <el-table-column
         v-for="column in columns"
@@ -52,8 +52,8 @@
       :total="pagination.total"
       :page-size="pagination.pageSize"
       :current-page="pagination.page"
-      @size-change="onShowSizeChange"
-      @current-change="onPageChange"
+      @size-change="emit('onPageChange', $event)"
+      @current-change="emit('onPageChange', $event)"
       :page-sizes="[5, 10, 20, 50]"
     />
 
@@ -268,13 +268,13 @@ const paginatiedtableData = computed(() => {
   return props.tableData.slice(start, end)
 })
 
-const onPageChange = (page: number) => {
-  props.pagination.page = page
-}
+// const onPageChange = (page: number) => {
+//   props.pagination.page = page
+// }
 
-const onShowSizeChange = (size: number) => {
-  props.pagination.pageSize = size
-}
+// const onShowSizeChange = (size: number) => {
+//   props.pagination.pageSize = size
+// }
 // 表格操作--end
 
 const selectedRows = ref<any[]>([])
