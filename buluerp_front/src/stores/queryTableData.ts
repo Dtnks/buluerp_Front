@@ -39,7 +39,7 @@ const getOrders = async () => {
       }
     )
     console.log('获取订单数据：', res);
-    tableData.value = res.rows || [];
+    tableData.value = res?.rows ?? [];
     total.value = res.total || 0;
     // for (let i = 0; i < res.rows.length; i++) {
       // const customerName = await getCustomerNameById(res.rows[i].id);

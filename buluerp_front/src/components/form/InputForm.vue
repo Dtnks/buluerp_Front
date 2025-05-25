@@ -4,7 +4,7 @@
     <el-row :gutter="20" align="middle" v-for="(list, index) in data" :key="index">
       <el-col :span="list.length == 3 ? 8 : 12" v-for="ele in list" :key="ele.label">
         <el-form-item :label="ele.label" v-if="ele.type === 'input'">
-          <el-input v-model.number="searchForm[ele.key]" />
+          <el-input v-model="searchForm[ele.key]" />
         </el-form-item>
         <el-form-item :label="ele.label" v-else-if="ele.type === 'select'">
           <el-select v-model="ele.value">

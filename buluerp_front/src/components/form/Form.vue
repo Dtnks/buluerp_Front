@@ -30,6 +30,7 @@
 <script lang="ts" setup>
 import InputForm from './InputForm.vue'
 import { defineProps } from 'vue'
+
 const props = defineProps([
   'data',
   'title',
@@ -40,6 +41,7 @@ const props = defineProps([
   'formState',
   'searchForm',
 ])
+
 const onClear = () => {
   props.data.forEach((element) => {
     element.forEach((ele) => {

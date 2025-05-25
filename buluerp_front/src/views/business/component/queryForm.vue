@@ -300,6 +300,7 @@ const onDownloadTemplate = () => {
 const onAddConfirm = () => {
   emit('onAdd', { ...dialogForm });
   dialogFormVisible.value = false;
+  
 };
 </script>
 
