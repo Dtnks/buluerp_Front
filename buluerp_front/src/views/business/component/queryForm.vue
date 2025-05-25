@@ -57,6 +57,7 @@ const tableStores = useQueryTableDataStore();
 const tableData = computed(() => {
   return tableStores.tableData;
 });
+const emit = defineEmits(['onSubmit', 'onAdd']);
 
 const dialogForm = reactive({
   status: 0,
@@ -154,25 +155,35 @@ const searchForm = reactive({
 // const datePicker = ref<[string, string]>(['', '']);
 
 
-// onSubmit: 查询表单数据
+// // onSubmit: 查询表单数据
+// const onSubmit = () => {
+//   console.log('查询条件', searchForm);
+//   // searchOrders(searchForm).then((res) => {
+//   //   console.log('查询结果', res);
+//   //   // tableData.value = res.data;
+//   // });
+//     tableStores.setQueryParams(searchForm); // 设置查询条件
+//   tableStores.setPage(1); // 查询时重置页码为 1
+//   tableStores.getOrders(); // 获取数据
+
+// };
 const onSubmit = () => {
-  console.log('查询条件', searchForm);
-  // searchOrders(searchForm).then((res) => {
-  //   console.log('查询结果', res);
-  //   // tableData.value = res.data;
-  // });
-    tableStores.setQueryParams(searchForm); // 设置查询条件
-  tableStores.setPage(1); // 查询时重置页码为 1
-  tableStores.getOrders(); // 获取数据
-
+  emit('onSubmit', { ...searchForm });
 };
 
+// const resetForm = () => {
+//   console.log('重置表单', formRef.value);
+
+//   formRef.value?.resetFields();
+//   // // formState.orderId = '';
+// };
+// resetForm: 重置表单
 const resetForm = () => {
-  console.log('重置表单', formRef.value);
-
-  formRef.value?.resetFields();
-  // // formState.orderId = '';
+  Object.keys(searchForm).forEach((key) => {
+    searchForm[key] = '';
+  });
 };
+
 const onCreate = () => {
   dialogFormVisible.value = true;
   console.log('点击创建');
@@ -187,34 +198,37 @@ const onImport = () => {
 const onDownloadTemplate = () => {
   console.log('下载导入模板');
 
-
 };
 
 
-// onAddConfirm: 添加确认, 将表单数据添加到表格中
-const onAddConfirm = async () => {
-  // 格式化时间
-  dialogForm.createTime = dayjs(dialogForm.createTime).format('YYYY-MM-DD HH:mm:ss');
+// // onAddConfirm: 添加确认, 将表单数据添加到表格中
+// const onAddConfirm = async () => {
+//   // 格式化时间
+//   dialogForm.createTime = dayjs(dialogForm.createTime).format('YYYY-MM-DD HH:mm:ss');
 
-  console.log('添加确认', dialogForm);
+//   console.log('添加确认', dialogForm);
 
-  const res = await addOrder(dialogForm);
-  console.log('添加结果', res);
-  // 重新获取表格数据
-  await tableStores.getOrders();
-  // 将添加的订单数据添加到表格中
-  // tableStores.addTableData({
-  //   ...dialogForm,
-  //   id: tableData.value.length + 1,
-  // } as any);
-  tableStores.tableData.unshift({
-    ...dialogForm,
-    id: tableData.value.length + 1,
-  } as any );
-  // 重置表单
+//   const res = await addOrder(dialogForm);
+//   console.log('添加结果', res);
+//   // 重新获取表格数据
+//   await tableStores.getOrders();
+//   // 将添加的订单数据添加到表格中
+//   // tableStores.addTableData({
+//   //   ...dialogForm,
+//   //   id: tableData.value.length + 1,
+//   // } as any);
+//   tableStores.tableData.unshift({
+//     ...dialogForm,
+//     id: tableData.value.length + 1,
+//   } as any );
+//   // 重置表单
+//   dialogFormVisible.value = false;
+//   formRef.value?.resetFields();
+
+// };
+const onAddConfirm = () => {
+  emit('onAdd', { ...dialogForm });
   dialogFormVisible.value = false;
-  formRef.value?.resetFields();
-
 };
 </script>
 
