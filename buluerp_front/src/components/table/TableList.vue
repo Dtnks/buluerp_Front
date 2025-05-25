@@ -3,8 +3,10 @@
     <template #header>
       <div class="card-header">
         <span>展示</span>
-        <el-button type="primary" @click="exportFunc(select!.getSelectionRows())">导出</el-button>
-        <el-button type="danger" @click="DeleteFunc(select!.getSelectionRows())">删除</el-button>
+        <div>
+          <el-button type="primary" @click="exportFunc(select!.getSelectionRows())">导出</el-button>
+          <el-button type="danger" @click="DeleteFunc(select!.getSelectionRows())">删除</el-button>
+        </div>
       </div>
     </template>
     <div>

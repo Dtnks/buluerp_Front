@@ -7,6 +7,7 @@ import {
   changeCustomer,
   newCustomer,
   exportSelectTable,
+  deleteCustomer,
 } from '@/apis/custom.js'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
@@ -14,6 +15,7 @@ import { ref } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { importCustomFile } from '@/apis/custom.js'
+import { messageBox } from '@/components/message/messageBox'
 //渲染页面
 const formData = ref([
   [
@@ -168,7 +170,26 @@ const DeleteFunc = (row) => {
   const ids = row.map((ele) => {
     return ele.id
   })
-  console.log(ids)
+  const func = () => {
+    return deleteCustomer(ids).then((res) => {
+      if (res.code == 500) {
+        throw new Error('权限不足')
+      } else {
+        listCustomer(page.value, pageSize.value).then((res) => {
+          listData.value = res.rows
+          total.value = res.total
+        })
+      }
+    })
+  }
+
+  messageBox(
+    'warning',
+    func,
+    `成功删除${ids.length}条记录`,
+    '用户权限不足',
+    `确认删除${ids.length}条记录`,
+  )
 }
 
 //分页

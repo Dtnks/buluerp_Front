@@ -1,12 +1,12 @@
 <template>
   <div>
-    <el-config-provider :locale="zhCn">
+    <!-- <el-config-provider :locale="zhCn">
       <BordShow content="业务订单查询列表" path="业务中心/查询" />
       <div class="greyBack">
         <QueryForm></QueryForm>
         <QueryTable :queryParams="searchParams" :addTab="props.addTab"></QueryTable>
       </div>
-    </el-config-provider>
+    </el-config-provider> -->
   </div>
 </template>
 

@@ -26,9 +26,9 @@ export function detailCustomer(id) {
   })
 }
 
-export function deleteCustomer(id) {
+export function deleteCustomer(ids) {
   return httpInstance({
-    url: `system/customers/${id}`,
+    url: `system/customers/${ids.join(',')}`,
     method: 'delete',
     headers: headers,
   })
