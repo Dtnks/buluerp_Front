@@ -28,6 +28,7 @@ export function detailManufacturers(id) {
 }
 
 export function deleteManufacturers(ids) {
+  console.log(`system/manufacturer/${ids.join(',')}`)
   return httpInstance({
     url: `system/manufacturer/${ids.join(',')}`,
     method: 'delete',
@@ -38,33 +39,40 @@ export function deleteManufacturers(ids) {
 export function listManufacturers(
   pageNum,
   pageSize,
-  searchContent = { email: '', name: '', remark: '', tel: '', creatTime: '' },
+  searchContent = {
+    email: '',
+    name: '',
+    remark: '',
+    tel: '',
+    createTimeFrom: '',
+    createTimeTo: '',
+  },
 ) {
   return httpInstance({
-    url: `system/manufacturer/list?name=${searchContent.name}&tel=${searchContent.tel}&email=${searchContent.email}&remark=${searchContent.remark}`,
+    url: `system/manufacturer/list?pageNum=${pageNum}&pageSize=${pageSize}&name=${searchContent.name}&tel=${searchContent.tel}&email=${searchContent.email}&remark=${searchContent.remark}&createTimeFrom=${searchContent.createTimeFrom}&createTimeTo=${searchContent.createTimeTo}`,
     method: 'get',
     headers: headers,
-    // pageNum=${pageNum}&pageSize=${pageSize}&
-    // &creatTime=${searchContent.creatTime}
+    //
+    //
   })
 }
-// export function exportSelectTable(data) {
-//   return httpInstance({
-//     url: `system/customers/export`,
-//     method: 'post',
-//     headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
-//     responseType: 'blob',
-//     data: data,
-//   })
-// }
+export function exportSelectTable(data) {
+  return httpInstance({
+    url: `system/manufacturer/export`,
+    method: 'post',
+    headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
+    responseType: 'blob',
+    data: data,
+  })
+}
 
-// export function importCustomFile(formData) {
-//   return httpInstance({
-//     url: 'system/customers/import',
-//     method: 'post',
-//     data: formData,
-//     headers: {
-//       'Content-Type': 'multipart/form-data',
-//     },
-//   })
-// }
+export function importmanufacturersFile(formData) {
+  return httpInstance({
+    url: 'system/manufacturer/import',
+    method: 'post',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+}

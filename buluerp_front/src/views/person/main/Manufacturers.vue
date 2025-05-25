@@ -7,6 +7,7 @@ import {
   changeManufacturers,
   newManufacturers,
   listManufacturers,
+  exportSelectTable,
 } from '@/apis/manufacturers.js'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
@@ -14,16 +15,17 @@ import { ref } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { importCustomFile } from '@/apis/custom.js'
+import { messageBox } from '@/components/message/messageBox'
 //渲染页面
 const formData = ref([
   [
-    { type: 'input', value: '', label: '姓名', key: 'name' },
-    { type: 'timer', value: '', label: '创建曰期', timerType: 'date', key: 'creatTime' },
+    { type: 'input', label: '姓名', key: 'name' },
+    { type: 'timer', label: '创建曰期', timerType: 'daterange', key: 'creatTime' },
   ],
   [
-    { type: 'input', value: '', label: '联系方式', key: 'tel' },
-    { type: 'input', value: '', label: '邮箱', key: 'email' },
-    { type: 'input', value: '', label: '客户备注', key: 'remark' },
+    { type: 'input', label: '联系方式', key: 'tel' },
+    { type: 'input', label: '邮箱', key: 'email' },
+    { type: 'input', label: '客户备注', key: 'remark' },
   ],
 ])
 const tableData = ref([
@@ -47,7 +49,7 @@ const tableData = ref([
     value: 'remark',
     label: '备注',
   },
-  { value: 'creatTime', label: '创建时间' },
+  { value: 'createTime', label: '创建时间' },
 ])
 const operation = ref([
   // {
@@ -72,6 +74,7 @@ const operation = ref([
     value: '编辑',
   },
 ])
+const searchContent = ref({ name: '', creatTime: '', email: '', remark: '', tel: '' })
 
 //新增与修改
 const importDialogVisible = ref(false)
@@ -108,21 +111,12 @@ const onCreate = () => {
 }
 
 const onSubmit = () => {
-  const searchContent = {}
-  formData.value.forEach((element) => {
-    element.forEach((ele) => {
-      if (ele.key == 'creatTime') {
-        const formattedDate = parseTime(ele.value, '{y}-{m}-{d}')
-        searchContent[ele.key] = formattedDate
-      } else {
-        searchContent[ele.key] = ele.value
-      }
-    })
-  })
-
+  console.log(searchContent.value)
+  searchContent.value.createTimeFrom = parseTime(searchContent.value.creatTime[0], '{y}-{m}-{d}')
+  searchContent.value.createTimeTo = parseTime(searchContent.value.creatTime[1], '{y}-{m}-{d}')
   page.value = 1
   console.log(searchContent)
-  listManufacturers(page.value, pageSize.value, searchContent).then((res) => {
+  listManufacturers(page.value, pageSize.value, searchContent.value).then((res) => {
     console.log(res)
     listData.value = res.rows
     total.value = res.total
@@ -148,28 +142,48 @@ const handleUpload = async (option: any) => {
 }
 
 //传给table组件
-// const exportFunc = (row) => {
-//   if (row.length === 0) {
-//     ElMessage.warning('请先选择要导出的产品')
-//     return
-//   }
-//   const formData = new URLSearchParams()
-//   const ids = row.map((ele) => {
-//     return ele.id
-//   })
-//   // const idsString = Array.isArray(ids) ? ids.join(',') : ids
-//   formData.append('ids', ids)
-//   exportSelectTable(formData).then((res) => {
-//     const now = new Date()
-//     downloadBinaryFile(res, now.toLocaleDateString())
-//   })
-// }
+const exportFunc = (row) => {
+  if (row.length === 0) {
+    ElMessage.warning('请先选择要导出的产品')
+    return
+  }
+  const formData = new URLSearchParams()
+  const ids = row.map((ele) => {
+    return ele.id
+  })
+  // const idsString = Array.isArray(ids) ? ids.join(',') : ids
+  formData.append('ids', ids)
+  exportSelectTable(formData).then((res) => {
+    const now = new Date()
+    downloadBinaryFile(res, now.toLocaleDateString())
+  })
+}
 
 const DeleteFunc = (row) => {
   const ids = row.map((ele) => {
     return ele.id
   })
-  console.log(ids)
+  const func = () => {
+    return deleteManufacturers(ids).then((res) => {
+      if (res.code == 500) {
+        console.log(res)
+        throw new Error('权限不足')
+      } else {
+        listCustomer(page.value, pageSize.value).then((res) => {
+          listData.value = res.rows
+          total.value = res.total
+        })
+      }
+    })
+  }
+
+  messageBox(
+    'warning',
+    func,
+    `成功删除${ids.length}条记录`,
+    '用户权限不足',
+    `确认删除${ids.length}条记录`,
+  )
 }
 
 //分页
@@ -208,6 +222,7 @@ listManufacturers(page.value, pageSize.value).then((res) => {
         :onCreate="onCreate"
         :onSubmit="onSubmit"
         :onImport="onImport"
+        :search-form="searchContent"
       />
       <TableList
         :tableData="tableData"

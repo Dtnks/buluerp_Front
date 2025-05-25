@@ -6,7 +6,7 @@
       </div>
     </template>
     <el-row>
-      <InputForm :data="data" :formState="formState" :searchForm="searchForm"/>
+      <InputForm :data="data" :formState="formState" :searchForm="searchForm" />
       <el-col :span="4" style="text-align: right; padding: 20px">
         <el-space direction="vertical">
           <el-row>
@@ -41,10 +41,8 @@ const props = defineProps([
   'searchForm',
 ])
 const onClear = () => {
-  props.data.forEach((element) => {
-    element.forEach((ele) => {
-      ele.value = ''
-    })
+  Object.keys(props.searchForm).forEach((key) => {
+    props.searchForm[key] = ''
   })
 }
 </script>

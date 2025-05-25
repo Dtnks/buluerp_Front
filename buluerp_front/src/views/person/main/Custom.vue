@@ -19,13 +19,13 @@ import { messageBox } from '@/components/message/messageBox'
 //渲染页面
 const formData = ref([
   [
-    { type: 'input', value: '', label: '姓名', key: 'name' },
-    { type: 'timer', value: '', label: '创建曰期', timerType: 'date', key: 'creatTime' },
+    { type: 'input', label: '姓名', key: 'name' },
+    { type: 'timer', label: '创建曰期', timerType: 'date', key: 'creatTime' },
   ],
   [
-    { type: 'input', value: '', label: '联系方式', key: 'contact' },
-    { type: 'input', value: '', label: '邮箱', key: 'email' },
-    { type: 'input', value: '', label: '客户备注', key: 'remarks' },
+    { type: 'input', label: '联系方式', key: 'contact' },
+    { type: 'input', label: '邮箱', key: 'email' },
+    { type: 'input', label: '客户备注', key: 'remarks' },
   ],
 ])
 const tableData = ref([
@@ -78,7 +78,13 @@ const operation = ref([
 //新增与修改
 const importDialogVisible = ref(false)
 const editDialogVisible = ref(false)
-const newSubmit = ref({})
+const newSubmit = ref({
+  name: '',
+  contact: '',
+  email: '',
+  remarks: '',
+  creatTime: '',
+})
 const handleSubmit = () => {
   if (title.value == '编辑') {
     changeCustomer(newSubmit.value).then((res) => {
@@ -107,23 +113,18 @@ const onCreate = () => {
   title.value = '新增'
   editDialogVisible.value = true
 }
-
+const searchContent = ref({
+  name: '',
+  contact: '',
+  email: '',
+  remarks: '',
+  creatTime: '',
+})
 const onSubmit = () => {
-  const searchContent = {}
-  formData.value.forEach((element) => {
-    element.forEach((ele) => {
-      if (ele.key == 'creatTime') {
-        const formattedDate = parseTime(ele.value, '{y}-{m}-{d}')
-        searchContent[ele.key] = formattedDate
-      } else {
-        searchContent[ele.key] = ele.value
-      }
-    })
-  })
+  searchContent.value.creatTime = parseTime(searchContent.value.creatTime, '{y}-{m}-{d}')
 
   page.value = 1
-  console.log(searchContent)
-  listCustomer(page.value, pageSize.value, searchContent).then((res) => {
+  listCustomer(page.value, pageSize.value, searchContent.value).then((res) => {
     console.log(res)
     listData.value = res.rows
     total.value = res.total
@@ -215,7 +216,6 @@ const handleSizeChange = async (val: number) => {
 listCustomer(page.value, pageSize.value).then((res) => {
   total.value = res.total
   listData.value = res.rows
-  console.log(res)
 })
 </script>
 <template>
@@ -228,6 +228,7 @@ listCustomer(page.value, pageSize.value).then((res) => {
         :onCreate="onCreate"
         :onSubmit="onSubmit"
         :onImport="onImport"
+        :searchForm="searchContent"
       />
       <TableList
         :tableData="tableData"

@@ -1,12 +1,18 @@
 <template>
   <div>
-    <!-- <el-config-provider :locale="zhCn">
+    <el-config-provider :locale="zhCn">
       <BordShow content="业务订单查询列表" path="业务中心/查询" />
       <div class="greyBack">
-        <QueryForm  @onSubmit="handleQuery" @onAdd="handleAdd"></QueryForm>
-        <QueryTable :queryParams="queryParams" :addTab="props.addTab" :pagination="pagination" :tableData="tableData" @onPageChange="handlePageChange"></QueryTable>
+        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd"></QueryForm>
+        <QueryTable
+          :queryParams="queryParams"
+          :addTab="props.addTab"
+          :pagination="pagination"
+          :tableData="tableData"
+          @onPageChange="handlePageChange"
+        ></QueryTable>
       </div>
-    </el-config-provider> -->
+    </el-config-provider>
   </div>
 </template>
 
@@ -36,7 +42,7 @@ const queryParams = reactive({
   createdBy: '',
   otherInfo: '',
   innerId: '',
-});
+})
 
 // pagination: 分页数据
 const pagination = reactive({
@@ -46,65 +52,65 @@ const pagination = reactive({
 })
 
 // tableData: 表格数据
-const tableData = ref([]);
+const tableData = ref([])
 
 // fetchTableData: 获取table数据
 // todo: 封装过searchOrder可以拿来用
 const fetchTableData = async () => {
   try {
-      // 过滤掉空值的查询参数
+    // 过滤掉空值的查询参数
     const filteredParams = Object.fromEntries(
-      Object.entries(queryParams).filter(([key, value]) => value !== '' || key === 'pageNum' || key === 'pageSize')
-    );
-    console.log('过滤后的查询参数:', filteredParams);
+      Object.entries(queryParams).filter(
+        ([key, value]) => value !== '' || key === 'pageNum' || key === 'pageSize',
+      ),
+    )
+    console.log('过滤后的查询参数:', filteredParams)
 
     const params = {
       ...queryParams,
       pageNum: pagination.page,
       pageSize: pagination.pageSize,
     }
-    console.log('查询参数:', params);
+    console.log('查询参数:', params)
 
-    const res = await getOrdersList(params);
+    const res = await getOrdersList(params)
     console.log('获取订单数据(queryTable.vue):', res)
     tableData.value = res.rows || []
     pagination.total = res.total || 0
-
   } catch (error) {
     console.error('获取订单数据失败(queryTable.vue):', error)
   }
 }
 
-
 // handleQuery: 处理查询
 const handleQuery = (params: Record<string, any>) => {
-  Object.assign(queryParams, params); // 更新查询条件
-  pagination.page = 1; // 查询时重置页码为 1
-  fetchTableData(); // 获取数据
-};
+  Object.assign(queryParams, params) // 更新查询条件
+  pagination.page = 1 // 查询时重置页码为 1
+  fetchTableData() // 获取数据
+}
 
 // handleAdd: 处理新增
 const handleAdd = async (newData: Record<string, any>) => {
   try {
-    const res = await addOrder(newData);
-    console.log('新增结果:', res);
-    fetchTableData(); // 重新获取数据
+    const res = await addOrder(newData)
+    console.log('新增结果:', res)
+    fetchTableData() // 重新获取数据
   } catch (err) {
-    console.error('新增失败:', err);
+    console.error('新增失败:', err)
   }
-};
+}
 
 // handlePageChange: 处理分页
 const handlePageChange = (page: number, pageSize: number) => {
-  pagination.page = page;
-  pagination.pageSize = pageSize;
-  fetchTableData(); // 获取数据
-};
+  pagination.page = page
+  pagination.pageSize = pageSize
+  fetchTableData() // 获取数据
+}
 
 // 初始化数据
 onMounted(() => {
-  fetchTableData();
-});
+  fetchTableData()
+})
 </script>
 
 <style scoped lang="less">
