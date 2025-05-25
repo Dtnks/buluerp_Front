@@ -46,3 +46,14 @@ export const searchOrders = async (params: any) => {
     console.log('查询订单失败：', err)
   }
 }
+
+// getPackingListByOrderId: 根据订单ID分包表
+export const getPackingListByOrderId = async (id: number) => {
+  try {
+    const res = await getOrderDetailById(id)
+    console.log('获取分包表：', res)
+    return res
+  } catch (err) {
+    console.log('获取分包表失败：', err)
+  }
+}

@@ -10,6 +10,7 @@
           :pagination="pagination"
           :tableData="tableData"
           @onPageChange="handlePageChange"
+          @fetchData="fetchTableData"
         ></QueryTable>
       </div>
     </el-config-provider>
@@ -47,30 +48,48 @@ const queryParams = reactive({
 // pagination: 分页数据
 const pagination = reactive({
   page: 1,
-  pageSize: 10,
+  pageSize: 5,
   total: 0,
 })
 
 // tableData: 表格数据
 const tableData = ref([])
 
-// fetchTableData: 获取table数据
-// todo: 封装过searchOrder可以拿来用
+// todo: 查询要再和后端对一下
+// // fetchTableData: 获取table数据
+// // todo: 封装过searchOrder可以拿来用
+// const fetchTableData = async () => {
+//   try {
+//       // 过滤掉空值的查询参数
+//     const filteredParams = Object.fromEntries(
+//       Object.entries(queryParams).filter(([key, value]) => value !== '' || key === 'pageNum' || key === 'pageSize')
+//     );
+//     console.log('过滤后的查询参数:', filteredParams);
+
+//     const params = {
+//       ...queryParams,
+//       pageNum: pagination.page,
+//       pageSize: pagination.pageSize,
+//     }
+//     console.log('查询参数:', params);
+
+//     const res = await getOrdersList(params);
+//     console.log('获取订单数据(queryTable.vue):', res)
+//     tableData.value = res.rows || []
+//     pagination.total = res.total || 0
+
+//   } catch (error) {
+//     console.error('获取订单数据失败(queryTable.vue):', error)
+//   }
+// }
 const fetchTableData = async () => {
   try {
-    // 过滤掉空值的查询参数
-    const filteredParams = Object.fromEntries(
-      Object.entries(queryParams).filter(
-        ([key, value]) => value !== '' || key === 'pageNum' || key === 'pageSize',
-      ),
-    )
-    console.log('过滤后的查询参数:', filteredParams)
-
+    // 只传递分页参数
     const params = {
-      ...queryParams,
       pageNum: pagination.page,
       pageSize: pagination.pageSize,
     }
+
     console.log('查询参数:', params)
 
     const res = await getOrdersList(params)
