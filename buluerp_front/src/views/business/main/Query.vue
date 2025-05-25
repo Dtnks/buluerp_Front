@@ -41,7 +41,7 @@ const queryParams = reactive({
 // pagination: 分页数据
 const pagination = reactive({
   page: 1,
-  pageSize: 10,
+  pageSize: 5,
   total: 0,
 })
 

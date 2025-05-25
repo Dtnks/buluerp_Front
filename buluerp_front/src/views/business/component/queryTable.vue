@@ -254,26 +254,26 @@ const onSaveEdit = () => {
 // // 编辑弹窗 ---end
 
 //  //表格分页
-const pagination = reactive({
-  page: 1,
-  pageSize: 5,
-  // total: props.tableData.length,
-  total: props.pagination.total,
-  pageSizes: [5, 10, 20, 50],
-})
+// const pagination = reactive({
+//   page: 1,
+//   pageSize: 5,
+//   // total: props.tableData.length,
+//   total: props.pagination.total,
+//   pageSizes: [5, 10, 20, 50],
+// })
 
 const paginatiedtableData = computed(() => {
-  const start = (pagination.page - 1) * pagination.pageSize
-  const end = start + pagination.pageSize
+  const start = (props.pagination.page - 1) * props.pagination.pageSize
+  const end = start + props.pagination.pageSize
   return props.tableData.slice(start, end)
 })
 
 const onPageChange = (page: number) => {
-  pagination.page = page
+  props.pagination.page = page
 }
 
 const onShowSizeChange = (size: number) => {
-  pagination.pageSize = size
+  props.pagination.pageSize = size
 }
 // 表格操作--end
 
