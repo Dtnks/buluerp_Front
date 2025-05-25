@@ -4,7 +4,7 @@
       <BordShow content="业务订单查询列表" path="业务中心/查询" />
       <div class="greyBack">
         <QueryForm  @onSubmit="handleQuery" @onAdd="handleAdd"></QueryForm>
-        <QueryTable :queryParams="queryParams" :addTab="props.addTab" :pagination="pagination" :tableData="tableData" @onPageChange="handlePageChange" @fetchData="fetchTableData"></QueryTable>
+        <QueryTable :queryParams="queryParams" :addTab="props.addTab" :pagination="pagination" :tableData="tableData" @onPageChange="handlePageChange" @onPageSizeChange="handleSizeChange" @fetchData="fetchTableData"></QueryTable>
       </div>
     </el-config-provider>
   </div>
@@ -80,7 +80,7 @@ const fetchTableData = async () => {
     // 只传递分页参数
     const params = {
       pageNum: pagination.page,
-      pageSize: pagination.pageSize?? 5,
+      pageSize: pagination.pageSize,
     };
 
     console.log('查询参数:', params);
@@ -89,7 +89,6 @@ const fetchTableData = async () => {
     console.log('获取订单数据(queryTable.vue):', res);
     tableData.value = res.rows || [];
     console.log('tableData.value:', tableData.value);
-
     pagination.total = res.total || 0;
   } catch (error) {
     console.error('获取订单数据失败(queryTable.vue):', error);
@@ -115,9 +114,15 @@ const handleAdd = async (newData: Record<string, any>) => {
 };
 
 // handlePageChange: 处理分页
-const handlePageChange = (page: number, pageSize: number) => {
+const handlePageChange = (page: number) => {
   pagination.page = page;
+  fetchTableData(); // 获取数据
+};
+
+// handleSizeChange: 处理每页条数变化
+const handleSizeChange = (pageSize: number) => {
   pagination.pageSize = pageSize;
+  pagination.page = 1; // 重置页码为 1
   fetchTableData(); // 获取数据
 };
 

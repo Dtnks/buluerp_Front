@@ -52,7 +52,7 @@
       :total="pagination.total"
       :page-size="pagination.pageSize"
       :current-page="pagination.page"
-      @size-change="emit('onPageChange', $event)"
+      @size-change="emit('onPageSizeChange', $event)"
       @current-change="emit('onPageChange', $event)"
       :page-sizes="[5, 10, 20, 50]"
     />
@@ -128,7 +128,7 @@ watch(
 
 
 
-const emit = defineEmits(['onPageChange', 'fetchData']);
+const emit = defineEmits(['onPageChange', 'fetchData', 'onPageSizeChange']);
 
 // const tableData = ref<TableDataType[]>([])
 
