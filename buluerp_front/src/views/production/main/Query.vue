@@ -15,7 +15,7 @@ const handleSearch = (params: Record<string, any>) => {
   const filteredParams = {
     id: params.productCode || null,
     name: params.productName || null,
-    design_status: params.productStatus || null,
+    designStatus: params.productStatus || null,
     createUsername: params.creatorName || null,
     createTimeFrom: params.createDate?.[0] || null,
     createTimeTo: params.createDate?.[1] || null,
@@ -24,16 +24,18 @@ const handleSearch = (params: Record<string, any>) => {
   searchParams.value = filteredParams
   console.log('父组件发送搜索参数', searchParams.value)
 }
+
+const handleCreated = () => {
+  handleSearch(searchParams.value)
+}
 </script>
 
 <template>
   <div>
     <BordShow content="产品查询列表" path="产品管理/查询" />
     <div class="greyBack">
-      <SearchForm @search="handleSearch" />
+      <SearchForm @search="handleSearch" @created="handleCreated" />
       <SearchList :queryParams="searchParams" :addTab="props.addTab" />
     </div>
   </div>
 </template>
-
-<style scoped></style>
