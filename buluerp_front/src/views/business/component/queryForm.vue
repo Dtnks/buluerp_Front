@@ -1,12 +1,12 @@
 <template>
   <Form :data="data" :title="title" :onSubmit="onSubmit" :onClear="resetForm" :onCreate="onCreate" :onImport="onImport"
     :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm"></Form>
-  <el-dialog v-model="dialogFormVisible" title="Shipping address" width="500">
+  <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
-      <el-form-item label="createdBy">
+      <el-form-item label="创建人姓名">
         <el-input v-model="dialogForm.createdBy" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="status">
+      <el-form-item label="订单状态">
         <el-select v-model="dialogForm.status" placeholder="Please select the status">
           <el-option label="初始状态" value=0 />
           <el-option label="设计中" value=1 />
@@ -16,16 +16,12 @@
           <el-option label="生产中" value=5 />
         </el-select>
       </el-form-item>
-      <el-form-item label="customerName">
+      <el-form-item label="客户姓名">
         <el-input v-model="dialogForm.customerName" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="information">
+      <el-form-item label="其他信息">
         <el-input v-model="dialogForm.information" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="createTime">
-        <el-date-picker v-model="dialogForm.createTime" type="datetime" placeholder="Pick a date" />
-      </el-form-item>
-
     </el-form>
     <template #footer>
       <div class="dialog-footer">
@@ -300,7 +296,7 @@ const onDownloadTemplate = () => {
 const onAddConfirm = () => {
   emit('onAdd', { ...dialogForm });
   dialogFormVisible.value = false;
-  
+
 };
 </script>
 
