@@ -52,11 +52,19 @@ const tableData = ref([]);
 // todo: 封装过searchOrder可以拿来用
 const fetchTableData = async () => {
   try {
+      // 过滤掉空值的查询参数
+    const filteredParams = Object.fromEntries(
+      Object.entries(queryParams).filter(([key, value]) => value !== '' || key === 'pageNum' || key === 'pageSize')
+    );
+    console.log('过滤后的查询参数:', filteredParams);
+
     const params = {
       ...queryParams,
       pageNum: pagination.page,
       pageSize: pagination.pageSize,
     }
+    console.log('查询参数:', params);
+
     const res = await getOrdersList(params);
     console.log('获取订单数据(queryTable.vue):', res)
     tableData.value = res.rows || []

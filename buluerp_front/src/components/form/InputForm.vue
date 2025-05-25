@@ -3,10 +3,10 @@
     <!-- 第一行 -->
     <el-row :gutter="20" align="middle" v-for="(list, index) in data" :key="index">
       <el-col :span="list.length == 3 ? 8 : 12" v-for="ele in list" :key="ele.label">
-        <el-form-item :label="ele.label" v-if="ele.type == 'input'">
-          <el-input v-model.number="ele.value" />
+        <el-form-item :label="ele.label" v-if="ele.type === 'input'">
+          <el-input v-model.number="searchForm[ele.key]" />
         </el-form-item>
-        <el-form-item :label="ele.label" v-else-if="ele.type == 'select'">
+        <el-form-item :label="ele.label" v-else-if="ele.type === 'select'">
           <el-select v-model="ele.value">
             <el-option
               v-for="option in ele.options"
@@ -16,9 +16,9 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="ele.label" v-else-if="ele.type == 'timer'">
+        <el-form-item :label="ele.label" v-else-if="ele.type === 'timer'">
           <el-date-picker
-            v-model="ele.value"
+            v-model="searchForm[ele.key]"
             :type="ele.timerType"
             start-placeholder="开始日期"
             end-placeholder="结束日期"

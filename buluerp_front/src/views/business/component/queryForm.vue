@@ -82,12 +82,14 @@ const data = reactive([
   [
     {
       label: '业务订单ID',
-      type: 'input',
+      type: 'input', // 确保 type 不为空
+      key: 'orderId', // 确保 key 对应 searchForm 的字段
       value: '',
     },
     {
       label: '订单状态',
       type: 'select',
+      key: 'status',
       value: '',
       options: [
         { label: '初始状态', value: '0' },
@@ -100,27 +102,31 @@ const data = reactive([
     {
       label: '创建日期',
       type: 'timer',
+      key: 'createTime',
       value: '',
+      timerType: 'daterange',
     },
   ],
   [
     {
       label: '客户姓名',
       type: 'input',
+      key: 'customerName',
       value: '',
     },
     {
       label: '创建人姓名',
       type: 'input',
+      key: 'createdBy',
       value: '',
     },
     {
       label: '其他搜索框',
       type: 'input',
+      key: 'otherInfo',
       value: '',
     },
   ],
-
 ]);
 
 const formRef = ref<FormInstance>();
@@ -168,6 +174,7 @@ const searchForm = reactive({
 
 // };
 const onSubmit = () => {
+  console.log('查询条件', searchForm);
   emit('onSubmit', { ...searchForm });
 };
 
