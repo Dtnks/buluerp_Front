@@ -10,8 +10,8 @@
         </div>
       </div>
     </template>
-    <el-table :data="props.tableData" border @selection-change="handleSelectionChange" >
-      <el-table-column type="selection"  />
+    <el-table :data="props.tableData" border @selection-change="handleSelectionChange">
+      <el-table-column type="selection" />
       <el-table-column
         v-for="column in columns"
         :key="column.prop"
@@ -52,7 +52,7 @@
       :total="pagination.total"
       :page-size="pagination.pageSize"
       :current-page="pagination.page"
-      @size-change="emit('onPageChange', $event)"
+      @size-change="emit('onPageSizeChange', $event)"
       @current-change="emit('onPageChange', $event)"
       :page-sizes="[5, 10, 20, 50]"
     />
@@ -138,7 +138,7 @@ watch(
   { immediate: true },
 )
 
-const emit = defineEmits(['onPageChange', 'fetchData'])
+const emit = defineEmits(['onPageChange', 'fetchData', 'onPageSizeChange'])
 
 // const tableData = ref<TableDataType[]>([])
 
