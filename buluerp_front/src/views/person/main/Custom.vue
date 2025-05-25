@@ -97,12 +97,15 @@ const handleSubmit = () => {
     })
   } else {
     newCustomer(newSubmit.value).then((res) => {
-      page.value = 1
-      listCustomer(page.value, pageSize.value).then((res) => {
-        listData.value = res.rows
-        total.value = res.total
-      })
-      editDialogVisible.value = false
+      if (res.msg == '操作成功') {
+        ElMessage.success('新增成功')
+        page.value = 1
+        listCustomer(page.value, pageSize.value).then((res) => {
+          listData.value = res.rows
+          total.value = res.total
+        })
+        editDialogVisible.value = false
+      }
     })
   }
 }

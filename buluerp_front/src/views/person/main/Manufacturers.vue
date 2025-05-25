@@ -16,6 +16,7 @@ import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { importCustomFile } from '@/apis/custom.js'
 import { messageBox } from '@/components/message/messageBox'
+import { ElMessage } from 'element-plus'
 //渲染页面
 const formData = ref([
   [
@@ -92,13 +93,15 @@ const handleSubmit = () => {
     })
   } else {
     newManufacturers(newSubmit.value).then((res) => {
-      console.log(res, newSubmit.value)
-      page.value = 1
-      listManufacturers(page.value, pageSize.value).then((res) => {
-        listData.value = res.rows
-        total.value = res.total
-      })
-      editDialogVisible.value = false
+      if (res.msg == '操作成功') {
+        page.value = 1
+        ElMessage.success('新增成功')
+        listManufacturers(page.value, pageSize.value).then((res) => {
+          listData.value = res.rows
+          total.value = res.total
+        })
+        editDialogVisible.value = false
+      }
     })
   }
 }
@@ -165,11 +168,12 @@ const DeleteFunc = (row) => {
   })
   const func = () => {
     return deleteManufacturers(ids).then((res) => {
+      console.log(res, '删除')
       if (res.code == 500) {
         console.log(res)
         throw new Error('权限不足')
       } else {
-        listCustomer(page.value, pageSize.value).then((res) => {
+        listManufacturers(page.value, pageSize.value).then((res) => {
           listData.value = res.rows
           total.value = res.total
         })
