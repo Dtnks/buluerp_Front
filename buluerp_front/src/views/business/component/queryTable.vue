@@ -6,7 +6,7 @@
         <span>列表</span>
       </div>
     </template>
-    <el-table :data="tableData" border>
+    <el-table :data="paginatiedtableData" border>
       <el-table-column
         v-for="column in columns"
         :key="column.prop"
@@ -46,7 +46,7 @@
       layout="prev, pager, next, sizes, total"
       :total="pagination.total"
       :page-size="pagination.pageSize"
-      :current-page="pagination.current"
+      :current-page="pagination.page"
       @size-change="onShowSizeChange"
       @current-change="onPageChange"
       :page-sizes="[5, 10, 20, 50]"
@@ -81,26 +81,46 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, onMounted, ref } from 'vue'
+import { reactive, computed, onMounted, ref, watch } from 'vue'
 import { ElButton, ElTable, ElTableColumn, ElPagination } from 'element-plus'
 import { getOrdersList } from '@/apis/orders'
 // import request from '@/utils/request';
 // import { createIncrementalCompilerHost } from 'typescript';
 import type { TableDataType } from '@/types/orderResponse'
 import BusinessDetail from '@/views/business/main/Detail.vue'
-import { getCustomerNameById } from '../apis/oders'
+import { getCustomerNameById, addOrder } from '../apis/oders'
 
 // 加载数据
 onMounted(() => {
-  getOrders()
+  // getOrders()
 })
 
 const props = defineProps<{
-  queryParams: Record<string, any>
+  // queryParams: Record<string, any>
   addTab: (targetName: string, component: any, data?: any) => void
+  tableData: any[]
+  pagination: {
+    page: number
+    pageSize: number
+    total: number
+  }
 }>()
+// 设置tableData默认值(注意: Vue 的 props 默认是只读的，不能直接修改)
+// 定义一个本地的 tableData
+const localTableData = ref([...props.tableData])
 
-const tableData = ref<TableDataType[]>([])
+// 监听 props.tableData 的变化，更新本地的 tableData
+watch(
+  () => props.tableData,
+  (newData) => {
+    localTableData.value = [...newData]
+  },
+  { immediate: true },
+)
+
+const emit = defineEmits(['onPageChange'])
+
+// const tableData = ref<TableDataType[]>([])
 
 const columns = [
   { prop: 'createTime', label: '创建时间' },
@@ -114,21 +134,21 @@ const columns = [
   { prop: 'information', label: '其他基本信息' },
 ]
 
-// getOders: 获取订单数据(不包括客户姓名)
-const getOrders = async () => {
-  try {
-    const res = await getOrdersList()
-    console.log('获取订单数据：', res)
-    tableData.value = res.rows
-    for (let i = 0; i < res.rows.length; i++) {
-      const customerName = await getCustomerNameById(res.rows[i].id)
-      // console.log('获取客户姓名：', customerName);
-      tableData.value[i].customerName = customerName
-    }
-  } catch (err) {
-    console.log('获取订单数据失败：', err)
-  }
-}
+// // getOders: 获取订单数据(不包括客户姓名)
+// const getOrders = async () => {
+//   try {
+//     const res = await getOrdersList()
+//     console.log('获取订单数据：', res)
+//     tableData.value = res.rows
+//     for (let i = 0; i < res.rows.length; i++) {
+//       const customerName = await getCustomerNameById(res.rows[i].id)
+//       // console.log('获取客户姓名：', customerName);
+//       tableData.value[i].customerName = customerName
+//     }
+//   } catch (err) {
+//     console.log('获取订单数据失败：', err)
+//   }
+// }
 
 // 表格操作--start
 const getStatusColor = (status: number) => {
@@ -212,32 +232,34 @@ const onEdit = (row: TableDataType) => {
 // 保存编辑后的数据
 const onSaveEdit = () => {
   // 在 tableData 中找到对应的行并更新数据
-  const index = tableData.value.findIndex((item) => item.innerId === editForm.innerId)
+  const index = localTableData.value.findIndex((item) => item.innerId === editForm.innerId)
   if (index !== -1) {
-    tableData.value[index] = { ...editForm }
+    localTableData.value[index] = { ...editForm }
   }
 
   // 关闭弹窗
   editDialogVisible.value = false
-  console.log('保存后的数据：', tableData.value)
+  console.log('保存后的数据：', localTableData.value)
 }
 // // 编辑弹窗 ---end
 
 //  //表格分页
 const pagination = reactive({
-  current: 1,
+  page: 1,
   pageSize: 5,
-  total: tableData.value.length,
+  // total: props.tableData.length,
+  total: props.pagination.total,
+  pageSizes: [5, 10, 20, 50],
 })
 
 const paginatiedtableData = computed(() => {
-  const start = (pagination.current - 1) * pagination.pageSize
+  const start = (pagination.page - 1) * pagination.pageSize
   const end = start + pagination.pageSize
-  return tableData.value.slice(start, end)
+  return props.tableData.slice(start, end)
 })
 
 const onPageChange = (page: number) => {
-  pagination.current = page
+  pagination.page = page
 }
 
 const onShowSizeChange = (size: number) => {

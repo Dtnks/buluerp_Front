@@ -60,6 +60,7 @@ const dialogFormVisible = ref(false)
 const tableData = computed(() => {
   return tableStores.tableData
 })
+const emit = defineEmits(['onSubmit', 'onAdd'])
 
 const dialogForm = reactive({
   status: 0,
@@ -83,12 +84,14 @@ const data = reactive([
   [
     {
       label: '业务订单ID',
-      type: 'input',
+      type: 'input', // 确保 type 不为空
+      key: 'orderId', // 确保 key 对应 searchForm 的字段
       value: '',
     },
     {
       label: '订单状态',
       type: 'select',
+      key: 'status',
       value: '',
       options: [
         { label: '初始状态', value: '0' },
@@ -101,23 +104,28 @@ const data = reactive([
     {
       label: '创建日期',
       type: 'timer',
+      key: 'createTime',
       value: '',
+      timerType: 'daterange',
     },
   ],
   [
     {
       label: '客户姓名',
       type: 'input',
+      key: 'customerName',
       value: '',
     },
     {
       label: '创建人姓名',
       type: 'input',
+      key: 'createdBy',
       value: '',
     },
     {
       label: '其他搜索框',
       type: 'input',
+      key: 'otherInfo',
       value: '',
     },
   ],
@@ -154,24 +162,36 @@ const searchForm = reactive({
 // // 时间选择框
 // const datePicker = ref<[string, string]>(['', '']);
 
-// onSubmit: 查询表单数据
+// // onSubmit: 查询表单数据
+// const onSubmit = () => {
+//   console.log('查询条件', searchForm);
+//   // searchOrders(searchForm).then((res) => {
+//   //   console.log('查询结果', res);
+//   //   // tableData.value = res.data;
+//   // });
+//     tableStores.setQueryParams(searchForm); // 设置查询条件
+//   tableStores.setPage(1); // 查询时重置页码为 1
+//   tableStores.getOrders(); // 获取数据
+
+// };
 const onSubmit = () => {
   console.log('查询条件', searchForm)
-  // searchOrders(searchForm).then((res) => {
-  //   console.log('查询结果', res);
-  //   // tableData.value = res.data;
-  // });
-  tableStores.setQueryParams(searchForm) // 设置查询条件
-  tableStores.setPage(1) // 查询时重置页码为 1
-  tableStores.getOrders() // 获取数据
+  emit('onSubmit', { ...searchForm })
 }
 
+// const resetForm = () => {
+//   console.log('重置表单', formRef.value);
+
+//   formRef.value?.resetFields();
+//   // // formState.orderId = '';
+// };
+// resetForm: 重置表单
 const resetForm = () => {
-  console.log('重置表单', formRef.value)
-
-  formRef.value?.resetFields()
-  // // formState.orderId = '';
+  Object.keys(searchForm).forEach((key) => {
+    searchForm[key] = ''
+  })
 }
+
 const onCreate = () => {
   dialogFormVisible.value = true
   console.log('点击创建')
@@ -185,29 +205,34 @@ const onDownloadTemplate = () => {
   console.log('下载导入模板')
 }
 
-// onAddConfirm: 添加确认, 将表单数据添加到表格中
-const onAddConfirm = async () => {
-  // 格式化时间
-  dialogForm.createTime = dayjs(dialogForm.createTime).format('YYYY-MM-DD HH:mm:ss')
+// // onAddConfirm: 添加确认, 将表单数据添加到表格中
+// const onAddConfirm = async () => {
+//   // 格式化时间
+//   dialogForm.createTime = dayjs(dialogForm.createTime).format('YYYY-MM-DD HH:mm:ss');
 
-  console.log('添加确认', dialogForm)
+//   console.log('添加确认', dialogForm);
 
-  const res = await addOrder(dialogForm)
-  console.log('添加结果', res)
-  // 重新获取表格数据
-  await tableStores.getOrders()
-  // 将添加的订单数据添加到表格中
-  // tableStores.addTableData({
-  //   ...dialogForm,
-  //   id: tableData.value.length + 1,
-  // } as any);
-  tableStores.tableData.unshift({
-    ...dialogForm,
-    id: tableData.value.length + 1,
-  } as any)
-  // 重置表单
+//   const res = await addOrder(dialogForm);
+//   console.log('添加结果', res);
+//   // 重新获取表格数据
+//   await tableStores.getOrders();
+//   // 将添加的订单数据添加到表格中
+//   // tableStores.addTableData({
+//   //   ...dialogForm,
+//   //   id: tableData.value.length + 1,
+//   // } as any);
+//   tableStores.tableData.unshift({
+//     ...dialogForm,
+//     id: tableData.value.length + 1,
+//   } as any );
+//   // 重置表单
+//   dialogFormVisible.value = false;
+//   formRef.value?.resetFields();
+
+// };
+const onAddConfirm = () => {
+  emit('onAdd', { ...dialogForm })
   dialogFormVisible.value = false
-  formRef.value?.resetFields()
 }
 </script>
 

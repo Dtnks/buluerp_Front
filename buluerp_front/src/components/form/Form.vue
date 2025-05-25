@@ -6,7 +6,7 @@
       </div>
     </template>
     <el-row>
-      <InputForm :data="data" :formState="formState" />
+      <InputForm :data="data" :formState="formState" :searchForm="searchForm"/>
       <el-col :span="4" style="text-align: right; padding: 20px">
         <el-space direction="vertical">
           <el-row>
@@ -38,6 +38,7 @@ const props = defineProps([
   'onCreate',
   'onDownloadTemplate',
   'formState',
+  'searchForm',
 ])
 const onClear = () => {
   props.data.forEach((element) => {
