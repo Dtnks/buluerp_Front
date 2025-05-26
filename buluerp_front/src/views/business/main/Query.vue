@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="col">
     <el-config-provider :locale="zhCn">
       <BordShow content="业务订单查询列表" path="业务中心/查询" />
       <div class="greyBack">
@@ -39,7 +39,7 @@ const queryParams = reactive({
   createdBy: '',
   otherInfo: '',
   innerId: '',
-});
+})
 
 // pagination: 分页数据
 const pagination = reactive({
@@ -49,7 +49,7 @@ const pagination = reactive({
 })
 
 // tableData: 表格数据
-const tableData = ref([]);
+const tableData = ref([])
 
 // todo: 查询要再和后端对一下
 // // fetchTableData: 获取table数据
@@ -90,9 +90,9 @@ const fetchTableData = async () => {
     pagination.total = res.total || 0;
     console.log('获取订单数据(queryTable.vue-fetchTableData):', res);
   } catch (error) {
-    console.error('获取订单数据失败(queryTable.vue):', error);
+    console.error('获取订单数据失败(queryTable.vue):', error)
   }
-};
+}
 
 // handleQuery: 处理查询
 const handleQuery = (params: Record<string, any>) => {
@@ -105,11 +105,11 @@ const handleQuery = (params: Record<string, any>) => {
 // handleAdd: 处理新增
 const handleAdd = async (newData: Record<string, any>) => {
   try {
-    const res = await addOrder(newData);
-    console.log('新增结果:', res);
-    fetchTableData(); // 重新获取数据
+    const res = await addOrder(newData)
+    console.log('新增结果:', res)
+    fetchTableData() // 重新获取数据
   } catch (err) {
-    console.error('新增失败:', err);
+    console.error('新增失败:', err)
   }
 };
 
@@ -128,21 +128,21 @@ const handleUpdate = async (updatedData: any) => {
 
 // handlePageChange: 处理分页
 const handlePageChange = (page: number) => {
-  pagination.page = page;
-  fetchTableData(); // 获取数据
-};
+  pagination.page = page
+  fetchTableData() // 获取数据
+}
 
 // handleSizeChange: 处理每页条数变化
 const handleSizeChange = (pageSize: number) => {
-  pagination.pageSize = pageSize;
-  pagination.page = 1; // 重置页码为 1
-  fetchTableData(); // 获取数据
-};
+  pagination.pageSize = pageSize
+  pagination.page = 1 // 重置页码为 1
+  fetchTableData() // 获取数据
+}
 
 // 初始化数据
 onMounted(() => {
-  fetchTableData();
-});
+  fetchTableData()
+})
 </script>
 
 <style scoped lang="less">

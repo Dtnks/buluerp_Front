@@ -1,8 +1,5 @@
 import { defineStore } from 'pinia'
 import { GetMenuInfo } from '@/apis/layout'
-// let data = await GetMenuInfo().then((res) => {
-//   return res[0]
-// })
 
 const useMenuState = defineStore('menu', {
   state: () => ({

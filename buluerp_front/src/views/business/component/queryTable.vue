@@ -81,7 +81,6 @@ import type { TableDataType } from '@/types/orderResponse'
 import BusinessDetail from '@/views/business/main/Detail.vue'
 import { exportToExcel } from '@/utils/file/exportExcel'
 
-
 // 加载数据
 onMounted(() => {
   // getOrders()
@@ -90,12 +89,12 @@ onMounted(() => {
 const props = defineProps<{
   // queryParams: Record<string, any>
   addTab: (targetName: string, component: any, data?: any) => void
-  tableData: any[];
+  tableData: any[]
   pagination: {
-    page: number;
-    pageSize: number;
-    total: number;
-  };
+    page: number
+    pageSize: number
+    total: number
+  }
 }>()
 
 const emit = defineEmits(['onUpdated', 'fetchData', 'onPageSizeChange', 'onPageChange']);
@@ -228,37 +227,37 @@ const handleSelectionChange = (selection: any[]) => {
 
 const onDelete = async () => {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('请先选择要删除的产品');
-    return;
+    ElMessage.warning('请先选择要删除的产品')
+    return
   }
 
   try {
     await ElMessageBox.confirm('确认要删除选中的产品吗？', '提示', {
-      type: 'warning'
-    });
+      type: 'warning',
+    })
 
-    const ids = selectedRows.value.map(item => item.id);
-    await deleteOrders(ids);
-    ElMessage.success('删除成功');
+    const ids = selectedRows.value.map((item) => item.id)
+    await deleteOrders(ids)
+    ElMessage.success('删除成功')
     // 重新获取表格数据
     emit('fetchData');
 
     selectedRows.value = [];
   } catch (err) {
-    ElMessage.info('取消删除');
+    ElMessage.info('取消删除')
   }
-};
+}
 // 导出
 const onExport = () => {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('请先选择要导出的产品');
-    return;
+    ElMessage.warning('请先选择要导出的产品')
+    return
   }
 
-  const today = new Date();
-  const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
+  const today = new Date()
+  const dateStr = today.toISOString().split('T')[0].replace(/-/g, '')
 
-  const exportData = selectedRows.value.map(item => ({
+  const exportData = selectedRows.value.map((item) => ({
     内部编号: item.innerId,
     外部编号: item.outerId,
     创建时间: item.createTime,
@@ -273,10 +272,10 @@ const onExport = () => {
     外购ID: item.purchaseId,
     分包ID: item.subcontractId,
     最后操作时间: item.lastOperationTime,
-  }));
+  }))
 
-  exportToExcel(exportData, `订单数据_${dateStr}`);
-};
+  exportToExcel(exportData, `订单数据_${dateStr}`)
+}
 </script>
 
 <style scoped></style>

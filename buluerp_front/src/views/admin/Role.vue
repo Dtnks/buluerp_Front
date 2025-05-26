@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="col">
     <BordShow content="角色配置" path="管理员/角色配置" />
     <div class="greyBack">
       <el-card class="col">
@@ -200,11 +200,7 @@
           <el-checkbox v-model="menuNodeAll" @change="handleCheckedTreeNodeAll($event, 'menu')"
             >全选/全不选</el-checkbox
           >
-          <el-checkbox
-            v-model="form.menuCheckStrictly"
-            @change="handleCheckedTreeConnect($event, 'menu')"
-            >父子联动</el-checkbox
-          >
+          <div style="width: 100px"></div>
           <el-tree
             class="tree-border"
             :data="menuOptions"
@@ -234,7 +230,6 @@
 import {
   addRole,
   changeRoleStatus,
-  dataScope,
   delRole,
   getRole,
   listRole,
@@ -243,10 +238,8 @@ import {
 } from '@/apis/system/role'
 import { roleMenuTreeselect, treeselect as menuTreeselect } from '@/apis/system/menu'
 import { ref, reactive, getCurrentInstance, toRefs, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import BordShow from '@/components/board/SecBoard.vue'
-const router = useRouter()
 const { proxy } = getCurrentInstance()
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable')
 
@@ -266,18 +259,8 @@ const menuNodeAll = ref(false)
 const deptExpand = ref(true)
 const deptNodeAll = ref(false)
 const deptOptions = ref([])
-const openDataScope = ref(false)
 const menuRef = ref(null)
 const deptRef = ref(null)
-
-/** 数据范围选项*/
-const dataScopeOptions = ref([
-  { value: '1', label: '全部数据权限' },
-  { value: '2', label: '自定数据权限' },
-  { value: '3', label: '本部门数据权限' },
-  { value: '4', label: '本部门及以下数据权限' },
-  { value: '5', label: '仅本人数据权限' },
-])
 
 const data = reactive({
   form: {},
@@ -362,23 +345,7 @@ function handleStatusChange(row) {
       row.status = row.status === '0' ? '1' : '0'
     })
 }
-/** 更多操作 */
-function handleCommand(command, row) {
-  switch (command) {
-    case 'handleDataScope':
-      handleDataScope(row)
-      break
-    case 'handleAuthUser':
-      handleAuthUser(row)
-      break
-    default:
-      break
-  }
-}
-/** 分配用户 */
-function handleAuthUser(row) {
-  router.push('/system/role-auth/user/' + row.roleId)
-}
+
 /** 查询菜单树结构 */
 function getMenuTreeselect() {
   menuTreeselect().then((response) => {
@@ -453,13 +420,6 @@ function getRoleMenuTreeselect(roleId) {
     return response
   })
 }
-/** 根据角色ID查询部门树结构 */
-function getDeptTree(roleId) {
-  return deptTreeSelect(roleId).then((response) => {
-    deptOptions.value = response.depts
-    return response
-  })
-}
 /** 树权限（展开/折叠）*/
 function handleCheckedTreeExpand(value, type) {
   if (type == 'menu') {
@@ -482,14 +442,7 @@ function handleCheckedTreeNodeAll(value, type) {
     deptRef.value.setCheckedNodes(value ? deptOptions.value : [])
   }
 }
-/** 树权限（父子联动） */
-function handleCheckedTreeConnect(value, type) {
-  if (type == 'menu') {
-    form.value.menuCheckStrictly = value ? true : false
-  } else if (type == 'dept') {
-    form.value.deptCheckStrictly = value ? true : false
-  }
-}
+
 /** 所有菜单节点数据 */
 function getMenuAllCheckedKeys() {
   // 目前被选中的菜单节点
@@ -527,25 +480,6 @@ function submitForm() {
 function cancel() {
   open.value = false
   reset()
-}
-/** 分配数据权限操作 */
-function handleDataScope(row) {
-  reset()
-  const deptTreeSelect = getDeptTree(row.roleId)
-  getRole(row.roleId).then((response) => {
-    form.value = response.data
-    openDataScope.value = true
-    nextTick(() => {
-      deptTreeSelect.then((res) => {
-        nextTick(() => {
-          if (deptRef.value) {
-            deptRef.value.setCheckedKeys(res.checkedKeys)
-          }
-        })
-      })
-    })
-    title.value = '分配数据权限'
-  })
 }
 
 getList()

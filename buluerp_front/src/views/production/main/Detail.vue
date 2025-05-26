@@ -33,7 +33,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
+  <div class="col">
     <BordShow content="产品详情页" path="产品管理/详情" />
     <basicInfomation v-if="detail" :detail="detail" :materialData="materialData" />
   </div>

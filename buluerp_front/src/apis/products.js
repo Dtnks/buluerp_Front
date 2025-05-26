@@ -1,4 +1,5 @@
 import httpInstance from "@/utils/httpsInstance.js"
+import { ElMessage } from "element-plus"
 
 export function getList_pro(params) {
     return httpInstance({
@@ -24,12 +25,13 @@ export function createProduct(formData) {
 }
 
 export function deleteProduct(ids) {
-  const idStr = Array.isArray(ids) ? ids.join('-') : ids
+  const idStr = Array.isArray(ids) ? ids.join(',') : ids 
   return httpInstance({
     url: `system/products/${idStr}`,
     method: 'delete'
   })
 }
+
 
 export function importProductFile(formData) {
   return httpInstance({
@@ -50,6 +52,8 @@ export function updateProduct(data) {
   if (data.pictureFile) {
     console.log('上传图片文件：', data.pictureFile);
     formData.append('picture', data.pictureFile); 
+  }else{
+    ElMessage.error('已经有图片的产品必须有一张图片')
   }
 
   return httpInstance({

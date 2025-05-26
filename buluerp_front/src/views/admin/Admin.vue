@@ -64,14 +64,13 @@ const tableData = ref([])
 const newDialogVisible = ref(false)
 </script>
 <template>
-  <div>
+  <div style="height: 100%; display: flex; flex-direction: column">
     <BordShow content="用户管理" path="管理员/用户管理" />
     <div class="greyBack">
       <el-card class="col">
         <div class="row">
-          <div class="input row">
-            <span>角色 </span
-            ><el-select
+          <el-form-item label="角色" class="input row">
+            <el-select
               v-model="searchContent.roleId"
               collapse-tags
               clearable
@@ -88,13 +87,13 @@ const newDialogVisible = ref(false)
                 :value="item.value"
               />
             </el-select>
-          </div>
-          <div class="input row">
-            <span>帐号 </span><el-input v-model="searchContent.userName" />
-          </div>
-          <div class="input row">
-            <span>姓名 </span><el-input v-model="searchContent.nickName" />
-          </div>
+          </el-form-item>
+          <el-form-item class="input row" label="账号">
+            <el-input v-model="searchContent.userName" />
+          </el-form-item>
+          <el-form-item class="input row" label="姓名">
+            <el-input v-model="searchContent.nickName" />
+          </el-form-item>
         </div>
         <div class="row" style="justify-content: flex-end; margin: 15px">
           <el-button

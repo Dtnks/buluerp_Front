@@ -1,6 +1,14 @@
 <template>
-  <Form :data="data" :title="title" :onSubmit="onSubmit" :onClear="resetForm" :onCreate="onCreate" :onImport="onImport"
-    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm"></Form>
+  <Form
+    :data="data"
+    :title="title"
+    :onSubmit="onSubmit"
+    :onClear="resetForm"
+    :onCreate="onCreate"
+    :onImport="onImport"
+    :onDownloadTemplate="onDownloadTemplate"
+    :searchForm="searchForm"
+  ></Form>
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
       <el-form-item label="创建人姓名">
@@ -8,12 +16,12 @@
       </el-form-item>
       <el-form-item label="订单状态">
         <el-select v-model="dialogForm.status" placeholder="Please select the status">
-          <el-option label="初始状态" value=0 />
-          <el-option label="设计中" value=1 />
-          <el-option label="已完成" value=2 />
-          <el-option label="作废" value=3 />
-          <el-option label="布产中" value=4 />
-          <el-option label="生产中" value=5 />
+          <el-option label="初始状态" value="0" />
+          <el-option label="设计中" value="1" />
+          <el-option label="已完成" value="2" />
+          <el-option label="作废" value="3" />
+          <el-option label="布产中" value="4" />
+          <el-option label="生产中" value="5" />
         </el-select>
       </el-form-item>
       <el-form-item label="客户姓名">
@@ -26,13 +34,11 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogFormVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="onAddConfirm">
-          Confirm
-        </el-button>
+        <el-button type="primary" @click="onAddConfirm"> Confirm </el-button>
       </div>
     </template>
   </el-dialog>
-    <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
+  <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
     <el-upload
       class="upload-demo"
       drag
@@ -51,26 +57,35 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue';
-import zhCn from 'element-plus/es/locale/lang/zh-cn';
+import { reactive, ref, computed } from 'vue'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 // import BordShow from '@/components/board/SecBoard.vue';
-import type { FormInstance } from 'element-plus';
+import type { FormInstance } from 'element-plus'
 // import type { ElForm } from 'element-plus';
-import { ElInput, ElSelect, ElOption, ElDatePicker, ElButton, ElDialog, ElUpload, ElMessage } from 'element-plus';
+import {
+  ElInput,
+  ElSelect,
+  ElOption,
+  ElDatePicker,
+  ElButton,
+  ElDialog,
+  ElUpload,
+  ElMessage,
+} from 'element-plus'
 // import { Search } from '@element-plus/icons-vue';
-import Form from '@/components/form/Form.vue';
-import { addOrder, searchOrders } from '../apis/oders';
-import { importOrderFile } from '@/apis/orders';
-import { id } from 'element-plus/es/locale';
-import { dayjs } from 'element-plus';
-import { useQueryTableDataStore } from '@/stores/queryTableData';
-import { number } from 'echarts';
-const dialogFormVisible = ref(false);
-const tableStores = useQueryTableDataStore();
+import Form from '@/components/form/Form.vue'
+import { addOrder, searchOrders } from '../apis/oders'
+import { importOrderFile } from '@/apis/orders'
+import { id } from 'element-plus/es/locale'
+import { dayjs } from 'element-plus'
+import { useQueryTableDataStore } from '@/stores/queryTableData'
+import { number } from 'echarts'
+const dialogFormVisible = ref(false)
+const tableStores = useQueryTableDataStore()
 const tableData = computed(() => {
-  return tableStores.tableData;
-});
-const emit = defineEmits(['onSubmit', 'onAdd']);
+  return tableStores.tableData
+})
+const emit = defineEmits(['onSubmit', 'onAdd'])
 
 const dialogForm = reactive({
   status: 0,
@@ -85,10 +100,9 @@ const dialogForm = reactive({
   customerId: 0,
   productId: 0,
   productName: '',
-
 })
 
-const title = '查询表单';
+const title = '查询表单'
 
 // data: 表单数据
 const data = reactive([
@@ -97,13 +111,11 @@ const data = reactive([
       label: '业务订单ID',
       type: 'input', // 确保 type 不为空
       key: 'orderId', // 确保 key 对应 searchForm 的字段
-      value: '',
     },
     {
       label: '订单状态',
       type: 'select',
       key: 'status',
-      value: '',
       options: [
         { label: '初始状态', value: '0' },
         { label: '设计中', value: '1' },
@@ -116,7 +128,6 @@ const data = reactive([
       label: '创建日期',
       type: 'timer',
       key: 'createTime',
-      value: '',
       timerType: 'daterange',
     },
   ],
@@ -131,18 +142,16 @@ const data = reactive([
       label: '创建人姓名',
       type: 'input',
       key: 'createdBy',
-      value: '',
     },
     {
       label: '其他搜索框',
       type: 'input',
       key: 'otherInfo',
-      value: '',
     },
   ],
-]);
+])
 
-const formRef = ref<FormInstance>();
+const formRef = ref<FormInstance>()
 // 表单状态
 const formState = reactive({
   orderId: '',
@@ -156,7 +165,7 @@ const formState = reactive({
   operatorId: '0',
   quantity: 0,
   customerId: 0,
-});
+})
 defineExpose({ formState })
 
 // searchForm: 查询条件
@@ -168,11 +177,10 @@ const searchForm = reactive({
   createdBy: '',
   otherInfo: '',
   innerId: '',
-});
+})
 
 // // 时间选择框
 // const datePicker = ref<[string, string]>(['', '']);
-
 
 // // onSubmit: 查询表单数据
 // const onSubmit = () => {
@@ -187,9 +195,9 @@ const searchForm = reactive({
 
 // };
 const onSubmit = () => {
-  console.log('查询条件', searchForm);
-  emit('onSubmit', { ...searchForm });
-};
+  console.log('查询条件', searchForm)
+  emit('onSubmit', { ...searchForm })
+}
 
 // const resetForm = () => {
 //   console.log('重置表单', formRef.value);
@@ -200,16 +208,14 @@ const onSubmit = () => {
 // resetForm: 重置表单
 const resetForm = () => {
   Object.keys(searchForm).forEach((key) => {
-    searchForm[key] = '';
-  });
-};
+    searchForm[key] = ''
+  })
+}
 
 const onCreate = () => {
-  dialogFormVisible.value = true;
-  console.log('点击创建');
-
-
-};
+  dialogFormVisible.value = true
+  console.log('点击创建')
+}
 
 // const onImport = () => {
 //   console.log('点击导入');
@@ -224,7 +230,6 @@ const importDialogVisible = ref(false)
 const onImport = () => {
   importDialogVisible.value = true
 }
-
 
 // 文件校验（限制大小）
 const beforeUpload = (file: File) => {
@@ -265,9 +270,6 @@ const onDownloadTemplate = () => {
   link.click()
 }
 
-
-
-
 // // onAddConfirm: 添加确认, 将表单数据添加到表格中
 // const onAddConfirm = async () => {
 //   // 格式化时间
@@ -294,10 +296,9 @@ const onDownloadTemplate = () => {
 
 // };
 const onAddConfirm = () => {
-  emit('onAdd', { ...dialogForm });
-  dialogFormVisible.value = false;
-
-};
+  emit('onAdd', { ...dialogForm })
+  dialogFormVisible.value = false
+}
 </script>
 
 <style scoped></style>
