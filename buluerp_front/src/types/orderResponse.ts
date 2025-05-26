@@ -3,8 +3,8 @@ export interface TableDataType {
   id?: number;
   innerId: string;
   status: number;
-  customerName: string;
-
+  customer: string;
+  remark?: string;
 }
 
 export interface OrderResponse {

@@ -74,24 +74,5 @@ export function importOrderFile(formData) {
   })
 }
 
-export function updateOrder(data) {
-  const formData = new FormData();
-  formData.append('id', data.id);
-  formData.append('name', data.name);
-  formData.append('designStatus', data.designStatus);
-  if (data.pictureFile) {
-    console.log('上传图片文件：', data.pictureFile);
-    formData.append('picture', data.pictureFile);
-  }
-
-  return httpInstance({
-    url: 'system/orders',
-    method: 'put',
-    data: formData,
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-}
 
 

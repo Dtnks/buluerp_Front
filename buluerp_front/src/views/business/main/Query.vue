@@ -3,8 +3,11 @@
     <el-config-provider :locale="zhCn">
       <BordShow content="业务订单查询列表" path="业务中心/查询" />
       <div class="greyBack">
-        <QueryForm  @onSubmit="handleQuery" @onAdd="handleAdd"></QueryForm>
-        <QueryTable :queryParams="queryParams" :addTab="props.addTab" :pagination="pagination" :tableData="tableData" @onPageChange="handlePageChange" @onPageSizeChange="handleSizeChange" @fetchData="fetchTableData"></QueryTable>
+        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd"></QueryForm>
+        <QueryTable :queryParams="queryParams" :addTab="props.addTab" :pagination="pagination" :tableData="tableData"
+          @onPageChange="handlePageChange" @onPageSizeChange="handleSizeChange" @fetchData="fetchTableData"
+          @onUpdated="handleUpdate">
+        </QueryTable>
       </div>
     </el-config-provider>
   </div>
@@ -20,7 +23,7 @@ import BordShow from '@/components/board/SecBoard.vue'
 // import { Search } from '@element-plus/icons-vue';
 import QueryForm from '../component/queryForm.vue'
 import QueryTable from '../component/queryTable.vue'
-import { getOrdersList } from '@/apis/orders'
+import { getOrdersList, putOrder } from '@/apis/orders'
 import { addOrder } from '../apis/oders'
 
 const props = defineProps<{
@@ -82,14 +85,10 @@ const fetchTableData = async () => {
       pageNum: pagination.page,
       pageSize: pagination.pageSize,
     };
-
-    console.log('查询参数:', params);
-
     const res = await getOrdersList(params);
-    console.log('获取订单数据(queryTable.vue):', res);
     tableData.value = res.rows || [];
-    console.log('tableData.value:', tableData.value);
     pagination.total = res.total || 0;
+    console.log('获取订单数据(queryTable.vue-fetchTableData):', res);
   } catch (error) {
     console.error('获取订单数据失败(queryTable.vue):', error);
   }
@@ -100,6 +99,7 @@ const handleQuery = (params: Record<string, any>) => {
   Object.assign(queryParams, params); // 更新查询条件
   pagination.page = 1; // 查询时重置页码为 1
   fetchTableData(); // 获取数据
+
 };
 
 // handleAdd: 处理新增
@@ -112,6 +112,19 @@ const handleAdd = async (newData: Record<string, any>) => {
     console.error('新增失败:', err);
   }
 };
+
+// handleUpdate: 处理更新
+const handleUpdate = async (updatedData: any) => {
+  try {
+    const res = await putOrder(updatedData);
+    console.log('更新结果:', res);
+    fetchTableData(); // 重新获取数据
+  } catch (err) {
+    console.error('更新失败:', err);
+  }
+
+};
+
 
 // handlePageChange: 处理分页
 const handlePageChange = (page: number) => {

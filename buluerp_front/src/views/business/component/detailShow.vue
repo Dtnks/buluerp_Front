@@ -39,18 +39,14 @@
         <el-col :span="6">
           <div class="field">
             <label>支付日期</label>
-            <el-date-picker v-model="payDate" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
-              style="width: 300px;" />
+            <el-date-picker v-model="payDate" style="width: 200px;"/>
           </div>
         </el-col>
         <!-- 其他基本信息 -->
         <el-col :span="6">
           <div class="field">
             <label>其他基本信息</label>
-            <el-select placeholder="请选择" style="width: 100%">
-              <el-option label="选项1" value="1" />
-              <el-option label="选项2" value="2" />
-            </el-select>
+            <el-input placeholder="请输入" />
           </div>
         </el-col>
       </el-row>

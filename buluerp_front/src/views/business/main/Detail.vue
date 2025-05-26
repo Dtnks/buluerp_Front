@@ -33,7 +33,6 @@ onMounted(async () => {
 <template>
   <div class="col">
     <BordShow content="业务订单详情页" path="业务中心/详情" />
-    <!-- <DetailShow :id="props.data.id" :innerId="props.innerId" :customerName="props.customerName" :status="props.status" :createdTime="props.createdTime"></DetailShow> -->
     <DetailShow :id="props.data.id" v-if="detail" :detail="detail" :basicData="basicData" />
   </div>
 </template>

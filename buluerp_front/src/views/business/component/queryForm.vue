@@ -4,7 +4,7 @@
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
       <el-form-item label="创建人姓名">
-        <el-input v-model="dialogForm.createdBy" autocomplete="off" />
+        <el-input v-model="dialogForm.createdBy" />
       </el-form-item>
       <el-form-item label="订单状态">
         <el-select v-model="dialogForm.status" placeholder="Please select the status">
@@ -17,10 +17,10 @@
         </el-select>
       </el-form-item>
       <el-form-item label="客户姓名">
-        <el-input v-model="dialogForm.customerName" autocomplete="off" />
+        <el-input v-model="dialogForm.customer"/>
       </el-form-item>
       <el-form-item label="其他信息">
-        <el-input v-model="dialogForm.information" autocomplete="off" />
+        <el-input v-model="dialogForm.remark" autocomplete="off" />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -75,11 +75,11 @@ const emit = defineEmits(['onSubmit', 'onAdd']);
 const dialogForm = reactive({
   status: 0,
   createTime: '',
-  customerName: '',
+  customer: '',
   createdBy: '',
   otherInfo: '',
   innerId: '',
-  information: '',
+  remark: '',
   operatorId: '0',
   quantity: 0,
   customerId: 0,
@@ -124,7 +124,7 @@ const data = reactive([
     {
       label: '客户姓名',
       type: 'input',
-      key: 'customerName',
+      key: 'customer',
       value: '',
     },
     {
@@ -148,11 +148,11 @@ const formState = reactive({
   orderId: '',
   status: null,
   createTime: '',
-  customerName: '',
+  customer: '',
   createdBy: '',
   otherInfo: '',
   innerId: '',
-  information: '',
+  remark: '',
   operatorId: '0',
   quantity: 0,
   customerId: 0,
@@ -164,7 +164,7 @@ const searchForm = reactive({
   orderId: '',
   status: '',
   createTime: '',
-  customerName: '',
+  customer: '',
   createdBy: '',
   otherInfo: '',
   innerId: '',
