@@ -1,14 +1,6 @@
 <template>
-  <Form
-    :data="data"
-    :title="title"
-    :onSubmit="onSubmit"
-    :onClear="resetForm"
-    :onCreate="onCreate"
-    :onImport="onImport"
-    :onDownloadTemplate="onDownloadTemplate"
-    :searchForm="searchForm"
-  ></Form>
+  <Form :data="data" :title="title" :onSubmit="onSubmit" :onClear="resetForm" :onCreate="onCreate" :onImport="onImport"
+    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm"></Form>
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
       <el-form-item label="创建人姓名">
@@ -25,7 +17,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="客户姓名">
-        <el-input v-model="dialogForm.customer"/>
+        <el-input v-model="dialogForm.customer" />
       </el-form-item>
       <el-form-item label="其他信息">
         <el-input v-model="dialogForm.remark" autocomplete="off" />
@@ -39,14 +31,8 @@
     </template>
   </el-dialog>
   <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
-    <el-upload
-      class="upload-demo"
-      drag
-      :show-file-list="false"
-      :before-upload="beforeUpload"
-      :http-request="handleUpload"
-      accept=".xlsx,.xls"
-    >
+    <el-upload class="upload-demo" drag :show-file-list="false" :before-upload="beforeUpload"
+      :http-request="handleUpload" accept=".xlsx,.xls">
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
       <template v-slot:tip>
@@ -74,7 +60,7 @@ import {
 } from 'element-plus'
 // import { Search } from '@element-plus/icons-vue';
 import Form from '@/components/form/Form.vue'
-import { addOrder, searchOrders } from '../apis/oders'
+import { addOrder, searchOrders } from '../function/oders'
 import { importOrderFile } from '@/apis/orders'
 import { id } from 'element-plus/es/locale'
 import { dayjs } from 'element-plus'

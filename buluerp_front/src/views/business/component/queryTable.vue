@@ -237,12 +237,16 @@ const onDelete = async () => {
     })
 
     const ids = selectedRows.value.map((item) => item.id)
-    await deleteOrders(ids)
+    try {
+      await deleteOrders(ids)
     ElMessage.success('删除成功')
     // 重新获取表格数据
     emit('fetchData');
-
     selectedRows.value = [];
+    } catch (error) {
+      console.error('删除失败:', error)
+      ElMessage.error('删除失败，请稍后再试')
+    }
   } catch (err) {
     ElMessage.info('取消删除')
   }
@@ -258,6 +262,7 @@ const onExport = () => {
   const dateStr = today.toISOString().split('T')[0].replace(/-/g, '')
 
   const exportData = selectedRows.value.map((item) => ({
+    // todo: 客户姓名字段
     内部编号: item.innerId,
     外部编号: item.outerId,
     创建时间: item.createTime,

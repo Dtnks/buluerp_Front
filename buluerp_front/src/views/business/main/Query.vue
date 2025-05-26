@@ -24,7 +24,7 @@ import BordShow from '@/components/board/SecBoard.vue'
 import QueryForm from '../component/queryForm.vue'
 import QueryTable from '../component/queryTable.vue'
 import { getOrdersList, putOrder } from '@/apis/orders'
-import { addOrder } from '../apis/oders'
+import { addOrder } from '../function/oders'
 
 const props = defineProps<{
   addTab: (targetName: string, component: any, data?: any) => void
@@ -88,7 +88,8 @@ const fetchTableData = async () => {
     const res = await getOrdersList(params);
     tableData.value = res.rows || [];
     pagination.total = res.total || 0;
-    console.log('获取订单数据(queryTable.vue-fetchTableData):', res);
+    console.log('获取订单数据(queryTable.vue):', res);
+
   } catch (error) {
     console.error('获取订单数据失败(queryTable.vue):', error)
   }
@@ -98,7 +99,7 @@ const fetchTableData = async () => {
 const handleQuery = (params: Record<string, any>) => {
   Object.assign(queryParams, params); // 更新查询条件
   pagination.page = 1; // 查询时重置页码为 1
-  fetchTableData(); // 获取数据
+  fetchTableData();
 
 };
 
@@ -106,8 +107,8 @@ const handleQuery = (params: Record<string, any>) => {
 const handleAdd = async (newData: Record<string, any>) => {
   try {
     const res = await addOrder(newData)
-    console.log('新增结果:', res)
-    fetchTableData() // 重新获取数据
+    console.log('新增结果(handleAdd):', res)
+    fetchTableData()
   } catch (err) {
     console.error('新增失败:', err)
   }
@@ -118,7 +119,7 @@ const handleUpdate = async (updatedData: any) => {
   try {
     const res = await putOrder(updatedData);
     console.log('更新结果:', res);
-    fetchTableData(); // 重新获取数据
+    fetchTableData();
   } catch (err) {
     console.error('更新失败:', err);
   }

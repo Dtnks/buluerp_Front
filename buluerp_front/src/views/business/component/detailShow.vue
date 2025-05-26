@@ -31,14 +31,15 @@
         <el-col :span="6">
           <div class="field">
             <label>客户姓名</label>
-            <el-input placeholder="请输入" />
+            <!-- <el-input placeholder="请输入" /> -->
+            <div>{{ detail.customerName }}</div>
           </div>
         </el-col>
         <!-- 支付日期 -->
         <el-col :span="6">
           <div class="field">
             <label>支付日期</label>
-            <el-date-picker v-model="payDate" style="width: 200px;"/>
+            <el-date-picker v-model="payDate" style="width: 200px;" />
           </div>
         </el-col>
         <!-- 其他基本信息 -->
@@ -68,10 +69,10 @@
         <el-table-column prop="orderId" label="订单ID" />
         <el-table-column prop="action" label="操作" width="180">
           <template #default="scope">
-            <el-button link type="primary" size="small" v-if="scope.row.type != '分包表'"
-              >创建</el-button
-            >
-            <el-button link type="primary" size="small">查看</el-button>
+            <el-button v-for="action in scope.row.actions" :key="action.name" link type="primary" size="small"
+              @click="handleAction(action.method, scope.row)">
+              {{ action.name }}
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -83,21 +84,21 @@
 import informationCard from './informationCard.vue'
 import { onMounted, ref } from 'vue'
 import { getStatusText } from '../utils/statusMap'
-import { getPackingListByOrderId } from '../apis/oders'
+import { getPackingListByOrderId, getProductsByOrderId} from '../function/oders'
 import { getList_pro } from '@/apis/products.js'
 
 // Props
 // defineProps(['innerId', 'customerName', 'status', 'createdTime']);
 const props = defineProps<{
   detail: any
+  id: number
 }>()
 
 onMounted(() => {
-  // 组件挂载后执行的逻辑
-  console.log('DetailShow.vue-mount')
-  console.log('DetailShow.vue-props.detail.createdTime', props.detail.createdTime)
   // getPackingList();
-  getOderDetails()
+  
+  getOrderProducts(props.id)
+
 })
 
 // 订单状态
@@ -109,20 +110,48 @@ const payDate = ref([])
 // 订单详情数据
 const orderDetails = ref([])
 
-// 订单ID
+// getOrderProducts: 获取订单产品详情
+const getOrderProducts = async (id: number) => {
+  const res = await getProductsByOrderId(id)
+}
+
+// 订单ID(id直接传过来, 不用这个了)
 const orderId = ref(props.detail.id)
 
-// 产品ID
-const productId = ref(props.detail.productId)
 
-const getOderDetails = async () => {
-  try {
-    const res = await getList_pro(productId.value)
-    console.log('获取订单详情数据(detailShow.vue):', res)
-    orderDetails.value = res.rows
-  } catch (error) {
-    console.error('获取订单详情数据失败:', error)
-  }
+// 关联订单数据和操作
+// 分包表
+const packingList = ref([]);
+
+// getPackingList: 根据订单ID获取分包表数据
+const getPackingList = (id: number) => {
+  getPackingListByOrderId(id)
+}
+
+// viewPackingList: 查看分包表
+const viewPackingList = (row: any) => {
+  console.log('查看分包表', row);
+}
+
+
+// 采购表
+const purchaseTable = ref([
+
+]);
+
+// viewPuchaseOrder: 查看采购表
+const viewPuchaseOrder = (row: any) => {
+  console.log('查看采购表', row);
+}
+
+// editPuchaseOrder: 编辑采购表
+const editPuchaseOrder = (row: any) => {
+  console.log('编辑采购表', row);
+}
+
+// handleAction: 处理关联订单的操作
+const handleAction = (method: Function, row: any) => {
+  method(row);
 }
 
 // 关联订单
@@ -130,40 +159,30 @@ const relatedOrdersTable = ref([
   {
     type: '分包表',
     orderId: '67890',
+    actions: [
+      { name: '查看', method: viewPackingList },
+    ]
   },
   {
     type: '采购表',
     orderId: '无',
+    actions: [
+      { name: '查看', method: viewPuchaseOrder },
+      { name: '编辑', method: editPuchaseOrder },
+    ]
   },
   {
     type: '其他表',
     orderId: '无',
+    actions: [
+      { name: '查看' },
+      { name: '编辑' },
+    ]
   },
 ])
 
-// // 关联订单数据
-// // 分包表
-// const packingList = ref([
-//   { date: '2023-10-01', name: '订单1', address: '地址1' },
-//   { date: '2023-10-02', name: '订单2', address: '地址2' },
-// ]);
 
-// //
-// const getPackingList = async () => {
-//   try {
-//     const res = await getPackingListByOrderId(orderId.value);
-//     // packingList.value = res;
-//     console.log('获取分包表数据(detailShow.vue):', res);
-//   } catch (error) {
-//     console.error('获取分包表数据失败:', error);
-//   }
-// };
 
-// // 采购表
-// const purchaseTable = ref([
-//   { date: '2023-10-01', name: '订单1', address: '地址1' },
-//   { date: '2023-10-02', name: '订单2', address: '地址2' },
-// ]);
 </script>
 
 <style scoped lang="less">
