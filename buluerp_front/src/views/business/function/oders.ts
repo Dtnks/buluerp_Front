@@ -1,7 +1,11 @@
 import { getOrdersList, getOrderDetailById, postOrder, putOrder, getOrderProducts } from '@/apis/orders'
-import { getPackingListById } from '@/apis/packing'
+import { getPackagingListById } from '@/apis/packaging'
 import { detailCustomer } from '@/apis/custom'
 import { messageBox } from '@/components/message/messageBox'
+import { getProductDetail } from '@/apis/products'
+
+// viewOrdersList: 查询订单列表
+
 
 // getCustomerNameById: 根据订单ID获取客户姓名
 export const getCustomerNameById = async (id: number) => {
@@ -48,7 +52,11 @@ export const addOrder = async (data: any) => {
 export const searchOrders = async (params: any) => {
   try {
     const res = await getOrdersList(params)
-    console.log('查询订单：', res)
+    console.log('查询订单(searchOrders):', res)
+    messageBox({
+      type: 'success',
+      message: '查询订单成功！'
+    })
     return res
   } catch (err) {
     console.log('查询订单失败：', err)
@@ -66,11 +74,25 @@ export const getProductsByOrderId = async (id: number) => {
   }
 }
 
+// getProductDetilById: 根据产品ID获取产品详情
+export const getProductDetailById = async (id: number) => {
+  try {
+    const res = await getProductDetail(id)
+    console.log('获取产品详情：', res)
+    return res
+  } catch (err) {
+    console.log('获取产品详情失败：', err)
+    messageBox({
+      type: 'error',
+      message: '获取产品详情失败，请稍后再试！'
+    })
+  }
+}
 
 // getPackingListByOrderId: 根据订单ID获取分包表
-export const getPackingListByOrderId = async (id: number) => {
+export const getPackagingListByOrderId = async (id: number) => {
   try {
-    const res = await getPackingListById(id)
+    const res = await getPackagingListById(id)
     console.log('获取分包表：', res)
     return res
   } catch (err) {
@@ -82,5 +104,7 @@ export const getPackingListByOrderId = async (id: number) => {
 
   }
 }
+
+
 // todo: id是订单id还是分包表id？
 // getPackingListDetailById: 根据分包表ID获取分包表详情

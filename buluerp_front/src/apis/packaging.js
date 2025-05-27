@@ -1,8 +1,8 @@
 import httpInstance from "@/utils/httpsInstance.js"
 
-export const getPackingListById = (id) => {
+export const getPackagingListById = (id) => {
   return httpInstance({
-    url: `system/packing-list/${id}`,
+    url: `system/packaging-list/${id}`,
     method: 'get',
   })
 }

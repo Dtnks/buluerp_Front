@@ -9,7 +9,6 @@ export function getOrdersList(params={}) {
     method: 'get',
     headers: headers,
     params,
-
   })
 }
 

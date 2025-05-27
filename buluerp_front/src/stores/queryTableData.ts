@@ -16,11 +16,13 @@ export const useQueryTableDataStore = defineStore('table', () => {
 
   // 查询条件
   const queryParams = reactive<Record<string, any>>({
+    id: 14,
     innerId: '',
     customerName: '',
-    orderId: '',
+    // orderId: '',
     createTime: '',
     status: '',
+    remark: '',
   })
   // getOders: 获取订单数据(支持查询和分页)
   const getOrders = async () => {
@@ -40,11 +42,6 @@ export const useQueryTableDataStore = defineStore('table', () => {
       })
       tableData.value = res?.rows ?? []
       total.value = res.total || 0
-      // for (let i = 0; i < res.rows.length; i++) {
-      // const customerName = await getCustomerNameById(res.rows[i].id);
-      // console.log('获取客户姓名：', customerName);
-      // tableData.value[i].customerName = customerName;
-      // }
     } catch (err) {
       console.log('获取订单数据失败：', err)
     }
@@ -85,7 +82,7 @@ export const useQueryTableDataStore = defineStore('table', () => {
         console.log('编辑订单数据--pinia：', res)
 
         // 更新
-        const index = tableData.value.findIndex((item) => item.innerId === aditData.innerId)
+        const index = tableData.value.findIndex((item) => item.id === aditData.id)
         if (index !== -1) {
           tableData.value[index] = { ...tableData.value[index], ...aditData }
         } else {

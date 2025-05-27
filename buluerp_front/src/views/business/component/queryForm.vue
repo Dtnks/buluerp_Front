@@ -1,5 +1,7 @@
 <template>
-  <Form :data="data" :title="title" :onSubmit="onSubmit" :onClear="resetForm" :onCreate="onCreate" :onImport="onImport"
+  <!-- <Form :data="data" :title="title" :onSubmit="onSubmit" :onClear="resetForm" :onCreate="onCreate" :onImport="onImport"
+    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm"></Form> -->
+  <Form :data="data" :title="title" :onSubmit="onSubmit" :onCreate="onCreate" :onImport="onImport"
     :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm"></Form>
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
@@ -13,14 +15,13 @@
           <el-option label="已完成" value="2" />
           <el-option label="作废" value="3" />
           <el-option label="布产中" value="4" />
-          <el-option label="生产中" value="5" />
         </el-select>
       </el-form-item>
       <el-form-item label="客户姓名">
-        <el-input v-model="dialogForm.customer" />
+        <el-input v-model="dialogForm.customerName" placeholder="请输入" />
       </el-form-item>
       <el-form-item label="其他信息">
-        <el-input v-model="dialogForm.remark" autocomplete="off" />
+        <el-input v-model="dialogForm.remark" autocomplete="off" placeholder="请输入" />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -60,32 +61,31 @@ import {
 } from 'element-plus'
 // import { Search } from '@element-plus/icons-vue';
 import Form from '@/components/form/Form.vue'
-import { addOrder, searchOrders } from '../function/oders'
 import { importOrderFile } from '@/apis/orders'
 import { id } from 'element-plus/es/locale'
 import { dayjs } from 'element-plus'
 import { useQueryTableDataStore } from '@/stores/queryTableData'
 import { number } from 'echarts'
+import type { TableDataType } from '@/types/orderResponse'
 const dialogFormVisible = ref(false)
 const tableStores = useQueryTableDataStore()
-const tableData = computed(() => {
-  return tableStores.tableData
-})
+
 const emit = defineEmits(['onSubmit', 'onAdd'])
 
 const dialogForm = reactive({
   status: 0,
   createTime: '',
-  customer: '',
   createdBy: '',
   otherInfo: '',
   innerId: '',
+  id: 14,
   remark: '',
   operatorId: '0',
   quantity: 0,
   customerId: 0,
   productId: 0,
   productName: '',
+  customerName: '',
 })
 
 const title = '查询表单'
@@ -96,7 +96,7 @@ const data = reactive([
     {
       label: '业务订单ID',
       type: 'input', // 确保 type 不为空
-      key: 'orderId', // 确保 key 对应 searchForm 的字段
+      key: 'id', // 确保 key 对应 searchForm 的字段
     },
     {
       label: '订单状态',
@@ -121,8 +121,7 @@ const data = reactive([
     {
       label: '客户姓名',
       type: 'input',
-      key: 'customer',
-      value: '',
+      key: 'customerName',
     },
     {
       label: '创建人姓名',
@@ -132,7 +131,7 @@ const data = reactive([
     {
       label: '其他搜索框',
       type: 'input',
-      key: 'otherInfo',
+      key: 'remark',
     },
   ],
 ])
@@ -140,78 +139,48 @@ const data = reactive([
 const formRef = ref<FormInstance>()
 // 表单状态
 const formState = reactive({
-  orderId: '',
+  // orderId: '',
   status: null,
   createTime: '',
-  customer: '',
   createdBy: '',
   otherInfo: '',
   innerId: '',
+  id: 14,
   remark: '',
   operatorId: '0',
   quantity: 0,
   customerId: 0,
+  customerName: '',
 })
 defineExpose({ formState })
 
 // searchForm: 查询条件
-const searchForm = reactive({
-  orderId: '',
-  status: '',
+const searchForm = ref({
+  id: null,
+  status: null,
   createTime: '',
-  customer: '',
   createdBy: '',
-  otherInfo: '',
-  innerId: '',
+  customerName: '',
+  remark: '',
 })
 
-// // 时间选择框
-// const datePicker = ref<[string, string]>(['', '']);
-
-// // onSubmit: 查询表单数据
-// const onSubmit = () => {
-//   console.log('查询条件', searchForm);
-//   // searchOrders(searchForm).then((res) => {
-//   //   console.log('查询结果', res);
-//   //   // tableData.value = res.data;
-//   // });
-//     tableStores.setQueryParams(searchForm); // 设置查询条件
-//   tableStores.setPage(1); // 查询时重置页码为 1
-//   tableStores.getOrders(); // 获取数据
-
-// };
+// onSubmit: 提交查询条件
 const onSubmit = () => {
-  console.log('查询条件', searchForm)
-  emit('onSubmit', { ...searchForm })
+  emit('onSubmit', searchForm.value)
 }
 
-// const resetForm = () => {
-//   console.log('重置表单', formRef.value);
-
-//   formRef.value?.resetFields();
-//   // // formState.orderId = '';
-// };
-// resetForm: 重置表单
-const resetForm = () => {
-  Object.keys(searchForm).forEach((key) => {
-    searchForm[key] = ''
-  })
-}
-
+// onCreate: 点击新建按钮
 const onCreate = () => {
   dialogFormVisible.value = true
-  console.log('点击创建')
+  console.log('点击新建')
 }
 
-// const onImport = () => {
-//   console.log('点击导入');
-// };
-
-// const onDownloadTemplate = () => {
-//   console.log('下载导入模板');
-
-// };
-
+// onAddConfirm: 确认新增订单
+const onAddConfirm = () => {
+  emit('onAdd', { ...dialogForm })
+  console.log('新增订单数据：', { ...dialogForm })
+  dialogFormVisible.value = false
+}
 const importDialogVisible = ref(false)
 const onImport = () => {
   importDialogVisible.value = true
@@ -256,35 +225,7 @@ const onDownloadTemplate = () => {
   link.click()
 }
 
-// // onAddConfirm: 添加确认, 将表单数据添加到表格中
-// const onAddConfirm = async () => {
-//   // 格式化时间
-//   dialogForm.createTime = dayjs(dialogForm.createTime).format('YYYY-MM-DD HH:mm:ss');
 
-//   console.log('添加确认', dialogForm);
-
-//   const res = await addOrder(dialogForm);
-//   console.log('添加结果', res);
-//   // 重新获取表格数据
-//   await tableStores.getOrders();
-//   // 将添加的订单数据添加到表格中
-//   // tableStores.addTableData({
-//   //   ...dialogForm,
-//   //   id: tableData.value.length + 1,
-//   // } as any);
-//   tableStores.tableData.unshift({
-//     ...dialogForm,
-//     id: tableData.value.length + 1,
-//   } as any );
-//   // 重置表单
-//   dialogFormVisible.value = false;
-//   formRef.value?.resetFields();
-
-// };
-const onAddConfirm = () => {
-  emit('onAdd', { ...dialogForm })
-  dialogFormVisible.value = false
-}
 </script>
 
 <style scoped></style>
