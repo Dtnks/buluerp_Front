@@ -29,11 +29,21 @@
             style="width: 100%"
           />
         </el-form-item>
+        <el-form-item :label="ele.label" v-else-if="ele.type === 'image'">
+          <upload
+            :setFile="
+              (file: File) => {
+                searchForm[ele.key] = file
+              }
+            "
+          />
+        </el-form-item>
       </el-col>
     </el-row>
   </el-form>
 </template>
 <script lang="ts" setup>
+import upload from '../upload/upload.vue'
 defineProps(['data', 'formState', 'formRef', 'searchForm'])
 </script>
 

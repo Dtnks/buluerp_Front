@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import FormSearch from '@/components/form/Form.vue'
+import InputForm from '@/components/form/InputForm.vue'
 import BordShow from '@/components/board/SecBoard.vue'
 import {
   listPurchasePlan,
@@ -30,6 +31,7 @@ const formData = ref([
     { type: 'input', label: '客户备注', key: 'remarks' },
   ],
 ])
+const newFormData = ref([])
 const searchContent = ref({
   operator: '',
   contact: '',
@@ -291,11 +293,7 @@ listPurchasePlan(page.value, pageSize.value).then((res) => {
     </div>
 
     <el-dialog v-model="editDialogVisible" :title="title" width="400px"
-      ><div class="col cardCenter">
-        <!-- <div class="input row">
-          <span>姓名 </span><el-input v-model="newSubmit.email" style="width: 240px" />
-        </div> -->
-      </div>
+      ><Form : />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
