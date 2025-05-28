@@ -41,9 +41,10 @@ const pagination = reactive({
 // tableData: 表格数据
 const tableData = ref<TableDataType[]>([])
 
+const queryParams = reactive({})
 // todo: 查询要再和后端对一下
 // fetchTableData: 获取table数据
-const fetchTableData = async (queryParams = {}) => {
+const fetchTableData = async () => {
   try {
     const filteredParams = Object.fromEntries(
       Object.entries(queryParams).filter(([key, value]) => value != '')
@@ -64,9 +65,11 @@ const fetchTableData = async (queryParams = {}) => {
 
 // handleQuery: 处理查询
 const handleQuery = (params: any) => {
-  console.log('查询参数(handleQuery):', params);
-  fetchTableData(params)
+
   pagination.page = 1; // 查询时重置页码为 1
+  Object.assign(queryParams, params); // 更新查询条件
+  console.log('查询参数(handleQuery):', params);
+  fetchTableData()
 };
 
 // handleAdd: 处理新增
@@ -88,9 +91,9 @@ const handleAdd = async (newData: TableDataType) => {
 const handleUpdate = async (updatedData: TableDataType) => {
   try {
     const res = await putOrder(updatedData);
-    if ( res.code == 200) {
+    if (res.code == 200) {
       console.log('更新结果(handelUpdate):', res);
-    fetchTableData();
+      fetchTableData();
     }
   } catch (err) {
     console.error('更新失败:', err);

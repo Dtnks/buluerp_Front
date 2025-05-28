@@ -2,9 +2,8 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 
 const request = axios.create({
-  baseURL: '/', // 基础 URL
-  // baseURL: 'http://154.201.77.135:8080/', // 基础 URL
-  timeout: 8000, // 超时时间
+  baseURL: '/',
+  timeout: 8000,
 })
 
 // 请求拦截器

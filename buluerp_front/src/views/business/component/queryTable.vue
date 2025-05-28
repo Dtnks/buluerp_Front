@@ -52,13 +52,7 @@
           <el-input v-model="editForm.customerName" />
         </el-form-item>
         <el-form-item label="订单状态">
-          <el-select v-model="editForm.status" placeholder="请选择">
-            <el-option label="初始状态" :value="0" />
-            <el-option label="设计中" :value="1" />
-            <el-option label="已完成" :value="2" />
-            <el-option label="作废" :value="3" />
-            <el-option label="布产中" :value="4" />
-          </el-select>
+          <el-input v-model="editForm.statusText" disabled />
         </el-form-item>
         <el-form-item label="其他信息">
           <el-input v-model="editForm.remark" />
@@ -79,6 +73,7 @@ import { getOrdersList, deleteOrders } from '@/apis/orders'
 import type { TableDataType } from '@/types/orderResponse'
 import BusinessDetail from '@/views/business/main/Detail.vue'
 import { exportToExcel } from '@/utils/file/exportExcel'
+import { Status, getStatusText } from '../utils/statusMap'
 
 // 加载数据
 onMounted(() => {
@@ -127,20 +122,6 @@ const getStatusColor = (status: number) => {
       return 'grey'
   }
 }
-const getStatusText = (status: number) => {
-  switch (status) {
-    case 0:
-      return '初始状态'
-    case 1:
-      return '设计中'
-    case 2:
-      return '已完成'
-    case 3:
-      return '作废'
-    case 4:
-      return '布产中'
-  }
-}
 
 const onCheck = (row: TableDataType) => {
   console.log('查看：', row)
@@ -163,7 +144,7 @@ const editForm = reactive({
   id: 0,
   innerId: '',
   customerName: '',
-  status: 0,
+  statusText: '',
   remark: '',
   createTime: '',
   // id: 0,
@@ -174,7 +155,7 @@ const onEdit = (row: TableDataType) => {
   // 将选中的行数据复制到编辑表单中
   // editForm.innerId = row.innerId
   editForm.customerName = row.customerName ? row.customerName : '';
-  editForm.status = row.status ? row.status : 0;
+  editForm.statusText = getStatusText(row.status) ;
   editForm.remark = row.remark ? row.remark : '';
   editForm.createTime = row.createTime ? row.createTime : '';
   editForm.id = row.id ? row.id : 0;

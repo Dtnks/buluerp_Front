@@ -3,7 +3,7 @@ import BordShow from '@/components/board/SecBoard.vue'
 import informationCard from '../component/informationCard.vue'
 import { onMounted, ref } from 'vue'
 import DetailShow from '../component/detailShow.vue'
-import { getOrderDetail } from '../function/oders'
+import { getOrderDetail, getOderProducts } from '../function/oders'
 import { dialogEmits } from 'element-plus'
 import { messageBox } from '../../../components/message/messageBox'
 
@@ -14,11 +14,16 @@ const props = defineProps<{
 // 数据
 const detail = ref<any>()
 const basicData = ref<any[]>([])
+const orderProduct = ref<any[]>([])
 
 onMounted(async () => {
   if (props.data.id) {
-    const res = await getOrderDetail(props.data.id)
-    detail.value = res
+    const detailRes = await getOrderDetail(props.data.id)
+    detail.value = detailRes
+    const productsRes = await getOderProducts(props.data.id)
+    orderProduct.value = productsRes
+    console.log('1231323242424');
+
   } else {
     console.log('找不到订单ID');
     messageBox('找不到订单ID', 'error')

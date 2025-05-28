@@ -67,6 +67,7 @@ import { dayjs } from 'element-plus'
 import { useQueryTableDataStore } from '@/stores/queryTableData'
 import { number } from 'echarts'
 import type { TableDataType } from '@/types/orderResponse'
+import { getStatusText, Status } from '../utils/statusMap'
 const dialogFormVisible = ref(false)
 const tableStores = useQueryTableDataStore()
 
@@ -86,6 +87,10 @@ const dialogForm = reactive({
   productId: 0,
   productName: '',
   customerName: '',
+})
+
+const statusText = computed(() => {
+  return getStatusText(dialogForm.status)
 })
 
 const title = '查询表单'

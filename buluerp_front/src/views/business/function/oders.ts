@@ -1,11 +1,16 @@
-import { getOrdersList, getOrderDetailById, postOrder, putOrder, getOrderProducts } from '@/apis/orders'
+import {
+  getOrdersList,
+  getOrderDetailById,
+  postOrder,
+  putOrder,
+  getOrderProducts,
+} from '@/apis/orders'
 import { getPackagingListById } from '@/apis/packaging'
 import { detailCustomer } from '@/apis/custom'
 import { messageBox } from '@/components/message/messageBox'
 import { getProductDetail } from '@/apis/products'
 
 // viewOrdersList: 查询订单列表
-
 
 // getCustomerNameById: 根据订单ID获取客户姓名
 export const getCustomerNameById = async (id: number) => {
@@ -15,6 +20,21 @@ export const getCustomerNameById = async (id: number) => {
     return res.data.name
   } catch (err) {
     console.log('获取客户姓名失败：', err)
+  }
+}
+
+// getOderProducts: 获取订单产品列表
+export const getOderProducts = async (id: number) => {
+  try {
+    const res = await getOrdersList({ id: id })
+    console.log('获取订单产品列表：', res)
+    return res
+  } catch (err) {
+    console.log('获取订单产品列表失败：', err)
+    messageBox({
+      type: 'error',
+      message: '获取订单详情失败，请稍后再试！',
+    })
   }
 }
 
@@ -36,11 +56,11 @@ export const addOrder = async (data: any) => {
     if (res.code === 200) {
       console.log('添加订单成功：', res)
       return res
-    }else {
+    } else {
       console.log('添加订单失败：', res)
       messageBox({
         type: 'error',
-        message: res.message || '添加订单失败，请稍后再试！'
+        message: res.message || '添加订单失败，请稍后再试！',
       })
     }
   } catch (err) {
@@ -55,7 +75,7 @@ export const searchOrders = async (params: any) => {
     console.log('查询订单(searchOrders):', res)
     messageBox({
       type: 'success',
-      message: '查询订单成功！'
+      message: '查询订单成功！',
     })
     return res
   } catch (err) {
@@ -84,7 +104,7 @@ export const getProductDetailById = async (id: number) => {
     console.log('获取产品详情失败：', err)
     messageBox({
       type: 'error',
-      message: '获取产品详情失败，请稍后再试！'
+      message: '获取产品详情失败，请稍后再试！',
     })
   }
 }
@@ -99,12 +119,10 @@ export const getPackagingListByOrderId = async (id: number) => {
     console.log('获取分包表失败：', err)
     messageBox({
       type: 'error',
-      message: '获取分包表失败，请稍后再试！'
+      message: '获取分包表失败，请稍后再试！',
     })
-
   }
 }
-
 
 // todo: id是订单id还是分包表id？
 // getPackingListDetailById: 根据分包表ID获取分包表详情
