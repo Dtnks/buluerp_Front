@@ -8,14 +8,16 @@ import {
   newCustomer,
   exportSelectTable,
   deleteCustomer,
+  importCustomFile,
 } from '@/apis/custom.js'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
 import { ref } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
-import { importCustomFile } from '@/apis/custom.js'
 import { messageBox } from '@/components/message/messageBox'
+import { ElMessageBox } from 'element-plus'
+const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
   [
@@ -32,24 +34,29 @@ const tableData = ref([
   {
     value: 'id',
     label: '用户ID',
+    type: 'text',
   },
   {
     value: 'name',
     label: '姓名',
+    type: 'text',
   },
   {
     value: 'contact',
     label: '联系方式',
+    type: 'text',
   },
   {
     value: 'email',
     label: '邮箱',
+    type: 'text',
   },
   {
     value: 'remarks',
     label: '备注',
+    type: 'text',
   },
-  { value: 'creatTime', label: '创建时间' },
+  { value: 'creatTime', label: '创建时间', type: 'text' },
 ])
 const operation = ref([
   // {
@@ -72,6 +79,7 @@ const operation = ref([
       })
     },
     value: '编辑',
+    disabled: props.control[1].disabled,
   },
 ])
 
@@ -141,15 +149,26 @@ const handleUpload = async (option: any) => {
   const formData = new FormData()
   formData.append('file', option.file)
 
-  try {
-    importCustomFile(formData).then((res) => {
-      console.log(res)
-    })
-    ElMessage.success('导入成功')
-    importDialogVisible.value = false
-  } catch (e) {
-    ElMessage.error('导入失败')
-  }
+  importCustomFile(formData).then((res) => {
+    console.log(res)
+    if (res.code == 200) {
+      ElMessage.success(res.msg)
+    } else {
+      ElMessage.error(res.msg)
+      const error_text = res.data
+        .map((ele) => {
+          return '第' + ele.rowNum + '行：' + ele.errorMsg
+        })
+        .join('<br>')
+      ElMessageBox.alert(error_text, '数据格式出现问题', {
+        confirmButtonText: '继续',
+        type: 'error',
+        dangerouslyUseHTMLString: true,
+      })
+    }
+  })
+
+  importDialogVisible.value = false
 }
 let count = 1
 //传给table组件
@@ -233,6 +252,7 @@ listCustomer(page.value, pageSize.value).then((res) => {
         :onSubmit="onSubmit"
         :onImport="onImport"
         :searchForm="searchContent"
+        :control="control"
       />
       <TableList
         :tableData="tableData"
@@ -240,6 +260,7 @@ listCustomer(page.value, pageSize.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
+        :control="control"
       >
         <slot>
           <div

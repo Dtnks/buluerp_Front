@@ -1,8 +1,14 @@
 <template>
-  <!-- <Form :data="data" :title="title" :onSubmit="onSubmit" :onClear="resetForm" :onCreate="onCreate" :onImport="onImport"
-    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm"></Form> -->
-  <Form :data="data" :title="title" :onSubmit="onSubmit" :onCreate="onCreate" :onImport="onImport"
-    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm"></Form>
+  <Form
+    :data="data"
+    :title="title"
+    :onSubmit="onSubmit"
+    :onCreate="onCreate"
+    :onImport="onImport"
+    :onDownloadTemplate="onDownloadTemplate"
+    :searchForm="searchForm"
+    :control="control"
+  ></Form>
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
       <el-form-item label="创建人姓名">
@@ -32,8 +38,14 @@
     </template>
   </el-dialog>
   <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
-    <el-upload class="upload-demo" drag :show-file-list="false" :before-upload="beforeUpload"
-      :http-request="handleUpload" accept=".xlsx,.xls">
+    <el-upload
+      class="upload-demo"
+      drag
+      :show-file-list="false"
+      :before-upload="beforeUpload"
+      :http-request="handleUpload"
+      accept=".xlsx,.xls"
+    >
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
       <template v-slot:tip>
@@ -70,9 +82,11 @@ import type { TableDataType } from '@/types/orderResponse'
 import { getStatusText, Status } from '../utils/statusMap'
 const dialogFormVisible = ref(false)
 const tableStores = useQueryTableDataStore()
-
-const emit = defineEmits(['onSubmit', 'onAdd'])
-
+const tableData = computed(() => {
+  return tableStores.tableData
+})
+const emit = ['onSubmit', 'onAdd']
+defineProps(['control'])
 const dialogForm = reactive({
   status: 0,
   createTime: '',
@@ -229,8 +243,6 @@ const onDownloadTemplate = () => {
   link.download = '订单导入模板.xlsx'
   link.click()
 }
-
-
 </script>
 
 <style scoped></style>

@@ -8,9 +8,10 @@ import { dialogEmits } from 'element-plus'
 import { messageBox } from '../../../components/message/messageBox'
 
 const props = defineProps<{
-  data: { id: number };
-}>();
-
+  data: { id: number }
+  control: Array<object>
+}>()
+console.log(props.control)
 // 数据
 const detail = ref<any>()
 const basicData = ref<any[]>([])
@@ -25,17 +26,22 @@ onMounted(async () => {
     console.log('1231323242424');
 
   } else {
-    console.log('找不到订单ID');
+    console.log('找不到订单ID')
     messageBox('找不到订单ID', 'error')
   }
 })
-
 </script>
 
 <template>
   <div class="col">
     <BordShow content="业务订单详情页" path="业务中心/详情" />
-    <DetailShow :id="props.data.id" v-if="detail" :detail="detail" :basicData="basicData" />
+    <DetailShow
+      :id="props.data.id"
+      v-if="detail"
+      :detail="detail"
+      :basicData="basicData"
+      :control="control"
+    />
   </div>
 </template>
 

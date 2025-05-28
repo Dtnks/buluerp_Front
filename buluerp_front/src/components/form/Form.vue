@@ -14,7 +14,9 @@
             <el-button @click="onClear">重置</el-button>
           </el-row>
           <el-row>
-            <el-button type="primary" @click="onCreate">新建</el-button>
+            <el-button type="primary" @click="onCreate" :disabled="control[0].disabled"
+              >新建</el-button
+            >
             <el-button @click="onImport">导入</el-button>
           </el-row>
         </el-space>
@@ -40,8 +42,9 @@ const props = defineProps([
   'onDownloadTemplate',
   'formState',
   'searchForm',
+  'control',
 ])
-
+console.log(props.control, 'props.control')
 const onClear = () => {
   console.log(props.searchForm)
   Object.keys(props.searchForm).forEach((key) => {
