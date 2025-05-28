@@ -44,7 +44,6 @@
             >编辑</el-button
           >
           <el-button link type="primary" @click="onCheck(row)">查看</el-button>
-          <!-- <el-button link type="primary" @click="onDerive(row)">导出</el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -65,16 +64,18 @@
     <el-dialog title="编辑订单" v-model="editDialogVisible" width="500px">
       <el-form :model="editForm" label-width="100px">
         <el-form-item label="订单ID">
-          <el-input v-model="editForm.innerId" disabled />
+          <el-input v-model="editForm.id" disabled />
         </el-form-item>
         <el-form-item label="客户姓名">
-          <el-input v-model="editForm.customer" />
+          <el-input v-model="editForm.customerName" />
         </el-form-item>
         <el-form-item label="订单状态">
           <el-select v-model="editForm.status" placeholder="请选择">
             <el-option label="初始状态" :value="0" />
             <el-option label="设计中" :value="1" />
             <el-option label="已完成" :value="2" />
+            <el-option label="作废" :value="3" />
+            <el-option label="布产中" :value="4" />
           </el-select>
         </el-form-item>
         <el-form-item label="其他信息">
@@ -106,8 +107,6 @@ import {
   ElMessageBox,
 } from 'element-plus'
 import { getOrdersList, deleteOrders } from '@/apis/orders'
-// import request from '@/utils/request';
-// import { createIncrementalCompilerHost } from 'typescript';
 import type { TableDataType } from '@/types/orderResponse'
 import BusinessDetail from '@/views/business/main/Detail.vue'
 import { exportToExcel } from '@/utils/file/exportExcel'
@@ -132,8 +131,8 @@ const emit = defineEmits(['onUpdated', 'fetchData', 'onPageSizeChange', 'onPageC
 
 const columns = [
   { prop: 'createTime', label: '创建时间' },
-  { prop: 'innerId', label: '订单ID' },
-  { prop: 'customer', label: '客户姓名' },
+  { prop: 'id', label: '订单ID' },
+  { prop: 'customerName', label: '客户姓名' },
   {
     prop: 'status',
     label: '订单状态',
@@ -191,10 +190,6 @@ const onCheck = (row: TableDataType) => {
   )
 }
 
-const onDerive = (row: TableDataType) => {
-  console.log('导出：', row)
-}
-
 // // 编辑弹窗 ---start
 // 编辑弹窗的显示状态
 const editDialogVisible = ref(false)
@@ -203,7 +198,7 @@ const editDialogVisible = ref(false)
 const editForm = reactive({
   id: 0,
   innerId: '',
-  customer: '',
+  customerName: '',
   status: 0,
   remark: '',
   createTime: '',
@@ -213,11 +208,11 @@ const editForm = reactive({
 // 点击“编辑”按钮时触发
 const onEdit = (row: TableDataType) => {
   // 将选中的行数据复制到编辑表单中
-  editForm.innerId = row.innerId
-  editForm.customer = row.customer
-  editForm.status = row.status
+  // editForm.innerId = row.innerId
+  editForm.customerName = row.customerName ? row.customerName : ''
+  editForm.status = row.status ? row.status : 0
   editForm.remark = row.remark ? row.remark : ''
-  editForm.createTime = row.createTime
+  editForm.createTime = row.createTime ? row.createTime : ''
   editForm.id = row.id ? row.id : 0
 
   Object.assign(editForm, row)
@@ -229,28 +224,12 @@ const onEdit = (row: TableDataType) => {
 
 // 保存编辑后的数据
 const onSaveEdit = () => {
-  console.log('111保存了', { ...editForm })
-
+  console.log('保存了', { ...editForm })
   emit('onUpdated', { ...editForm })
-
   emit('fetchData')
-
   editDialogVisible.value = false
 }
 
-const paginatiedtableData = computed(() => {
-  const start = (props.pagination.page - 1) * props.pagination.pageSize
-  const end = start + props.pagination.pageSize
-  return props.tableData.slice(start, end)
-})
-
-// const onPageChange = (page: number) => {
-//   props.pagination.page = page
-// }
-
-// const onShowSizeChange = (size: number) => {
-//   props.pagination.pageSize = size
-// }
 // 表格操作--end
 
 const selectedRows = ref<any[]>([])
@@ -258,41 +237,41 @@ const handleSelectionChange = (selection: any[]) => {
   selectedRows.value = selection
 }
 
-// 删除
-
+// onDelete: 点击删除
 const onDelete = async () => {
   if (selectedRows.value.length === 0) {
     ElMessage.warning('请先选择要删除的产品')
     return
   }
-
   try {
     await ElMessageBox.confirm('确认要删除选中的产品吗？', '提示', {
       type: 'warning',
     })
-
     const ids = selectedRows.value.map((item) => item.id)
-    await deleteOrders(ids)
-    ElMessage.success('删除成功')
-    // 重新获取表格数据
-    emit('fetchData')
-
-    selectedRows.value = []
+    try {
+      await deleteOrders(ids)
+      ElMessage.success('删除成功')
+      // 重新获取表格数据
+      emit('fetchData')
+      selectedRows.value = []
+    } catch (error) {
+      console.error('删除失败:', error)
+      ElMessage.error('删除失败，请稍后再试')
+    }
   } catch (err) {
     ElMessage.info('取消删除')
   }
 }
-// 导出
+// onExport: 点击导出
 const onExport = () => {
   if (selectedRows.value.length === 0) {
     ElMessage.warning('请先选择要导出的产品')
     return
   }
-
   const today = new Date()
   const dateStr = today.toISOString().split('T')[0].replace(/-/g, '')
-
   const exportData = selectedRows.value.map((item) => ({
+    // todo: 客户姓名字段
     内部编号: item.innerId,
     外部编号: item.outerId,
     创建时间: item.createTime,
@@ -301,6 +280,7 @@ const onExport = () => {
     交货期限: item.deliveryDeadline,
     交货时间: item.deliveryTime,
     状态: item.status,
+    客户姓名: item.customerName,
     客户ID: item.customerId,
     产品ID: item.productId,
     布产ID: item.productionId,

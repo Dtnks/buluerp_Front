@@ -2,7 +2,6 @@
 // import type { AxiosResponse } from 'axios'
 // import type { OrderResponse } from '@/types/orderResponse'
 import httpInstance from "@/utils/httpsInstance"
-
 let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
 export function getOrdersList(params={}) {
   return httpInstance({
@@ -10,7 +9,6 @@ export function getOrdersList(params={}) {
     method: 'get',
     headers: headers,
     params,
-
   })
 }
 
@@ -23,9 +21,8 @@ export const editOder = (data) => {
   })
 }
 export const deleteOrders = (ids) => {
-  const idStr = Array.isArray(ids) ? ids.join('-') : ids
   return httpInstance({
-    url: `system/orders/${idStr}`,
+    url: `system/orders/${ids}`,
     method: 'delete',
     headers: headers,
   })
@@ -46,6 +43,8 @@ export const getOrderDetailById = (id) => {
 
 // 新增
 export const postOrder = (data) => {
+  console.log('postOrder data:', data);
+
   return httpInstance({
     url: 'system/orders',
     method: 'post',
@@ -63,9 +62,11 @@ export const putOrder = (data) => {
     headers: headers,
   })
 }
+
+// 导入订单
 export function importOrderFile(formData) {
   return httpInstance({
-    url: '/system/oders/import',
+    url: '/system/orders/import',
     method: 'post',
     data: formData,
     headers: {
@@ -74,5 +75,12 @@ export function importOrderFile(formData) {
   })
 }
 
-
-
+// 根据订单ID获取订单的产品列表
+export const getOrderProducts = (id) => {
+  return httpInstance({
+    url: `system/products/list`,
+    method: 'get',
+    params: { orderId: id },
+    headers: headers,
+  })
+}

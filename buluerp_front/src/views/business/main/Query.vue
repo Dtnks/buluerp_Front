@@ -5,7 +5,6 @@
       <div class="greyBack">
         <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd" :control="control"></QueryForm>
         <QueryTable
-          :queryParams="queryParams"
           :control="control"
           :addTab="props.addTab"
           :pagination="pagination"
@@ -32,23 +31,13 @@ import BordShow from '@/components/board/SecBoard.vue'
 import QueryForm from '../component/queryForm.vue'
 import QueryTable from '../component/queryTable.vue'
 import { getOrdersList, putOrder } from '@/apis/orders'
-import { addOrder } from '../apis/oders'
+import { addOrder, searchOrders } from '../function/oders'
+import type { OrderResponse, TableDataType } from '@/types/orderResponse'
 
 const props = defineProps<{
   addTab: (targetName: string, component: any, data?: any) => void
   control: Array<object>
 }>()
-console.log(props.control)
-// queryParams: 查询参数
-const queryParams = reactive({
-  orderId: '',
-  status: '',
-  createTime: '',
-  customerName: '',
-  createdBy: '',
-  otherInfo: '',
-  innerId: '',
-})
 
 // pagination: 分页数据
 const pagination = reactive({
@@ -58,75 +47,58 @@ const pagination = reactive({
 })
 
 // tableData: 表格数据
-const tableData = ref([])
+const tableData = ref<TableDataType[]>([])
 
 // todo: 查询要再和后端对一下
-// // fetchTableData: 获取table数据
-// // todo: 封装过searchOrder可以拿来用
-// const fetchTableData = async () => {
-//   try {
-//       // 过滤掉空值的查询参数
-//     const filteredParams = Object.fromEntries(
-//       Object.entries(queryParams).filter(([key, value]) => value !== '' || key === 'pageNum' || key === 'pageSize')
-//     );
-//     console.log('过滤后的查询参数:', filteredParams);
-
-//     const params = {
-//       ...queryParams,
-//       pageNum: pagination.page,
-//       pageSize: pagination.pageSize,
-//     }
-//     console.log('查询参数:', params);
-
-//     const res = await getOrdersList(params);
-//     console.log('获取订单数据(queryTable.vue):', res)
-//     tableData.value = res.rows || []
-//     pagination.total = res.total || 0
-
-//   } catch (error) {
-//     console.error('获取订单数据失败(queryTable.vue):', error)
-//   }
-// }
-const fetchTableData = async () => {
+// fetchTableData: 获取table数据
+const fetchTableData = async (queryParams = {}) => {
   try {
-    // 只传递分页参数
+    const filteredParams = Object.fromEntries(
+      Object.entries(queryParams).filter(([key, value]) => value != ''),
+    )
     const params = {
+      ...filteredParams,
       pageNum: pagination.page,
       pageSize: pagination.pageSize,
     }
     const res = await getOrdersList(params)
+    console.log('获取订单数据(queryTable.vue):', res)
     tableData.value = res.rows || []
     pagination.total = res.total || 0
-    console.log('获取订单数据(queryTable.vue-fetchTableData):', res)
   } catch (error) {
     console.error('获取订单数据失败(queryTable.vue):', error)
   }
 }
 
 // handleQuery: 处理查询
-const handleQuery = (params: Record<string, any>) => {
-  Object.assign(queryParams, params) // 更新查询条件
+const handleQuery = (params: any) => {
+  console.log('查询参数(handleQuery):', params)
+  fetchTableData(params)
   pagination.page = 1 // 查询时重置页码为 1
-  fetchTableData() // 获取数据
 }
 
 // handleAdd: 处理新增
-const handleAdd = async (newData: Record<string, any>) => {
+const handleAdd = async (newData: TableDataType) => {
   try {
+    console.log('1111新增数据(handleAdd):', newData)
     const res = await addOrder(newData)
-    console.log('新增结果:', res)
-    fetchTableData() // 重新获取数据
+    if (res.code === 200) {
+      console.log('新增结果(handleAdd):', res)
+      fetchTableData()
+    }
   } catch (err) {
     console.error('新增失败:', err)
   }
 }
 
 // handleUpdate: 处理更新
-const handleUpdate = async (updatedData: any) => {
+const handleUpdate = async (updatedData: TableDataType) => {
   try {
     const res = await putOrder(updatedData)
-    console.log('更新结果:', res)
-    fetchTableData() // 重新获取数据
+    if (res.code == 200) {
+      console.log('更新结果(handelUpdate):', res)
+      fetchTableData()
+    }
   } catch (err) {
     console.error('更新失败:', err)
   }
@@ -152,21 +124,11 @@ onMounted(() => {
 </script>
 
 <style scoped lang="less">
-// .input {
-//   margin-bottom: 20px;
-// }
-
 .form-buttons {
   display: flex;
   gap: 0 20px;
   justify-content: flex-end;
-  // margin-right: 10px;
-  // margin-top: 10px;
 }
-
-// .el-table {
-//   margin-top: 20px;
-// }
 
 ::v-deep(.table-container .el-card__body) {
   padding: 0 !important;
