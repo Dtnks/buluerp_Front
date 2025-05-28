@@ -8,13 +8,13 @@ import {
   newManufacturers,
   listManufacturers,
   exportSelectTable,
+  importmanufacturersFile,
 } from '@/apis/manufacturers.js'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
 import { ref } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
-import { importCustomFile } from '@/apis/custom.js'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessage } from 'element-plus'
 const props = defineProps(['control'])
@@ -34,24 +34,29 @@ const tableData = ref([
   {
     value: 'id',
     label: '用户ID',
+    type: 'text',
   },
   {
     value: 'name',
     label: '姓名',
+    type: 'text',
   },
   {
     value: 'tel',
     label: '联系方式',
+    type: 'text',
   },
   {
     value: 'email',
     label: '邮箱',
+    type: 'text',
   },
   {
     value: 'remark',
     label: '备注',
+    type: 'text',
   },
-  { value: 'createTime', label: '创建时间' },
+  { value: 'createTime', label: '创建时间', type: 'text' },
 ])
 const operation = ref([
   // {
@@ -135,15 +140,24 @@ const handleUpload = async (option: any) => {
   const formData = new FormData()
   formData.append('file', option.file)
 
-  try {
-    importCustomFile(formData).then((res) => {
-      console.log(res)
-    })
-    ElMessage.success('导入成功')
-    importDialogVisible.value = false
-  } catch (e) {
-    ElMessage.error('导入失败')
-  }
+  importmanufacturersFile(formData).then((res) => {
+    console.log(res)
+    if (res.code == 200) {
+      ElMessage.success(res.msg)
+    } else {
+      ElMessage.error(res.msg)
+      const error_text = res.data
+        .map((ele) => {
+          return '第' + ele.rowNum + '行：' + ele.errorMsg
+        })
+        .join('<br>')
+      ElMessageBox.alert(error_text, '数据格式出现问题', {
+        confirmButtonText: '继续',
+        type: 'error',
+        dangerouslyUseHTMLString: true,
+      })
+    }
+  })
 }
 let count = 1
 //传给table组件

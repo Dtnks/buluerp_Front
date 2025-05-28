@@ -23,7 +23,18 @@
           :label="item.label"
           v-for="item in tableData"
           :key="item.value"
-        />
+        >
+          <template #default="{ row }">
+            <span v-if="item.type === 'picture'">
+              <el-image
+                v-if="row[item.value]"
+                :src="getFullImageUrl(row[item.value])"
+                style="width: 50px; height: 50px"
+              />
+            </span>
+            <span v-else-if="item.type == 'text'">{{ row[item.value] }}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" fixed="right">
           <template #default="{ row }">
             <el-button
@@ -47,6 +58,13 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
+const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
+
+const getFullImageUrl = (path: string) => {
+  // 防止多余斜杠：/profile//2025/... => /profile/2025/...
+  return BASE_IMAGE_URL + path.replace('//', '/')
+}
+
 defineProps(['tableData', 'operations', 'listData', 'exportFunc', 'DeleteFunc', 'control'])
 const select = ref()
 </script>
