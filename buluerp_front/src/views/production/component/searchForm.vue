@@ -26,7 +26,7 @@
           <el-form-item label="创建日期" prop="createDate">
             <el-date-picker
               v-model="formState.createDate"
-              type="datetimerange"
+              type="daterange"
               value-format="YYYY-MM-DD HH:mm:ss"
               range-separator="至"
               start-placeholder="开始日期"
