@@ -4,8 +4,8 @@ import { getOptionselect, newUser, getUserList } from '@/apis/admin.js'
 import Table from './component/Table.vue'
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
+defineProps(['control'])
 const options = ref({})
-
 const searchContent = ref({ roleId: '', userName: '', nickName: '' })
 const currentPage = ref(1)
 const total = ref()
@@ -64,14 +64,13 @@ const tableData = ref([])
 const newDialogVisible = ref(false)
 </script>
 <template>
-  <div>
+  <div style="height: 100%; display: flex; flex-direction: column">
     <BordShow content="用户管理" path="管理员/用户管理" />
     <div class="greyBack">
       <el-card class="col">
         <div class="row">
-          <div class="input row">
-            <span>角色 </span
-            ><el-select
+          <el-form-item label="角色" class="input row">
+            <el-select
               v-model="searchContent.roleId"
               collapse-tags
               clearable
@@ -88,13 +87,13 @@ const newDialogVisible = ref(false)
                 :value="item.value"
               />
             </el-select>
-          </div>
-          <div class="input row">
-            <span>帐号 </span><el-input v-model="searchContent.userName" />
-          </div>
-          <div class="input row">
-            <span>姓名 </span><el-input v-model="searchContent.nickName" />
-          </div>
+          </el-form-item>
+          <el-form-item class="input row" label="账号">
+            <el-input v-model="searchContent.userName" />
+          </el-form-item>
+          <el-form-item class="input row" label="姓名">
+            <el-input v-model="searchContent.nickName" />
+          </el-form-item>
         </div>
         <div class="row" style="justify-content: flex-end; margin: 15px">
           <el-button
@@ -105,6 +104,7 @@ const newDialogVisible = ref(false)
                 newDialogVisible = true
               }
             "
+            :disabled="control[0].disabled"
             >新建</el-button
           >
           <el-button type="primary" @click="search">查询</el-button>
@@ -157,7 +157,7 @@ const newDialogVisible = ref(false)
             </template>
           </el-dialog>
         </div>
-        <Table :tableData="tableData" :options="options" :setPage="setPage" />
+        <Table :tableData="tableData" :options="options" :setPage="setPage" :control="control" />
         <div style="right: 40px; bottom: 20px">
           <el-pagination
             v-model:current-page="currentPage"

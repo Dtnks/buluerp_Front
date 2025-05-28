@@ -2,7 +2,6 @@
 // import type { AxiosResponse } from 'axios'
 // import type { OrderResponse } from '@/types/orderResponse'
 import httpInstance from "@/utils/httpsInstance"
-
 let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
 export function getOrdersList(params={}) {
   return httpInstance({
@@ -10,35 +9,42 @@ export function getOrdersList(params={}) {
     method: 'get',
     headers: headers,
     params,
-
   })
 }
 
-export const editOder = ( data) => {
+export const editOder = (data) => {
   return httpInstance({
-    url: 'dev-api/system/orders/edit',
+    url: 'system/orders/edit',
     method: 'post',
     data,
     headers: headers,
   })
 }
-export const deleteOrder = ( id) => {
+export const deleteOrders = (ids) => {
   return httpInstance({
-    url: `dev-api/system/orders/${id}`,
-    method: 'post',
+    url: `system/orders/${ids}`,
+    method: 'delete',
     headers: headers,
   })
 }
 
-export const getOrderDetailById = ( id) => {
+// 根据订单id获取订单详情
+export const getOrderDetailById = (id) => {
+  // 使用httpInstance发送get请求，获取订单详情
   return httpInstance({
+    // 请求的url
     url: `system/orders/${id}`,
+    // 请求的方法
     method: 'get',
+    // 请求的头部信息
     headers: headers,
   })
 }
 
-export const postOrder = ( data) => {
+// 新增
+export const postOrder = (data) => {
+  console.log('postOrder data:', data);
+
   return httpInstance({
     url: 'system/orders',
     method: 'post',
@@ -47,7 +53,8 @@ export const postOrder = ( data) => {
   })
 }
 
-export const putOrder = ( data) => {
+// 修改
+export const putOrder = (data) => {
   return httpInstance({
     url: 'system/orders',
     method: 'put',
@@ -56,5 +63,24 @@ export const putOrder = ( data) => {
   })
 }
 
+// 导入订单
+export function importOrderFile(formData) {
+  return httpInstance({
+    url: '/system/orders/import',
+    method: 'post',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
 
-
+// 根据订单ID获取订单的产品列表
+export const getOrderProducts = (id) => {
+  return httpInstance({
+    url: `system/products/list`,
+    method: 'get',
+    params: { orderId: id },
+    headers: headers,
+  })
+}

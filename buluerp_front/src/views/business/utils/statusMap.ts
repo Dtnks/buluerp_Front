@@ -1,3 +1,4 @@
+// todo: 改成枚举
 export const statusMap: Record<number, string> = {
   0: '初始状态',
   1: '设计中',

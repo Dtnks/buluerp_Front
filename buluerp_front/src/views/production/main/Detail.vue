@@ -6,7 +6,7 @@ import { getProductDetail } from '@/apis/products.js'
 import { getMaterialList } from '@/apis/materials.js'
 
 // 接收父组件传来的 id
-const props = defineProps<{ data: { id: number } }>()
+const props = defineProps<{ data: { id: number }; control: Array<object> }>()
 
 // 详情数据
 const detail = ref<any>(null)
@@ -33,8 +33,13 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
+  <div class="col">
     <BordShow content="产品详情页" path="产品管理/详情" />
-    <basicInfomation v-if="detail" :detail="detail" :materialData="materialData" />
+    <basicInfomation
+      v-if="detail"
+      :detail="detail"
+      :materialData="materialData"
+      :control="control"
+    />
   </div>
 </template>
