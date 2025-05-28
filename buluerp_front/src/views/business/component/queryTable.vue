@@ -2,28 +2,37 @@
   <!-- 表格 -->
   <el-card shadow="never" style="margin: 0px 20px">
     <template #header>
-      <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; justify-content: space-between; align-items: center">
         <span>列表</span>
         <div>
-          <el-button type="danger" @click="onDelete">删除</el-button>
+          <el-button type="danger" @click="onDelete" :disabled="control[2].disabled"
+            >删除</el-button
+          >
           <el-button type="primary" @click="onExport">导出</el-button>
         </div>
       </div>
     </template>
     <el-table :data="props.tableData" border @selection-change="handleSelectionChange">
       <el-table-column type="selection" />
-      <el-table-column v-for="column in columns" :key="column.prop" :prop="column.prop" :label="column.label">
+      <el-table-column
+        v-for="column in columns"
+        :key="column.prop"
+        :prop="column.prop"
+        :label="column.label"
+      >
         <template v-if="column.slot" #default="{ row }">
           <span style="display: flex; align-items: center">
-            <span :style="{
-              backgroundColor: getStatusColor(row[column.prop]),
-              display: 'inline-block',
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              margin: '0 5px 0 0',
-              border: '1px solid #ccc',
-            }"></span>
+            <span
+              :style="{
+                backgroundColor: getStatusColor(row[column.prop]),
+                display: 'inline-block',
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                margin: '0 5px 0 0',
+                border: '1px solid #ccc',
+              }"
+            ></span>
             <!-- {{ row[column.prop] }} -->
             {{ getStatusText(row[column.prop]) }}
           </span>
@@ -31,7 +40,9 @@
       </el-table-column>
       <el-table-column label="操作">
         <template #default="{ row }">
-          <el-button link type="primary" @click="onEdit(row)">编辑</el-button>
+          <el-button link type="primary" @click="onEdit(row)" :disabled="control[1].disabled"
+            >编辑</el-button
+          >
           <el-button link type="primary" @click="onCheck(row)">查看</el-button>
           <!-- <el-button link type="primary" @click="onDerive(row)">导出</el-button> -->
         </template>
@@ -39,9 +50,16 @@
     </el-table>
 
     <!-- 分页 -->
-    <el-pagination background layout="prev, pager, next, sizes, total" :total="pagination.total"
-      :page-size="pagination.pageSize" :current-page="pagination.page" @size-change="emit('onPageSizeChange', $event)"
-      @current-change="emit('onPageChange', $event)" :page-sizes="[5, 10, 20, 50]" />
+    <el-pagination
+      background
+      layout="prev, pager, next, sizes, total"
+      :total="pagination.total"
+      :page-size="pagination.pageSize"
+      :current-page="pagination.page"
+      @size-change="emit('onPageSizeChange', $event)"
+      @current-change="emit('onPageChange', $event)"
+      :page-sizes="[5, 10, 20, 50]"
+    />
 
     <!-- 编辑弹窗 -->
     <el-dialog title="编辑订单" v-model="editDialogVisible" width="500px">
@@ -73,14 +91,26 @@
 
 <script setup lang="ts">
 import { reactive, computed, onMounted, ref, watch } from 'vue'
-import { ElButton, ElTable, ElTableColumn, ElPagination, ElDialog, ElForm, ElFormItem, ElSelect, ElOption, ElInput, ElMessage, ElMessageBox } from 'element-plus'
+import {
+  ElButton,
+  ElTable,
+  ElTableColumn,
+  ElPagination,
+  ElDialog,
+  ElForm,
+  ElFormItem,
+  ElSelect,
+  ElOption,
+  ElInput,
+  ElMessage,
+  ElMessageBox,
+} from 'element-plus'
 import { getOrdersList, deleteOrders } from '@/apis/orders'
 // import request from '@/utils/request';
 // import { createIncrementalCompilerHost } from 'typescript';
 import type { TableDataType } from '@/types/orderResponse'
 import BusinessDetail from '@/views/business/main/Detail.vue'
 import { exportToExcel } from '@/utils/file/exportExcel'
-
 // 加载数据
 onMounted(() => {
   // getOrders()
@@ -95,9 +125,10 @@ const props = defineProps<{
     pageSize: number
     total: number
   }
+  control: Array<object>
 }>()
 
-const emit = defineEmits(['onUpdated', 'fetchData', 'onPageSizeChange', 'onPageChange']);
+const emit = defineEmits(['onUpdated', 'fetchData', 'onPageSizeChange', 'onPageChange'])
 
 const columns = [
   { prop: 'createTime', label: '创建时间' },
@@ -145,14 +176,19 @@ const getStatusText = (status: number) => {
 
 const onCheck = (row: TableDataType) => {
   console.log('查看：', row)
-  props.addTab(`订单详情 ${row.innerId}`, BusinessDetail, {
-    id: row.id,
-    innerId: row.innerId,
-    customer: row.customer,
-    status: row.status,
-    remark: row.remark,
-    createTime: row.createTime,
-  })
+  props.addTab(
+    `订单详情 ${row.innerId}`,
+    BusinessDetail,
+    {
+      id: row.id,
+      innerId: row.innerId,
+      customer: row.customer,
+      status: row.status,
+      remark: row.remark,
+      createTime: row.createTime,
+    },
+    props.control,
+  )
 }
 
 const onDerive = (row: TableDataType) => {
@@ -180,12 +216,12 @@ const onEdit = (row: TableDataType) => {
   editForm.innerId = row.innerId
   editForm.customer = row.customer
   editForm.status = row.status
-  editForm.remark = row.remark ? row.remark : '';
+  editForm.remark = row.remark ? row.remark : ''
   editForm.createTime = row.createTime
-  editForm.id = row.id ? row.id : 0;
+  editForm.id = row.id ? row.id : 0
 
   Object.assign(editForm, row)
-  console.log('编辑表单数据：', editForm);
+  console.log('编辑表单数据：', editForm)
 
   // 打开编辑弹窗
   editDialogVisible.value = true
@@ -193,12 +229,11 @@ const onEdit = (row: TableDataType) => {
 
 // 保存编辑后的数据
 const onSaveEdit = () => {
-  console.log('111保存了', {...editForm});
+  console.log('111保存了', { ...editForm })
 
   emit('onUpdated', { ...editForm })
 
   emit('fetchData')
-
 
   editDialogVisible.value = false
 }
@@ -240,9 +275,9 @@ const onDelete = async () => {
     await deleteOrders(ids)
     ElMessage.success('删除成功')
     // 重新获取表格数据
-    emit('fetchData');
+    emit('fetchData')
 
-    selectedRows.value = [];
+    selectedRows.value = []
   } catch (err) {
     ElMessage.info('取消删除')
   }

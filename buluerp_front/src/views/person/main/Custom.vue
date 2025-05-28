@@ -16,6 +16,7 @@ import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { importCustomFile } from '@/apis/custom.js'
 import { messageBox } from '@/components/message/messageBox'
+const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
   [
@@ -72,6 +73,7 @@ const operation = ref([
       })
     },
     value: '编辑',
+    disabled: props.control[1].disabled,
   },
 ])
 
@@ -233,6 +235,7 @@ listCustomer(page.value, pageSize.value).then((res) => {
         :onSubmit="onSubmit"
         :onImport="onImport"
         :searchForm="searchContent"
+        :control="control"
       />
       <TableList
         :tableData="tableData"
@@ -240,6 +243,7 @@ listCustomer(page.value, pageSize.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
+        :control="control"
       >
         <slot>
           <div

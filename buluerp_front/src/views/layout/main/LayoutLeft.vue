@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps({
+defineProps({
   isCollapse: { type: Boolean },
   addTab: { type: Function },
 })
@@ -26,6 +26,8 @@ import PMInventoryList from '@/views/PMcenter/inventory/main/List.vue'
 import PMInventoryQuery from '@/views/PMcenter/inventory/main/Query.vue'
 import PMProcurementQuery from '@/views/PMcenter/procurement/main/List.vue'
 import PMProcurementPlan from '@/views/PMcenter/procurement/main/Plan.vue'
+import PMProduceArrange from '@/views/PMcenter/produce/main/Arrange.vue'
+import PMProduceSchedule from '@/views/PMcenter/produce/main/Schedule.vue'
 const ComponentsGroup = {
   UserInformation,
   CustomQuery,
@@ -40,6 +42,8 @@ const ComponentsGroup = {
   PMInventoryQuery,
   PMProcurementQuery,
   PMProcurementPlan,
+  PMProduceArrange,
+  PMProduceSchedule,
 }
 const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
 </script>
@@ -65,11 +69,30 @@ const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
         <div v-for="subItem in item.children" :key="subItem.id">
           <el-menu-item
             :index="subItem.id"
-            @click="addTab(subItem.label, ComponentsGroup[subItem.path])"
-            v-if="!subItem.disabled"
+            @click="addTab(subItem.label, ComponentsGroup[subItem.path], null, subItem.children)"
+            v-if="!subItem.disabled && subItem.path != '/'"
           >
             {{ subItem.label }}
           </el-menu-item>
+          <el-sub-menu :index="subItem.id" v-else-if="!subItem.disabled">
+            <template #title
+              ><span>{{ subItem.label }}</span></template
+            >
+            <el-menu-item
+              v-for="subSubItem in subItem.children"
+              :key="subSubItem.id"
+              :index="subSubItem.id"
+              @click="
+                addTab(
+                  subSubItem.label,
+                  ComponentsGroup[subSubItem.path],
+                  null,
+                  subSubItem.children,
+                )
+              "
+              >{{ subSubItem.label }}</el-menu-item
+            >
+          </el-sub-menu>
         </div>
       </el-sub-menu>
     </div>

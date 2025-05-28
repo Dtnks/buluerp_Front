@@ -2,13 +2,13 @@
 import FormSearch from '@/components/form/Form.vue'
 import BordShow from '@/components/board/SecBoard.vue'
 import {
-  deleteManufacturers,
-  detailManufacturers,
-  changeManufacturers,
-  newManufacturers,
-  listManufacturers,
+  listCustomer,
+  detailCustomer,
+  changeCustomer,
+  newCustomer,
   exportSelectTable,
-} from '@/apis/manufacturers.js'
+  deleteCustomer,
+} from '@/apis/custom.js'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
 import { ref } from 'vue'
@@ -16,18 +16,16 @@ import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { importCustomFile } from '@/apis/custom.js'
 import { messageBox } from '@/components/message/messageBox'
-import { ElMessage } from 'element-plus'
-const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
   [
     { type: 'input', label: '姓名', key: 'name' },
-    { type: 'timer', label: '创建曰期', timerType: 'daterange', key: 'creatTime' },
+    { type: 'timer', label: '创建曰期', timerType: 'date', key: 'creatTime' },
   ],
   [
-    { type: 'input', label: '联系方式', key: 'tel' },
+    { type: 'input', label: '联系方式', key: 'contact' },
     { type: 'input', label: '邮箱', key: 'email' },
-    { type: 'input', label: '客户备注', key: 'remark' },
+    { type: 'input', label: '客户备注', key: 'remarks' },
   ],
 ])
 const tableData = ref([
@@ -40,7 +38,7 @@ const tableData = ref([
     label: '姓名',
   },
   {
-    value: 'tel',
+    value: 'contact',
     label: '联系方式',
   },
   {
@@ -48,10 +46,10 @@ const tableData = ref([
     label: '邮箱',
   },
   {
-    value: 'remark',
+    value: 'remarks',
     label: '备注',
   },
-  { value: 'createTime', label: '创建时间' },
+  { value: 'creatTime', label: '创建时间' },
 ])
 const operation = ref([
   // {
@@ -69,36 +67,40 @@ const operation = ref([
       title.value = '编辑'
       editDialogVisible.value = true
       newSubmit.value = {}
-      detailManufacturers(id).then((res) => {
+      detailCustomer(id).then((res) => {
         newSubmit.value = res.data
       })
     },
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
 ])
-const searchContent = ref({ name: '', creatTime: '', email: '', remark: '', tel: '' })
 
 //新增与修改
 const importDialogVisible = ref(false)
 const editDialogVisible = ref(false)
-const newSubmit = ref({})
+const newSubmit = ref({
+  name: '',
+  contact: '',
+  email: '',
+  remarks: '',
+  creatTime: '',
+})
 const handleSubmit = () => {
   if (title.value == '编辑') {
-    changeManufacturers(newSubmit.value).then((res) => {
+    changeCustomer(newSubmit.value).then((res) => {
       page.value = 1
-      listManufacturers(page.value, pageSize.value).then((res) => {
+      listCustomer(page.value, pageSize.value).then((res) => {
         listData.value = res.rows
         total.value = res.total
       })
       editDialogVisible.value = false
     })
   } else {
-    newManufacturers(newSubmit.value).then((res) => {
+    newCustomer(newSubmit.value).then((res) => {
       if (res.msg == '操作成功') {
-        page.value = 1
         ElMessage.success('新增成功')
-        listManufacturers(page.value, pageSize.value).then((res) => {
+        page.value = 1
+        listCustomer(page.value, pageSize.value).then((res) => {
           listData.value = res.rows
           total.value = res.total
         })
@@ -114,14 +116,18 @@ const onCreate = () => {
   title.value = '新增'
   editDialogVisible.value = true
 }
-
+const searchContent = ref({
+  name: '',
+  contact: '',
+  email: '',
+  remarks: '',
+  creatTime: '',
+})
 const onSubmit = () => {
-  console.log(searchContent.value)
-  searchContent.value.createTimeFrom = parseTime(searchContent.value.creatTime[0], '{y}-{m}-{d}')
-  searchContent.value.createTimeTo = parseTime(searchContent.value.creatTime[1], '{y}-{m}-{d}')
+  searchContent.value.creatTime = parseTime(searchContent.value.creatTime, '{y}-{m}-{d}')
+
   page.value = 1
-  console.log(searchContent)
-  listManufacturers(page.value, pageSize.value, searchContent.value).then((res) => {
+  listCustomer(page.value, pageSize.value, searchContent.value).then((res) => {
     console.log(res)
     listData.value = res.rows
     total.value = res.total
@@ -160,7 +166,7 @@ const exportFunc = (row) => {
   formData.append('ids', ids)
   exportSelectTable(formData).then((res) => {
     const now = new Date()
-    downloadBinaryFile(res, '厂商信息_' + now.toLocaleDateString() + '_' + count + '.xlsx')
+    downloadBinaryFile(res, '客户信息_' + now.toLocaleDateString() + '_' + count + '.xlsx')
     count += 1
   })
 }
@@ -170,13 +176,11 @@ const DeleteFunc = (row) => {
     return ele.id
   })
   const func = () => {
-    return deleteManufacturers(ids).then((res) => {
-      console.log(res, '删除')
+    return deleteCustomer(ids).then((res) => {
       if (res.code == 500) {
-        console.log(res)
         throw new Error('权限不足')
       } else {
-        listManufacturers(page.value, pageSize.value).then((res) => {
+        listCustomer(page.value, pageSize.value).then((res) => {
           listData.value = res.rows
           total.value = res.total
         })
@@ -200,28 +204,27 @@ const total = ref(0)
 const listData = ref([])
 const handlePageChange = async (val: number) => {
   page.value = val
-  listManufacturers(page.value, pageSize.value).then((res) => {
+  listCustomer(page.value, pageSize.value).then((res) => {
     listData.value = res.rows
   })
 }
 const handleSizeChange = async (val: number) => {
   pageSize.value = val
   page.value = 1
-  listManufacturers(page.value, pageSize.value).then((res) => {
+  listCustomer(page.value, pageSize.value).then((res) => {
     listData.value = res.rows
   })
 }
 
 //初次渲染
-listManufacturers(page.value, pageSize.value).then((res) => {
+listCustomer(page.value, pageSize.value).then((res) => {
   total.value = res.total
   listData.value = res.rows
-  console.log(res, '厂商')
 })
 </script>
 <template>
   <div class="col">
-    <BordShow content="厂商查询" path="用户中心/厂商查询" />
+    <BordShow content="客户查询" path="用户中心/客户查询" />
     <div class="greyBack">
       <FormSearch
         title="查询"
@@ -229,8 +232,7 @@ listManufacturers(page.value, pageSize.value).then((res) => {
         :onCreate="onCreate"
         :onSubmit="onSubmit"
         :onImport="onImport"
-        :search-form="searchContent"
-        :control="control"
+        :searchForm="searchContent"
       />
       <TableList
         :tableData="tableData"
@@ -238,7 +240,6 @@ listManufacturers(page.value, pageSize.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
-        :control="control"
       >
         <slot>
           <div
@@ -271,13 +272,13 @@ listManufacturers(page.value, pageSize.value).then((res) => {
           <span>姓名 </span><el-input v-model="newSubmit.name" style="width: 240px" />
         </div>
         <div class="input row">
-          <span>联系方式 </span><el-input v-model="newSubmit.tel" style="width: 240px" />
+          <span>联系方式 </span><el-input v-model="newSubmit.contact" style="width: 240px" />
         </div>
         <div class="input row">
           <span>邮箱 </span><el-input v-model="newSubmit.email" style="width: 240px" />
         </div>
         <div class="input row">
-          <span>备注 </span><el-input v-model="newSubmit.remark" style="width: 240px" />
+          <span>备注 </span><el-input v-model="newSubmit.remarks" style="width: 240px" />
         </div>
       </div>
       <template #footer>

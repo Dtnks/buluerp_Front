@@ -3,10 +3,18 @@
     <el-config-provider :locale="zhCn">
       <BordShow content="业务订单查询列表" path="业务中心/查询" />
       <div class="greyBack">
-        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd"></QueryForm>
-        <QueryTable :queryParams="queryParams" :addTab="props.addTab" :pagination="pagination" :tableData="tableData"
-          @onPageChange="handlePageChange" @onPageSizeChange="handleSizeChange" @fetchData="fetchTableData"
-          @onUpdated="handleUpdate">
+        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd" :control="control"></QueryForm>
+        <QueryTable
+          :queryParams="queryParams"
+          :control="control"
+          :addTab="props.addTab"
+          :pagination="pagination"
+          :tableData="tableData"
+          @onPageChange="handlePageChange"
+          @onPageSizeChange="handleSizeChange"
+          @fetchData="fetchTableData"
+          @onUpdated="handleUpdate"
+        >
         </QueryTable>
       </div>
     </el-config-provider>
@@ -28,8 +36,9 @@ import { addOrder } from '../apis/oders'
 
 const props = defineProps<{
   addTab: (targetName: string, component: any, data?: any) => void
+  control: Array<object>
 }>()
-
+console.log(props.control)
 // queryParams: 查询参数
 const queryParams = reactive({
   orderId: '',
@@ -84,11 +93,11 @@ const fetchTableData = async () => {
     const params = {
       pageNum: pagination.page,
       pageSize: pagination.pageSize,
-    };
-    const res = await getOrdersList(params);
-    tableData.value = res.rows || [];
-    pagination.total = res.total || 0;
-    console.log('获取订单数据(queryTable.vue-fetchTableData):', res);
+    }
+    const res = await getOrdersList(params)
+    tableData.value = res.rows || []
+    pagination.total = res.total || 0
+    console.log('获取订单数据(queryTable.vue-fetchTableData):', res)
   } catch (error) {
     console.error('获取订单数据失败(queryTable.vue):', error)
   }
@@ -96,11 +105,10 @@ const fetchTableData = async () => {
 
 // handleQuery: 处理查询
 const handleQuery = (params: Record<string, any>) => {
-  Object.assign(queryParams, params); // 更新查询条件
-  pagination.page = 1; // 查询时重置页码为 1
-  fetchTableData(); // 获取数据
-
-};
+  Object.assign(queryParams, params) // 更新查询条件
+  pagination.page = 1 // 查询时重置页码为 1
+  fetchTableData() // 获取数据
+}
 
 // handleAdd: 处理新增
 const handleAdd = async (newData: Record<string, any>) => {
@@ -111,20 +119,18 @@ const handleAdd = async (newData: Record<string, any>) => {
   } catch (err) {
     console.error('新增失败:', err)
   }
-};
+}
 
 // handleUpdate: 处理更新
 const handleUpdate = async (updatedData: any) => {
   try {
-    const res = await putOrder(updatedData);
-    console.log('更新结果:', res);
-    fetchTableData(); // 重新获取数据
+    const res = await putOrder(updatedData)
+    console.log('更新结果:', res)
+    fetchTableData() // 重新获取数据
   } catch (err) {
-    console.error('更新失败:', err);
+    console.error('更新失败:', err)
   }
-
-};
-
+}
 
 // handlePageChange: 处理分页
 const handlePageChange = (page: number) => {

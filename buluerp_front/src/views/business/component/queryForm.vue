@@ -8,6 +8,7 @@
     :onImport="onImport"
     :onDownloadTemplate="onDownloadTemplate"
     :searchForm="searchForm"
+    :control="control"
   ></Form>
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
@@ -25,7 +26,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="客户姓名">
-        <el-input v-model="dialogForm.customer"/>
+        <el-input v-model="dialogForm.customer" />
       </el-form-item>
       <el-form-item label="其他信息">
         <el-input v-model="dialogForm.remark" autocomplete="off" />
@@ -85,8 +86,8 @@ const tableStores = useQueryTableDataStore()
 const tableData = computed(() => {
   return tableStores.tableData
 })
-const emit = defineEmits(['onSubmit', 'onAdd'])
-
+const emit = ['onSubmit', 'onAdd']
+defineProps(['control'])
 const dialogForm = reactive({
   status: 0,
   createTime: '',

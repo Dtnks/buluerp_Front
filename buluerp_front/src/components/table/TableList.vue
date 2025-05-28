@@ -5,7 +5,12 @@
         <span>展示</span>
         <div>
           <el-button type="primary" @click="exportFunc(select!.getSelectionRows())">导出</el-button>
-          <el-button type="danger" @click="DeleteFunc(select!.getSelectionRows())">删除</el-button>
+          <el-button
+            type="danger"
+            @click="DeleteFunc(select!.getSelectionRows())"
+            :disabled="control[2].disabled"
+            >删除</el-button
+          >
         </div>
       </div>
     </template>
@@ -27,6 +32,7 @@
               text
               @click="operation.func(row)"
               v-for="operation in operations"
+              :disabled="operation.disabled"
               >{{ operation.value }}</el-button
             >
           </template>
@@ -41,7 +47,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-defineProps(['tableData', 'operations', 'listData', 'exportFunc', 'DeleteFunc'])
+defineProps(['tableData', 'operations', 'listData', 'exportFunc', 'DeleteFunc', 'control'])
 const select = ref()
 </script>
 <style scoped>
