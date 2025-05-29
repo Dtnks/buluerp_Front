@@ -1,15 +1,10 @@
 <template>
-  <el-card style="margin: 0 20px">
+  <el-card style=" margin: 0 20px;">
     <template #header>
-      <div
-        class="card-header"
-        style="display: flex; justify-content: space-between; align-items: center"
-      >
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
         <span>展示</span>
         <div>
-          <el-button type="danger" @click="onDelete" :disabled="control[2].disabled"
-            >删除</el-button
-          >
+          <el-button type="danger" @click="onDelete">删除</el-button>
           <el-button type="primary" @click="onExport">导出</el-button>
         </div>
       </div>
@@ -22,7 +17,7 @@
         <el-table-column prop="name" label="产品名称" />
         <el-table-column prop="designStatus" label="产品状态">
           <template #default="{ row }">
-            <span style="display: flex; align-items: center">
+            <span style="display: flex; align-items: center;">
               <span
                 :style="{
                   display: 'inline-block',
@@ -43,7 +38,7 @@
               v-if="row.pictureUrl"
               :src="getFullImageUrl(row.pictureUrl)"
               alt="产品图片"
-              style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px"
+              style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;"
             />
             <span v-else>暂无图片</span>
           </template>
@@ -57,9 +52,7 @@
       </el-table>
 
       <!-- 分页器 -->
-      <div
-        style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center"
-      >
+      <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
         <div>共 {{ total }} 条</div>
         <el-pagination
           background
@@ -77,16 +70,15 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch , onMounted} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getList_pro, deleteProduct } from '@/apis/products.js'
+import { getList_pro , deleteProduct} from '@/apis/products.js'
 import { exportToExcel } from '@/utils/file/exportExcel'
 
 import Detail from '../main/Detail.vue'
 const props = defineProps<{
   queryParams: Record<string, any>
   addTab: (targetName: string, component: any, data?: any) => void
-  control: Array<object>
 }>()
 
 const data = ref([])
@@ -99,6 +91,8 @@ const getFullImageUrl = (path: string) => {
   // 防止多余斜杠：/profile//2025/... => /profile/2025/...
   return BASE_IMAGE_URL + path.replace('//', '/')
 }
+
+
 
 const fetchData = async () => {
   console.log('queryParams:', props.queryParams)
@@ -121,7 +115,7 @@ watch(
     page.value = 1
     fetchData()
   },
-  { deep: true },
+  { deep: true }
 )
 
 watch([page, pageSize], fetchData)
@@ -149,10 +143,10 @@ const onDelete = async () => {
 
   try {
     await ElMessageBox.confirm('确认要删除选中的产品吗？', '提示', {
-      type: 'warning',
+      type: 'warning'
     })
 
-    const ids = selectedRows.value.map((item) => item.id)
+    const ids = selectedRows.value.map(item => item.id)
     await deleteProduct(ids)
     ElMessage.success('删除成功')
     fetchData()
@@ -171,7 +165,7 @@ const onExport = () => {
   const today = new Date()
   const dateStr = today.toISOString().split('T')[0].replace(/-/g, '')
 
-  const exportData = selectedRows.value.map((item) => ({
+  const exportData = selectedRows.value.map(item => ({
     产品ID: item.id,
     产品名称: item.name,
     创建时间: item.createTime,
@@ -184,8 +178,9 @@ const onExport = () => {
   exportToExcel(exportData, `产品数据_${dateStr}`)
 }
 
+
 const onView = (row: any) => {
-  props.addTab(`详情页-${row.name}`, Detail, { id: row.id }, props.control)
-  console.log('id是', row.id)
+  props.addTab(`详情页-${row.name}`, Detail, {id : row.id})
+  console.log('id是',row.id)
 }
 </script>
