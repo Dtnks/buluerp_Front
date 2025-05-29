@@ -3,6 +3,7 @@ import { ref, reactive, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { updateProduct } from '@/apis/products.js'
+import { addMaterial } from '@/apis/materials';
 
 const props = defineProps<{
   detail: any
@@ -143,15 +144,29 @@ const openDialog = () => {
 
 const submitMaterial = async () => {
   await materialFormRef.value?.validate()
-  if (editingIndex.value !== null) {
-    tableData.value.splice(editingIndex.value, 1, { ...materialFormState })
-    ElMessage.success('编辑成功')
-  } else {
-    tableData.value.push({ ...materialFormState })
+
+  try {
+    const res = await addMaterial({ ...materialFormState })
+    const newMaterial = res.data
+
+    tableData.value.push(newMaterial)
+    dialogVisible.value = false
     ElMessage.success('新增成功')
+
+    const oldIds = props.detail.materialIds || []
+    const newIds = [...oldIds, newMaterial.id]
+
+    await updateProduct({
+      id: props.detail.id,
+      materialIds: newIds,
+    })
+    ElMessage.success('产品物料更新成功')
+  } catch (err) {
+    console.error('新建物料失败', err)
+    ElMessage.error('新建物料失败')
   }
-  dialogVisible.value = false
 }
+
 
 const onDelete = (index: number) => {
   tableData.value.splice(index, 1)
@@ -260,12 +275,11 @@ const resetMaterialForm = () => {
       </el-steps>
 
       <el-table :data="tableData" style="width: 100%" max-height="400">
-        <el-table-column prop="materialCode" label="物料编号" width="150" />
-        <el-table-column prop="materialName" label="物料名称" width="150" />
-        <el-table-column prop="color" label="颜色" width="120" />
-        <el-table-column prop="size" label="物料尺寸" width="120" />
-        <el-table-column prop="source" label="物料来源" width="150" />
-        <el-table-column prop="quantity" label="数量" width="100" />
+        <el-table-column prop="materialCode" label="模具编号" width="150" />
+        <el-table-column prop="materialName" label="规格名称" width="150" />
+        <el-table-column prop="color" label="料别" width="120" />
+        <el-table-column prop="size" label="常规编码" width="120" />
+        <el-table-column prop="source" label="单重" width="150" />
         <el-table-column fixed="right" label="操作" width="150">
           <template #default="scope">
             <el-button

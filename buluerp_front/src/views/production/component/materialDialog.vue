@@ -12,17 +12,11 @@
       :rules="rules"
       status-icon
     >
-      <el-form-item label="创建时间" prop="creatTime">
-        <el-date-picker v-model="form.creatTime" type="datetime" style="width: 100%" />
+      <el-form-item label="胶件图引" prop="drawingReferenceFile">
+        <ImageUpload :setFile="setDrawingFile" :initial-url="imageUrl" />
       </el-form-item>
-      <el-form-item label="更新时间" prop="updateTime">
-        <el-date-picker v-model="form.updateTime" type="datetime" style="width: 100%" />
-      </el-form-item>
-      <el-form-item label="胶件图引" prop="drawingReference">
-        <el-input v-model="form.drawingReference" />
-      </el-form-item>
-      <el-form-item label="模具编号" prop="id">
-        <el-input v-model="form.id" />
+      <el-form-item label="模具编号" prop="mouldNumber">
+        <el-input v-model="form.mouldNumber" />
       </el-form-item>
       <el-form-item label="规格名称" prop="specificationName">
         <el-input v-model="form.specificationName" />
@@ -68,25 +62,28 @@
 
 <script lang="ts" setup>
 import { ref, defineProps, defineEmits, watch } from 'vue'
-
+import ImageUpload from '@/components/upload/editUpload.vue'
 const props = defineProps<{
   modelValue: boolean
   isEdit: boolean
   currentData?: Record<string, any>
 }>()
 
+const drawingFile = ref<File | null>(null)
+const setDrawingFile = (file: File) => {
+  drawingFile.value = file
+}
+
 const emit = defineEmits(['update:modelValue', 'submit'])
 
 const visible = ref(props.modelValue)
 watch(() => props.modelValue, (val) => (visible.value = val))
 watch(() => visible.value, (val) => emit('update:modelValue', val))
+const imageUrl = ref('')
 
 const formRef = ref()
 const form = ref<Record<string, any>>({
-  creatTime: '',
-  updateTime: '',
-  drawingReference: '',
-  id: '',
+  mouldNumber: '',
   specificationName: '',
   cavityCount: null,
   materialType: '',
@@ -109,11 +106,57 @@ watch(
   () => props.currentData,
   (data) => {
     if (data) {
-      form.value = { ...data }
+      const {
+        mouldNumber,
+        id,
+        specificationName,
+        cavityCount,
+        materialType,
+        standardCode,
+        singleWeight,
+        mouldStatus,
+        mouldManufacturer,
+        cycleTime,
+        sampleLocation,
+        remarks,
+        spareCode,
+        drawingReference
+      } = data
+
+      form.value = {
+        mouldNumber,
+        id,
+        specificationName,
+        cavityCount,
+        materialType,
+        standardCode,
+        singleWeight,
+        mouldStatus,
+        mouldManufacturer,
+        cycleTime,
+        sampleLocation,
+        remarks,
+        spareCode,
+      }
+
+      drawingFile.value = null
+      
+      if (drawingReference) {
+        imageUrl.value = getFullImageUrl(drawingReference)
+      } else {
+        imageUrl.value = ''
+      }
     }
   },
   { immediate: true }
 )
+
+
+
+const getFullImageUrl = (path: string) => {
+  const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
+  return BASE_IMAGE_URL + path.replace('//', '/')
+}
 
 const handleClose = () => {
   visible.value = false
@@ -122,10 +165,21 @@ const handleClose = () => {
 const handleSubmit = async () => {
   try {
     await formRef.value.validate()
-    emit('submit', { ...form.value })
+
+    const formData = new FormData()
+    for (const key in form.value) {
+      formData.append(key, form.value[key])
+    }
+
+    if (drawingFile.value) {
+      formData.append('drawingReferenceFile', drawingFile.value)
+    }
+
+    emit('submit', formData)
     handleClose()
   } catch (err) {
     console.error('校验失败', err)
   }
 }
+
 </script>

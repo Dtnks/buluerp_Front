@@ -42,3 +42,23 @@ export function importMaterialFile(formData) {
     }
   })
 }
+
+export function getMaterialTemplate() {
+  return httpInstance({
+    url: 'system/material-info/export/template',
+    method: 'get',
+    responseType: 'blob'
+  })
+}
+
+export function exportMaterialFile(formData) {
+  return httpInstance({
+    url: 'system/material-info/export',
+    method: 'post',
+    data: formData,
+    responseType: 'blob'
+  })
+}
+
+
+

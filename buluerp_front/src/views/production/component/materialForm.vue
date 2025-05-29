@@ -87,9 +87,11 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
-import { getMaterialList, importMaterialFile, updateMaterial } from '@/apis/materials'
+import { getMaterialList, importMaterialFile, addMaterial, getMaterialTemplate } from '@/apis/materials'
 import { messageBox } from '@/components/message/messageBox'
 import MaterialDialog from '@/views/production/component/materialDialog.vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { downloadBinaryFile } from '@/utils/file/base64'
 
 const emit = defineEmits(['search'])
 
@@ -143,7 +145,7 @@ const handleCreate = () => {
 
 const handleCreateSubmit = async (formData: any) => {
   try {
-    await updateMaterial(formData)
+    await addMaterial(formData)
     messageBox('success', null, '新建成功', '', '')
     dialogVisible.value = false
     emit('search') // 刷新列表
@@ -171,16 +173,36 @@ const handleUpload = async (option: any) => {
   const formData = new FormData()
   formData.append('file', option.file)
   try {
-    await importMaterialFile(formData)
-    messageBox('success', null, '导入成功', '', '')
-    importDialogVisible.value = false
+    const res = await importMaterialFile(formData)
+    if (res.code === 200) {
+      messageBox('success', null, '导入成功', '', '')
+      importDialogVisible.value = false
+    } else {
+      ElMessage.error(res.msg)
+      const error_text = res.data
+        .map((ele) => {
+            return '第' + ele.rowNum + '行：' + ele.errorMsg
+        })
+        .join('<br>')
+        ElMessageBox.alert(error_text, '数据格式出现问题', {
+            confirmButtonText: '继续',
+            type: 'error',
+            dangerouslyUseHTMLString: true,
+        })
+    }
   } catch (e) {
     messageBox('error', null, '', '导入失败', '')
   }
 }
 
-const handleDownloadTemplate = () => {
-  console.log('下载模板')
+
+const handleDownloadTemplate = async () => {
+  try {
+    const res = await getMaterialTemplate()
+    downloadBinaryFile(res, '模具模板.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+  } catch (e) {
+    ElMessage.error('下载失败')
+  }
 }
 </script>
 

@@ -15,8 +15,8 @@
         <el-table-column label="胶件图片">
           <template #default="{ row }">
             <img
-              v-if="row.pictureUrl"
-              :src="getFullImageUrl(row.pictureUrl)"
+              v-if="row.drawingReference"
+              :src="getFullImageUrl(row.drawingReference)"
               alt="产品图片"
               style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;"
             />
@@ -36,7 +36,7 @@
         <el-table-column prop="updateTime" label="更新时间" />
         <el-table-column label="操作" fixed="right" width="75">
           <template #default="{ row }">
-            <el-button size="small" type="primary" text @click="onEdit">编辑</el-button>
+            <el-button size="small" type="primary" text @click="onEdit(row)">编辑</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -57,15 +57,27 @@
       </div>
     </div>
   </el-card>
+  <MaterialDialog
+  v-model="showDialog"
+  :isEdit="isEdit"
+  :currentData="currentRow"
+  @submit="handleSubmit"
+/>
+
 </template>
 
 <script lang="ts" setup>
 import { ref, watch , onMounted} from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import {deleteMaterial ,getMaterialList } from '@/apis/materials.js' 
+import { deleteMaterial , exportMaterialFile, getMaterialList , updateMaterial , } from '@/apis/materials.js' 
 import { exportToExcel } from '@/utils/file/exportExcel'
+import { downloadBinaryFile } from '@/utils/file/base64'
 
-import Detail from '../main/Detail.vue' 
+import MaterialDialog from '@/views/production/component/materialDialog.vue' 
+const showDialog = ref(false)
+const isEdit = ref(false)
+const currentRow = ref({})
+
 const props = defineProps<{
   queryParams: Record<string, any>
   addTab: (targetName: string, component: any, data?: any) => void
@@ -92,6 +104,27 @@ const fetchData = async () => {
   })
   data.value = res.rows || []
   total.value = res.total || 0
+}
+
+const onEdit = (row: any) => {
+  isEdit.value = true
+  currentRow.value = { ...row }
+  showDialog.value = true
+}
+
+const handleSubmit = async (formData: any) => {
+  try {
+    if (isEdit.value) {
+      await updateMaterial(formData) 
+      ElMessage.success('更新成功')
+    } else {
+    }
+    fetchData()
+  } catch (err) {
+    ElMessage.error('操作失败')
+  } finally {
+    showDialog.value = false
+  }
 }
 
 onMounted(() => {
@@ -145,38 +178,24 @@ const onDelete = async () => {
   }
 }
 
-const onExport = () => {
+const onExport = async () => {
   if (selectedRows.value.length === 0) {
     ElMessage.warning('请先选择要导出的物料')
     return
   }
 
-  const today = new Date()
-  const dateStr = today.toISOString().split('T')[0].replace(/-/g, '') 
+  const ids = selectedRows.value.map(item => item.id).join(',') 
 
-  const exportData = selectedRows.value.map(item => ({
-    创建时间: item.creatTime,
-    更新时间: item.updateTime,
-    胶件图引: item.drawingReference,
-    模具编号: item.id,
-    规格名称: item.specificationName,
-    腔口数量: item.cavityCount,
-    材料类型: item.materialType,
-    常规编码: item.standardCode,
-    单重: item.singleWeight,
-    模具状态: item.mouldStatus,
-    模具厂商: item.mouldManufacturer,
-    生产周期: item.cycleTime,
-    样品库位: item.sampleLocation,
-    备注: item.remarks,
-    备用编码: item.spareCode,
-  }))
+  const formData = new FormData()
+  formData.append('ids', ids)
 
-  exportToExcel(exportData, `物料资料数据`)
-}
-
-
-const onEdit = (row: any) => {
-
+  try {
+    const res = await exportMaterialFile(formData)
+    const blob = new Blob([res], { type: 'application/vnd.ms-excel' })
+    downloadBinaryFile(blob, '物料导出.xlsx')
+  } catch (err) {
+    ElMessage.error('导出失败')
+    console.error('导出错误:', err)
+  }
 }
 </script>
