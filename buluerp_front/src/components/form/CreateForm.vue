@@ -1,16 +1,19 @@
 <template>
   <el-form :ref="formRef" :model="formState" label-width="100px" class="search-form">
     <el-row :gutter="20" align="middle" v-for="(list, index) in data" :key="index">
-      <el-col :span="list.length == 3 ? 8 : 12" v-for="ele in list" :key="ele.label">
+      <el-col :span="ele.width" v-for="ele in list" :key="ele.label">
         <el-form-item :label="ele.label" v-if="ele.type === 'input' && !ele.children">
-          <el-input v-model="searchForm[ele.key]" />
+          <el-input v-model="Formvalue[ele.key]" />
+        </el-form-item>
+        <el-form-item :label="ele.label" v-if="ele.type === 'textarea' && !ele.children">
+          <el-input v-model="Formvalue[ele.key]" type="textarea" />
         </el-form-item>
         <!-- <el-form-item v-else-if="ele.children" :label="ele.children[0].label">
           <el-input v-model="searchForm.customer[ele.children[0].key]" />
           {{searchForm.customer['name'] }}
         </el-form-item> -->
         <el-form-item :label="ele.label" v-else-if="ele.type === 'select'">
-          <el-select v-model="searchForm[ele.key]">
+          <el-select v-model="Formvalue[ele.key]">
             <el-option
               v-for="option in ele.options"
               :key="option.value"
@@ -21,7 +24,7 @@
         </el-form-item>
         <el-form-item :label="ele.label" v-else-if="ele.type === 'timer'">
           <el-date-picker
-            v-model="searchForm[ele.key]"
+            v-model="Formvalue[ele.key]"
             :type="ele.timerType"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
@@ -33,7 +36,7 @@
           <upload
             :setFile="
               (file: File) => {
-                searchForm[ele.key] = file
+                Formvalue[ele.key] = file
               }
             "
           />
@@ -44,7 +47,7 @@
 </template>
 <script lang="ts" setup>
 import upload from '../upload/uploadImage.vue'
-defineProps(['data', 'formState', 'formRef', 'searchForm'])
+defineProps(['data', 'formState', 'formRef', 'Formvalue'])
 </script>
 
 <style scoped>

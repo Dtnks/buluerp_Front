@@ -36,20 +36,14 @@ export function deleteManufacturers(ids) {
   })
 }
 
-export function listManufacturers(
-  pageNum,
-  pageSize,
-  searchContent = {
-    email: '',
-    name: '',
-    remark: '',
-    tel: '',
-    createTimeFrom: '',
-    createTimeTo: '',
-  },
-) {
+export function listManufacturers(pageNum, pageSize, searchContent = {}) {
+  let concatText = Object.keys(searchContent)
+    .map((key) => {
+      return `&${key}=${searchContent[key]}`
+    })
+    .join('')
   return httpInstance({
-    url: `system/manufacturer/list?pageNum=${pageNum}&pageSize=${pageSize}&name=${searchContent.name}&tel=${searchContent.tel}&email=${searchContent.email}&remark=${searchContent.remark}&createTimeFrom=${searchContent.createTimeFrom}&createTimeTo=${searchContent.createTimeTo}`,
+    url: `system/manufacturer/list?pageNum=${pageNum}&pageSize=${pageSize}${concatText}`,
     method: 'get',
     headers: headers,
     //
@@ -74,5 +68,14 @@ export function importmanufacturersFile(formData) {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
+  })
+}
+
+export function downLoadModule() {
+  return httpInstance({
+    url: `system/manufacturer/template`,
+    method: 'get',
+    headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
+    responseType: 'blob',
   })
 }

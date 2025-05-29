@@ -9,6 +9,7 @@ import {
   exportSelectTable,
   deleteCustomer,
   importCustomFile,
+  downLoadModule,
 } from '@/apis/custom.js'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
@@ -16,7 +17,7 @@ import { ref } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
-import { ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
@@ -73,10 +74,7 @@ const operation = ref([
       const id = row.id
       title.value = '编辑'
       editDialogVisible.value = true
-      newSubmit.value = {}
-      detailCustomer(id).then((res) => {
-        newSubmit.value = res.data
-      })
+      newSubmit.value = { ...row }
     },
     value: '编辑',
     disabled: props.control[1].disabled,
@@ -96,23 +94,32 @@ const newSubmit = ref({
 const handleSubmit = () => {
   if (title.value == '编辑') {
     changeCustomer(newSubmit.value).then((res) => {
-      page.value = 1
-      listCustomer(page.value, pageSize.value).then((res) => {
-        listData.value = res.rows
-        total.value = res.total
-      })
-      editDialogVisible.value = false
-    })
-  } else {
-    newCustomer(newSubmit.value).then((res) => {
-      if (res.msg == '操作成功') {
-        ElMessage.success('新增成功')
+      if (res.code == 200) {
         page.value = 1
         listCustomer(page.value, pageSize.value).then((res) => {
           listData.value = res.rows
           total.value = res.total
         })
         editDialogVisible.value = false
+        ElMessage.success(res.msg)
+      } else {
+        ElMessage.error(res.msg)
+        return
+      }
+    })
+  } else {
+    newCustomer(newSubmit.value).then((res) => {
+      if (res.msg == '操作成功') {
+        page.value = 1
+        listCustomer(page.value, pageSize.value).then((res) => {
+          listData.value = res.rows
+          total.value = res.total
+        })
+        ElMessage.success(res.msg)
+        editDialogVisible.value = false
+      } else {
+        ElMessage.error(res.msg)
+        return
       }
     })
   }
@@ -141,7 +148,11 @@ const onSubmit = () => {
     total.value = res.total
   })
 }
-
+const onDownloadTemplate = () => {
+  downLoadModule().then((res) => {
+    downloadBinaryFile(res, '客户信息模板.xlsx')
+  })
+}
 const onImport = () => {
   importDialogVisible.value = true
 }
@@ -153,6 +164,10 @@ const handleUpload = async (option: any) => {
     console.log(res)
     if (res.code == 200) {
       ElMessage.success(res.msg)
+      listCustomer(page.value, pageSize.value).then((res) => {
+        listData.value = res.rows
+        total.value = res.total
+      })
     } else {
       ElMessage.error(res.msg)
       const error_text = res.data
@@ -251,6 +266,7 @@ listCustomer(page.value, pageSize.value).then((res) => {
         :onCreate="onCreate"
         :onSubmit="onSubmit"
         :onImport="onImport"
+        :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent"
         :control="control"
       />

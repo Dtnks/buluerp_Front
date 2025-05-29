@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import FormSearch from '@/components/form/Form.vue'
-import InputForm from '@/components/form/InputForm.vue'
+import CreateForm from '@/components/form/CreateForm.vue'
 import BordShow from '@/components/board/SecBoard.vue'
 import {
   listPurchasePlan,
-  detailPurchasePlan,
   changePurchasePlan,
   newPurchasePlan,
   exportSelectTable,
   deletePurchasePlan,
   importFile,
+  downLoadModule,
 } from '@/apis/produceControl/purchase/purchasePlan'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
@@ -23,21 +23,75 @@ const props = defineProps(['control'])
 const formData = ref([
   [
     { type: 'input', label: '操作人', key: 'operator' },
-    { type: 'timer', label: '创建曰期', timerType: 'date', key: 'creatTime' },
+    { type: 'timer', label: '创建曰期', timerType: 'date', key: 'creationTime' },
+    { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
   ],
   [
-    { type: 'input', label: '备注', key: 'remarks' },
-    { type: 'input', label: '邮箱', key: 'email' },
-    { type: 'input', label: '客户备注', key: 'remarks' },
+    { type: 'timer', label: '预交时间', key: 'deliveryDate', timerType: 'date' },
+    { type: 'input', label: '供应商', key: 'supplier' },
+    { type: 'input', label: '料别', key: 'materialType' },
   ],
 ])
-const newFormData = ref([])
-const searchContent = ref({
-  operator: '',
-  contact: '',
+const newFormData = ref([
+  [
+    { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
+    { type: 'input', label: '采购数量', key: 'purchaseQuantity', width: 8 },
+    { type: 'input', label: '产品ID', key: 'productId', width: 8 },
+  ],
+  [
+    {
+      type: 'timer',
+      label: '预交时间',
+      key: 'deliveryDate',
+      width: 12,
+      timerType: 'date',
+    },
+    { type: 'timer', label: '交货时间', key: 'deliveryTime', width: 12, timerType: 'date' },
+  ],
+  [
+    { type: 'timer', label: '下单时间', key: 'orderTime', width: 12, timerType: 'date' },
+    { type: 'input', label: '供应商', key: 'supplier', width: 12 },
+  ],
+  [
+    { type: 'input', label: '单重', key: 'singleWeight', width: 8 },
+    { type: 'input', label: '采购重量', key: 'purchaseWeight', width: 8 },
+    { type: 'input', label: '料别', key: 'materialType', width: 8 },
+  ],
+
+  [
+    { type: 'input', label: '模具编号', key: 'mouldNumber', width: 12 },
+    { type: 'input', label: '规格', key: 'specification', width: 12 },
+  ],
+  [{ type: 'input', label: 'orderId', key: 'orderCode', width: 12 }],
+  [{ type: 'textarea', label: '客户备注', key: 'remarks', width: 24 }],
+  [{ type: 'image', label: '图片', key: 'picture', width: 12 }],
+])
+const newSubmit = ref({
+  creationTime: '',
   remarks: '',
   email: '',
-  creatTime: '',
+  colorCode: '',
+  deliveryDate: '',
+  deliveryTime: '',
+  orderTime: '',
+  purchaseQuantity: '',
+  singleWeight: '',
+  purchaseWeight: '',
+  supplier: '',
+  materialType: '',
+  picture: '',
+  mouldNumber: '',
+  specification: '',
+  orderCode: '',
+  productId: '',
+})
+const searchContent = ref({
+  creationTime: '',
+  deliveryDate: '',
+  operator: '',
+  colorCode: '',
+  supplier: '',
+  materialType: '',
 })
 const tableData = ref([
   {
@@ -45,7 +99,22 @@ const tableData = ref([
     label: '采购单号',
     type: 'text',
   },
-
+  { value: 'creationTime', label: '创建时间', type: 'text' },
+  {
+    value: 'operator',
+    label: '操作人',
+    type: 'text',
+  },
+  {
+    value: 'materialType',
+    label: '料别',
+    type: 'text',
+  },
+  {
+    value: 'mouldNumber',
+    label: '模具编号',
+    type: 'text',
+  },
   {
     value: 'productId',
     label: '产品ID',
@@ -57,11 +126,41 @@ const tableData = ref([
     type: 'picture',
   },
   {
-    value: 'operator',
-    label: '操作人',
+    value: 'colorCode',
+    label: '颜色编号',
     type: 'text',
   },
-  { value: 'creationTime', label: '创建时间', type: 'text' },
+  {
+    value: 'deliveryDate',
+    label: '预交时间',
+    type: 'text',
+  },
+  {
+    value: 'orderTime',
+    label: '下单时间',
+    type: 'text',
+  },
+  {
+    value: 'purchaseQuantity',
+    label: '采购数量',
+    type: 'text',
+  },
+  {
+    value: 'singleWeight',
+    label: '单重',
+    type: 'text',
+  },
+  {
+    value: 'purchaseWeight',
+    label: '采购重量',
+    type: 'text',
+  },
+  {
+    value: 'supplier',
+    label: '供应商',
+    type: 'text',
+  },
+
   {
     value: 'remarks',
     label: '备注',
@@ -83,10 +182,7 @@ const operation = ref([
       const id = row.id
       title.value = '编辑'
       editDialogVisible.value = true
-      newSubmit.value = {}
-      detailPurchasePlan(id).then((res) => {
-        newSubmit.value = res.data
-      })
+      newSubmit.value = { ...row }
     },
     value: '编辑',
     disabled: props.control[1].disabled,
@@ -96,51 +192,78 @@ const operation = ref([
 //新增与修改
 const importDialogVisible = ref(false)
 const editDialogVisible = ref(false)
-const newSubmit = ref({
-  name: '',
-  contact: '',
-  email: '',
-  remarks: '',
-  creatTime: '',
-})
 const handleSubmit = () => {
   if (title.value == '编辑') {
+    console.log(newSubmit.value)
     changePurchasePlan(newSubmit.value).then((res) => {
-      page.value = 1
-      listPurchasePlan(page.value, pageSize.value).then((res) => {
-        listData.value = res.rows
-        total.value = res.total
-      })
-      editDialogVisible.value = false
-    })
-  } else {
-    newPurchasePlan(newSubmit.value).then((res) => {
-      if (res.msg == '操作成功') {
-        ElMessage.success('新增成功')
+      if (res.code == 200) {
         page.value = 1
         listPurchasePlan(page.value, pageSize.value).then((res) => {
           listData.value = res.rows
           total.value = res.total
         })
+        ElMessage.success(res.msg)
         editDialogVisible.value = false
+      } else {
+        ElMessage.error(res.msg)
+        return
+      }
+    })
+  } else {
+    newSubmit.value.creationTime = parseTime(newSubmit.value.creationTime, '{y}-{m}-{d}')
+    newSubmit.value.deliveryDate = parseTime(newSubmit.value.deliveryDate, '{y}-{m}-{d}')
+    newSubmit.value.deliveryTime = parseTime(newSubmit.value.deliveryTime, '{y}-{m}-{d}')
+    newSubmit.value.orderTime = parseTime(newSubmit.value.orderTime, '{y}-{m}-{d}')
+    newPurchasePlan(newSubmit.value).then((res) => {
+      if (res.msg == '操作成功') {
+        page.value = 1
+        listPurchasePlan(page.value, pageSize.value).then((res) => {
+          listData.value = res.rows
+          total.value = res.total
+        })
+        ElMessage.success(res.msg)
+        editDialogVisible.value = false
+      } else {
+        ElMessage.error('操作失败')
+        return
       }
     })
   }
 }
 const title = ref('编辑')
 //传给form组件的参数
+const resetSubmit = () => {
+  newSubmit.value = {
+    creationTime: '',
+    remarks: '',
+    email: '',
+    colorCode: '',
+    deliveryDate: '',
+    deliveryTime: '',
+    orderTime: '',
+    purchaseQuantity: '',
+    singleWeight: '',
+    purchaseWeight: '',
+    supplier: '',
+    materialType: '',
+    picture: '',
+    mouldNumber: '',
+    specification: '',
+    orderCode: '',
+    productId: '',
+  }
+}
 const onCreate = () => {
-  newSubmit.value = {}
+  resetSubmit()
   title.value = '新增'
   editDialogVisible.value = true
 }
 
 const onSubmit = () => {
-  searchContent.value.creatTime = parseTime(searchContent.value.creatTime, '{y}-{m}-{d}')
-
+  searchContent.value.creationTime = parseTime(searchContent.value.creationTime, '{y}-{m}-{d}')
+  searchContent.value.deliveryDate = parseTime(searchContent.value.deliveryDate, '{y}-{m}-{d}')
   page.value = 1
   listPurchasePlan(page.value, pageSize.value, searchContent.value).then((res) => {
-    console.log(res)
     listData.value = res.rows
     total.value = res.total
   })
@@ -149,14 +272,22 @@ const onSubmit = () => {
 const onImport = () => {
   importDialogVisible.value = true
 }
+const onDownloadTemplate = () => {
+  downLoadModule().then((res) => {
+    downloadBinaryFile(res, '采购计划模板.xlsx')
+  })
+}
 const handleUpload = async (option: any) => {
   const formData = new FormData()
   formData.append('file', option.file)
 
   importFile(formData).then((res) => {
-    console.log(res)
     if (res.code == 200) {
       ElMessage.success(res.msg)
+      listPurchasePlan(page.value, pageSize.value).then((res) => {
+        listData.value = res.rows
+        total.value = res.total
+      })
     } else {
       ElMessage.error(res.msg)
       const error_text = res.data
@@ -241,7 +372,6 @@ const handleSizeChange = async (val: number) => {
 
 //初次渲染
 listPurchasePlan(page.value, pageSize.value).then((res) => {
-  console.log(res, 'plan')
   total.value = res.total
   listData.value = res.rows
 })
@@ -256,6 +386,7 @@ listPurchasePlan(page.value, pageSize.value).then((res) => {
         :onCreate="onCreate"
         :onSubmit="onSubmit"
         :onImport="onImport"
+        :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent"
         :control="control"
       />
@@ -292,8 +423,8 @@ listPurchasePlan(page.value, pageSize.value).then((res) => {
       </TableList>
     </div>
 
-    <el-dialog v-model="editDialogVisible" :title="title" width="400px"
-      ><Form : />
+    <el-dialog v-model="editDialogVisible" :title="title" width="800px"
+      ><CreateForm :data="newFormData" :Formvalue="newSubmit" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>

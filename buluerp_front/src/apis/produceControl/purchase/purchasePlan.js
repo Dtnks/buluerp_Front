@@ -6,6 +6,10 @@ export function newPurchasePlan(data) {
     method: 'post',
     headers: headers,
     data: data,
+    headers: {
+      ...headers,
+      'Content-Type': 'multipart/form-data',
+    },
   })
 }
 
@@ -13,8 +17,20 @@ export function changePurchasePlan(data) {
   return httpInstance({
     url: `system/purchase-collection`,
     method: 'put',
-    headers: headers,
+    headers: {
+      ...headers,
+      'Content-Type': 'multipart/form-data',
+    },
     data: data,
+  })
+}
+
+export function downLoadModule() {
+  return httpInstance({
+    url: `system/purchase-collection/export/template`,
+    method: 'get',
+    headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
+    responseType: 'blob',
   })
 }
 
@@ -34,13 +50,14 @@ export function deletePurchasePlan(ids) {
   })
 }
 
-export function listPurchasePlan(
-  pageNum,
-  pageSize,
-  searchContent = { name: '', contact: '', email: '', remarks: '' },
-) {
+export function listPurchasePlan(pageNum, pageSize, searchContent = {}) {
+  let concatText = Object.keys(searchContent)
+    .map((key) => {
+      return `&${key}=${searchContent[key]}`
+    })
+    .join('')
   return httpInstance({
-    url: `system/purchase-collection/list?pageNum=${pageNum}&pageSize=${pageSize}&name=${searchContent.name}&contact=${searchContent.contact}&email=${searchContent.email}&remarks=${searchContent.remarks}&creatTime=${searchContent.creatTime}`,
+    url: `system/purchase-collection/list?pageNum=${pageNum}&pageSize=${pageSize}${concatText}`,
     method: 'get',
     headers: headers,
   })
@@ -61,6 +78,7 @@ export function importFile(formData) {
     method: 'post',
     data: formData,
     headers: {
+      ...headers,
       'Content-Type': 'multipart/form-data',
     },
   })
