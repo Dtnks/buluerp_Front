@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { updateProduct } from '@/apis/products.js'
-import { addMaterial , searchMaterial} from '@/apis/materials';
+import { addMaterial, searchMaterial } from '@/apis/materials'
+import { messageBox } from '@/components/message/messageBox' // 替换弹窗组件
 
 const props = defineProps<{
   detail: any
@@ -37,7 +37,6 @@ const BASE_URL = 'http://154.201.77.135:8080'
 
 function resolveImageUrl(path: string) {
   if (!path) return ''
-  // 去掉多余的斜杠，拼接完整地址
   return `${BASE_URL}${path.replace('//', '/')}`
 }
 const materialIds = ref<number[]>([])
@@ -45,7 +44,6 @@ const materialIds = ref<number[]>([])
 watch(
   () => props.detail,
   async (val) => {
-    console.log('接收到 props.detail：', val)
     if (val) {
       mainFormState.productName = val.name || ''
       mainFormState.designStatus = Number(val.designStatus ?? 0)
@@ -62,7 +60,7 @@ watch(
           tableData.value = res.data || []
         } catch (err) {
           console.error('获取物料信息失败', err)
-          ElMessage.error('获取物料信息失败')
+          messageBox('error', null, '', '获取物料信息失败', '')
         }
       } else {
         materialIds.value = []
@@ -72,8 +70,6 @@ watch(
   },
   { immediate: true }
 )
-
-
 
 const dummyRequest = (options: any) => {
   const { onSuccess } = options
@@ -109,10 +105,10 @@ const submitMainForm = async () => {
       pictureFile: rawFile,
     })
 
-    ElMessage.success('提交成功')
+    messageBox('success', null, '提交成功', '', '')
   } catch (err) {
     console.error('提交失败', err)
-    ElMessage.error('提交失败')
+    messageBox('error', null, '', '提交失败', '')
   }
 }
 
@@ -147,9 +143,6 @@ const openDialog = () => {
   dialogVisible.value = true
 }
 
-
-//新建物料需要Formdata类型参数
-
 const submitMaterial = async () => {
   await materialFormRef.value?.validate()
   const formData = new FormData()
@@ -178,25 +171,20 @@ const submitMaterial = async () => {
     tableData.value = queryRes.data || []
 
     dialogVisible.value = false
-    ElMessage.success('新增物料并关联产品成功')
+    messageBox('success', null, '新增物料并关联产品成功', '', '')
 
     props.detail.materialIds = newIds
   } catch (err) {
     console.error('新建物料失败', err)
-    ElMessage.error('新建物料失败')
+    messageBox('error', null, '', '新建物料失败', '')
   }
 }
 
-
 const onDelete = async (materialId: number) => {
-  try {
-    await ElMessageBox.confirm('确认删除该物料吗？', '提示', {
-      type: 'warning',
-    })
-    console.log('要删除的是',materialId)
+  const deleteAction = async () => {
     const oldIds = props.detail.materialIds || []
     const newIds = oldIds.filter(id => id !== materialId)
-    console.log('准备发送的是',newIds)
+
     await updateProduct({
       ...props.detail,
       materialIds: newIds,
@@ -204,14 +192,16 @@ const onDelete = async (materialId: number) => {
 
     const queryRes = await searchMaterial({ ids: newIds.join(',') })
     tableData.value = queryRes.data || []
-
     props.detail.materialIds = newIds
-
-    ElMessage.success('删除物料并更新产品成功')
-  } catch (err) {
-    console.error('删除物料失败', err)
-    ElMessage.error('删除物料失败')
   }
+
+  messageBox(
+    'warning',
+    deleteAction,
+    '删除物料并更新产品成功',
+    '删除物料失败',
+    '确认删除该物料吗？'
+  )
 }
 
 const onEdit = (row: MaterialItem, index: number) => {
@@ -227,6 +217,7 @@ const resetMaterialForm = () => {
   materialFormState.standardCode = 0
   materialFormState.singleWeight = 0
 }
+
 </script>
 
 <template>

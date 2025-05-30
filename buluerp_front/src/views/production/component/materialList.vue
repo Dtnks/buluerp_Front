@@ -67,13 +67,20 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch , onMounted} from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { deleteMaterial , exportMaterialFile, getMaterialList , updateMaterial , } from '@/apis/materials.js' 
+import { ref, watch, onMounted } from 'vue'
+// import { ElMessage, ElMessageBox } from 'element-plus' ✅ 已移除
+import {
+  deleteMaterial,
+  exportMaterialFile,
+  getMaterialList,
+  updateMaterial,
+} from '@/apis/materials.js'
 import { exportToExcel } from '@/utils/file/exportExcel'
 import { downloadBinaryFile } from '@/utils/file/base64'
+import { messageBox } from '@/components/message/messageBox' // ✅ 使用封装后的消息模块
 
-import MaterialDialog from '@/views/production/component/materialDialog.vue' 
+import MaterialDialog from '@/views/production/component/materialDialog.vue'
+
 const showDialog = ref(false)
 const isEdit = ref(false)
 const currentRow = ref({})
@@ -88,15 +95,13 @@ const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
-const BASE_IMAGE_URL = 'http://154.201.77.135:8080' 
+const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
 
 const getFullImageUrl = (path: string) => {
-  // 防止多余斜杠：/profile//2025/... => /profile/2025/...
   return BASE_IMAGE_URL + path.replace('//', '/')
 }
 
 const fetchData = async () => {
-  console.log('queryParams:', props.queryParams)
   const res = await getMaterialList({
     ...props.queryParams,
     pageNum: page.value,
@@ -115,20 +120,23 @@ const onEdit = (row: any) => {
 const handleSubmit = async (formData: any) => {
   try {
     if (isEdit.value) {
-      await updateMaterial(formData) 
-      ElMessage.success('更新成功')
-    } else {
+      const res = await updateMaterial(formData)
+      if (res.code === 200) {
+        messageBox('success', Promise.resolve, '更新成功', '', '')
+      } else {
+        throw new Error('更新失败')
+      }
     }
     fetchData()
   } catch (err) {
-    ElMessage.error('操作失败')
+    messageBox('error', () => Promise.reject(), '', '操作失败', '')
   } finally {
     showDialog.value = false
   }
 }
 
 onMounted(() => {
-  fetchData() // 组件挂载时发一次请求
+  fetchData()
 })
 
 watch(
@@ -159,33 +167,35 @@ const handleSelectionChange = (selection: any[]) => {
 
 const onDelete = async () => {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('请先选择要删除的产品')
+    messageBox('warning', () => Promise.reject(), '', '请先选择要删除的产品', '')
     return
   }
 
-  try {
-    await ElMessageBox.confirm('确认要删除选中的产品吗？', '提示', {
-      type: 'warning'
-    })
-
-    const ids = selectedRows.value.map(item => item.id)
-    await deleteMaterial(ids) 
-    ElMessage.success('删除成功')
-    fetchData() 
-    selectedRows.value = [] 
-  } catch (err) {
-    ElMessage.info('取消删除')
-  }
+  messageBox(
+    'warning',
+    async () => {
+      const ids = selectedRows.value.map((item) => item.id)
+      const res = await deleteMaterial(ids)
+      if (res.code === 200) {
+        fetchData()
+        selectedRows.value = []
+        return Promise.resolve()
+      }
+      return Promise.reject()
+    },
+    '删除成功',
+    '删除失败',
+    '确认要删除选中的产品吗？'
+  )
 }
 
 const onExport = async () => {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('请先选择要导出的物料')
+    messageBox('warning', () => Promise.reject(), '', '请先选择要导出的物料', '')
     return
   }
 
-  const ids = selectedRows.value.map(item => item.id).join(',') 
-
+  const ids = selectedRows.value.map((item) => item.id).join(',')
   const formData = new FormData()
   formData.append('ids', ids)
 
@@ -194,8 +204,9 @@ const onExport = async () => {
     const blob = new Blob([res], { type: 'application/vnd.ms-excel' })
     downloadBinaryFile(blob, '物料导出.xlsx')
   } catch (err) {
-    ElMessage.error('导出失败')
+    messageBox('error', () => Promise.reject(), '', '导出失败', '')
     console.error('导出错误:', err)
   }
 }
+
 </script>

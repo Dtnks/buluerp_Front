@@ -87,10 +87,15 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
-import { getMaterialList, importMaterialFile, addMaterial, getMaterialTemplate } from '@/apis/materials'
+import {
+  getMaterialList,
+  importMaterialFile,
+  addMaterial,
+  getMaterialTemplate,
+} from '@/apis/materials'
 import { messageBox } from '@/components/message/messageBox'
 import MaterialDialog from '@/views/production/component/materialDialog.vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import { downloadBinaryFile } from '@/utils/file/base64'
 
 const emit = defineEmits(['search'])
@@ -118,7 +123,7 @@ const fetchMaterialOptions = async () => {
       value: String(val),
     }))
   } catch (error) {
-    console.error('获取物料失败:', error)
+    messageBox('error', null, '', '获取物料失败', '')
   }
 }
 
@@ -148,7 +153,7 @@ const handleCreateSubmit = async (formData: any) => {
     await addMaterial(formData)
     messageBox('success', null, '新建成功', '', '')
     dialogVisible.value = false
-    emit('search') // 刷新列表
+    emit('search')
   } catch (error) {
     messageBox('error', null, '', '新建失败', '')
   }
@@ -162,48 +167,54 @@ const beforeUpload = (file: File) => {
   const isExcel =
     file.type === 'application/vnd.ms-excel' ||
     file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
   if (!isExcel) {
-    messageBox('error', null, '', '只能上传excel文件', '')
+    messageBox('error', null, '', '只能上传 Excel 文件', '')
     return false
   }
+
   return true
 }
 
 const handleUpload = async (option: any) => {
   const formData = new FormData()
   formData.append('file', option.file)
+
   try {
     const res = await importMaterialFile(formData)
+
     if (res.code === 200) {
       messageBox('success', null, '导入成功', '', '')
       importDialogVisible.value = false
     } else {
-      ElMessage.error(res.msg)
       const error_text = res.data
-        .map((ele) => {
-            return '第' + ele.rowNum + '行：' + ele.errorMsg
-        })
+        .map((ele) => '第' + ele.rowNum + '行：' + ele.errorMsg)
         .join('<br>')
-        ElMessageBox.alert(error_text, '数据格式出现问题', {
-            confirmButtonText: '继续',
-            type: 'error',
-            dangerouslyUseHTMLString: true,
-        })
+
+      ElMessageBox.alert(error_text, '数据格式出现问题', {
+        confirmButtonText: '继续',
+        type: 'error',
+        dangerouslyUseHTMLString: true,
+      })
     }
   } catch (e) {
     messageBox('error', null, '', '导入失败', '')
   }
 }
 
-
 const handleDownloadTemplate = async () => {
   try {
     const res = await getMaterialTemplate()
-    downloadBinaryFile(res, '模具模板.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    downloadBinaryFile(
+      res,
+      '模具模板.xlsx',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
   } catch (e) {
-    ElMessage.error('下载失败')
+    messageBox('error', null, '', '下载失败', '')
   }
 }
+
 </script>
 
 <style scoped>
