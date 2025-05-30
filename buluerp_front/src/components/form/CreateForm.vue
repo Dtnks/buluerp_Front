@@ -41,13 +41,33 @@
             "
           />
         </el-form-item>
+        <el-form-item :label="ele.label" v-else-if="ele.type === 'fileList'">
+          <el-upload
+            v-model:file-list="FileList"
+            class="upload-demo"
+            multiple
+            :auto-upload="false"
+            :on-change="handleFileChange(ele.key)"
+            ><el-button>点击上传</el-button>
+          </el-upload>
+        </el-form-item>
       </el-col>
     </el-row>
   </el-form>
 </template>
 <script lang="ts" setup>
 import upload from '../upload/uploadImage.vue'
-defineProps(['data', 'formState', 'formRef', 'Formvalue'])
+import { ref } from 'vue'
+const props = defineProps(['data', 'formState', 'formRef', 'Formvalue'])
+const FileList = ref([])
+const handleFileChange = (key) => {
+  if (FileList.value.length > 0) {
+    props.Formvalue[key] = FileList.value.map((item) => {
+      return item.raw
+    })
+  }
+  console.log(FileList.value, key)
+}
 </script>
 
 <style scoped>

@@ -22,148 +22,72 @@ const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
   [
-    { type: 'input', label: '操作人', key: 'operator' },
-    { type: 'timer', label: '创建曰期', timerType: 'date', key: 'creationTime' },
-    { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
+    { type: 'input', label: '订单金额', key: 'amount' },
+    { type: 'input', label: '采购计划单号', key: 'purchaseId' },
+    { type: 'timer', label: '创建曰期', timerType: 'date', key: 'createTime' },
   ],
   [
-    { type: 'timer', label: '预交时间', key: 'deliveryDate', timerType: 'date' },
-    { type: 'input', label: '供应商', key: 'supplier' },
-    { type: 'input', label: '料别', key: 'materialType' },
+    { type: 'input', label: '创建人', key: 'createBy' },
+    { type: 'input', label: '备注', key: 'remark' },
   ],
 ])
 const newFormData = ref([
   [
-    { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
-    { type: 'input', label: '采购数量', key: 'purchaseQuantity', width: 8 },
-    { type: 'input', label: '产品ID', key: 'productId', width: 8 },
+    { type: 'input', label: '采购计划', key: 'purchaseId', width: 12 },
+    { type: 'input', label: '订单金额', key: 'amount', width: 12 },
   ],
   [
-    {
-      type: 'timer',
-      label: '预交时间',
-      key: 'deliveryDate',
-      width: 12,
-      timerType: 'date',
-    },
-    { type: 'timer', label: '交货时间', key: 'deliveryTime', width: 12, timerType: 'date' },
+    { type: 'textarea', label: '备注', key: 'remark', width: 10 },
+    { type: 'fileList', label: '发票文件', key: 'invoice', width: 10 },
   ],
-  [
-    { type: 'timer', label: '下单时间', key: 'orderTime', width: 12, timerType: 'date' },
-    { type: 'input', label: '供应商', key: 'supplier', width: 12 },
-  ],
-  [
-    { type: 'input', label: '单重', key: 'singleWeight', width: 8 },
-    { type: 'input', label: '采购重量', key: 'purchaseWeight', width: 8 },
-    { type: 'input', label: '料别', key: 'materialType', width: 8 },
-  ],
-
-  [
-    { type: 'input', label: '模具编号', key: 'mouldNumber', width: 12 },
-    { type: 'input', label: '规格', key: 'specification', width: 12 },
-  ],
-  [{ type: 'input', label: 'orderId', key: 'orderCode', width: 12 }],
-  [{ type: 'textarea', label: '客户备注', key: 'remarks', width: 24 }],
-  [{ type: 'image', label: '图片', key: 'picture', width: 12 }],
 ])
 const newSubmit = ref({
-  creationTime: '',
-  remarks: '',
-  email: '',
-  colorCode: '',
-  deliveryDate: '',
-  deliveryTime: '',
-  orderTime: '',
-  purchaseQuantity: '',
-  singleWeight: '',
-  purchaseWeight: '',
-  supplier: '',
-  materialType: '',
-  picture: '',
-  mouldNumber: '',
-  specification: '',
-  orderCode: '',
-  productId: '',
+  purchaseId: '',
+  amount: '',
+  remark: '',
+  invoice: [],
 })
 const searchContent = ref({
-  creationTime: '',
-  deliveryDate: '',
-  operator: '',
-  colorCode: '',
-  supplier: '',
-  materialType: '',
+  purchaseId: '',
+  createBy: '',
+  amount: '',
+  createTime: '',
+  remark: '',
 })
 const tableData = ref([
   {
     value: 'id',
-    label: '采购单号',
-    type: 'text',
-  },
-  { value: 'creationTime', label: '创建时间', type: 'text' },
-  {
-    value: 'operator',
-    label: '操作人',
+    label: 'ID',
     type: 'text',
   },
   {
-    value: 'materialType',
-    label: '料别',
+    value: 'purchaseId',
+    label: '采购计划',
     type: 'text',
   },
   {
-    value: 'mouldNumber',
-    label: '模具编号',
+    value: 'createBy',
+    label: '创建人',
     type: 'text',
   },
   {
-    value: 'productId',
-    label: '产品ID',
+    value: 'amount',
+    label: '订单金额',
     type: 'text',
   },
   {
-    value: 'pictureUrl',
-    label: '产品图片',
-    type: 'picture',
-  },
-  {
-    value: 'colorCode',
-    label: '颜色编号',
+    value: 'createTime',
+    label: '创建时间',
     type: 'text',
   },
   {
-    value: 'deliveryDate',
-    label: '预交时间',
-    type: 'text',
-  },
-  {
-    value: 'orderTime',
-    label: '下单时间',
-    type: 'text',
-  },
-  {
-    value: 'purchaseQuantity',
-    label: '采购数量',
-    type: 'text',
-  },
-  {
-    value: 'singleWeight',
-    label: '单重',
-    type: 'text',
-  },
-  {
-    value: 'purchaseWeight',
-    label: '采购重量',
-    type: 'text',
-  },
-  {
-    value: 'supplier',
-    label: '供应商',
-    type: 'text',
-  },
-
-  {
-    value: 'remarks',
+    value: 'remark',
     label: '备注',
+    type: 'text',
+  },
+  {
+    value: 'invoice',
+    label: '发票文件',
     type: 'text',
   },
 ])
@@ -210,11 +134,9 @@ const handleSubmit = () => {
       }
     })
   } else {
-    newSubmit.value.creationTime = parseTime(newSubmit.value.creationTime, '{y}-{m}-{d}')
-    newSubmit.value.deliveryDate = parseTime(newSubmit.value.deliveryDate, '{y}-{m}-{d}')
-    newSubmit.value.deliveryTime = parseTime(newSubmit.value.deliveryTime, '{y}-{m}-{d}')
-    newSubmit.value.orderTime = parseTime(newSubmit.value.orderTime, '{y}-{m}-{d}')
+    newSubmit.value.createTime = parseTime(newSubmit.value.createTime, '{y}-{m}-{d}')
     newPurchaseList(newSubmit.value).then((res) => {
+      console.log(res)
       if (res.msg == '操作成功') {
         page.value = 1
         listPurchaseList(page.value, pageSize.value).then((res) => {
@@ -234,23 +156,12 @@ const title = ref('编辑')
 //传给form组件的参数
 const resetSubmit = () => {
   newSubmit.value = {
-    creationTime: '',
-    remarks: '',
-    email: '',
-    colorCode: '',
-    deliveryDate: '',
-    deliveryTime: '',
-    orderTime: '',
-    purchaseQuantity: '',
-    singleWeight: '',
-    purchaseWeight: '',
-    supplier: '',
-    materialType: '',
-    picture: '',
-    mouldNumber: '',
-    specification: '',
-    orderCode: '',
-    productId: '',
+    purchaseId: '',
+    createBy: '',
+    amount: '',
+    createTime: '',
+    remark: '',
+    invoice: [],
   }
 }
 const onCreate = () => {
@@ -260,8 +171,7 @@ const onCreate = () => {
 }
 
 const onSubmit = () => {
-  searchContent.value.creationTime = parseTime(searchContent.value.creationTime, '{y}-{m}-{d}')
-  searchContent.value.deliveryDate = parseTime(searchContent.value.deliveryDate, '{y}-{m}-{d}')
+  searchContent.value.createTime = parseTime(searchContent.value.createTime, '{y}-{m}-{d}')
   page.value = 1
   listPurchaseList(page.value, pageSize.value, searchContent.value).then((res) => {
     listData.value = res.rows

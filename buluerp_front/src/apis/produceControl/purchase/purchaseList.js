@@ -1,12 +1,15 @@
 import httpInstance from '@/utils/httpsInstance.js'
 let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
 export function newPurchaseList(data) {
+  console.log(data)
   return httpInstance({
     url: `system/purchase/order`,
     method: 'post',
-    headers: headers,
+    headers: {
+      ...headers,
+      'Content-Type': 'multipart/form-data',
+    },
     data: data,
-    headers,
   })
 }
 
@@ -53,6 +56,8 @@ export function listPurchaseList(pageNum, pageSize, searchContent = {}) {
       return `&${key}=${searchContent[key]}`
     })
     .join('')
+
+  console.log(`system/purchase/order/list?pageNum=${pageNum}&pageSize=${pageSize}${concatText}`)
   return httpInstance({
     url: `system/purchase/order/list?pageNum=${pageNum}&pageSize=${pageSize}${concatText}`,
     method: 'get',
