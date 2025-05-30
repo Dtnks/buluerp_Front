@@ -185,7 +185,8 @@ const onExport = () => {
 }
 
 const onView = (row: any) => {
-  props.addTab(`详情页-${row.name}`, Detail, { id: row.id }, props.control)
-  console.log('id是', row.id)
+  props.addTab(`详情页-${row.name}`, Detail, row, props.control)
+  console.log('传递的产品信息是', row)
 }
+
 </script>

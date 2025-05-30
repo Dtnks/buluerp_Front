@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { updateProduct } from '@/apis/products.js'
-import { addMaterial } from '@/apis/materials';
+import { addMaterial , searchMaterial} from '@/apis/materials';
 
 const props = defineProps<{
   detail: any
@@ -16,12 +16,11 @@ const dialogVisible = ref(false)
 const editingIndex = ref<number | null>(null)
 const materialFormRef = ref<FormInstance>()
 const materialFormState = reactive<MaterialItem>({
-  materialCode: '',
-  materialName: '',
-  color: '',
-  size: '',
-  source: '',
-  quantity: 1,
+  mouldNumber: 0,
+  specificationName: '',
+  materialType: '',
+  standardCode: 0,
+  singleWeight: 0,
 })
 
 const mainFormRef = ref<FormInstance>()
@@ -41,10 +40,11 @@ function resolveImageUrl(path: string) {
   // 去掉多余的斜杠，拼接完整地址
   return `${BASE_URL}${path.replace('//', '/')}`
 }
+const materialIds = ref<number[]>([])
 
 watch(
   () => props.detail,
-  (val) => {
+  async (val) => {
     console.log('接收到 props.detail：', val)
     if (val) {
       mainFormState.productName = val.name || ''
@@ -53,20 +53,27 @@ watch(
         const url = resolveImageUrl(val.pictureUrl)
         fileList.value = [{ url }]
       }
+
+      if (Array.isArray(val.materialIds) && val.materialIds.length > 0) {
+        materialIds.value = [...val.materialIds]
+        try {
+          const idsStr = materialIds.value.join(',')
+          const res = await searchMaterial({ ids: idsStr })
+          tableData.value = res.data || []
+        } catch (err) {
+          console.error('获取物料信息失败', err)
+          ElMessage.error('获取物料信息失败')
+        }
+      } else {
+        materialIds.value = []
+        tableData.value = []
+      }
     }
   },
-  { immediate: true },
+  { immediate: true }
 )
 
-watch(
-  () => props.materialData,
-  (val) => {
-    if (val) {
-      tableData.value = val
-    }
-  },
-  { immediate: true },
-)
+
 
 const dummyRequest = (options: any) => {
   const { onSuccess } = options
@@ -119,21 +126,19 @@ const onCancel = () => {
 }
 
 interface MaterialItem {
-  materialCode: string
-  materialName: string
-  color: string
-  size: string
-  source: string
-  quantity: number
+  mouldNumber: number
+  specificationName: string
+  materialType: string
+  standardCode: number
+  singleWeight: number
 }
 
 const materialRules = reactive<FormRules>({
-  materialCode: [{ required: true, message: '请输入物料编号', trigger: 'blur' }],
-  materialName: [{ required: true, message: '请输入物料名称', trigger: 'blur' }],
-  color: [{ required: true, message: '请输入颜色', trigger: 'blur' }],
-  size: [{ required: true, message: '请输入物料尺寸', trigger: 'blur' }],
-  source: [{ required: true, message: '请输入物料来源', trigger: 'blur' }],
-  quantity: [{ required: true, type: 'number', message: '请输入数量', trigger: 'change' }],
+  mouldNumber: [{ required: true, message: '请输入模具编号', trigger: 'blur' }],
+  specificationName: [{ required: true, message: '请输入规格名称', trigger: 'blur' }],
+  materialType: [{ required: true, message: '请输入料别', trigger: 'blur' }],
+  standardCode: [{ required: true, message: '请输入标准编码', trigger: 'blur' }],
+  singleWeight: [{ required: true, message: '请输入单重', trigger: 'blur' }],
 })
 
 const openDialog = () => {
@@ -142,25 +147,40 @@ const openDialog = () => {
   dialogVisible.value = true
 }
 
+
+//新建物料需要Formdata类型参数
+
 const submitMaterial = async () => {
   await materialFormRef.value?.validate()
-
+  const formData = new FormData()
   try {
-    const res = await addMaterial({ ...materialFormState })
-    const newMaterial = res.data
+    formData.append('mouldNumber', materialFormState.mouldNumber.toString())
+    formData.append('specificationName', materialFormState.specificationName)
+    formData.append('materialType', materialFormState.materialType)
+    formData.append('standardCode', materialFormState.standardCode.toString())
+    formData.append('singleWeight', materialFormState.singleWeight.toString())
+    const res = await addMaterial(formData)
+    const newId = res.data
 
-    tableData.value.push(newMaterial)
-    dialogVisible.value = false
-    ElMessage.success('新增成功')
+    if (!newId) {
+      throw new Error('新增物料返回无效 id')
+    }
 
     const oldIds = props.detail.materialIds || []
-    const newIds = [...oldIds, newMaterial.id]
+    const newIds = [...oldIds, newId]
 
     await updateProduct({
-      id: props.detail.id,
+      ...props.detail,
       materialIds: newIds,
     })
-    ElMessage.success('产品物料更新成功')
+
+    const queryRes = await searchMaterial({ ids: newIds.join(',') })
+    tableData.value = queryRes.data || []
+
+    dialogVisible.value = false
+    ElMessage.success('新增物料并关联产品成功')
+
+    props.detail.materialIds = newIds
   } catch (err) {
     console.error('新建物料失败', err)
     ElMessage.error('新建物料失败')
@@ -168,9 +188,30 @@ const submitMaterial = async () => {
 }
 
 
-const onDelete = (index: number) => {
-  tableData.value.splice(index, 1)
-  ElMessage.success('删除成功')
+const onDelete = async (materialId: number) => {
+  try {
+    await ElMessageBox.confirm('确认删除该物料吗？', '提示', {
+      type: 'warning',
+    })
+    console.log('要删除的是',materialId)
+    const oldIds = props.detail.materialIds || []
+    const newIds = oldIds.filter(id => id !== materialId)
+    console.log('准备发送的是',newIds)
+    await updateProduct({
+      ...props.detail,
+      materialIds: newIds,
+    })
+
+    const queryRes = await searchMaterial({ ids: newIds.join(',') })
+    tableData.value = queryRes.data || []
+
+    props.detail.materialIds = newIds
+
+    ElMessage.success('删除物料并更新产品成功')
+  } catch (err) {
+    console.error('删除物料失败', err)
+    ElMessage.error('删除物料失败')
+  }
 }
 
 const onEdit = (row: MaterialItem, index: number) => {
@@ -180,12 +221,11 @@ const onEdit = (row: MaterialItem, index: number) => {
 }
 
 const resetMaterialForm = () => {
-  materialFormState.materialCode = ''
-  materialFormState.materialName = ''
-  materialFormState.color = ''
-  materialFormState.size = ''
-  materialFormState.source = ''
-  materialFormState.quantity = 1
+  materialFormState.mouldNumber = 0
+  materialFormState.specificationName = ''
+  materialFormState.materialType = ''
+  materialFormState.standardCode = 0
+  materialFormState.singleWeight = 0
 }
 </script>
 
@@ -275,11 +315,11 @@ const resetMaterialForm = () => {
       </el-steps>
 
       <el-table :data="tableData" style="width: 100%" max-height="400">
-        <el-table-column prop="materialCode" label="模具编号" width="150" />
-        <el-table-column prop="materialName" label="规格名称" width="150" />
-        <el-table-column prop="color" label="料别" width="120" />
-        <el-table-column prop="size" label="常规编码" width="120" />
-        <el-table-column prop="source" label="单重" width="150" />
+        <el-table-column prop="mouldNumber" label="模具编号" width="150" />
+        <el-table-column prop="specificationName" label="规格名称" width="150" />
+        <el-table-column prop="materialType" label="料别" width="120" />
+        <el-table-column prop="standardCode" label="常规编码" width="120" />
+        <el-table-column prop="singleWeight" label="单重" width="150" />
         <el-table-column fixed="right" label="操作" width="150">
           <template #default="scope">
             <el-button
@@ -294,7 +334,7 @@ const resetMaterialForm = () => {
               link
               type="danger"
               size="small"
-              @click="onDelete(scope.$index)"
+              @click="onDelete(scope.row.id)"
               :disabled="control[1].disabled"
               >删除</el-button
             >
@@ -326,23 +366,20 @@ const resetMaterialForm = () => {
         label-width="100px"
         :rules="materialRules"
       >
-        <el-form-item label="物料编号" prop="materialCode">
-          <el-input v-model="materialFormState.materialCode" placeholder="请输入物料编号" />
+        <el-form-item label="模具编号" prop="mouldNumber">
+          <el-input v-model="materialFormState.mouldNumber" placeholder="请输入模具编号" />
         </el-form-item>
-        <el-form-item label="物料名称" prop="materialName">
-          <el-input v-model="materialFormState.materialName" placeholder="请输入物料名称" />
+        <el-form-item label="规格名称" prop="specificationName">
+          <el-input v-model="materialFormState.specificationName" placeholder="请输入规格名称" />
         </el-form-item>
-        <el-form-item label="颜色" prop="color">
-          <el-input v-model="materialFormState.color" placeholder="请输入颜色" />
+        <el-form-item label="料别" prop="materialType">
+          <el-input v-model="materialFormState.materialType" placeholder="请输入料别" />
         </el-form-item>
-        <el-form-item label="物料尺寸" prop="size">
-          <el-input v-model="materialFormState.size" placeholder="请输入物料尺寸" />
+        <el-form-item label="常规编码" prop="standardCode">
+          <el-input v-model="materialFormState.standardCode" placeholder="请输入常规编码" />
         </el-form-item>
-        <el-form-item label="物料来源" prop="source">
-          <el-input v-model="materialFormState.source" placeholder="请输入物料来源" />
-        </el-form-item>
-        <el-form-item label="数量" prop="quantity">
-          <el-input-number v-model="materialFormState.quantity" :min="1" />
+        <el-form-item label="单重" prop="singleWeight">
+          <el-input v-model="materialFormState.singleWeight" placeholder="请输入单重" />
         </el-form-item>
       </el-form>
 

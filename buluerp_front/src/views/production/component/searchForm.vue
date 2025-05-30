@@ -136,7 +136,8 @@
 import { ref, reactive } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { ElMessage } from 'element-plus'
-import { createProduct, importProductFile } from '@/apis/products.js'
+import { createProduct, importProductFile , getProductTemplate} from '@/apis/products.js'
+import { downloadBinaryFile } from '@/utils/file/base64'
 
 const emit = defineEmits(['search', 'created'])
 defineProps(['control'])
@@ -274,12 +275,13 @@ const handleUpload = async (option: any) => {
   }
 }
 
-const onDownloadTemplate = () => {
-  // 下载 Excel 模板，可以是静态文件或接口返回
-  const link = document.createElement('a')
-  link.href = '/template/import-template.xlsx' // 替换成你的模板文件路径
-  link.download = '导入模板.xlsx'
-  link.click()
+const onDownloadTemplate = async () => {
+  try {
+      const res = await getProductTemplate()
+      downloadBinaryFile(res, '产品模板.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    } catch (e) {
+      ElMessage.error('下载失败')
+    }
 }
 
 const beforeImageUpload = (file: File) => {
@@ -304,6 +306,8 @@ const beforeImageUpload = (file: File) => {
 
   return false
 }
+
+
 </script>
 
 <style scoped>

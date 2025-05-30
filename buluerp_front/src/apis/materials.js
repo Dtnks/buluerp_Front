@@ -60,5 +60,12 @@ export function exportMaterialFile(formData) {
   })
 }
 
+export function searchMaterial(params) {
+  return httpInstance({
+    url: 'system/material-info',
+    method: 'get',
+    params
+  })
+}
 
 
