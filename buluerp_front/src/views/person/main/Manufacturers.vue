@@ -16,9 +16,9 @@ import TableList from '@/components/table/TableList.vue'
 import { ref } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
+import { importCustomFile } from '@/apis/custom.js'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessage } from 'element-plus'
-const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
   [
@@ -35,29 +35,24 @@ const tableData = ref([
   {
     value: 'id',
     label: '用户ID',
-    type: 'text',
   },
   {
     value: 'name',
     label: '姓名',
-    type: 'text',
   },
   {
     value: 'tel',
     label: '联系方式',
-    type: 'text',
   },
   {
     value: 'email',
     label: '邮箱',
-    type: 'text',
   },
   {
     value: 'remark',
     label: '备注',
-    type: 'text',
   },
-  { value: 'createTime', label: '创建时间', type: 'text' },
+  { value: 'createTime', label: '创建时间' },
 ])
 console.log(props.control)
 const operation = ref([
@@ -78,7 +73,6 @@ const operation = ref([
       newSubmit.value = { ...row }
     },
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
 ])
 const searchContent = ref({ name: '', creatTime: '', email: '', remark: '', tel: '' })
@@ -262,7 +256,6 @@ listManufacturers(page.value, pageSize.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :search-form="searchContent"
-        :control="control"
       />
       <TableList
         :tableData="tableData"
@@ -270,7 +263,6 @@ listManufacturers(page.value, pageSize.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
-        :control="control"
       >
         <slot>
           <div

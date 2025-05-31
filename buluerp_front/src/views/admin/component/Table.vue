@@ -2,7 +2,7 @@
 import { changeStatus, changeRoles, resetPassword } from '@/apis/admin.js'
 import { messageBox } from '@/components/message/messageBox.js'
 import { ElMessage } from 'element-plus'
-const props = defineProps(['tableData', 'total', 'setPage', 'options', 'control'])
+const props = defineProps(['tableData', 'total', 'setPage', 'options'])
 import { ref } from 'vue'
 const editPerson = ref({
   userName: null,
@@ -118,7 +118,6 @@ const filterHandler = (value: string, row: User, column: TableColumnCtx<User>) =
             type="primary"
             @click="handleRole(scope.row)"
             v-if="scope.row.status == '生效'"
-            :disabled="control[1].disabled"
           >
             授权
           </el-button>
@@ -127,7 +126,6 @@ const filterHandler = (value: string, row: User, column: TableColumnCtx<User>) =
             size="small"
             @click="handelResetPassword(scope.row)"
             v-if="scope.row.status == '生效'"
-            :disabled="control[1].disabled"
           >
             重置密码
           </el-button>
@@ -136,7 +134,6 @@ const filterHandler = (value: string, row: User, column: TableColumnCtx<User>) =
             type="danger"
             @click="handleStatus(scope.row, 1)"
             v-if="scope.row.status == '生效'"
-            :disabled="control[2].disabled"
           >
             离职失效
           </el-button>

@@ -7,7 +7,6 @@ import { updateProduct } from '@/apis/products.js'
 const props = defineProps<{
   detail: any
   materialData: any[]
-  control: Array<object>
 }>()
 
 const tableData = ref<MaterialItem[]>([])
@@ -54,8 +53,10 @@ watch(
       }
     }
   },
-  { immediate: true },
+  { immediate: true }
 )
+
+
 
 watch(
   () => props.materialData,
@@ -226,10 +227,10 @@ const resetMaterialForm = () => {
               action="#"
               :http-request="dummyRequest"
               :show-file-list="false"
-              :file-list="fileList"
+              :file-list="fileList" 
               :on-change="handleChange"
             >
-              <el-button icon="el-icon-upload" :disabled="control[1].disabled">点击上传</el-button>
+              <el-button icon="el-icon-upload">点击上传</el-button>
             </el-upload>
           </el-form-item>
         </el-col>
@@ -237,13 +238,7 @@ const resetMaterialForm = () => {
           <div class="preview-container">
             <div v-for="(item, index) in fileList" :key="index" class="preview-item">
               <img :src="item.url" alt="预览" class="preview-image" />
-              <el-button
-                type="danger"
-                size="small"
-                @click="removeImage(index)"
-                :disabled="control[1].disabled"
-                >删除</el-button
-              >
+              <el-button type="danger" size="small" @click="removeImage(index)">删除</el-button>
             </div>
           </div>
         </el-col>
@@ -268,39 +263,21 @@ const resetMaterialForm = () => {
         <el-table-column prop="quantity" label="数量" width="100" />
         <el-table-column fixed="right" label="操作" width="150">
           <template #default="scope">
-            <el-button
-              link
-              type="primary"
-              size="small"
-              @click="onEdit(scope.row, scope.$index)"
-              :disabled="control[1].disabled"
+            <el-button link type="primary" size="small" @click="onEdit(scope.row, scope.$index)"
               >编辑</el-button
             >
-            <el-button
-              link
-              type="danger"
-              size="small"
-              @click="onDelete(scope.$index)"
-              :disabled="control[1].disabled"
+            <el-button link type="danger" size="small" @click="onDelete(scope.$index)"
               >删除</el-button
             >
           </template>
         </el-table-column>
       </el-table>
 
-      <el-button
-        class="mt-4"
-        style="width: 100%"
-        @click="openDialog"
-        :disabled="control[1].disabled"
-        >新增物料</el-button
-      >
+      <el-button class="mt-4" style="width: 100%" @click="openDialog">新增物料</el-button>
       <div style="text-align: right; margin-top: 20px">
         <el-space>
           <el-button @click="onCancel">取消</el-button>
-          <el-button type="primary" @click="submitMainForm" :disabled="control[1].disabled"
-            >提交</el-button
-          >
+          <el-button type="primary" @click="submitMainForm">提交</el-button>
           <el-button @click="onClear">重置</el-button>
         </el-space>
       </div>

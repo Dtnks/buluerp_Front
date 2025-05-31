@@ -60,12 +60,7 @@
         </el-form>
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
-            <el-button
-              type="primary"
-              plain
-              @click="handleAdd"
-              v-hasPermi="['system:role:add']"
-              :disabled="control[0].disabled"
+            <el-button type="primary" plain @click="handleAdd" v-hasPermi="['system:role:add']"
               >新增</el-button
             >
           </el-col>
@@ -73,7 +68,7 @@
             <el-button
               type="success"
               plain
-              :disabled="single || control[1].disabled"
+              :disabled="single"
               @click="handleUpdate"
               v-hasPermi="['system:role:edit']"
               >修改</el-button
@@ -83,7 +78,7 @@
             <el-button
               type="danger"
               plain
-              :disabled="multiple || control[2].disabled"
+              :disabled="multiple"
               @click="handleDelete"
               v-hasPermi="['system:role:remove']"
               >删除</el-button
@@ -121,7 +116,6 @@
           <el-table-column label="状态" align="center" width="100">
             <template #default="scope">
               <el-switch
-                :disabled="control[1].disabled"
                 v-model="scope.row.status"
                 active-value="0"
                 inactive-value="1"
@@ -143,7 +137,6 @@
                   icon="Edit"
                   @click="handleUpdate(scope.row)"
                   v-hasPermi="['system:role:edit']"
-                  :disabled="control[1].disabled"
                   >修改</el-button
                 >
               </el-tooltip>
@@ -152,7 +145,6 @@
                   link
                   type="primary"
                   icon="Delete"
-                  :disabled="control[2].disabled"
                   @click="handleDelete(scope.row)"
                   v-hasPermi="['system:role:remove']"
                   >删除</el-button
@@ -242,12 +234,12 @@ import {
   getRole,
   listRole,
   updateRole,
+  deptTreeSelect,
 } from '@/apis/system/role'
 import { roleMenuTreeselect, treeselect as menuTreeselect } from '@/apis/system/menu'
 import { ref, reactive, getCurrentInstance, toRefs, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import BordShow from '@/components/board/SecBoard.vue'
-defineProps(['control'])
 const { proxy } = getCurrentInstance()
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable')
 

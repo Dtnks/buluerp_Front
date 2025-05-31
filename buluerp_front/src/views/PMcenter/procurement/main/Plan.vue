@@ -459,16 +459,3 @@ listPurchasePlan(page.value, pageSize.value).then((res) => {
     </el-dialog>
   </div>
 </template>
-<style scoped>
-.input .el-input {
-  width: 240px;
-}
-.cardCenter .el-input {
-  margin-bottom: 20px;
-}
-.input span {
-  text-align: right;
-  padding-right: 5px;
-  width: 60px;
-}
-</style>
