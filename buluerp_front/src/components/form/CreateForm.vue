@@ -47,7 +47,8 @@
             class="upload-demo"
             multiple
             :auto-upload="false"
-            :on-change="handleFileChange(ele.key)"
+            :on-change="()=>handleFileChange(ele.key)"
+            :on-remove="(file)=>onRemove(file,ele.key)"
             ><el-button>点击上传</el-button>
           </el-upload>
         </el-form-item>
@@ -66,8 +67,14 @@ const handleFileChange = (key) => {
       return item.raw
     })
   }
-  console.log(FileList.value, key)
 }
+const onRemove=(file, key)=> {
+        const index = props.Formvalue[key].indexOf(file.raw);
+        if (index >= 0) {
+            props.Formvalue[key].splice(index, 1); // 移除指定索引处的一个元素
+        }
+        console.log(props.Formvalue[key])
+    }
 </script>
 
 <style scoped>

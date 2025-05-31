@@ -22,13 +22,14 @@ const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
   [
-    { type: 'input', label: '订单金额', key: 'amount' },
-    { type: 'input', label: '采购计划单号', key: 'purchaseId' },
-    { type: 'timer', label: '创建曰期', timerType: 'date', key: 'createTime' },
+    
+    { type: 'input', label: 'ID', key: 'id' },
+    { type: 'timer', label: '创建曰期', timerType: 'daterange', key: 'createTime' },
   ],
   [
-    { type: 'input', label: '创建人', key: 'createBy' },
-    { type: 'input', label: '备注', key: 'remark' },
+    { type: 'input', label: '创建人', key: 'createUser' },
+    { type: 'input', label: '订单金额', key: 'amount' },
+    { type: 'input', label: '采购计划单号', key: 'purchaseId' },
   ],
 ])
 const newFormData = ref([
@@ -37,22 +38,20 @@ const newFormData = ref([
     { type: 'input', label: '订单金额', key: 'amount', width: 12 },
   ],
   [
-    { type: 'textarea', label: '备注', key: 'remark', width: 10 },
-    { type: 'fileList', label: '发票文件', key: 'invoice', width: 10 },
+        { type: 'fileList', label: '发票文件', key: 'invoice', width: 22 },
   ],
 ])
 const newSubmit = ref({
   purchaseId: '',
   amount: '',
-  remark: '',
   invoice: [],
 })
 const searchContent = ref({
-  purchaseId: '',
-  createBy: '',
-  amount: '',
+  id: '',
   createTime: '',
-  remark: '',
+  createUser: '',
+  amount: '',
+  purchaseId: '',
 })
 const tableData = ref([
   {
@@ -66,7 +65,7 @@ const tableData = ref([
     type: 'text',
   },
   {
-    value: 'createBy',
+    value: 'createUser',
     label: '创建人',
     type: 'text',
   },
@@ -78,11 +77,6 @@ const tableData = ref([
   {
     value: 'createTime',
     label: '创建时间',
-    type: 'text',
-  },
-  {
-    value: 'remark',
-    label: '备注',
     type: 'text',
   },
   {
@@ -156,13 +150,10 @@ const title = ref('编辑')
 //传给form组件的参数
 const resetSubmit = () => {
   newSubmit.value = {
-    purchaseId: '',
-    createBy: '',
-    amount: '',
-    createTime: '',
-    remark: '',
-    invoice: [],
-  }
+  purchaseId: '',
+  amount: '',
+  invoice: [],
+}
 }
 const onCreate = () => {
   resetSubmit()
@@ -171,9 +162,11 @@ const onCreate = () => {
 }
 
 const onSubmit = () => {
-  searchContent.value.createTime = parseTime(searchContent.value.createTime, '{y}-{m}-{d}')
+  searchContent.value.createTimeFrom = parseTime(searchContent.value.createTime[0], '{y}-{m}-{d}')
+  searchContent.value.createTimeTo = parseTime(searchContent.value.createTime[1], '{y}-{m}-{d}')
   page.value = 1
   listPurchaseList(page.value, pageSize.value, searchContent.value).then((res) => {
+    console.log(res)
     listData.value = res.rows
     total.value = res.total
   })
