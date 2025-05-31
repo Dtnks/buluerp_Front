@@ -16,7 +16,6 @@ import TableList from '@/components/table/TableList.vue'
 import { ref } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
-import { importCustomFile } from '@/apis/custom.js'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessage, ElMessageBox } from 'element-plus'
 const props = defineProps(['control'])

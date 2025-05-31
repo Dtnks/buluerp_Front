@@ -150,7 +150,6 @@ const formState = reactive({
   customerId: 0,
   customerName: '',
 })
-defineExpose({ formState })
 
 // searchForm: 查询条件
 const searchForm = ref({
@@ -161,6 +160,10 @@ const searchForm = ref({
   customerName: '',
   remark: '',
 })
+defineExpose({ formState,  formRef, searchForm })
+
+
+
 
 // onSubmit: 提交查询条件
 const onSubmit = () => {

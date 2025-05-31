@@ -37,7 +37,6 @@
 
 <script lang="ts" setup>
 import InputForm from './InputForm.vue'
-import { defineProps } from 'vue'
 
 const props = defineProps([
   'data',
@@ -52,7 +51,7 @@ const props = defineProps([
 
 const onClear = () => {
   console.log(props.searchForm)
-  Object.keys(props.searchForm).forEach((key) => {
+  Object.keys(props.searchForm)?.forEach((key) => {
     props.searchForm[key] = ''
   })
 }
