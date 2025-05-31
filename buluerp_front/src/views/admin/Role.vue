@@ -60,7 +60,12 @@
         </el-form>
         <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
-            <el-button type="primary" plain @click="handleAdd" v-hasPermi="['system:role:add']"
+            <el-button
+              type="primary"
+              plain
+              @click="handleAdd"
+              v-hasPermi="['system:role:add']"
+              :disabled="control[0].disabled"
               >新增</el-button
             >
           </el-col>
@@ -68,7 +73,7 @@
             <el-button
               type="success"
               plain
-              :disabled="single"
+              :disabled="single || control[1].disabled"
               @click="handleUpdate"
               v-hasPermi="['system:role:edit']"
               >修改</el-button
@@ -78,7 +83,7 @@
             <el-button
               type="danger"
               plain
-              :disabled="multiple"
+              :disabled="multiple || control[2].disabled"
               @click="handleDelete"
               v-hasPermi="['system:role:remove']"
               >删除</el-button
@@ -117,6 +122,7 @@
             <template #default="scope">
               <el-switch
                 v-model="scope.row.status"
+                :disabled="control[1].disabled"
                 active-value="0"
                 inactive-value="1"
                 @change="handleStatusChange(scope.row)"
@@ -136,6 +142,7 @@
                   type="primary"
                   icon="Edit"
                   @click="handleUpdate(scope.row)"
+                   :disabled="control[1].disabled"
                   v-hasPermi="['system:role:edit']"
                   >修改</el-button
                 >
@@ -146,6 +153,7 @@
                   type="primary"
                   icon="Delete"
                   @click="handleDelete(scope.row)"
+                  :disabled="control[2].disabled"
                   v-hasPermi="['system:role:remove']"
                   >删除</el-button
                 >
@@ -242,7 +250,7 @@ import { ElMessage } from 'element-plus'
 import BordShow from '@/components/board/SecBoard.vue'
 const { proxy } = getCurrentInstance()
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable')
-
+defineProps(['control'])
 const roleList = ref([])
 const open = ref(false)
 const loading = ref(true)

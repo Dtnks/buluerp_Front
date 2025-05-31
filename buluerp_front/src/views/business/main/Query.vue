@@ -3,8 +3,8 @@
     <el-config-provider :locale="zhCn">
       <BordShow content="业务订单查询列表" path="业务中心/查询" />
       <div class="greyBack">
-        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd"></QueryForm>
-        <QueryTable :addTab="props.addTab" :pagination="pagination" :tableData="tableData"
+        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd" :control="control"></QueryForm>
+        <QueryTable :addTab="props.addTab" :pagination="pagination" :tableData="tableData" :control="control"
           @onPageChange="handlePageChange" @onPageSizeChange="handleSizeChange" @fetchData="fetchTableData"
           @onUpdated="handleUpdate">
         </QueryTable>
@@ -29,8 +29,8 @@ import type { OrderResponse, TableDataType } from '@/types/orderResponse'
 
 const props = defineProps<{
   addTab: (targetName: string, component: any, data?: any) => void
+  control: Array<object>
 }>()
-
 // pagination: 分页数据
 const pagination = reactive({
   page: 1,

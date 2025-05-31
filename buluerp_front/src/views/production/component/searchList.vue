@@ -4,7 +4,7 @@
       <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
         <span>展示</span>
         <div>
-          <el-button type="danger" @click="onDelete">删除</el-button>
+          <el-button type="danger" @click="onDelete" :disabled="control[2].disabled">删除</el-button>
           <el-button type="primary" @click="onExport">导出</el-button>
         </div>
       </div>
@@ -81,6 +81,7 @@ import Detail from '../main/Detail.vue'
 const props = defineProps<{
   queryParams: Record<string, any>
   addTab: (targetName: string, component: any, data?: any) => void
+   control: Array<object>
 }>()
 
 const data = ref([])
