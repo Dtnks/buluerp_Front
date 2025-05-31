@@ -11,6 +11,15 @@ export function getOrdersList(params={}) {
     params,
   })
 }
+
+export const editOder = (data) => {
+  return httpInstance({
+    url: 'system/orders/edit',
+    method: 'post',
+    data,
+    headers: headers,
+  })
+}
 export const deleteOrders = (ids) => {
   return httpInstance({
     url: `system/orders/${ids}`,
@@ -35,6 +44,7 @@ export const getOrderDetailById = (id) => {
 // 新增
 export const postOrder = (data) => {
   console.log('postOrder data:', data);
+
   return httpInstance({
     url: 'system/orders',
     method: 'post',
@@ -49,16 +59,6 @@ export const putOrder = (data) => {
     url: 'system/orders',
     method: 'put',
     data,
-    headers: headers,
-  })
-}
-
-// 下载导入模板
-export function downloadOrderTemplate() {
-  return httpInstance({
-    url: '/system/orders/template',
-    method: 'get',
-    responseType: 'blob',
     headers: headers,
   })
 }

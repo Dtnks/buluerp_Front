@@ -14,7 +14,7 @@
                 <div v-else class="field-value">
                   <el-input v-if="field.label == '客户姓名'" v-model="updateFields.customerName" placeholder="请输入" />
                   <el-input v-else-if="field.label == '其他基本信息'" v-model="updateFields.remark" placeholder="请输入" />
-                  <el-date-picker v-else v-model="updateFields.deliveryTime" style="width: 200px;" placeholder="请选择" />
+                  <el-date-picker v-else v-model="updateFields.deliveryDate" style="width: 200px;" placeholder="请选择" />
                 </div>
               </div>
             </el-col>
@@ -68,25 +68,20 @@ import informationCard from './informationCard.vue'
 import { computed, onMounted, ref } from 'vue'
 import { getStatusText } from '../utils/statusMap'
 import { getPackagingListByOrderId, getProductsByOrderId, getProductDetailById, getOrderDetail } from '../function/oders'
-import { ElMessage, ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElMessageBox, dayjs } from 'element-plus'
-import { fetchTableDataApi } from '../function/oders'
-import { getOrdersList, putOrder } from '@/apis/orders.js'
-import PackagingList from '../main/packagingList.vue'
+import { getList_pro } from '@/apis/products.js'
+import { ElMessage, ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElMessageBox } from 'element-plus'
 
 // Props
 const props = defineProps<{
-  addTab: (targetName: string, component: any, data?: any) => void
   detail: any
   id: number
 }>()
-// 订单详情-基本信息
-const orderDetail = ref(props.detail || {})
+
+const orderDetail = computed(() => props.detail)
 
 onMounted(() => {
   console.log('订单详情组件加载', props.id);
 })
-
-
 
 // 订单状态
 const statusText = ref(getStatusText(props.detail.status))
@@ -97,19 +92,16 @@ const fields = ref([
   { label: '创建日期', value: props.detail.createTime },
   { label: '订单状态', value: statusText.value },
   { label: '客户姓名', value: props.detail.customerName },
-  { label: '交付日期', value: props.detail.deliveryTime },
+  { label: '交付日期', value: props.detail.deliveryDate },
   { label: '其他基本信息', value: props.detail.remark },
 ])
 
 // 修改订单基本信息
 const updateFields = ref({
-  ...orderDetail.value,
-  id: props.detail.id,
-  customerName: props.detail.customerName ? props.detail.customerName : '',
-  deliveryTime: props.detail.deliveryTime ? props.detail.deliveryTime : '',
-  remark: props.detail.remark ? props.detail.remark : '',
-  status: props.detail.status,
-  createTime: props.detail.createTime,
+  ...fields.value,
+  deliveryDate: '',
+  remark: '',
+  customerName: '',
 })
 // 订单详情-产品数据
 const orderProducts = computed(() => props.detail.products || []);
@@ -143,12 +135,10 @@ const onEditProduct = (row: any) => {
 // 分包表
 const packagingList = ref([]);
 
-// // getPackagingList: 根据订单ID获取分包表数据
-// const getPackagingList = (id: number) => {
-//  const res =  getPackagingListByOrderId(id)
-//  console.log('获取分包表数据detailShow:', res);
-
-// }
+// getPackagingList: 根据订单ID获取分包表数据
+const getPackagingList = (id: number) => {
+  getPackagingListByOrderId(id)
+}
 
 
 
@@ -178,11 +168,9 @@ const addPackagingList = (row: any) => {
 }
 
 // viewPackagingList: 查看分包表
-const viewPackagingList = () => {
-const res =  getPackagingListByOrderId(props.id)
- console.log('获取分包表数据detailShow:', res);
- props.addTab(`分包表 ${props.id}`, PackagingList, { orderId: props.id });
-  console.log('查看分包表', res);
+const viewPackagingList = (row: any) => {
+  getPackagingList(props.id)
+  console.log('查看分包表', row);
 }
 // handleAction: 处理关联订单的操作
 const handleAction = (method: Function, row: any) => {
@@ -204,7 +192,7 @@ const relatedOrdersTable = ref([
   {
     type: '分包表',
     orderId: '无',
-    actions: [{ name: '创建', method: addPackagingList }, { name: '查看', method: viewPackagingList },]
+    actions: [{ name: '创建',  method: addPackagingList }, { name: '查看',  method: viewPackagingList },]
   }
 ])
 
@@ -212,25 +200,6 @@ const relatedOrdersTable = ref([
 // onBoxSubmit: 提交按钮
 const onBoxSubmit = () => {
   console.log('提交1111', updateFields.value);
-  const submitData = { ...updateFields.value }
-  console.log('submitData:', submitData
-  );
-  if (submitData.deliveryTime instanceof Date) {
-    submitData.deliveryTime = dayjs(submitData.deliveryTime).format('YYYY-MM-DD')
-    console.log('提交订单数据w3222:', submitData);
-  }
-
-  putOrder(submitData)
-    .then(() => {
-      ElMessage.success('订单提交成功');
-    })
-    .catch((error) => {
-      console.error('提交订单失败:', error);
-      ElMessage.error('订单提交失败，请稍后重试');
-    });
-  const res = getOrdersList()
-  console.log('获取订单列表dddd:', res);
-
   ElMessage.success('提交成功')
 }
 

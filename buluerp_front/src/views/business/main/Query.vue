@@ -24,7 +24,7 @@ import BordShow from '@/components/board/SecBoard.vue'
 import QueryForm from '../component/queryForm.vue'
 import QueryTable from '../component/queryTable.vue'
 import { getOrdersList, putOrder } from '@/apis/orders'
-import { addOrder, fetchTableDataApi, searchOrders } from '../function/oders'
+import { addOrder, searchOrders } from '../function/oders'
 import type { OrderResponse, TableDataType } from '@/types/orderResponse'
 
 const props = defineProps<{
@@ -43,7 +43,7 @@ const tableData = ref<TableDataType[]>([])
 
 const queryParams = reactive({})
 // todo: 查询要再和后端对一下
-// // fetchTableData: 获取table数据
+// fetchTableData: 获取table数据
 const fetchTableData = async () => {
   try {
     const filteredParams = Object.fromEntries(
@@ -62,18 +62,10 @@ const fetchTableData = async () => {
     console.error('获取订单数据失败(queryTable.vue):', error)
   }
 }
-// const fetchTableData = async () => {
-//   try {
-//     const { rows, total } = await fetchTableDataApi(queryParams, pagination)
-//     tableData.value = rows || []
-//     pagination.total = total || 0
-//   } catch (error) {
-//     console.error('获取订单数据失败(fetchTableData):', error)
-//   }
-// }
 
 // handleQuery: 处理查询
 const handleQuery = (params: any) => {
+
   pagination.page = 1; // 查询时重置页码为 1
   Object.assign(queryParams, params); // 更新查询条件
   console.log('查询参数(handleQuery):', params);
