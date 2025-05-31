@@ -23,6 +23,22 @@ export const getCustomerNameById = async (id: number) => {
   }
 }
 
+// fetchTableDataApi: 获取订单列表
+export const fetchTableDataApi = async (params: any) => {
+  try {
+    const res = await getOrdersList(params)
+    console.log('获取订单列表：', res)
+    return res
+  }
+  catch (err) {
+    console.log('获取订单列表失败：', err)
+    messageBox({
+      type: 'error',
+      message: '获取订单列表失败，请稍后再试！',
+    })
+  }
+}
+
 // getOderProducts: 获取订单产品列表
 export const getOderProducts = async (id: number) => {
   try {

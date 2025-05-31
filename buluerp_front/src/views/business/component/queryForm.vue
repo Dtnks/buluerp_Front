@@ -46,30 +46,23 @@
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
-// import BordShow from '@/components/board/SecBoard.vue';
 import type { FormInstance } from 'element-plus'
-// import type { ElForm } from 'element-plus';
 import {
   ElInput,
   ElSelect,
   ElOption,
-  ElDatePicker,
   ElButton,
   ElDialog,
   ElUpload,
   ElMessage,
 } from 'element-plus'
-// import { Search } from '@element-plus/icons-vue';
 import Form from '@/components/form/Form.vue'
-import { importOrderFile } from '@/apis/orders'
-import { id } from 'element-plus/es/locale'
-import { dayjs } from 'element-plus'
+import { importOrderFile, downloadOrderTemplate } from '@/apis/orders'
 import { useQueryTableDataStore } from '@/stores/queryTableData'
-import { number } from 'echarts'
 import type { TableDataType } from '@/types/orderResponse'
 import { getStatusText, Status } from '../utils/statusMap'
+
 const dialogFormVisible = ref(false)
-const tableStores = useQueryTableDataStore()
 
 const emit = defineEmits(['onSubmit', 'onAdd'])
 
@@ -212,22 +205,61 @@ const handleUpload = async (option: any) => {
   const formData = new FormData()
   formData.append('file', option.file)
 
-  try {
-    const res = await importOrderFile(formData)
-    console.log(res)
+  const res = await importOrderFile(formData)
+  console.log(res)
+  if (res.code == 200) {
     ElMessage.success('导入成功')
     importDialogVisible.value = false
-  } catch (e) {
+  } else if (res.code == 400) {
+    // ElMessage.error('导入失败')
+    importDialogVisible.value = false
+    const error = res.data.map((item: any) => {
+      return '第 ' + item.rowNum + '行: ' + item.errorMsg
+    })
+
+    ElMessageBox.alert(error.join('<br>'), '数据格式出现问题', {
+      confirmButtonText: '继续',
+      type: 'error',
+      dangerouslyUseHTMLString: true,
+    })
+  }
+  else {
     ElMessage.error('导入失败')
   }
 }
 
-const onDownloadTemplate = () => {
+// onDownloadTemplate: 下载 Excel 模板
+const onDownloadTemplate = async () => {
   // 下载 Excel 模板，可以是静态文件或接口返回
-  const link = document.createElement('a')
-  link.href = '/template/import-order-template.xlsx' // 替换成你的模板文件路径
-  link.download = '订单导入模板.xlsx'
-  link.click()
+  // const link = document.createElement('a')
+  try {
+    const res = await downloadOrderTemplate()
+    console.log('res55342阿31:', res);
+
+    const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = '订单导入模板.xlsx'
+    link.click()
+    window.URL.revokeObjectURL(url)
+  } catch (error) {
+  console.error('下载模板错误:', error)
+  ElMessage.error('下载模板失败')
+}
+  // res.blob().then((blob: Blob) => {
+  //   const url = window.URL.createObjectURL(blob)
+  //   const link = document.createElement('a')
+  //   link.href = url
+  //   link.download = '订单导入模板.xlsx'
+  //   link.click()
+  // })
+  // link.href = 'http://localhost:3000/订单导入模板.xlsx'
+  // link.download = '订单导入模板.xlsx'
+  // link.click()
+
+  // link.download = '订单导入模板.xlsx'
+  // link.click()
 }
 
 

@@ -5,6 +5,7 @@ import { ref } from 'vue'
 import type { TabPaneName } from 'element-plus'
 import BusinessQuery from '../business/main/Query.vue'
 
+
 const editableTabsValue = ref('')
 const editableTabs = ref([])
 
