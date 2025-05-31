@@ -13,6 +13,6 @@ const detail = ref(props.data)
 <template>
   <div class="col">
     <BordShow content="产品详情页" path="产品管理/详情" />
-    <basicInfomation v-if="detail" :detail="detail" :materialData="materialData" />
+    <basicInfomation v-if="detail" :detail="detail" :materialData="materialData" :control="control" />
   </div>
 </template>

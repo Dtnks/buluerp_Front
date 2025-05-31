@@ -16,7 +16,6 @@ import TableList from '@/components/table/TableList.vue'
 import { ref } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
-import { importCustomFile } from '@/apis/custom.js'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessage, ElMessageBox } from 'element-plus'
 const props = defineProps(['control'])
@@ -36,24 +35,29 @@ const tableData = ref([
   {
     value: 'id',
     label: '用户ID',
+    type: 'text',
   },
   {
     value: 'name',
     label: '姓名',
+    type: 'text',
   },
   {
     value: 'contact',
     label: '联系方式',
+    type: 'text',
   },
   {
     value: 'email',
     label: '邮箱',
+    type: 'text',
   },
   {
     value: 'remarks',
     label: '备注',
+    type: 'text',
   },
-  { value: 'creatTime', label: '创建时间' },
+  { value: 'creatTime', label: '创建时间', type: 'text' },
 ])
 const operation = ref([
   // {
@@ -73,6 +77,7 @@ const operation = ref([
       newSubmit.value = { ...row }
     },
     value: '编辑',
+    disabled: props.control[1].disabled,
   },
 ])
 
@@ -263,6 +268,7 @@ listCustomer(page.value, pageSize.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent"
+        :control="control"
       />
       <TableList
         :tableData="tableData"
@@ -270,6 +276,7 @@ listCustomer(page.value, pageSize.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
+        :control="control"
       >
         <slot>
           <div

@@ -1,8 +1,14 @@
 <template>
-  <!-- <Form :data="data" :title="title" :onSubmit="onSubmit" :onClear="resetForm" :onCreate="onCreate" :onImport="onImport"
-    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm"></Form> -->
-  <Form :data="data" :title="title" :onSubmit="onSubmit" :onCreate="onCreate" :onImport="onImport"
-    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm"></Form>
+  <Form
+    :data="data"
+    :title="title"
+    :onSubmit="onSubmit"
+    :onCreate="onCreate"
+    :onImport="onImport"
+    :onDownloadTemplate="onDownloadTemplate"
+    :searchForm="searchForm"
+    :control="control"
+  ></Form>
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
       <el-form-item label="创建人姓名">
@@ -72,7 +78,7 @@ const dialogFormVisible = ref(false)
 const tableStores = useQueryTableDataStore()
 
 const emit = defineEmits(['onSubmit', 'onAdd'])
-
+defineProps(['control'])
 const dialogForm = reactive({
   status: 0,
   createTime: '',

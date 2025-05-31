@@ -48,8 +48,8 @@ const props = defineProps([
   'onDownloadTemplate',
   'formState',
   'searchForm',
+  'control'
 ])
-
 const onClear = () => {
   console.log(props.searchForm)
   Object.keys(props.searchForm).forEach((key) => {

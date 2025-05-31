@@ -5,7 +5,7 @@
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <span>列表</span>
         <div>
-          <el-button type="danger" @click="onDelete">删除</el-button>
+          <el-button type="danger" @click="onDelete" :disabled="control[2].disabled">删除</el-button>
           <el-button type="primary" @click="onExport">导出</el-button>
         </div>
       </div>
@@ -31,7 +31,7 @@
       </el-table-column>
       <el-table-column label="操作">
         <template #default="{ row }">
-          <el-button link type="primary" @click="onEdit(row)">编辑</el-button>
+          <el-button link type="primary" @click="onEdit(row)" :disabled="control[1].disabled">编辑</el-button>
           <el-button link type="primary" @click="onCheck(row)">查看</el-button>
         </template>
       </el-table-column>
@@ -84,6 +84,7 @@ const props = defineProps<{
   // queryParams: Record<string, any>
   addTab: (targetName: string, component: any, data?: any) => void
   tableData: any[]
+  control: Array<object>
   pagination: {
     page: number
     pageSize: number
