@@ -34,13 +34,14 @@ export function deleteCustomer(ids) {
   })
 }
 
-export function listCustomer(
-  pageNum,
-  pageSize,
-  searchContent = { name: '', contact: '', email: '', remarks: '' },
-) {
+export function listCustomer(pageNum, pageSize, searchContent = {}) {
+  let concatText = Object.keys(searchContent)
+    .map((key) => {
+      return `&${key}=${searchContent[key]}`
+    })
+    .join('')
   return httpInstance({
-    url: `system/customers/list?pageNum=${pageNum}&pageSize=${pageSize}&name=${searchContent.name}&contact=${searchContent.contact}&email=${searchContent.email}&remarks=${searchContent.remarks}&creatTime=${searchContent.creatTime}`,
+    url: `system/customers/list?pageNum=${pageNum}&pageSize=${pageSize}${concatText}`,
     method: 'get',
     headers: headers,
   })
@@ -63,5 +64,14 @@ export function importCustomFile(formData) {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
+  })
+}
+
+export function downLoadModule() {
+  return httpInstance({
+    url: `system/customers/export/template`,
+    method: 'get',
+    headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
+    responseType: 'blob',
   })
 }

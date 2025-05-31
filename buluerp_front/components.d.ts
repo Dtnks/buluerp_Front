@@ -23,6 +23,7 @@ declare module 'vue' {
     ASelectOption: typeof import('ant-design-vue/es')['SelectOption']
     ASpace: typeof import('ant-design-vue/es')['Space']
     ATable: typeof import('ant-design-vue/es')['Table']
+    EditUpload: typeof import('./src/components/upload/editUpload.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
@@ -75,6 +76,8 @@ declare module 'vue' {
     Table: typeof import('./src/components/table/table.vue')['default']
     TableList: typeof import('./src/components/table/TableList.vue')['default']
     Upload: typeof import('./src/components/upload/upload.vue')['default']
+    UploadFileList: typeof import('./src/components/upload/uploadFileList.vue')['default']
+    UploadImage: typeof import('./src/components/upload/uploadImage.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

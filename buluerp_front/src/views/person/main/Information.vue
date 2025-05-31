@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import upload from '@/components/upload/upload.vue'
+import upload from '@/components/upload/uploadImage.vue'
 let fileValue = {}
 const setFile = (file: any) => {
   fileValue = file

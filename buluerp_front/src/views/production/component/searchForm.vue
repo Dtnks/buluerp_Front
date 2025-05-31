@@ -26,7 +26,7 @@
           <el-form-item label="创建日期" prop="createDate">
             <el-date-picker
               v-model="formState.createDate"
-              type="datetimerange"
+              type="daterange"
               value-format="YYYY-MM-DD HH:mm:ss"
               range-separator="至"
               start-placeholder="开始日期"
@@ -133,10 +133,13 @@
 <script lang="ts" setup>
 import { ref, reactive } from 'vue'
 import type { FormInstance } from 'element-plus'
-import { ElMessage } from 'element-plus'
-import { createProduct, importProductFile } from '@/apis/products.js'
+// import { ElMessage } from 'element-plus' // ✅ 已移除
+import { createProduct, importProductFile, getProductTemplate } from '@/apis/products.js'
+import { downloadBinaryFile } from '@/utils/file/base64'
+import { messageBox } from '@/components/message/messageBox' // ✅ 使用自定义封装
 
 const emit = defineEmits(['search', 'created'])
+defineProps(['control'])
 
 const createDialogVisible = ref(false)
 const createForm = reactive({
@@ -167,28 +170,34 @@ const handleCreateSubmit = async () => {
   if (!valid) return
 
   if (!imageFile.value) {
-    ElMessage.error('请上传产品图片')
+    messageBox('error', () => Promise.reject(), '', '请上传产品图片', '')
     return
   }
 
-  try {
-    const formData = new FormData()
-    formData.append('name', createForm.name)
-    formData.append('picture', imageFile.value)
+  const formData = new FormData()
+  formData.append('name', createForm.name)
+  formData.append('picture', imageFile.value)
 
-    createForm.materialIds.forEach((id) => {
-      formData.append('materialIds', id) // ✅ 正确传数组形式
-    })
+  createForm.materialIds.forEach((id) => {
+    formData.append('materialIds', id)
+  })
 
-    await createProduct(formData)
-
-    ElMessage.success('产品创建成功')
-    createDialogVisible.value = false
-    resetCreateForm()
-    emit('created')
-  } catch (e) {
-    ElMessage.error('创建失败')
-  }
+  messageBox(
+    'warning',
+    () =>
+      createProduct(formData).then((res) => {
+        if (res.code === 200) {
+          createDialogVisible.value = false
+          resetCreateForm()
+          emit('created')
+          return Promise.resolve()
+        }
+        return Promise.reject()
+      }),
+    '产品创建成功',
+    '创建失败',
+    '是否确认创建该产品？'
+  )
 }
 
 const resetCreateForm = () => {
@@ -220,7 +229,6 @@ const onSubmit = () => {
     createDate: formState.createDate || [],
     otherSearch: formState.otherSearch || '',
   }
-  console.log('onSubmit params:', params)
   emit('search', params)
 }
 
@@ -241,18 +249,19 @@ const onImport = () => {
   importDialogVisible.value = true
 }
 
-// 文件校验（限制大小）
+// 文件校验
 const beforeUpload = (file: File) => {
   const isExcel =
     file.type === 'application/vnd.ms-excel' ||
     file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   const isLt5M = file.size / 1024 / 1024 < 5
+
   if (!isExcel) {
-    ElMessage.error('只能上传 Excel 文件（xls/xlsx）')
+    messageBox('error', () => Promise.reject(), '', '只能上传 Excel 文件（xls/xlsx）', '')
     return false
   }
   if (!isLt5M) {
-    ElMessage.error('文件大小不能超过 5MB')
+    messageBox('error', () => Promise.reject(), '', '文件大小不能超过 5MB', '')
     return false
   }
   return true
@@ -262,38 +271,46 @@ const handleUpload = async (option: any) => {
   const formData = new FormData()
   formData.append('file', option.file)
 
-  try {
-    const res = await importProductFile(formData)
-    console.log(res)
-    ElMessage.success('导入成功')
-    importDialogVisible.value = false
-  } catch (e) {
-    ElMessage.error('导入失败')
-  }
+  messageBox(
+    'warning',
+    () =>
+      importProductFile(formData).then((res) => {
+        if (res.code === 200) {
+          importDialogVisible.value = false
+          return Promise.resolve()
+        }
+        return Promise.reject()
+      }),
+    '导入成功',
+    '导入失败',
+    '确定要导入选中的 Excel 文件吗？'
+  )
 }
 
-const onDownloadTemplate = () => {
-  // 下载 Excel 模板，可以是静态文件或接口返回
-  const link = document.createElement('a')
-  link.href = '/template/import-template.xlsx' // 替换成你的模板文件路径
-  link.download = '导入模板.xlsx'
-  link.click()
+const onDownloadTemplate = async () => {
+  try {
+    const res = await getProductTemplate()
+    downloadBinaryFile(res, '产品模板.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+  } catch (e) {
+    messageBox('error', () => Promise.reject(), '', '下载失败', '')
+  }
 }
 
 const beforeImageUpload = (file: File) => {
   const isImage = file.type.startsWith('image/')
   const isLt2M = file.size / 1024 / 1024 < 2
+
   if (!isImage) {
-    ElMessage.error('只能上传图片文件')
+    messageBox('error', () => Promise.reject(), '', '只能上传图片文件', '')
     return false
   }
+
   if (!isLt2M) {
-    ElMessage.error('图片大小不能超过 2MB')
+    messageBox('error', () => Promise.reject(), '', '图片大小不能超过 2MB', '')
     return false
   }
 
   imageFile.value = file
-
   const reader = new FileReader()
   reader.onload = () => {
     createForm.image = reader.result as string
@@ -302,6 +319,7 @@ const beforeImageUpload = (file: File) => {
 
   return false
 }
+
 </script>
 
 <style scoped>

@@ -70,12 +70,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch , onMounted} from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { getList_pro , deleteProduct} from '@/apis/products.js'
+import { ref, watch, onMounted } from 'vue'
+// import { ElMessage, ElMessageBox } from 'element-plus' // ✅ 移除 
+import { getList_pro, deleteProduct } from '@/apis/products.js'
 import { exportToExcel } from '@/utils/file/exportExcel'
+import { messageBox } from '@/components/message/messageBox' // ✅ 引入封装的 messageBox
 
 import Detail from '../main/Detail.vue'
+
 const props = defineProps<{
   queryParams: Record<string, any>
   addTab: (targetName: string, component: any, data?: any) => void
@@ -88,14 +90,12 @@ const total = ref(0)
 const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
 
 const getFullImageUrl = (path: string) => {
-  // 防止多余斜杠：/profile//2025/... => /profile/2025/...
   return BASE_IMAGE_URL + path.replace('//', '/')
 }
 
 
 
 const fetchData = async () => {
-  console.log('queryParams:', props.queryParams)
   const res = await getList_pro({
     ...props.queryParams,
     pageNum: page.value,
@@ -106,7 +106,7 @@ const fetchData = async () => {
 }
 
 onMounted(() => {
-  fetchData() // 组件挂载时发一次请求
+  fetchData()
 })
 
 watch(
@@ -137,28 +137,45 @@ const handleSelectionChange = (selection: any[]) => {
 
 const onDelete = async () => {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('请先选择要删除的产品')
+    messageBox(
+      'error',
+      () => Promise.reject(),
+      '',
+      '请先选择要删除的产品',
+      '',
+    )
     return
   }
 
-  try {
-    await ElMessageBox.confirm('确认要删除选中的产品吗？', '提示', {
-      type: 'warning'
-    })
+  const ids = selectedRows.value.map((item) => item.id)
 
-    const ids = selectedRows.value.map(item => item.id)
-    await deleteProduct(ids)
-    ElMessage.success('删除成功')
-    fetchData()
-    selectedRows.value = []
-  } catch (err) {
-    ElMessage.info('取消删除')
-  }
+  messageBox(
+    'warning',
+    () =>
+      deleteProduct(ids).then((res) => {
+        if (res.code === 200) {
+          fetchData()
+          selectedRows.value = []
+          return Promise.resolve()
+        } else {
+          return Promise.reject()
+        }
+      }),
+    '删除成功',
+    '删除失败',
+    '确认要删除选中的产品吗？'
+  )
 }
 
 const onExport = () => {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('请先选择要导出的产品')
+    messageBox(
+      'error',
+      () => Promise.reject(),
+      '',
+      '请先选择要导出的产品',
+      ''
+    )
     return
   }
 
@@ -180,7 +197,7 @@ const onExport = () => {
 
 
 const onView = (row: any) => {
-  props.addTab(`详情页-${row.name}`, Detail, {id : row.id})
-  console.log('id是',row.id)
+  props.addTab(`详情页-${row.name}`, Detail, row, props.control)
 }
+
 </script>

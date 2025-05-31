@@ -8,6 +8,8 @@ import {
   newManufacturers,
   listManufacturers,
   exportSelectTable,
+  importmanufacturersFile,
+  downLoadModule,
 } from '@/apis/manufacturers.js'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
@@ -52,6 +54,7 @@ const tableData = ref([
   },
   { value: 'createTime', label: '创建时间' },
 ])
+console.log(props.control)
 const operation = ref([
   // {
   //   func: (id) => {
@@ -67,10 +70,7 @@ const operation = ref([
       const id = row.id
       title.value = '编辑'
       editDialogVisible.value = true
-      newSubmit.value = {}
-      detailManufacturers(id).then((res) => {
-        newSubmit.value = res.data
-      })
+      newSubmit.value = { ...row }
     },
     value: '编辑',
   },
@@ -84,23 +84,32 @@ const newSubmit = ref({})
 const handleSubmit = () => {
   if (title.value == '编辑') {
     changeManufacturers(newSubmit.value).then((res) => {
-      page.value = 1
-      listManufacturers(page.value, pageSize.value).then((res) => {
-        listData.value = res.rows
-        total.value = res.total
-      })
-      editDialogVisible.value = false
+      if (res.code == 200) {
+        page.value = 1
+        listManufacturers(page.value, pageSize.value).then((res) => {
+          listData.value = res.rows
+          total.value = res.total
+        })
+        ElMessage.success(res.msg)
+        editDialogVisible.value = false
+      } else {
+        ElMessage.error(res.msg)
+        return
+      }
     })
   } else {
     newManufacturers(newSubmit.value).then((res) => {
       if (res.msg == '操作成功') {
         page.value = 1
-        ElMessage.success('新增成功')
         listManufacturers(page.value, pageSize.value).then((res) => {
           listData.value = res.rows
           total.value = res.total
         })
+        ElMessage.success(res.msg)
         editDialogVisible.value = false
+      } else {
+        ElMessage.error(res.msg)
+        return
       }
     })
   }
@@ -125,7 +134,11 @@ const onSubmit = () => {
     total.value = res.total
   })
 }
-
+const onDownloadTemplate = () => {
+  downLoadModule().then((res) => {
+    downloadBinaryFile(res, '厂商信息模板.xlsx')
+  })
+}
 const onImport = () => {
   importDialogVisible.value = true
 }
@@ -133,15 +146,29 @@ const handleUpload = async (option: any) => {
   const formData = new FormData()
   formData.append('file', option.file)
 
-  try {
-    importCustomFile(formData).then((res) => {
-      console.log(res)
-    })
-    ElMessage.success('导入成功')
-    importDialogVisible.value = false
-  } catch (e) {
-    ElMessage.error('导入失败')
-  }
+  importmanufacturersFile(formData).then((res) => {
+    console.log(res)
+    if (res.code == 200) {
+      ElMessage.success(res.msg)
+      listManufacturers(page.value, pageSize.value).then((res) => {
+        listData.value = res.rows
+        total.value = res.total
+      })
+      importDialogVisible.value = false
+    } else {
+      ElMessage.error(res.msg)
+      const error_text = res.data
+        .map((ele) => {
+          return '第' + ele.row + '行：' + ele.error
+        })
+        .join('<br>')
+      ElMessageBox.alert(error_text, '数据格式出现问题', {
+        confirmButtonText: '继续',
+        type: 'error',
+        dangerouslyUseHTMLString: true,
+      })
+    }
+  })
 }
 let count = 1
 //传给table组件
@@ -227,6 +254,7 @@ listManufacturers(page.value, pageSize.value).then((res) => {
         :onCreate="onCreate"
         :onSubmit="onSubmit"
         :onImport="onImport"
+        :onDownloadTemplate="onDownloadTemplate"
         :search-form="searchContent"
       />
       <TableList
