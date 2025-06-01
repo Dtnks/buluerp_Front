@@ -52,6 +52,9 @@
             ><el-button>点击上传</el-button>
           </el-upload>
         </el-form-item>
+        <el-form-item :label="ele.label" v-else-if="ele.type === 'number'">
+          <el-input-number v-model="Formvalue[ele.key]" :min="0" style="width: 100%" />
+        </el-form-item>
       </el-col>
     </el-row>
   </el-form>

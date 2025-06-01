@@ -27,6 +27,13 @@
                 style="width: 50px; height: 50px"
               />
             </span>
+            <span v-if="item.type === 'fileList'">
+              <!-- <a v-for="(subItem) in row[item.value]" :href="getFullImageUrl(subItem[item.key])" :download="subItem[item.key].split('/').pop()" target="_blank">{{ subItem[item.key].split('/').pop()}}</a> -->
+              <el-button 
+              type="primary" text v-for="(subItem) in row[item.value]" @click="donwLoadFile(getFullImageUrl(subItem[item.key]),item.miniType)">
+                {{ subItem[item.key].split('/').pop()}}
+              </el-button>
+            </span>
             <span v-else-if="item.type == 'text'">{{ row[item.value] }}</span>
             </template>
       </el-table-column>
@@ -53,6 +60,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
+import axios from 'axios'
 defineProps(['tableData', 'operations', 'listData', 'exportFunc', 'DeleteFunc' , 'control'])
 const select = ref()
 const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
@@ -60,10 +68,26 @@ const getFullImageUrl = (path: string) => {
   // 防止多余斜杠：/profile//2025/... => /profile/2025/...
   return BASE_IMAGE_URL + path.replace('//', '/')
 }
+const donwLoadFile =async  (Fileurl,miniType) => {
+  let content=await axios.get(Fileurl,{responseType: 'blob'})
+  const blob = new Blob([content.data], { type:miniType  })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = Fileurl.split('/').pop()
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
 </script>
 <style scoped>
 .card-header {
   display: flex;
   justify-content: space-between;
+}
+span .el-button+.el-button {
+  margin-left:0 ;
 }
 </style>

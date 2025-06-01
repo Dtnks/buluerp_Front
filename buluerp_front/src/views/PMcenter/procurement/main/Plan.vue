@@ -35,7 +35,7 @@ const formData = ref([
 const newFormData = ref([
   [
     { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
-    { type: 'input', label: '采购数量', key: 'purchaseQuantity', width: 8 },
+    { type: 'number', label: '采购数量', key: 'purchaseQuantity', width: 8 },
     { type: 'input', label: '产品ID', key: 'productId', width: 8 },
   ],
   [

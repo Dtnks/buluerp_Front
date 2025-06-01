@@ -82,7 +82,9 @@ const tableData = ref([
   {
     value: 'invoice',
     label: '发票文件',
-    type: 'text',
+    type: 'fileList',
+    key:"invoiceUrl",
+    miniType:'application/octet-stream'
   },
 ])
 const operation = ref([
