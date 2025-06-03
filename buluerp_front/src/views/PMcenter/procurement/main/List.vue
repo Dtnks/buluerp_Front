@@ -22,7 +22,6 @@ const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
   [
-    
     { type: 'input', label: 'ID', key: 'id' },
     { type: 'timer', label: '创建曰期', timerType: 'daterange', key: 'createTime' },
   ],
@@ -37,9 +36,7 @@ const newFormData = ref([
     { type: 'input', label: '采购计划', key: 'purchaseId', width: 12 },
     { type: 'input', label: '订单金额', key: 'amount', width: 12 },
   ],
-  [
-        { type: 'fileList', label: '发票文件', key: 'invoice', width: 22 },
-  ],
+  [{ type: 'fileList', label: '发票文件', key: 'invoice', width: 22 }],
 ])
 const newSubmit = ref({
   purchaseId: '',
@@ -83,8 +80,8 @@ const tableData = ref([
     value: 'invoice',
     label: '发票文件',
     type: 'fileList',
-    key:"invoiceUrl",
-    miniType:'application/octet-stream'
+    key: 'invoiceUrl',
+    miniType: 'application/octet-stream',
   },
 ])
 const operation = ref([
@@ -131,6 +128,10 @@ const handleSubmit = () => {
     })
   } else {
     newSubmit.value.createTime = parseTime(newSubmit.value.createTime, '{y}-{m}-{d}')
+    if (newSubmit.value.invoice.length === 0) {
+      delete newSubmit.value.invoice
+    }
+    console.log(newSubmit.value)
     newPurchaseList(newSubmit.value).then((res) => {
       console.log(res)
       if (res.msg == '操作成功') {
@@ -152,10 +153,10 @@ const title = ref('编辑')
 //传给form组件的参数
 const resetSubmit = () => {
   newSubmit.value = {
-  purchaseId: '',
-  amount: '',
-  invoice: [],
-}
+    purchaseId: '',
+    amount: '',
+    invoice: [],
+  }
 }
 const onCreate = () => {
   resetSubmit()
@@ -174,38 +175,38 @@ const onSubmit = () => {
   })
 }
 
-const onImport = () => {
-  importDialogVisible.value = true
-}
+// const onImport = () => {
+//   importDialogVisible.value = true
+// }
 
-const handleUpload = async (option: any) => {
-  const formData = new FormData()
-  formData.append('file', option.file)
+// const handleUpload = async (option: any) => {
+//   const formData = new FormData()
+//   formData.append('file', option.file)
 
-  importFile(formData).then((res) => {
-    if (res.code == 200) {
-      ElMessage.success(res.msg)
-      listPurchaseList(page.value, pageSize.value).then((res) => {
-        listData.value = res.rows
-        total.value = res.total
-      })
-    } else {
-      ElMessage.error(res.msg)
-      const error_text = res.data
-        .map((ele) => {
-          return '第' + ele.rowNum + '行：' + ele.errorMsg
-        })
-        .join('<br>')
-      ElMessageBox.alert(error_text, '数据格式出现问题', {
-        confirmButtonText: '继续',
-        type: 'error',
-        dangerouslyUseHTMLString: true,
-      })
-    }
-  })
+//   importFile(formData).then((res) => {
+//     if (res.code == 200) {
+//       ElMessage.success(res.msg)
+//       listPurchaseList(page.value, pageSize.value).then((res) => {
+//         listData.value = res.rows
+//         total.value = res.total
+//       })
+//     } else {
+//       ElMessage.error(res.msg)
+//       const error_text = res.data
+//         .map((ele) => {
+//           return '第' + ele.rowNum + '行：' + ele.errorMsg
+//         })
+//         .join('<br>')
+//       ElMessageBox.alert(error_text, '数据格式出现问题', {
+//         confirmButtonText: '继续',
+//         type: 'error',
+//         dangerouslyUseHTMLString: true,
+//       })
+//     }
+//   })
 
-  importDialogVisible.value = false
-}
+//   importDialogVisible.value = false
+// }
 const count = 1
 //传给table组件
 // const exportFunc = (row) => {
@@ -232,6 +233,7 @@ const DeleteFunc = (row) => {
   })
   const func = () => {
     return deletePurchaseList(ids).then((res) => {
+      console.log(res)
       if (res.code == 500) {
         throw new Error('权限不足')
       } else {
