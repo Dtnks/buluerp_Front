@@ -158,7 +158,7 @@ const onEdit = (row: TableDataType) => {
   // 将选中的行数据复制到编辑表单中
   // editForm.innerId = row.innerId
   editForm.customerName = row.customerName ? row.customerName : '';
-  editForm.statusText = getStatusText(row.status) ;
+  editForm.statusText = getStatusText(row.status);
   editForm.remark = row.remark ? row.remark : '';
   editForm.createTime = row.createTime ? row.createTime : '';
   editForm.id = row.id ? row.id : 0;
@@ -210,7 +210,21 @@ const onDelete = async () => {
     ElMessage.info('取消删除')
   }
 }
-// onExport: 点击导出
+// 导出字段配置，方便维护和扩展
+const exportFields = [
+  { label: '内部编号', key: 'innerId' },
+  { label: '外部编号', key: 'id' },
+  { label: '数量', key: 'quantity' },
+  { label: '交货期限', key: 'deliveryDeadline' },
+  { label: '交货时间', key: 'deliveryTime' },
+  { label: '状态', key: 'status' },
+  { label: '产品ID', key: 'productId' },
+  { label: '布产ID', key: 'productionId' },
+  { label: '外购ID', key: 'purchaseId' },
+  { label: '分包ID', key: 'subcontractId' },
+  { label: '其它信息', key: 'remark' },
+]
+
 const onExport = () => {
   if (selectedRows.value.length === 0) {
     ElMessage.warning('请先选择要导出的产品')
@@ -218,25 +232,13 @@ const onExport = () => {
   }
   const today = new Date()
   const dateStr = today.toISOString().split('T')[0].replace(/-/g, '')
-  const exportData = selectedRows.value.map((item) => ({
-    // todo: 客户姓名字段
-    内部编号: item.innerId,
-    外部编号: item.outerId,
-    创建时间: item.createTime,
-    操作人ID: item.operatorId,
-    数量: item.quantity,
-    交货期限: item.deliveryDeadline,
-    交货时间: item.deliveryTime,
-    状态: item.status,
-    客户姓名: item.customerName,
-    客户ID: item.customerId,
-    产品ID: item.productId,
-    布产ID: item.productionId,
-    外购ID: item.purchaseId,
-    分包ID: item.subcontractId,
-    最后操作时间: item.lastOperationTime,
-  }))
-
+  const exportData = selectedRows.value.map(item => {
+    const row: Record<string, any> = {}
+    exportFields.forEach(field => {
+      row[field.label] = item[field.key]
+    })
+    return row
+  })
   exportToExcel(exportData, `订单数据_${dateStr}`)
 }
 </script>
