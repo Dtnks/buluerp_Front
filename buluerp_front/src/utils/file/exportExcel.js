@@ -1,7 +1,7 @@
-
 import * as XLSX from 'xlsx'
 import { saveAs } from 'file-saver'
 
+//产品的批量导出接口
 export function exportToExcel(data, fileName = '导出数据') {
   const worksheet = XLSX.utils.json_to_sheet(data)
 

@@ -21,6 +21,7 @@ import BusinessShow from '@/views/business/main/Show.vue'
 import BusinessQuery from '@/views/business/main/Query.vue'
 import ProQuery from '@/views/production/main/Query.vue'
 import ProMaterial from '@/views/production/main/Material.vue'
+import ProDesign from '@/views/production/main/Design.vue'
 import Admin from '@/views/admin/Admin.vue'
 import Role from '@/views/admin/Role.vue'
 import PMInventoryList from '@/views/PMcenter/inventory/main/List.vue'
@@ -37,6 +38,7 @@ const ComponentsGroup = {
   BusinessQuery,
   ProQuery,
   ProMaterial,
+  ProDesign,
   Admin,
   Role,
   PMInventoryList,
