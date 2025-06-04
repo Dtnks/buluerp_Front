@@ -19,186 +19,295 @@ import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessageBox } from 'element-plus'
 const type = ref('part')
-listRecording(1, 10, 'product').then((res) => {
-  console.log(res)
-})
-const props = defineProps(['control', 'addTab'])
+const refreshList = () => {
+  listRecording(page.value, pageSize.value, type.value).then((res) => {
+    console.log(res)
+    listData.value = res.data
+    total.value = res.total
+  })
+}
+// listRecording(1, 10, 'product').then((res) => {
+//   console.log(res)
+// })
+const TypeOptions = [
+  {
+    label: '料包',
+    value: 'packaging-material',
+  },
+  {
+    label: '胶件',
+    value: 'part',
+  },
+  {
+    label: '成品',
+    value: 'product',
+  },
+]
+const props = defineProps(['control'])
 //渲染页面
-const formData = ref([
-  [
-    { type: 'input', label: '操作人', key: 'operator' },
-    { type: 'timer', label: '创建曰期', timerType: 'date', key: 'creationTime' },
-    { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
+const formData = ref({
+  'packaging-material': [
+    [
+      { type: 'input', label: '操作人', key: 'operator' },
+      { type: 'timer', label: '创建曰期', timerType: 'date', key: 'creationTime' },
+      { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
+    ],
+    [
+      { type: 'timer', label: '预交时间', key: 'deliveryDate', timerType: 'date' },
+      { type: 'input', label: '供应商', key: 'supplier' },
+      { type: 'input', label: '料别', key: 'materialType' },
+    ],
   ],
-  [
-    { type: 'timer', label: '预交时间', key: 'deliveryDate', timerType: 'date' },
-    { type: 'input', label: '供应商', key: 'supplier' },
-    { type: 'input', label: '料别', key: 'materialType' },
+  part: [
+    [
+      { type: 'input', label: '操作人', key: 'operator' },
+      { type: 'timer', label: '创建曰期', timerType: 'date', key: 'creationTime' },
+      { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
+    ],
   ],
-])
-const newFormData = ref([
-  [
-    { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
-    { type: 'number', label: '采购数量', key: 'purchaseQuantity', width: 8 },
-    { type: 'input', label: '产品ID', key: 'productId', width: 8 },
+  product: [
+    [
+      { type: 'input', label: '操作人', key: 'operator' },
+      { type: 'timer', label: '创建曰期', timerType: 'date', key: 'creationTime' },
+      { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
+    ],
+    [
+      { type: 'input', label: '供应商', key: 'supplier' },
+      { type: 'input', label: '料别', key: 'materialType' },
+      { type: 'input', label: '模具编号', key: 'mouldNumber' },
+    ],
   ],
-  [
-    {
-      type: 'timer',
-      label: '预交时间',
-      key: 'deliveryDate',
-      width: 12,
-      timerType: 'date',
-    },
-    { type: 'timer', label: '交货时间', key: 'deliveryTime', width: 12, timerType: 'date' },
+})
+const newFormData = ref({
+  'packaging-material': [
+    [
+      { type: 'input', label: '进出数量', key: 'inOutQuantity', width: 12 },
+      { type: 'input', label: '进出包', key: 'packagingNumber', width: 12 },
+    ],
+    [
+      { type: 'timer', label: '日期', key: 'changeDate', width: 12, timerType: 'date' },
+      { type: 'input', label: '订单编号', key: 'orderCode', width: 12 },
+    ],
+    [
+      { type: 'input', label: '产品货号', key: 'productPartNumber', width: 12 },
+      { type: 'input', label: '仓库位置', key: 'storageLocation', width: 12 },
+    ],
+    [{ type: 'textarea', label: '客户备注', key: 'remarks', width: 24 }],
   ],
-  [
-    { type: 'timer', label: '下单时间', key: 'orderTime', width: 12, timerType: 'date' },
-    { type: 'input', label: '供应商', key: 'supplier', width: 12 },
+  part: [
+    [
+      { type: 'input', label: '进出数量', key: 'inOutQuantity', width: 12 },
+      { type: 'timer', label: '日期', key: 'changeDate', width: 12, timerType: 'date' },
+    ],
+    [
+      { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
+      { type: 'input', label: '订单编号', key: 'orderCode', width: 8 },
+      { type: 'input', label: '模具数量', key: 'mouldNumber', width: 8 },
+    ],
+    [{ type: 'textarea', label: '客户备注', key: 'remarks', width: 24 }],
   ],
-  [
-    { type: 'input', label: '单重', key: 'singleWeight', width: 8 },
-    { type: 'input', label: '采购重量', key: 'purchaseWeight', width: 8 },
-    { type: 'input', label: '料别', key: 'materialType', width: 8 },
+  product: [
+    [
+      { type: 'input', label: '进出数量', key: 'inOutQuantity', width: 12 },
+      { type: 'timer', label: '日期', key: 'changeDate', width: 12, timerType: 'date' },
+    ],
+    [
+      { type: 'input', label: '产品货号', key: 'productPartNumber', width: 8 },
+      { type: 'input', label: '订单编号', key: 'orderCode', width: 8 },
+      { type: 'input', label: '仓库位置', key: 'storageLocation', width: 8 },
+    ],
+    [{ type: 'textarea', label: '客户备注', key: 'remarks', width: 24 }],
   ],
-
-  [
-    { type: 'input', label: '模具编号', key: 'mouldNumber', width: 12 },
-    { type: 'input', label: '规格', key: 'specification', width: 12 },
-  ],
-  [{ type: 'input', label: 'orderId', key: 'orderCode', width: 12 }],
-  [{ type: 'textarea', label: '客户备注', key: 'remarks', width: 24 }],
-  [{ type: 'image', label: '图片', key: 'picture', width: 12 }],
-])
+})
 const newSubmit = ref({
-  creationTime: '',
-  remarks: '',
-  email: '',
-  colorCode: '',
-  deliveryDate: '',
-  deliveryTime: '',
-  orderTime: '',
-  purchaseQuantity: '',
-  singleWeight: '',
-  purchaseWeight: '',
-  supplier: '',
-  materialType: '',
-  picture: '',
-  mouldNumber: '',
-  specification: '',
-  orderCode: '',
-  productId: '',
+  'packaging-material': {
+    creationTime: '',
+    remarks: '',
+    email: '',
+    colorCode: '',
+    deliveryDate: '',
+    deliveryTime: '',
+    orderTime: '',
+    purchaseQuantity: '',
+    singleWeight: '',
+    purchaseWeight: '',
+    supplier: '',
+    materialType: '',
+    picture: '',
+    mouldNumber: '',
+    specification: '',
+    orderCode: '',
+    productId: '',
+  },
+  part: {},
+  product: {},
 })
 const searchContent = ref({
-  creationTime: '',
-  deliveryDate: '',
-  operator: '',
-  colorCode: '',
-  supplier: '',
-  materialType: '',
+  'packaging-material': {
+    creationTime: '',
+    deliveryDate: '',
+    operator: '',
+    colorCode: '',
+    supplier: '',
+    materialType: '',
+  },
+  part: {},
+  product: {},
 })
-const tableData = ref([
-  {
-    value: 'id',
-    label: '采购单号',
-    type: 'text',
-  },
-  { value: 'creationTime', label: '创建时间', type: 'text' },
-  {
-    value: 'operator',
-    label: '操作人',
-    type: 'text',
-  },
-  {
-    value: 'materialType',
-    label: '料别',
-    type: 'text',
-  },
-  {
-    value: 'mouldNumber',
-    label: '模具编号',
-    type: 'text',
-  },
-  {
-    value: 'productId',
-    label: '产品ID',
-    type: 'text',
-  },
-  {
-    value: 'pictureUrl',
-    label: '产品图片',
-    type: 'picture',
-  },
-  {
-    value: 'colorCode',
-    label: '颜色编号',
-    type: 'text',
-  },
-  {
-    value: 'deliveryDate',
-    label: '预交时间',
-    type: 'text',
-  },
-  {
-    value: 'orderTime',
-    label: '下单时间',
-    type: 'text',
-  },
-  {
-    value: 'purchaseQuantity',
-    label: '采购数量',
-    type: 'text',
-  },
-  {
-    value: 'singleWeight',
-    label: '单重',
-    type: 'text',
-  },
-  {
-    value: 'purchaseWeight',
-    label: '采购重量',
-    type: 'text',
-  },
-  {
-    value: 'supplier',
-    label: '供应商',
-    type: 'text',
-  },
-
-  {
-    value: 'remarks',
-    label: '备注',
-    type: 'text',
-  },
-])
-const operation = ref([
-  // {
-  //   func: (id) => {
-  //     console.log(id)
-  //     detailCustomer(id).then((res) => {
-  //       console.log(res)
-  //     })
-  //   },
-  //   value: '查看',
-  // },
-  {
-    func: (row) => {
-      const id = row.id
-      title.value = '编辑'
-      editDialogVisible.value = true
-      newSubmit.value = { ...row }
+const tableData = ref({
+  'packaging-material': [
+    {
+      value: 'id',
+      label: '采购单号',
+      type: 'text',
     },
-    value: '编辑',
-    disabled: props.control[1].disabled,
-  },
-  // {
-  //   func: (row) => {
-  //     props.addTab('采购计划-' + row.id, PlanDetail, row, null)
-  //   },
-  //   value: '查看',
-  //   disabled: false,
-  // },
-])
+    { value: 'creationTime', label: '创建时间', type: 'text' },
+    {
+      value: 'operator',
+      label: '操作人',
+      type: 'text',
+    },
+    {
+      value: 'materialType',
+      label: '料别',
+      type: 'text',
+    },
+    {
+      value: 'mouldNumber',
+      label: '模具编号',
+      type: 'text',
+    },
+    {
+      value: 'productId',
+      label: '产品ID',
+      type: 'text',
+    },
+    {
+      value: 'pictureUrl',
+      label: '产品图片',
+      type: 'picture',
+    },
+    {
+      value: 'colorCode',
+      label: '颜色编号',
+      type: 'text',
+    },
+    {
+      value: 'deliveryDate',
+      label: '预交时间',
+      type: 'text',
+    },
+    {
+      value: 'orderTime',
+      label: '下单时间',
+      type: 'text',
+    },
+    {
+      value: 'purchaseQuantity',
+      label: '采购数量',
+      type: 'text',
+    },
+    {
+      value: 'singleWeight',
+      label: '单重',
+      type: 'text',
+    },
+    {
+      value: 'purchaseWeight',
+      label: '采购重量',
+      type: 'text',
+    },
+    {
+      value: 'supplier',
+      label: '供应商',
+      type: 'text',
+    },
+
+    {
+      value: 'remarks',
+      label: '备注',
+      type: 'text',
+    },
+  ],
+  part: [
+    {
+      value: 'id',
+      label: '采购单号',
+      type: 'text',
+    },
+    { value: 'creationTime', label: '创建时间', type: 'text' },
+    {
+      value: 'operator',
+      label: '操作人',
+      type: 'text',
+    },
+    {
+      value: 'materialType',
+      label: '料别',
+      type: 'text',
+    },
+    {
+      value: 'mouldNumber',
+      label: '模具编号',
+      type: 'text',
+    },
+  ],
+  product: [
+    {
+      value: 'id',
+      label: '采购单号',
+      type: 'text',
+    },
+    { value: 'creationTime', label: '创建时间', type: 'text' },
+    {
+      value: 'operator',
+      label: '操作人',
+      type: 'text',
+    },
+    {
+      value: 'materialType',
+      label: '料别',
+      type: 'text',
+    },
+    {
+      value: 'mouldNumber',
+      label: '模具编号',
+      type: 'text',
+    },
+  ],
+})
+const operation = ref({
+  'packaging-material': [
+    // {
+    //   func: (id) => {
+    //     console.log(id)
+    //     detailCustomer(id).then((res) => {
+    //       console.log(res)
+    //     })
+    //   },
+    //   value: '查看',
+    // },
+    {
+      func: (row) => {
+        const id = row.id
+        title.value = '编辑'
+        editDialogVisible.value = true
+        newSubmit.value = { ...row }
+      },
+      value: '编辑',
+      disabled: props.control[1].disabled,
+    },
+    // {
+    //   func: (row) => {
+    //     props.addTab('采购计划-' + row.id, PlanDetail, row, null)
+    //   },
+    //   value: '查看',
+    //   disabled: false,
+    // },
+  ],
+  part: [],
+  product: [],
+})
 
 //新增与修改
 const importDialogVisible = ref(false)
@@ -221,10 +330,6 @@ const handleSubmit = () => {
       }
     })
   } else {
-    newSubmit.value.creationTime = parseTime(newSubmit.value.creationTime, '{y}-{m}-{d}')
-    newSubmit.value.deliveryDate = parseTime(newSubmit.value.deliveryDate, '{y}-{m}-{d}')
-    newSubmit.value.deliveryTime = parseTime(newSubmit.value.deliveryTime, '{y}-{m}-{d}')
-    newSubmit.value.orderTime = parseTime(newSubmit.value.orderTime, '{y}-{m}-{d}')
     newRecording(newSubmit.value, type.value).then((res) => {
       if (res.msg == '操作成功') {
         page.value = 1
@@ -380,20 +485,14 @@ const handleSizeChange = async (val: number) => {
     listData.value = res.rows
   })
 }
-
-//初次渲染
-listRecording(page.value, pageSize.value, type.value).then((res) => {
-  total.value = res.total
-  listData.value = res.rows
-})
 </script>
 <template>
   <div class="col">
-    <BordShow content="采购计划" path="生产管理/采购/采购计划" />
+    <BordShow content="出入库单" path="生产管理中心/出入库单" />
     <div class="greyBack">
       <FormSearch
         title="查询"
-        :data="formData"
+        :data="formData[type]"
         :onCreate="onCreate"
         :onSubmit="onSubmit"
         :onImport="onImport"
@@ -401,9 +500,9 @@ listRecording(page.value, pageSize.value, type.value).then((res) => {
         :searchForm="searchContent"
         :control="control"
       >
-        <el-select v-model="value" clearable placeholder="Select" style="width: 240px">
+        <el-select v-model="type" placeholder="Select" style="width: 100px" @change="refreshList">
           <el-option
-            v-for="item in options"
+            v-for="item in TypeOptions"
             :key="item.value"
             :label="item.label"
             :value="item.value"
@@ -411,7 +510,7 @@ listRecording(page.value, pageSize.value, type.value).then((res) => {
         </el-select>
       </FormSearch>
       <TableList
-        :tableData="tableData"
+        :tableData="tableData[type]"
         :operations="operation"
         :listData="listData"
         :DeleteFunc="DeleteFunc"
@@ -444,7 +543,7 @@ listRecording(page.value, pageSize.value, type.value).then((res) => {
     </div>
 
     <el-dialog v-model="editDialogVisible" :title="title" width="800px"
-      ><CreateForm :data="newFormData" :Formvalue="newSubmit" />
+      ><CreateForm :data="newFormData[type]" :Formvalue="newSubmit" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
