@@ -24,15 +24,6 @@ export function changePurchaseList(data) {
   })
 }
 
-// export function downLoadModule() {
-//   return httpInstance({
-//     url: `system/purchase-collection/export/template`,
-//     method: 'get',
-//     headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
-//     responseType: 'blob',
-//   })
-// }
-
 export function detailPurchaseList(id) {
   return httpInstance({
     url: `system/purchase/order/${id}`,
@@ -42,9 +33,16 @@ export function detailPurchaseList(id) {
 }
 
 export function deletePurchaseList(ids) {
-  console.log(`system/purchase/order/${ids.join(',')}`)
   return httpInstance({
     url: `system/purchase/order/${ids.join(',')}`,
+    method: 'delete',
+    headers: headers,
+  })
+}
+
+export function deletePurchaseInvoice(ids) {
+  return httpInstance({
+    url: `system/purchase/order/invoice/${ids.join(',')}`,
     method: 'delete',
     headers: headers,
   })

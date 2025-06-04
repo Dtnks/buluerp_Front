@@ -188,14 +188,13 @@ const operation = ref([
     value: '编辑',
     disabled: props.control[1].disabled,
   },
-  {
-    func: (row) => {
-      console.log(row)
-      props.addTab('采购计划-' + row.id, PlanDetail, row, null)
-    },
-    value: '查看',
-    disabled: false,
-  },
+  // {
+  //   func: (row) => {
+  //     props.addTab('采购计划-' + row.id, PlanDetail, row, null)
+  //   },
+  //   value: '查看',
+  //   disabled: false,
+  // },
 ])
 
 //新增与修改
