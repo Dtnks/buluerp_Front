@@ -272,7 +272,7 @@ const resetMaterialForm = () => {
               action="#"
               :http-request="dummyRequest"
               :show-file-list="false"
-              :file-list="fileList" 
+              :file-list="fileList"
               :on-change="handleChange"
             >
               <el-button icon="el-icon-upload"  :disabled="control[1].disabled">点击上传</el-button>

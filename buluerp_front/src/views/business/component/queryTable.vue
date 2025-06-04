@@ -127,6 +127,8 @@ const getStatusColor = (status: number) => {
 const onCheck = (row: TableDataType) => {
   console.log('查看：', row)
   props.addTab(`订单详情 ${row.id}`, BusinessDetail, {
+    addTab: props.addTab,
+    control: props.control,
     id: row.id,
     innerId: row.innerId,
     status: row.status,

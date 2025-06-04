@@ -22,7 +22,7 @@ const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
   [
-    
+
     { type: 'input', label: 'ID', key: 'id' },
     { type: 'timer', label: '创建曰期', timerType: 'daterange', key: 'createTime' },
   ],
@@ -38,7 +38,7 @@ const newFormData = ref([
     { type: 'input', label: '订单金额', key: 'amount', width: 12 },
   ],
   [
-        { type: 'fileList', label: '发票文件', key: 'invoice', width: 22 },
+    { type: 'fileList', label: '发票文件', key: 'invoice', width: 22 },
   ],
 ])
 const newSubmit = ref({
@@ -150,10 +150,10 @@ const title = ref('编辑')
 //传给form组件的参数
 const resetSubmit = () => {
   newSubmit.value = {
-  purchaseId: '',
-  amount: '',
-  invoice: [],
-}
+    purchaseId: '',
+    amount: '',
+    invoice: [],
+  }
 }
 const onCreate = () => {
   resetSubmit()
@@ -280,76 +280,44 @@ listPurchaseList(page.value, pageSize.value).then((res) => {
   <div class="col">
     <BordShow content="采购计划" path="生产管理/采购/采购计划" />
     <div class="greyBack">
-      <FormSearch
-        title="查询"
-        :data="formData"
-        :onCreate="onCreate"
-        :onSubmit="onSubmit"
-        :onImport="onImport"
-        :onDownloadTemplate="onDownloadTemplate"
-        :searchForm="searchContent"
-        :control="control"
-      />
-      <TableList
-        :tableData="tableData"
-        :operations="operation"
-        :listData="listData"
-        :DeleteFunc="DeleteFunc"
-        :exportFunc="exportFunc"
-        :control="control"
-      >
+      <FormSearch title="查询" :data="formData" :onCreate="onCreate" :onSubmit="onSubmit" :onImport="onImport"
+        :onDownloadTemplate="onDownloadTemplate" :searchForm="searchContent" :control="control" />
+      <TableList :tableData="tableData" :operations="operation" :listData="listData" :DeleteFunc="DeleteFunc"
+        :exportFunc="exportFunc" :control="control">
         <slot>
-          <div
-            style="
+          <div style="
               margin-top: 20px;
               display: flex;
               justify-content: space-between;
               align-items: center;
-            "
-          >
+            ">
             <div>共 {{ total }} 条</div>
-            <el-pagination
-              background
-              layout="prev, pager, next, jumper, ->, total, sizes"
-              :current-page="page"
-              :page-size="pageSize"
-              :page-sizes="[5, 10, 20, 50]"
-              :total="total"
-              @current-change="handlePageChange"
-              @size-change="handleSizeChange"
-            />
+            <el-pagination background layout="prev, pager, next, jumper, ->, total, sizes" :current-page="page"
+              :page-size="pageSize" :page-sizes="[5, 10, 20, 50]" :total="total" @current-change="handlePageChange"
+              @size-change="handleSizeChange" />
           </div>
         </slot>
       </TableList>
     </div>
 
-    <el-dialog v-model="editDialogVisible" :title="title" width="800px"
-      ><CreateForm :data="newFormData" :Formvalue="newSubmit" />
+    <el-dialog v-model="editDialogVisible" :title="title" width="800px">
+      <CreateForm :data="newFormData" :Formvalue="newSubmit" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button
-            type="info"
-            @click="
-              () => {
-                editDialogVisible = false
-              }
-            "
-          >
+          <el-button type="info" @click="
+            () => {
+              editDialogVisible = false
+            }
+          ">
             取消
           </el-button>
         </div>
       </template>
     </el-dialog>
     <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
-      <el-upload
-        class="upload-demo"
-        drag
-        :show-file-list="false"
-        :before-upload="beforeUpload"
-        :http-request="handleUpload"
-        accept=".xlsx,.xls"
-      >
+      <el-upload class="upload-demo" drag :show-file-list="false" :before-upload="beforeUpload"
+        :http-request="handleUpload" accept=".xlsx,.xls">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
         <template v-slot:tip>
@@ -363,9 +331,11 @@ listPurchaseList(page.value, pageSize.value).then((res) => {
 .input .el-input {
   width: 240px;
 }
+
 .cardCenter .el-input {
   margin-bottom: 20px;
 }
+
 .input span {
   text-align: right;
   padding-right: 5px;
