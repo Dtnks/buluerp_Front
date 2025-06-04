@@ -18,7 +18,8 @@ import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessageBox } from 'element-plus'
-const props = defineProps(['control'])
+import PlanDetail from '../component/PlanDetail.vue'
+const props = defineProps(['control', 'addTab'])
 //渲染页面
 const formData = ref([
   [
@@ -35,7 +36,7 @@ const formData = ref([
 const newFormData = ref([
   [
     { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
-    { type: 'input', label: '采购数量', key: 'purchaseQuantity', width: 8 },
+    { type: 'number', label: '采购数量', key: 'purchaseQuantity', width: 8 },
     { type: 'input', label: '产品ID', key: 'productId', width: 8 },
   ],
   [
@@ -186,6 +187,14 @@ const operation = ref([
     },
     value: '编辑',
     disabled: props.control[1].disabled,
+  },
+  {
+    func: (row) => {
+      console.log(row)
+      props.addTab('采购计划-' + row.id, PlanDetail, row, null)
+    },
+    value: '查看',
+    disabled: false,
   },
 ])
 

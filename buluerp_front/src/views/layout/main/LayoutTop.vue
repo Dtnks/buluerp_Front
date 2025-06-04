@@ -1,5 +1,17 @@
 <script setup lang="ts">
 const props = defineProps({ handleHiddenMenu: { type: Function } })
+import { GetUserInfo } from '@/apis/layout'
+import { ref } from 'vue'
+const message = ref({ avatar: '' })
+GetUserInfo().then((res) => {
+  message.value = res.user
+  console.log(message.value)
+})
+const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
+const getFullImageUrl = (path: string) => {
+  // 防止多余斜杠：/profile//2025/... => /profile/2025/...
+  return BASE_IMAGE_URL + path.replace('//', '/')
+}
 </script>
 <template>
   <div id="menu" class="row">
@@ -12,7 +24,10 @@ const props = defineProps({ handleHiddenMenu: { type: Function } })
       <div class="center" style="flex: 1"><img class="icon" src="@/assets/icon/u39.png" /></div>
 
       <div class="center row" style="flex: 3; align-items: center">
-        <img id="head" src="@/assets/icon/u37.jpg" /><el-text style="flex: 1">姓名</el-text>
+        <img id="head" :src="getFullImageUrl(message.avatar)" v-if="message.avatar" /><el-text
+          style="flex: 1"
+          >{{ message.nickName }}</el-text
+        >
       </div>
     </div>
   </div>
