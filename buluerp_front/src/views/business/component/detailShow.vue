@@ -23,9 +23,28 @@
 
         <!-- 订单详情 -->
         <informationCard title="订单详情">
-          <el-table :data="orderProducts" style="width: 100%">
-            <el-table-column prop="productId" label="产品编号" />
-            <el-table-column prop="product.name" label="产品名称" />
+          <!-- <el-select v-model="seletedProdunctId">
+            <el-option v-for="product in orderDetail.products" :key="product.id" :label="product.id"
+              :value="product.id">
+            </el-option>
+          </el-select> -->
+
+          <el-table :data="displayProducts" style="width: 100%">
+            <el-table-column prop="productId" label="产品编号">
+              <!-- <template #default="scope">
+              <el-select  v-if="scope.$index >= 2" v-model="selectedProductIds.value[scope.$index]" @change="updateRow(scope.row, scope.$index)">
+                <el-option v-for="product in orderDetail.products" :key="product.productId" :label="product.productId"
+                  :value="product.productId">
+                </el-option>
+              </el-select>
+              <span v-else>{{ scope.row.productId }}</span>
+            </template> -->
+            </el-table-column>
+            <el-table-column prop="product.name" label="产品名称">
+              <template #default="scope">
+                {{ scope.row.product ? scope.row.product.name : '未选择产品' }}
+              </template>
+            </el-table-column>
             <el-table-column prop="quantity" label="数量" />
             <el-table-column prop="remark" label="其他信息" />
             <el-table-column prop="action" label="操作" width="180">
@@ -37,13 +56,18 @@
               </template>
             </el-table-column>
           </el-table>
+          <div class="add-row">
+            <span class="add-row-text">增加</span>
+            <el-input v-model="addRowCount" class="input-blank" />
+            <span class="add-row-text">行</span>
+          </div>
         </informationCard>
 
         <!-- 关联订单 -->
         <informationCard title="关联订单">
           <el-table :data="relatedOrdersTable" style="width: 100%">
             <el-table-column prop="type" label="订单类型" width="100" />
-            <el-table-column prop="orderId" label="订单ID" />
+            <el-table-column prop=orderId label="订单ID" />
             <el-table-column prop="action" label="操作" width="180">
               <template #default="scope">
                 <el-button v-for="action in scope.row.actions" :key="action.name" link type="primary" size="small"
@@ -60,6 +84,41 @@
       <el-button @click=onBoxCancel>取消</el-button>
       <el-button type="primary" @click="onBoxSubmit">提交</el-button>
     </el-footer>
+
+
+    <el-dialog v-model="editDialogVisible" width="800px">
+      <CreateForm :data="newPackagingList" :Formvalue="newSubmit" />
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
+          <el-button type="info" @click="
+            () => {
+              editDialogVisible = false
+            }
+          ">
+            取消
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="editproductVisible" title="编辑产品" width="500px">
+      <el-form :model="updatedProduct" label-width="100px">
+        <el-form-item label="产品编号">
+          <el-input v-model="updatedProduct.productId" disabled />
+        </el-form-item>
+        <el-form-item label="产品名称">
+          <el-input v-model="updatedProduct.productName" disabled />
+        </el-form-item>
+        <el-form-item label="产品数量">
+          <el-input v-model="updatedProduct.productQuantity" type="number" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="editproductVisible = false">取消</el-button>
+        <el-button type="primary" @click="onEditProductConfirm(updatedProduct)">保存</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -68,21 +127,37 @@ import informationCard from './informationCard.vue'
 import { computed, onMounted, ref } from 'vue'
 import { getStatusText } from '../utils/statusMap'
 import { getPackagingListByOrderId, getProductsByOrderId, getProductDetailById, getOrderDetail } from '../function/oders'
-import { getList_pro } from '@/apis/products.js'
-import { ElMessage, ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElMessageBox } from 'element-plus'
+import { putOrder } from '@/apis/orders'
+import { deleteProduct } from '@/apis/products'
+import { ElMessage, ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElMessageBox, ElDialog } from 'element-plus'
+import CreateForm from '@/components/form/CreateForm.vue'
+import PackagingList from './packagingList.vue'
+import ProductionSchedule from './productionSchedule.vue'
 
 // Props
 const props = defineProps<{
   detail: any
   id: number
+  addTab: (targetName: string, component: any, data?: any) => void
+  control: Array<object>
 }>()
 
 const orderDetail = computed(() => props.detail)
 
 onMounted(() => {
   console.log('订单详情组件加载', props.id);
+  fetchOrderProducts(props.id);
 })
 
+// 控制 CreateForm 的显示
+const showCreateForm = ref(false);
+// 打开 CreateForm
+const openCreateForm = () => {
+  showCreateForm.value = true;
+}
+
+const editDialogVisible = ref(false);
+const editproductVisible = ref(false);
 // 订单状态
 const statusText = ref(getStatusText(props.detail.status))
 
@@ -103,8 +178,69 @@ const updateFields = ref({
   remark: '',
   customerName: '',
 })
+
 // 订单详情-产品数据
-const orderProducts = computed(() => props.detail.products || []);
+const orderProducts = ref([]);
+// 获取订单产品数据
+const fetchOrderProducts = async (orderId: number) => {
+  try {
+    const res = await getOrderDetail(orderId);
+    console.log('获取订单产品数据www:', res.products);
+    if (res.products) {
+      orderProducts.value = res.products || [];
+      console.log('订单产品数据:11111111', orderProducts.value);
+
+    } else {
+      ElMessage.error('获取订单产品数据失败');
+    }
+  } catch (error) {
+    console.error('获取订单产品数据失败:', error);
+    ElMessage.error('获取订单产品数据失败，请稍后再试');
+  }
+}
+
+// 用户选择的产品编号
+const selectedProductIds = ref({});
+// 用户输入的新增的行数
+const addRowCount = ref(0);
+// const newRowCount = computed(()=> addRowCount.value-0 + 2)
+const newRowCount = computed(() => Number(addRowCount.value) + 2);
+
+// 展示出来的产品数据
+const displayProducts = computed(() => {
+  if (addRowCount.value == 0) {
+    return orderProducts.value.slice(0, 2);
+  }
+  return [...orderProducts.value.slice(0, newRowCount.value)];
+})
+
+// 编辑弹窗的产品数据
+const updatedProduct = ref({
+  productId: 0,
+  productName: '',
+  productQuantity: 0,
+});
+
+// 根据id查找出来的产品数据
+const productDetail = ref([]);
+
+// updateRow: 更新产品行
+const updateRow = (row, rowIndex) => {
+  //  const selectedProduct = orderProducts.value.find(item => item.productId === row.productId);
+  const selectedProduct = orderProducts.value.find(item => item.productId == selectedProductIds.value[rowIndex]);
+  console.log(selectedProductIds.value, 'selectedProductIds.value');
+  console.log('orderProducts.value', orderProducts.value);
+  console.log('selectedProduct', selectedProduct);
+  // if (selectedProduct) {
+  //   row.product.name = selectedProduct.product.name;
+  //   row.quantity = selectedProduct.quantity;
+  //   row.remark = selectedProduct.remark;
+  // } else {
+  //   row.product.name = '';
+  //   row.quantity = 0;
+  //   row.remark = '';
+  // }
+}
 
 // onDeleteProduct: 删除订单产品
 const onDeleteProduct = (row: any) => {
@@ -115,30 +251,62 @@ const onDeleteProduct = (row: any) => {
   })
     .then(() => {
       // 删除逻辑
-      console.log('删除产品:', row);
-      ElMessage.success('产品已删除');
-    })
-    .catch(() => {
+      deleteProduct(row.productId)
+        .then(() => {
+          // 从订单产品列表中移除该产品
+          orderProducts.value = orderProducts.value.filter(item => item.productId !== row.productId);
+          fetchOrderProducts(props.id);
+          ElMessage.success('产品删除成功');
+        })
+        .catch(error => {
+          console.error('删除产品失败:', error);
+          ElMessage.error('删除产品失败，请稍后再试');
+        });
+      }).catch(() => {
       ElMessage.info('已取消删除');
     });
 }
 
 // onEditProduct: 编辑订单产品
-const onEditProduct = (row: any) => {
+const onEditProduct = async (row: any) => {
   console.log('编辑产品:', row);
-  // 编辑逻辑
-  ElMessage.success('产品已编辑');
+
+  editproductVisible.value = true;
+  updatedProduct.value = {
+    productId: row.productId,
+    productName: row.product?.name || '',
+    productQuantity: row.quantity,
+  };
 }
+
+// onEditProductConfirm: 确认编辑产品
+const onEditProductConfirm = async (product: any) => {
+  console.log('确认编辑产品:', product);
+  try {
+
+    await putOrder({
+      ...orderDetail.value,
+      products: orderProducts.value.map(item => item.productId === product.productId ? {
+        ...item,
+        quantity: Number(product.productQuantity),
+      } : item)
+    });
+    fetchOrderProducts(props.id);
+    ElMessage.success('更新订单产品成功');
+
+  } catch (error) {
+    console.error('更新订单产品失败:', error);
+    ElMessage.error('更新订单产品失败，请稍后再试');
+  }
+  editproductVisible.value = false;
+}
+
 
 
 // 关联订单数据和操作
 // 分包表
 const packagingList = ref([]);
 
-// getPackagingList: 根据订单ID获取分包表数据
-const getPackagingList = (id: number) => {
-  getPackagingListByOrderId(id)
-}
 
 
 
@@ -147,8 +315,9 @@ const purchaseTable = ref([]);
 
 // viewPuchaseOrder: 查看外购表
 const viewPuchaseOrder = (row: any) => {
-  console.log('查看采购表', row);
+  console.log('查看外购表', row);
 }
+
 
 // addProductsSchedule: 创建布产表
 const addProductsSchedule = (row: any) => {
@@ -158,19 +327,27 @@ const addProductsSchedule = (row: any) => {
 // viewProductsSchedule: 查看布产表
 const viewProductsSchedule = (row: any) => {
   console.log('查看布产表', row);
+  props.addTab(`布产表 ${row.orderId}`, ProductionSchedule, {
+    orderId: props.id,
+    control: props.control,
+  });
 }
 
 // addPackagingList: 创建分包表
 const addPackagingList = (row: any) => {
   console.log('创建分包表', row);
   // // 创建分包表逻辑
+  openCreateForm();
   // getPackagingList(props.id)
 }
 
 // viewPackagingList: 查看分包表
-const viewPackagingList = (row: any) => {
-  getPackagingList(props.id)
-  console.log('查看分包表', row);
+const viewPackagingList = async (row: any) => {
+  props.addTab(`分包表 ${row.orderId}`, PackagingList, {
+    orderId: props.id,
+    control: props.control,
+  });
+
 }
 // handleAction: 处理关联订单的操作
 const handleAction = (method: Function, row: any) => {
@@ -181,18 +358,18 @@ const handleAction = (method: Function, row: any) => {
 const relatedOrdersTable = ref([
   { // todo: 后端还没写外购表
     type: '外购表',
-    orderId: '',
+    orderId: props.id,
     actions: [{ name: '查看', method: viewPuchaseOrder },]
   },
   {
     type: '布产表',
-    orderId: '无',
+    orderId: props.id,
     actions: [{ name: '创建', method: addProductsSchedule }, { name: '查看', method: viewProductsSchedule },]
   },
   {
     type: '分包表',
-    orderId: '无',
-    actions: [{ name: '创建',  method: addPackagingList }, { name: '查看',  method: viewPackagingList },]
+    orderId: props.id,
+    actions: [{ name: '创建', method: addPackagingList }, { name: '查看', method: viewPackagingList },]
   }
 ])
 
@@ -242,6 +419,25 @@ const onBoxCancel = () => {
     margin-top: 6px;
     font-size: small;
     color: #707070;
+  }
+}
+
+.add-row {
+  margin-top: 4px;
+  font-size: small;
+  color: #424548;
+}
+
+.input-blank {
+  width: 40px;
+  border-bottom: 1px solid #000;
+  outline: none;
+  margin-left: 5px;
+  margin-right: 5px;
+  padding: 0;
+
+  :deep(.el-input__wrapper) {
+    box-shadow: none !important;
   }
 }
 </style>

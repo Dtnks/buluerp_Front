@@ -5,7 +5,7 @@ export function getList_pro(params) {
     return httpInstance({
       url: 'system/products/list',
       method: 'get',
-      params 
+      params
     })
   }
 
@@ -25,7 +25,7 @@ export function createProduct(formData) {
 }
 
 export function deleteProduct(ids) {
-  const idStr = Array.isArray(ids) ? ids.join(',') : ids 
+  const idStr = Array.isArray(ids) ? ids.join(',') : ids
   return httpInstance({
     url: `system/products/${idStr}`,
     method: 'delete'
