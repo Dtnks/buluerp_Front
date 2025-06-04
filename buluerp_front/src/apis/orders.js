@@ -12,7 +12,7 @@ export function getOrdersList() {
   })
 }
 
-export const editOder = ( data) => {
+export const editOrder = ( data) => {
   return httpInstance({
     url: 'dev-api/system/orders/edit',
     method: 'post',
