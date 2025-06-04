@@ -5,9 +5,10 @@ import { ref } from 'vue'
 import type { TabPaneName } from 'element-plus'
 import BusinessQuery from '../business/main/Query.vue'
 
-const editableTabsValue = ref('订单看板')
+const editableTabsValue = ref('')
 const editableTabs = ref([])
-const addTab = (targetName: string, component, data = null) => {
+
+const addTab = (targetName: string, component, data, control = null) => {
   if (editableTabs.value.filter((item) => item.title == targetName).length > 0) {
     editableTabsValue.value = targetName
     return
@@ -17,9 +18,11 @@ const addTab = (targetName: string, component, data = null) => {
     name: targetName,
     component: component,
     data: data,
+    control: control,
   })
   editableTabsValue.value = targetName
 }
+
 const removeTab = (targetName: TabPaneName) => {
   const tabs = editableTabs.value
   let activeName = editableTabsValue.value
@@ -61,14 +64,16 @@ const handleHiddenMenu = () => {
           :name="item.name"
         >
           <KeepAlive>
-            <component :is="item.component" :addTab="addTab" :data="item.data"></component>
+            <component
+              :is="item.component"
+              :addTab="addTab"
+              :data="item.data"
+              :control="item.control"
+            ></component>
           </KeepAlive>
         </el-tab-pane>
       </el-tabs>
     </div>
-    <template>
-      <BusinessQuery :addTab="addTab" />
-    </template>
   </div>
 </template>
 
@@ -80,3 +85,4 @@ const handleHiddenMenu = () => {
   height: 100%;
 }
 </style>
+

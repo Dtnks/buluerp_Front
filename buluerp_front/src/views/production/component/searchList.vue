@@ -1,12 +1,16 @@
 <template>
-  <el-card style="width: 100%; margin: 0 20px;">
+  <el-card style=" margin: 0 20px;">
     <template #header>
-      <div class="card-header">
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
         <span>展示</span>
+        <div>
+          <el-button type="danger" @click="onDelete" :disabled="control[2].disabled">删除</el-button>
+          <el-button type="primary" @click="onExport">导出</el-button>
+        </div>
       </div>
     </template>
     <div>
-      <el-table :data="data" border style="width: 100%">
+      <el-table :data="data" border style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" />
         <el-table-column prop="createTime" label="创建时间" />
         <el-table-column prop="id" label="产品编码" />
@@ -20,21 +24,29 @@
                   width: '8px',
                   height: '8px',
                   borderRadius: '50%',
-                  backgroundColor: row.designStatus === '已完成' ? '#67C23A' : '#C0C4CC',
+                  backgroundColor: row.designStatus === 1 ? '#67C23A' : '#E6A23C',
                   marginRight: '8px',
                 }"
               ></span>
-              {{ row.designStatus || '未定义' }}
+              {{ row.designStatus === 1 ? '已完成' : '设计中' }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="pictureUrl" label="产品图片" />
+        <el-table-column label="产品图片">
+          <template #default="{ row }">
+            <img
+              v-if="row.pictureUrl"
+              :src="getFullImageUrl(row.pictureUrl)"
+              alt="产品图片"
+              style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;"
+            />
+            <span v-else>暂无图片</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="updateTime" label="更新时间" />
         <el-table-column label="操作" fixed="right" width="250">
           <template #default="{ row }">
             <el-button size="small" type="primary" text @click="onView(row)">查看</el-button>
-            <el-button size="small" type="primary" text>编辑</el-button>
-            <el-button size="small" type="primary" text>导出</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -58,19 +70,31 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
-import { getList_pro } from '@/apis/products.js' // 你的接口方法
+import { ref, watch, onMounted } from 'vue'
+// import { ElMessage, ElMessageBox } from 'element-plus' // ✅ 移除 
+import { getList_pro, deleteProduct } from '@/apis/products.js'
+import { exportToExcel } from '@/utils/file/exportExcel'
+import { messageBox } from '@/components/message/messageBox' // ✅ 引入封装的 messageBox
 
-import Detail from '../main/Detail.vue' // 确保路径正确
+import Detail from '../main/Detail.vue'
+
 const props = defineProps<{
   queryParams: Record<string, any>
   addTab: (targetName: string, component: any, data?: any) => void
+   control: Array<object>
 }>()
 
 const data = ref([])
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
+const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
+
+const getFullImageUrl = (path: string) => {
+  return BASE_IMAGE_URL + path.replace('//', '/')
+}
+
+
 
 const fetchData = async () => {
   const res = await getList_pro({
@@ -82,11 +106,20 @@ const fetchData = async () => {
   total.value = res.total || 0
 }
 
+onMounted(() => {
+  fetchData()
+})
+
 watch(
-  () => [props.queryParams, page.value, pageSize.value],
-  fetchData,
-  { immediate: true, deep: true }
+  () => props.queryParams,
+  () => {
+    page.value = 1
+    fetchData()
+  },
+  { deep: true }
 )
+
+watch([page, pageSize], fetchData)
 
 const handlePageChange = (val: number) => {
   page.value = val
@@ -97,8 +130,75 @@ const handleSizeChange = (val: number) => {
   page.value = 1
 }
 
-const onView = (row: any) => {
-  props.addTab('详情页', Detail, {id : row.id})
-  console.log('id是',row.id)
+const selectedRows = ref<any[]>([])
+
+const handleSelectionChange = (selection: any[]) => {
+  selectedRows.value = selection
 }
+
+const onDelete = async () => {
+  if (selectedRows.value.length === 0) {
+    messageBox(
+      'error',
+      () => Promise.reject(),
+      '',
+      '请先选择要删除的产品',
+      '',
+    )
+    return
+  }
+
+  const ids = selectedRows.value.map((item) => item.id)
+
+  messageBox(
+    'warning',
+    () =>
+      deleteProduct(ids).then((res) => {
+        if (res.code === 200) {
+          fetchData()
+          selectedRows.value = []
+          return Promise.resolve()
+        } else {
+          return Promise.reject()
+        }
+      }),
+    '删除成功',
+    '删除失败',
+    '确认要删除选中的产品吗？'
+  )
+}
+
+const onExport = () => {
+  if (selectedRows.value.length === 0) {
+    messageBox(
+      'error',
+      () => Promise.reject(),
+      '',
+      '请先选择要导出的产品',
+      ''
+    )
+    return
+  }
+
+  const today = new Date()
+  const dateStr = today.toISOString().split('T')[0].replace(/-/g, '')
+
+  const exportData = selectedRows.value.map(item => ({
+    产品ID: item.id,
+    产品名称: item.name,
+    创建时间: item.createTime,
+    更新时间: item.updateTime,
+    创建人: item.createUsername || '未知',
+    设计确认状态: item.designStatus === 1 ? '已完成' : '设计中',
+    图片URL: item.pictureUrl ? getFullImageUrl(item.pictureUrl) : '暂无',
+  }))
+
+  exportToExcel(exportData, `产品数据_${dateStr}`)
+}
+
+
+const onView = (row: any) => {
+  props.addTab(`详情页-${row.name}`, Detail, row, props.control)
+}
+
 </script>

@@ -34,12 +34,9 @@ export function newUser(data) {
   })
 }
 
-export function getUserList(
-  page,
-  searchContent = { roleNames: null, userName: '', nickName: '', status: '' },
-) {
+export function getUserList(page, searchContent = { roleId: '', userName: '', nickName: '' }) {
   return httpInstance({
-    url: `system/user/urlist?pageNum=${page}&pageSize=8&roleNames=${searchContent.roleNames}&userName=${searchContent.userName}&nickName=${searchContent.nickName}&status=${searchContent.status}`,
+    url: `system/user/urlist?pageNum=${page}&pageSize=8&roleId=${searchContent.roleId}&userName=${searchContent.userName}&nickName=${searchContent.nickName}`,
     method: 'get',
     headers: headers,
   })
@@ -56,10 +53,9 @@ export function changeStatus(data) {
 
 export function changeRoles(data) {
   return httpInstance({
-    url: `system/user/authRole`,
+    url: `system/user/authRole?userId=${data.userId}&roleIds=${data.roleIds.join('&roleIds=')}`,
     method: 'put',
     headers: headers,
-    data: data,
   })
 }
 
@@ -74,7 +70,7 @@ export function resetPassword(data) {
 
 export function getUser(id) {
   return httpInstance({
-    url: `system/user?userId=${id}`,
+    url: `system/user/${id}`,
     method: 'get',
     headers: headers,
   })

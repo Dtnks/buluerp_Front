@@ -1,6 +1,19 @@
 <script setup lang="ts">
-const props = defineProps({ isCollapse: { type: Boolean }, addTab: { type: Function } })
-import { User } from '@element-plus/icons-vue'
+const props = defineProps({
+  isCollapse: { type: Boolean },
+  addTab: { type: Function },
+})
+import useMenuState from '@/stores/modules/menu.js'
+import { ref, onMounted } from 'vue'
+import { Grid, Memo, CircleCheck, User, Menu } from '@element-plus/icons-vue'
+const menuStore = useMenuState()
+const menuOptions = ref([])
+onMounted(async () => {
+  await menuStore.refreshMenu()
+  console.log('menuStore.menu.children:', menuStore.menu.children)
+  menuOptions.value = menuStore.menu.children
+})
+
 import UserInformation from '@/views/person/main/Information.vue'
 import CustomQuery from '@/views/person/main/Custom.vue'
 import Manufacturers from '@/views/person/main/Manufacturers.vue'
@@ -8,12 +21,34 @@ import BusinessShow from '@/views/business/main/Show.vue'
 import BusinessQuery from '@/views/business/main/Query.vue'
 import ProQuery from '@/views/production/main/Query.vue'
 import ProMaterial from '@/views/production/main/Material.vue'
+import DesignTable from '@/views/production/main/DesignTable.vue'
 import Admin from '@/views/admin/Admin.vue'
 import Role from '@/views/admin/Role.vue'
 import PMInventoryList from '@/views/PMcenter/inventory/main/List.vue'
 import PMInventoryQuery from '@/views/PMcenter/inventory/main/Query.vue'
 import PMProcurementQuery from '@/views/PMcenter/procurement/main/List.vue'
 import PMProcurementPlan from '@/views/PMcenter/procurement/main/Plan.vue'
+import PMProduceArrange from '@/views/PMcenter/produce/main/Arrange.vue'
+import PMProduceSchedule from '@/views/PMcenter/produce/main/Schedule.vue'
+const ComponentsGroup = {
+  UserInformation,
+  CustomQuery,
+  Manufacturers,
+  BusinessShow,
+  BusinessQuery,
+  ProQuery,
+  ProMaterial,
+  DesignTable,
+  Admin,
+  Role,
+  PMInventoryList,
+  PMInventoryQuery,
+  PMProcurementQuery,
+  PMProcurementPlan,
+  PMProduceArrange,
+  PMProduceSchedule,
+}
+const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
 </script>
 <template>
   <el-menu
@@ -28,39 +63,43 @@ import PMProcurementPlan from '@/views/PMcenter/procurement/main/Plan.vue'
       <img id="logo" src="@/assets/img/logo.png" />
       <div style="color: white; font-size: 25px; white-space: nowrap">布鲁科</div>
     </div>
-    <el-sub-menu index="0">
-      <template #title
-        ><el-icon><img src="@/assets/icon/u21.png" class="icon" /></el-icon
-        ><span>管理员</span></template
-      >
-      <el-menu-item index="0-1" @click="addTab('授权管理', Admin)"> 授权管理 </el-menu-item>
-      <el-menu-item index="0-1" @click="addTab('角色管理', Role)"> 节点管理 </el-menu-item>
-    </el-sub-menu>
-    <el-sub-menu index="1">
-      <template #title
-        ><el-icon><User /></el-icon> <span>用户中心</span></template
-      >
-      <el-menu-item index="1-1" @click="addTab('我的信息', UserInformation)">我的信息</el-menu-item>
-      <el-menu-item index="1-2" @click="addTab('客户信息', CustomQuery)">客户查询</el-menu-item>
-      <el-menu-item index="1-3" @click="addTab('厂商信息', Manufacturers)">厂商查询</el-menu-item>
-    </el-sub-menu>
-    <el-sub-menu index="2">
-      <template #title>
-        <el-icon><img src="@/assets/icon/u9.png" class="icon" /></el-icon>
-        <span>业务中心</span>
-      </template>
-      <el-menu-item index="2-1" @click="addTab('订单查询', BusinessQuery)">订单查询</el-menu-item>
-      <el-menu-item index="2-2" @click="addTab('订单看板', BusinessShow)">看板</el-menu-item>
-    </el-sub-menu>
+    <div v-for="item in menuOptions" :key="item.id">
+      <el-sub-menu :index="item.id" v-if="!item.disabled">
+        <template #title
+          ><el-icon><component :is="IconGroup[item.path]"></component></el-icon
+          ><span>{{ item.label }}</span></template
+        >
+        <div v-for="subItem in item.children" :key="subItem.id">
+          <el-menu-item
+            :index="subItem.id"
+            @click="addTab(subItem.label, ComponentsGroup[subItem.path], null, subItem.children)"
+            v-if="!subItem.disabled && subItem.path != '/'"
+          >
+            {{ subItem.label }}
+          </el-menu-item>
+          <el-sub-menu :index="subItem.id" v-else-if="!subItem.disabled">
+            <template #title
+              ><span>{{ subItem.label }}</span></template
+            >
+            <el-menu-item
+              v-for="subSubItem in subItem.children"
+              :key="subSubItem.id"
+              :index="subSubItem.id"
+              @click="
+                addTab(
+                  subSubItem.label,
+                  ComponentsGroup[subSubItem.path],
+                  null,
+                  subSubItem.children,
+                )
+              "
+              >{{ subSubItem.label }}</el-menu-item
+            >
+          </el-sub-menu>
+        </div>
+      </el-sub-menu>
+    </div>
 
-    <el-sub-menu index="3">
-      <template #title
-        ><el-icon><img src="@/assets/icon/u25.png" class="icon" /></el-icon>
-        <span>产品中心</span></template
-      >
-      <el-menu-item index="3-1" @click="addTab('产品订单', ProQuery)">产品查询</el-menu-item>
-      <el-menu-item index="3-2" @click="addTab('物料资料表', ProMaterial)">物料资料表</el-menu-item>
-    </el-sub-menu>
     <el-sub-menu index="4">
       <template #title
         ><el-icon><img src="@/assets/icon/u29.png" class="icon" /></el-icon>

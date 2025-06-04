@@ -1,41 +1,63 @@
 <script setup lang="ts">
 import FormSearch from '@/components/form/Form.vue'
-import { listCustomer, detailCustomer, changeCustomer, newCustomer } from '@/apis/custom.js'
+import BordShow from '@/components/board/SecBoard.vue'
+import {
+  listCustomer,
+  detailCustomer,
+  changeCustomer,
+  newCustomer,
+  exportSelectTable,
+  deleteCustomer,
+  importCustomFile,
+  downLoadModule,
+} from '@/apis/custom.js'
+import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
 import { ref } from 'vue'
+import { parseTime } from '@/utils/ruoyi'
+import { beforeUpload } from '@/utils/file/importExcel'
+import { messageBox } from '@/components/message/messageBox'
+import { ElMessage, ElMessageBox } from 'element-plus'
+const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
   [
-    { type: 'input', value: null, label: '用户ID' },
-    { type: 'input', value: null, label: '姓名' },
+    { type: 'input', label: '姓名', key: 'name' },
+    { type: 'timer', label: '创建曰期', timerType: 'date', key: 'creatTime' },
   ],
   [
-    { type: 'input', value: null, label: '联系方式' },
-    { type: 'input', value: null, label: '邮箱' },
-    { type: 'input', value: null, label: '客户备注' },
+    { type: 'input', label: '联系方式', key: 'contact' },
+    { type: 'input', label: '邮箱', key: 'email' },
+    { type: 'input', label: '客户备注', key: 'remarks' },
   ],
 ])
 const tableData = ref([
   {
     value: 'id',
     label: '用户ID',
+    type: 'text',
   },
   {
     value: 'name',
     label: '姓名',
+    type: 'text',
   },
   {
     value: 'contact',
     label: '联系方式',
+    type: 'text',
   },
   {
     value: 'email',
     label: '邮箱',
+    type: 'text',
   },
   {
     value: 'remarks',
     label: '备注',
+    type: 'text',
   },
+  { value: 'creatTime', label: '创建时间', type: 'text' },
 ])
 const operation = ref([
   // {
@@ -48,39 +70,57 @@ const operation = ref([
   //   value: '查看',
   // },
   {
-    func: (id) => {
+    func: (row) => {
+      const id = row.id
       title.value = '编辑'
       editDialogVisible.value = true
-      newSubmit.value = {}
-      detailCustomer(id).then((res) => {
-        newSubmit.value = res.data
-      })
+      newSubmit.value = { ...row }
     },
     value: '编辑',
+    disabled: props.control[1].disabled,
   },
-  { func: () => {}, value: '导出' },
 ])
 
 //新增与修改
 const importDialogVisible = ref(false)
 const editDialogVisible = ref(false)
-const newSubmit = ref({})
+const newSubmit = ref({
+  name: '',
+  contact: '',
+  email: '',
+  remarks: '',
+  creatTime: '',
+})
 const handleSubmit = () => {
   if (title.value == '编辑') {
     changeCustomer(newSubmit.value).then((res) => {
-      page.value = 1
-      listCustomer(page.value, pageSize.value).then((res) => {
-        listData.value = res.rows
-      })
-      editDialogVisible.value = false
+      if (res.code == 200) {
+        page.value = 1
+        listCustomer(page.value, pageSize.value).then((res) => {
+          listData.value = res.rows
+          total.value = res.total
+        })
+        editDialogVisible.value = false
+        ElMessage.success(res.msg)
+      } else {
+        ElMessage.error(res.msg)
+        return
+      }
     })
   } else {
     newCustomer(newSubmit.value).then((res) => {
-      page.value = 1
-      listCustomer(page.value, pageSize.value).then((res) => {
-        listData.value = res.rows
-      })
-      editDialogVisible.value = false
+      if (res.msg == '操作成功') {
+        page.value = 1
+        listCustomer(page.value, pageSize.value).then((res) => {
+          listData.value = res.rows
+          total.value = res.total
+        })
+        ElMessage.success(res.msg)
+        editDialogVisible.value = false
+      } else {
+        ElMessage.error(res.msg)
+        return
+      }
     })
   }
 }
@@ -91,12 +131,104 @@ const onCreate = () => {
   title.value = '新增'
   editDialogVisible.value = true
 }
-const onClear = () => {
-  formData.value.forEach((element) => {
-    element.forEach((ele) => {
-      ele.value = null
-    })
+const searchContent = ref({
+  name: '',
+  contact: '',
+  email: '',
+  remarks: '',
+  creatTime: '',
+})
+const onSubmit = () => {
+  searchContent.value.creatTime = parseTime(searchContent.value.creatTime, '{y}-{m}-{d}')
+
+  page.value = 1
+  listCustomer(page.value, pageSize.value, searchContent.value).then((res) => {
+    console.log(res)
+    listData.value = res.rows
+    total.value = res.total
   })
+}
+const onDownloadTemplate = () => {
+  downLoadModule().then((res) => {
+    downloadBinaryFile(res, '客户信息模板.xlsx')
+  })
+}
+const onImport = () => {
+  importDialogVisible.value = true
+}
+const handleUpload = async (option: any) => {
+  const formData = new FormData()
+  formData.append('file', option.file)
+
+  importCustomFile(formData).then((res) => {
+    console.log(res)
+    if (res.code == 200) {
+      ElMessage.success(res.msg)
+      listCustomer(page.value, pageSize.value).then((res) => {
+        listData.value = res.rows
+        total.value = res.total
+      })
+    } else {
+      ElMessage.error(res.msg)
+      const error_text = res.data
+        .map((ele) => {
+          return '第' + ele.rowNum + '行：' + ele.errorMsg
+        })
+        .join('<br>')
+      ElMessageBox.alert(error_text, '数据格式出现问题', {
+        confirmButtonText: '继续',
+        type: 'error',
+        dangerouslyUseHTMLString: true,
+      })
+    }
+  })
+
+  importDialogVisible.value = false
+}
+let count = 1
+//传给table组件
+const exportFunc = (row) => {
+  if (row.length === 0) {
+    ElMessage.warning('请先选择要导出的产品')
+    return
+  }
+  const formData = new URLSearchParams()
+  const ids = row.map((ele) => {
+    return ele.id
+  })
+  // const idsString = Array.isArray(ids) ? ids.join(',') : ids
+  formData.append('ids', ids)
+  exportSelectTable(formData).then((res) => {
+    const now = new Date()
+    downloadBinaryFile(res, '客户信息_' + now.toLocaleDateString() + '_' + count + '.xlsx')
+    count += 1
+  })
+}
+
+const DeleteFunc = (row) => {
+  const ids = row.map((ele) => {
+    return ele.id
+  })
+  const func = () => {
+    return deleteCustomer(ids).then((res) => {
+      if (res.code == 500) {
+        throw new Error('权限不足')
+      } else {
+        listCustomer(page.value, pageSize.value).then((res) => {
+          listData.value = res.rows
+          total.value = res.total
+        })
+      }
+    })
+  }
+
+  messageBox(
+    'warning',
+    func,
+    `成功删除${ids.length}条记录`,
+    '用户权限不足',
+    `确认删除${ids.length}条记录`,
+  )
 }
 
 //分页
@@ -122,36 +254,54 @@ const handleSizeChange = async (val: number) => {
 listCustomer(page.value, pageSize.value).then((res) => {
   total.value = res.total
   listData.value = res.rows
-  console.log(res)
 })
 </script>
 <template>
-  <div>
-    <FormSearch title="查询" :data="formData" :onCreate="onCreate" :onClear="onClear" />
-    <TableList :tableData="tableData" :operations="operation" :listData="listData">
-      <slot>
-        <div
-          style="
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          "
-        >
-          <div>共 {{ total }} 条</div>
-          <el-pagination
-            background
-            layout="prev, pager, next, jumper, ->, total, sizes"
-            :current-page="page"
-            :page-size="pageSize"
-            :page-sizes="[5, 10, 20, 50]"
-            :total="total"
-            @current-change="handlePageChange"
-            @size-change="handleSizeChange"
-          />
-        </div>
-      </slot>
-    </TableList>
+  <div class="col">
+    <BordShow content="客户查询" path="用户中心/客户查询" />
+    <div class="greyBack">
+      <FormSearch
+        title="查询"
+        :data="formData"
+        :onCreate="onCreate"
+        :onSubmit="onSubmit"
+        :onImport="onImport"
+        :onDownloadTemplate="onDownloadTemplate"
+        :searchForm="searchContent"
+        :control="control"
+      />
+      <TableList
+        :tableData="tableData"
+        :operations="operation"
+        :listData="listData"
+        :DeleteFunc="DeleteFunc"
+        :exportFunc="exportFunc"
+        :control="control"
+      >
+        <slot>
+          <div
+            style="
+              margin-top: 20px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <div>共 {{ total }} 条</div>
+            <el-pagination
+              background
+              layout="prev, pager, next, jumper, ->, total, sizes"
+              :current-page="page"
+              :page-size="pageSize"
+              :page-sizes="[5, 10, 20, 50]"
+              :total="total"
+              @current-change="handlePageChange"
+              @size-change="handleSizeChange"
+            />
+          </div>
+        </slot>
+      </TableList>
+    </div>
 
     <el-dialog v-model="editDialogVisible" :title="title" width="400px"
       ><div class="col cardCenter">
