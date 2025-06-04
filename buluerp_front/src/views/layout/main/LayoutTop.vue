@@ -1,17 +1,13 @@
 <script setup lang="ts">
 const props = defineProps({ handleHiddenMenu: { type: Function } })
 import { GetUserInfo } from '@/apis/layout'
+import { getFullImageUrl } from '@/utils/image/getUrl'
 import { ref } from 'vue'
 const message = ref({ avatar: '' })
 GetUserInfo().then((res) => {
   message.value = res.user
   console.log(message.value)
 })
-const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
-const getFullImageUrl = (path: string) => {
-  // 防止多余斜杠：/profile//2025/... => /profile/2025/...
-  return BASE_IMAGE_URL + path.replace('//', '/')
-}
 </script>
 <template>
   <div id="menu" class="row">

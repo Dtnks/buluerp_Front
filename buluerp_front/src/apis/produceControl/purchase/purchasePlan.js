@@ -34,14 +34,6 @@ export function downLoadModule() {
   })
 }
 
-export function detailPurchasePlan(id) {
-  return httpInstance({
-    url: `system/purchase-collection/${id}`,
-    method: 'get',
-    headers: headers,
-  })
-}
-
 export function deletePurchasePlan(ids) {
   return httpInstance({
     url: `system/purchase-collection/${ids.join(',')}`,
