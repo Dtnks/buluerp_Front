@@ -75,6 +75,16 @@ export function importOrderFile(formData) {
   })
 }
 
+// 下载导入模板
+export function getProductTemplate() {
+  return httpInstance({
+    url: 'system/orders/export/template',
+    method: 'get',
+    responseType: 'blob'
+  })
+}
+
+
 // 根据订单ID获取订单的产品列表
 export const getOrderProducts = (id) => {
   return httpInstance({
