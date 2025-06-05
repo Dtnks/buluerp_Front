@@ -82,7 +82,7 @@ const newFormData = ref({
   'packaging-material': [
     [
       { type: 'input', label: '进出数量', key: 'inOutQuantity', width: 12 },
-      { type: 'input', label: '进出包', key: 'packagingNumber', width: 12 },
+      { type: 'input', label: '料包编号', key: 'packagingNumber', width: 12 },
     ],
     [
       { type: 'timer', label: '日期', key: 'changeDate', width: 12, timerType: 'date' },
@@ -102,7 +102,7 @@ const newFormData = ref({
     [
       { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
       { type: 'input', label: '订单编号', key: 'orderCode', width: 8 },
-      { type: 'input', label: '模具数量', key: 'mouldNumber', width: 8 },
+      { type: 'input', label: '模具编号', key: 'mouldNumber', width: 8 },
     ],
     [{ type: 'textarea', label: '客户备注', key: 'remarks', width: 24 }],
   ],
@@ -112,7 +112,7 @@ const newFormData = ref({
       { type: 'timer', label: '日期', key: 'changeDate', width: 12, timerType: 'date' },
     ],
     [
-      { type: 'input', label: '产品货号', key: 'productPartNumber', width: 8 },
+      { type: 'input', label: '料包编号', key: 'productPartNumber', width: 8 },
       { type: 'input', label: '订单编号', key: 'orderCode', width: 8 },
       { type: 'input', label: '仓库位置', key: 'storageLocation', width: 8 },
     ],
