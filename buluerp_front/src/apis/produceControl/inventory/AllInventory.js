@@ -34,6 +34,7 @@ export function storeRecording(id, type) {
 }
 
 export function deleteRecording(ids, type) {
+  console.log(`system/inventory/${type}/${ids.join(',')}`)
   return httpInstance({
     url: `system/inventory/${type}/${ids.join(',')}`,
     method: 'delete',

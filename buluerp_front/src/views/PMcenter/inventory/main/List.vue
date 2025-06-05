@@ -18,17 +18,15 @@ import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessageBox } from 'element-plus'
-const type = ref('part')
+const type = ref('packaging-material')
 const refreshList = () => {
   listRecording(page.value, pageSize.value, type.value).then((res) => {
     console.log(res)
-    listData.value = res.data
+    listData.value = res.rows
     total.value = res.total
   })
 }
-// listRecording(1, 10, 'product').then((res) => {
-//   console.log(res)
-// })
+
 const TypeOptions = [
   {
     label: '料包',
@@ -43,38 +41,54 @@ const TypeOptions = [
     value: 'product',
   },
 ]
+const mapList = { 'packaging-material': '料包', part: '胶件', product: '成品' }
 const props = defineProps(['control'])
 //渲染页面
 const formData = ref({
   'packaging-material': [
     [
       { type: 'input', label: '操作人', key: 'operator' },
-      { type: 'timer', label: '创建曰期', timerType: 'date', key: 'creationTime' },
-      { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
+      { type: 'input', label: '进出数量', key: 'inOutQuantity' },
+      { type: 'input', label: '仓库位置', key: 'storageLocation' },
     ],
     [
-      { type: 'timer', label: '预交时间', key: 'deliveryDate', timerType: 'date' },
-      { type: 'input', label: '供应商', key: 'supplier' },
-      { type: 'input', label: '料别', key: 'materialType' },
+      { type: 'timer', label: '创建时间', key: 'creationTime', timerType: 'daterange' },
+      { type: 'timer', label: '修改时间', key: 'changeDate', timerType: 'daterange' },
+    ],
+    [
+      { type: 'input', label: '料包编号', key: 'packagingNumber' },
+      { type: 'input', label: '订单编号', key: 'orderCode' },
+      { type: 'input', label: '产品货号', key: 'productPartNumber' },
     ],
   ],
   part: [
     [
       { type: 'input', label: '操作人', key: 'operator' },
-      { type: 'timer', label: '创建曰期', timerType: 'date', key: 'creationTime' },
-      { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
+      { type: 'input', label: '进出数量', key: 'inOutQuantity' },
+      { type: 'input', label: '颜色编号', key: 'colorCode' },
+    ],
+    [
+      { type: 'timer', label: '创建时间', key: 'creationTime', timerType: 'daterange' },
+      { type: 'timer', label: '修改时间', key: 'changeDate', timerType: 'daterange' },
+    ],
+    [
+      { type: 'input', label: '订单编号', key: 'orderCode' },
+      { type: 'input', label: '模具编号', key: 'mouldNumber' },
     ],
   ],
   product: [
     [
       { type: 'input', label: '操作人', key: 'operator' },
-      { type: 'timer', label: '创建曰期', timerType: 'date', key: 'creationTime' },
-      { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
+      { type: 'input', label: '进出数量', key: 'inOutQuantity' },
+      { type: 'input', label: '仓库位置', key: 'storageLocation' },
     ],
     [
-      { type: 'input', label: '供应商', key: 'supplier' },
-      { type: 'input', label: '料别', key: 'materialType' },
-      { type: 'input', label: '模具编号', key: 'mouldNumber' },
+      { type: 'timer', label: '创建时间', key: 'creationTime', timerType: 'daterange' },
+      { type: 'timer', label: '修改时间', key: 'changeDate', timerType: 'daterange' },
+    ],
+    [
+      { type: 'input', label: '订单编号', key: 'orderCode' },
+      { type: 'input', label: '产品货号', key: 'productPartNumber' },
     ],
   ],
 })
@@ -149,84 +163,79 @@ const newSubmit = ref({
 const searchContent = ref({
   'packaging-material': {
     creationTime: '',
-    deliveryDate: '',
+    changeDate: '',
     operator: '',
-    colorCode: '',
-    supplier: '',
-    materialType: '',
+    inOutQuantity: '',
+    orderCode: '',
+    productPartNumber: '',
+    packagingNumber: '',
+    storageLocation: '',
+    remarks: '',
   },
-  part: {},
-  product: {},
+  part: {
+    creationTime: '',
+    changeDate: '',
+    operator: '',
+    inOutQuantity: '',
+    orderCode: '',
+    colorCode: '',
+    mouldNumber: '',
+    remarks: '',
+  },
+  product: {
+    creationTime: '',
+    changeDate: '',
+    operator: '',
+    inOutQuantity: '',
+    orderCode: '',
+    productPartNumber: '',
+    storageLocation: '',
+    remarks: '',
+  },
 })
 const tableData = ref({
   'packaging-material': [
     {
       value: 'id',
-      label: '采购单号',
+      label: 'ID',
+      type: 'text',
+    },
+    {
+      value: 'inOutQuantity',
+      label: '进出数量',
       type: 'text',
     },
     { value: 'creationTime', label: '创建时间', type: 'text' },
+    {
+      value: 'changeDate',
+      label: '修改时间',
+      type: 'text',
+    },
     {
       value: 'operator',
       label: '操作人',
       type: 'text',
     },
     {
-      value: 'materialType',
-      label: '料别',
+      value: 'orderCode',
+      label: '订单编号',
       type: 'text',
     },
     {
-      value: 'mouldNumber',
-      label: '模具编号',
+      value: 'productPartNumber',
+      label: '产品货号',
       type: 'text',
     },
     {
-      value: 'productId',
-      label: '产品ID',
+      value: 'packagingNumber',
+      label: '料包编号',
       type: 'text',
     },
     {
-      value: 'pictureUrl',
-      label: '产品图片',
-      type: 'picture',
-    },
-    {
-      value: 'colorCode',
-      label: '颜色编号',
+      value: 'storageLocation',
+      label: '仓库位置',
       type: 'text',
     },
-    {
-      value: 'deliveryDate',
-      label: '预交时间',
-      type: 'text',
-    },
-    {
-      value: 'orderTime',
-      label: '下单时间',
-      type: 'text',
-    },
-    {
-      value: 'purchaseQuantity',
-      label: '采购数量',
-      type: 'text',
-    },
-    {
-      value: 'singleWeight',
-      label: '单重',
-      type: 'text',
-    },
-    {
-      value: 'purchaseWeight',
-      label: '采购重量',
-      type: 'text',
-    },
-    {
-      value: 'supplier',
-      label: '供应商',
-      type: 'text',
-    },
-
     {
       value: 'remarks',
       label: '备注',
@@ -259,44 +268,55 @@ const tableData = ref({
   product: [
     {
       value: 'id',
-      label: '采购单号',
+      label: 'ID',
+      type: 'text',
+    },
+    {
+      value: 'inOutQuantity',
+      label: '进出数量',
       type: 'text',
     },
     { value: 'creationTime', label: '创建时间', type: 'text' },
+    {
+      value: 'changeDate',
+      label: '修改时间',
+      type: 'text',
+    },
     {
       value: 'operator',
       label: '操作人',
       type: 'text',
     },
     {
-      value: 'materialType',
-      label: '料别',
+      value: 'orderCode',
+      label: '订单编号',
       type: 'text',
     },
     {
-      value: 'mouldNumber',
-      label: '模具编号',
+      value: 'productPartNumber',
+      label: '产品货号',
+      type: 'text',
+    },
+    {
+      value: 'storageLocation',
+      label: '仓库位置',
+      type: 'text',
+    },
+    {
+      value: 'remarks',
+      label: '备注',
       type: 'text',
     },
   ],
 })
 const operation = ref({
   'packaging-material': [
-    // {
-    //   func: (id) => {
-    //     console.log(id)
-    //     detailCustomer(id).then((res) => {
-    //       console.log(res)
-    //     })
-    //   },
-    //   value: '查看',
-    // },
     {
       func: (row) => {
         const id = row.id
         title.value = '编辑'
         editDialogVisible.value = true
-        newSubmit.value = { ...row }
+        newSubmit.value[type.value] = { ...row }
       },
       value: '编辑',
       disabled: props.control[1].disabled,
@@ -318,8 +338,8 @@ const importDialogVisible = ref(false)
 const editDialogVisible = ref(false)
 const handleSubmit = () => {
   if (title.value == '编辑') {
-    console.log(newSubmit.value)
-    changeRecording(newSubmit.value, type.value).then((res) => {
+    changeRecording(newSubmit.value[type.value], type.value).then((res) => {
+      console.log(res)
       if (res.code == 200) {
         page.value = 1
         listRecording(page.value, pageSize.value, type.value).then((res) => {
@@ -334,7 +354,8 @@ const handleSubmit = () => {
       }
     })
   } else {
-    newRecording(newSubmit.value, type.value).then((res) => {
+    newRecording(newSubmit.value[type.value], type.value).then((res) => {
+      console.log(res, newSubmit.value[type.value], type.value)
       if (res.msg == '操作成功') {
         page.value = 1
         listRecording(page.value, pageSize.value, type.value).then((res) => {
@@ -354,23 +375,31 @@ const title = ref('编辑')
 //传给form组件的参数
 const resetSubmit = () => {
   newSubmit.value = {
-    creationTime: '',
-    remarks: '',
-    email: '',
-    colorCode: '',
-    deliveryDate: '',
-    deliveryTime: '',
-    orderTime: '',
-    purchaseQuantity: '',
-    singleWeight: '',
-    purchaseWeight: '',
-    supplier: '',
-    materialType: '',
-    picture: '',
-    mouldNumber: '',
-    specification: '',
-    orderCode: '',
-    productId: '',
+    'packaging-material': {
+      inOutQuantity: '',
+      packagingNumber: '',
+      changeDate: '',
+      orderCode: '',
+      productPartNumber: '',
+      storageLocation: '',
+      remarks: '',
+    },
+    part: {
+      inOutQuantity: '',
+      changeDate: '',
+      colorCode: '',
+      orderCode: '',
+      mouldNumber: '',
+      remarks: '',
+    },
+    product: {
+      inOutQuantity: '',
+      changeDate: '',
+      productPartNumber: '',
+      orderCode: '',
+      storageLocation: '',
+      remarks: '',
+    },
   }
 }
 const onCreate = () => {
@@ -380,13 +409,30 @@ const onCreate = () => {
 }
 
 const onSubmit = () => {
-  searchContent.value.creationTime = parseTime(searchContent.value.creationTime, '{y}-{m}-{d}')
-  searchContent.value.deliveryDate = parseTime(searchContent.value.deliveryDate, '{y}-{m}-{d}')
   page.value = 1
-  listRecording(page.value, pageSize.value, type.value, searchContent.value).then((res) => {
-    listData.value = res.rows
-    total.value = res.total
-  })
+  searchContent.value[type.value].changeDateFrom = parseTime(
+    searchContent.value[type.value].changeDate[0],
+    '{y}-{m}-{d}',
+  )
+  searchContent.value[type.value].changeDateTo = parseTime(
+    searchContent.value[type.value].changeDate[1],
+    '{y}-{m}-{d}',
+  )
+  searchContent.value[type.value].createTimeFrom = parseTime(
+    searchContent.value[type.value].creationTime[0],
+    '{y}-{m}-{d}',
+  )
+  searchContent.value[type.value].createTimeTo = parseTime(
+    searchContent.value[type.value].creationTime[1],
+    '{y}-{m}-{d}',
+  )
+  // console.log(searchContent.value[type.value])
+  listRecording(page.value, pageSize.value, type.value, searchContent.value[type.value]).then(
+    (res) => {
+      listData.value = res.rows
+      total.value = res.total
+    },
+  )
 }
 
 const onImport = () => {
@@ -402,6 +448,7 @@ const handleUpload = async (option: any) => {
   formData.append('file', option.file)
 
   importFile(formData, type.value).then((res) => {
+    console.log(res)
     if (res.code == 200) {
       ElMessage.success(res.msg)
       listRecording(page.value, pageSize.value, type.value).then((res) => {
@@ -410,9 +457,9 @@ const handleUpload = async (option: any) => {
       })
     } else {
       ElMessage.error(res.msg)
-      const error_text = res.data
+      const error_text = res.data.errors
         .map((ele) => {
-          return '第' + ele.rowNum + '行：' + ele.errorMsg
+          return '第' + ele.row + '行：' + ele.error
         })
         .join('<br>')
       ElMessageBox.alert(error_text, '数据格式出现问题', {
@@ -440,7 +487,10 @@ const exportFunc = (row) => {
   formData.append('ids', ids)
   exportSelectTable(formData, type.value).then((res) => {
     const now = new Date()
-    downloadBinaryFile(res, '客户信息_' + now.toLocaleDateString() + '_' + count + '.xlsx')
+    downloadBinaryFile(
+      res,
+      mapList[type.value] + '信息_' + now.toLocaleDateString() + '_' + count + '.xlsx',
+    )
     count += 1
   })
 }
@@ -489,6 +539,11 @@ const handleSizeChange = async (val: number) => {
     listData.value = res.rows
   })
 }
+listRecording(page.value, pageSize.value, type.value).then((res) => {
+  console.log(res)
+  listData.value = res.rows
+  total.value = res.total
+})
 </script>
 <template>
   <div class="col">
@@ -501,7 +556,7 @@ const handleSizeChange = async (val: number) => {
         :onSubmit="onSubmit"
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
-        :searchForm="searchContent"
+        :searchForm="searchContent[type]"
         :control="control"
       >
         <el-select v-model="type" placeholder="Select" style="width: 100px" @change="refreshList">
@@ -515,7 +570,7 @@ const handleSizeChange = async (val: number) => {
       </FormSearch>
       <TableList
         :tableData="tableData[type]"
-        :operations="operation"
+        :operations="operation[type]"
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
@@ -547,7 +602,7 @@ const handleSizeChange = async (val: number) => {
     </div>
 
     <el-dialog v-model="editDialogVisible" :title="title" width="800px"
-      ><CreateForm :data="newFormData[type]" :Formvalue="newSubmit" />
+      ><CreateForm :data="newFormData[type]" :Formvalue="newSubmit[type]" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>

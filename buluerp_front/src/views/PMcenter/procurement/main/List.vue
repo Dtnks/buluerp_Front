@@ -46,7 +46,6 @@ const newSubmit = ref({
 const changeFormData = ref([
   [{ type: 'input', label: '采购计划', key: 'purchaseId', width: 16 }],
   [{ type: 'input', label: '订单金额', key: 'amount', width: 16 }],
-  [{ type: 'fileList', label: '发票文件', key: 'invoice', width: 16 }],
 ])
 
 const searchContent = ref({
@@ -150,8 +149,10 @@ const fileChangeVisible = ref(false)
 let count = 0
 const handleSubmit = () => {
   if (title.value == '编辑') {
+    delete newSubmit.value.invoice
     console.log(newSubmit.value)
     changePurchaseList(newSubmit.value).then((res) => {
+      console.log(res)
       if (res.code == 200) {
         page.value = 1
         listPurchaseList(page.value, pageSize.value).then((res) => {
@@ -159,6 +160,7 @@ const handleSubmit = () => {
           total.value = res.total
         })
         editDialogVisible.value = false
+        ElMessage.success(res.msg)
       } else {
         ElMessage.error(res.msg)
         return
