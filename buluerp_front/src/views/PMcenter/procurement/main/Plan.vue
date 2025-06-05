@@ -18,8 +18,7 @@ import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessageBox } from 'element-plus'
-import PlanDetail from '../component/PlanDetail.vue'
-const props = defineProps(['control', 'addTab'])
+const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
   [
