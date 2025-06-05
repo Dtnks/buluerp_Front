@@ -74,6 +74,7 @@ import type { TableDataType } from '@/types/orderResponse'
 import BusinessDetail from '@/views/business/main/Detail.vue'
 import { exportToExcel } from '@/utils/file/exportExcel'
 import { Status, getStatusText } from '../utils/statusMap'
+import { messageBox } from '@/components/message/messageBox'
 
 // 加载数据
 onMounted(() => {
@@ -188,7 +189,7 @@ const handleSelectionChange = (selection: any[]) => {
 // onDelete: 点击删除
 const onDelete = async () => {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('请先选择要删除的产品')
+    messageBox('error', null, null,    '请先选择要删除的产品')
     return
   }
   try {
@@ -198,16 +199,16 @@ const onDelete = async () => {
     const ids = selectedRows.value.map((item) => item.id)
     try {
       await deleteOrders(ids)
-      ElMessage.success('删除成功')
+      messageBox('success', null, '已成功删除选中的产品')
       // 重新获取表格数据
       emit('fetchData');
       selectedRows.value = [];
     } catch (error) {
       console.error('删除失败:', error)
-      ElMessage.error('删除失败，请稍后再试')
+      messageBox('error', null, null, '删除失败,请稍后重试')
     }
   } catch (err) {
-    ElMessage.info('取消删除')
+    messageBox('success', null, '已取消删除操作')
   }
 }
 // 导出字段配置，方便维护和扩展
@@ -227,7 +228,7 @@ const exportFields = [
 
 const onExport = () => {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('请先选择要导出的产品')
+    messageBox('error', null, null,  '请先选择要导出的订单')
     return
   }
   const today = new Date()

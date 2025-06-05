@@ -24,8 +24,8 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="onAddConfirm"> Confirm </el-button>
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="onAddConfirm"> 确定 </el-button>
       </div>
     </template>
   </el-dialog>
@@ -64,6 +64,7 @@ import { number } from 'echarts'
 import type { TableDataType } from '@/types/orderResponse'
 import { getStatusText, Status } from '../utils/statusMap'
 import { downloadBinaryFile } from '@/utils/file/base64'
+import { messageBox } from '@/components/message/messageBox'
 
 const dialogFormVisible = ref(false)
 const tableStores = useQueryTableDataStore()
@@ -177,7 +178,6 @@ const onSubmit = () => {
 // onCreate: 点击新建按钮
 const onCreate = () => {
   dialogFormVisible.value = true
-  console.log('点击新建')
 }
 
 // onAddConfirm: 确认新增订单
@@ -186,23 +186,29 @@ const onAddConfirm = () => {
   console.log('新增订单数据：', { ...dialogForm })
   dialogFormVisible.value = false
 }
+
 const importDialogVisible = ref(false)
+
 const onImport = () => {
   importDialogVisible.value = true
 }
 
 // 文件校验（限制大小）
 const beforeUpload = (file: File) => {
+  console.log('beforeUpload file:mmmmmmm');
+  
   const isExcel =
     file.type === 'application/vnd.ms-excel' ||
     file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   const isLt5M = file.size / 1024 / 1024 < 5
   if (!isExcel) {
-    ElMessage.error('只能上传 Excel 文件（xls/xlsx）')
+    console.log('beforeUpload file: !isExcel');
+    messageBox('error', null, null,  '只能上传 xls/xlsx 文件')
     return false
   }
   if (!isLt5M) {
-    ElMessage.error('文件大小不能超过 5MB')
+    console.log('beforeUpload file: !isLt5M');
+    messageBox('error', null, null,  '文件大小不能超过 5MB') 
     return false
   }
   return true
@@ -211,13 +217,12 @@ const beforeUpload = (file: File) => {
 const handleUpload = async (option: any) => {
   const formData = new FormData()
   formData.append('file', option.file)
-  const res = await importOrderFile(formData)
+  const res = await importOrderFile(formData)  
   if (res.code == 200) {
-    ElMessage.success('导入成功')
+    messageBox('success', null, res.msg || '导入成功')
   } else {
-        ElMessage.error(res.msg || '导入失败')
-        console.log('导入失败2222:', res);
-        
+    ElMessage.error(res.msg || '导入失败')
+    console.log('导入失败2222:', res);
     if (res.data && Array.isArray(res.data)) {
       const error_text = res.data
         .map((ele: any) => {

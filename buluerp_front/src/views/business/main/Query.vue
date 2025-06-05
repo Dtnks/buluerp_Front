@@ -17,20 +17,18 @@
 import { reactive, ref, computed, onMounted } from 'vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import BordShow from '@/components/board/SecBoard.vue'
-// import type { FormInstance } from 'element-plus';
-// import type { ElForm } from 'element-plus';
-// import { ElInput, ElSelect, ElOption, ElDatePicker, ElButton, ElTable, ElTableColumn, ElPagination } from 'element-plus';
-// import { Search } from '@element-plus/icons-vue';
 import QueryForm from '../component/queryForm.vue'
 import QueryTable from '../component/queryTable.vue'
 import { getOrdersList, putOrder } from '@/apis/orders'
 import { addOrder, searchOrders } from '../function/oders'
 import type { OrderResponse, TableDataType } from '@/types/orderResponse'
+import { messageBox } from '@/components/message/messageBox'
 
 const props = defineProps<{
   addTab: (targetName: string, component: any, data?: any) => void
   control: Array<object>
 }>()
+
 // pagination: 分页数据
 const pagination = reactive({
   page: 1,
@@ -42,7 +40,7 @@ const pagination = reactive({
 const tableData = ref<TableDataType[]>([])
 
 const queryParams = reactive({})
-// todo: 查询要再和后端对一下
+
 // fetchTableData: 获取table数据
 const fetchTableData = async () => {
   try {
@@ -55,17 +53,17 @@ const fetchTableData = async () => {
       pageSize: pagination.pageSize,
     }
     const res = await getOrdersList(params);
-    console.log('获取订单数据(queryTable.vue):', res)
+    console.log('获取订单数据(queryTable.vue):', res);
     tableData.value = res.rows || []
     pagination.total = res.total || 0
   } catch (error) {
     console.error('获取订单数据失败(queryTable.vue):', error)
+    messageBox('error', null, null, '获取订单数据失败', '请稍后重试')
   }
 }
 
 // handleQuery: 处理查询
 const handleQuery = (params: any) => {
-
   pagination.page = 1; // 查询时重置页码为 1
   Object.assign(queryParams, params); // 更新查询条件
   console.log('查询参数(handleQuery):', params);
@@ -74,29 +72,30 @@ const handleQuery = (params: any) => {
 
 // handleAdd: 处理新增
 const handleAdd = async (newData: TableDataType) => {
-  try {
-    console.log('1111新增数据(handleAdd):', newData);
-    const res = await addOrder(newData)
-    if (res.code === 200) {
-      console.log('新增结果(handleAdd):', res)
-      fetchTableData()
-    }
-
-  } catch (err) {
-    console.error('新增失败:', err)
+  console.log('1111新增数据(handleAdd):', newData);
+  const res = await addOrder(newData)
+  if (res.code === 200) {
+    messageBox('success', null, '订单已成功添加')
+    fetchTableData()
   }
+  else {
+    messageBox('error', null, null, '新增订单失败', '请检查输入数据是否正确')
+  }
+  
 };
 
-// handleUpdate: 处理更新
+// handleUpdate: 处理编辑更新
 const handleUpdate = async (updatedData: TableDataType) => {
   try {
     const res = await putOrder(updatedData);
     if (res.code == 200) {
       console.log('更新结果(handelUpdate):', res);
+      messageBox('success', null, '订单已成功更新')
       fetchTableData();
     }
   } catch (err) {
     console.error('更新失败:', err);
+    messageBox('error', null, null, '更新订单失败', '请稍后重试')
   }
 };
 
