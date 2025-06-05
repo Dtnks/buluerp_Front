@@ -30,6 +30,7 @@ import PMProcurementQuery from '@/views/PMcenter/procurement/main/List.vue'
 import PMProcurementPlan from '@/views/PMcenter/procurement/main/Plan.vue'
 import PMProduceArrange from '@/views/PMcenter/produce/main/Arrange.vue'
 import PMProduceSchedule from '@/views/PMcenter/produce/main/Schedule.vue'
+import PMProducePackaging from '@/views/PMcenter/produce/main/Packaging.vue'
 const ComponentsGroup = {
   UserInformation,
   CustomQuery,
@@ -47,6 +48,7 @@ const ComponentsGroup = {
   PMProcurementPlan,
   PMProduceArrange,
   PMProduceSchedule,
+  PMProducePackaging,
 }
 const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
 </script>

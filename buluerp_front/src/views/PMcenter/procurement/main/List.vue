@@ -290,14 +290,53 @@ const DeleteFunc = (row) => {
   )
 }
 
-const handleChangeInvoice = () => {
-  console.log({
-    invoice: FileSubmit.value.invoice,
-    id: FileSubmit.value.id,
-  })
-  changePurchaseList({ invoice: FileSubmit.value.invoice, id: FileSubmit.value.id }).then((res) => {
-    console.log(res)
-  })
+const handleChangeInvoice = async () => {
+  const promiseList = []
+  const close = () => {
+    fileChangeVisible.value = false
+    listPurchaseList(page.value, pageSize.value).then((res) => {
+      listData.value = res.rows
+      total.value = res.total
+    })
+  }
+  if (FileSubmit.value.invoiceList.length > 0) {
+    console.log('append1')
+    promiseList.push(deletePurchaseInvoice(FileSubmit.value.invoiceList))
+  }
+  if (FileSubmit.value.invoice.length > 0) {
+    console.log('append2')
+    promiseList.push(
+      changePurchaseList({ invoice: FileSubmit.value.invoice, id: FileSubmit.value.id }),
+    )
+  }
+  if (promiseList.length === 0) {
+    ElMessage.warning('请先选择要删除的发票')
+    return
+  } else if (promiseList.length === 1) {
+    promiseList[0].then((res) => {
+      console.log(res, 1)
+      if (res.code == 200) {
+        ElMessage.success(res.msg)
+        close()
+      } else {
+        ElMessage.error(res.msg)
+      }
+    })
+  } else {
+    await promiseList[0].then((res) => {
+      if (res.code == 200) {
+        promiseList[1].then((res) => {
+          console.log(res, 2)
+          if (res.code == 200) {
+            ElMessage.success(res.msg)
+            close()
+          } else {
+            ElMessage.error(res.msg)
+          }
+        })
+      }
+    })
+  }
   // deletePurchaseInvoice(FileSubmit.value.invoiceList).then((res) => {
   //   if (res.code == 200) {
   //     ElMessage.success(res.msg)

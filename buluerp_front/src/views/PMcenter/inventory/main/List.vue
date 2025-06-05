@@ -6,6 +6,7 @@ import {
   deleteRecording,
   exportSelectTable,
   importFile,
+  downLoadModule,
 } from '@/apis/produceControl/inventory/AllInventory'
 
 import FormSearch from '@/components/form/Form.vue'
@@ -426,9 +427,10 @@ const onSubmit = () => {
     searchContent.value[type.value].creationTime[1],
     '{y}-{m}-{d}',
   )
-  // console.log(searchContent.value[type.value])
+  console.log(searchContent.value[type.value])
   listRecording(page.value, pageSize.value, type.value, searchContent.value[type.value]).then(
     (res) => {
+      console.log(res)
       listData.value = res.rows
       total.value = res.total
     },
@@ -438,11 +440,11 @@ const onSubmit = () => {
 const onImport = () => {
   importDialogVisible.value = true
 }
-// const onDownloadTemplate = () => {
-//   downLoadModule().then((res) => {
-//     downloadBinaryFile(res, '采购计划模板.xlsx')
-//   })
-// }
+const onDownloadTemplate = () => {
+  downLoadModule(type.value).then((res) => {
+    downloadBinaryFile(res, mapList[type.value] + '计划模板.xlsx')
+  })
+}
 const handleUpload = async (option: any) => {
   const formData = new FormData()
   formData.append('file', option.file)

@@ -25,7 +25,7 @@ export function detailRecording(id, type) {
     headers: headers,
   })
 }
-export function storeRecording(id, type) {
+export function storeRecording(type) {
   return httpInstance({
     url: `system/inventory/${type}/store`,
     method: 'get',
@@ -71,5 +71,14 @@ export function importFile(formData, type) {
     method: 'post',
     data: formData,
     headers,
+  })
+}
+
+export function downLoadModule(type) {
+  return httpInstance({
+    url: `/system/inventory/${type}/template`,
+    method: 'get',
+    headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
+    responseType: 'blob',
   })
 }
