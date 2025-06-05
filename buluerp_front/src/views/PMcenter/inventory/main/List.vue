@@ -121,26 +121,30 @@ const newFormData = ref({
 })
 const newSubmit = ref({
   'packaging-material': {
-    creationTime: '',
-    remarks: '',
-    email: '',
-    colorCode: '',
-    deliveryDate: '',
-    deliveryTime: '',
-    orderTime: '',
-    purchaseQuantity: '',
-    singleWeight: '',
-    purchaseWeight: '',
-    supplier: '',
-    materialType: '',
-    picture: '',
-    mouldNumber: '',
-    specification: '',
+    inOutQuantity: '',
+    packagingNumber: '',
+    changeDate: '',
     orderCode: '',
-    productId: '',
+    productPartNumber: '',
+    storageLocation: '',
+    remarks: '',
   },
-  part: {},
-  product: {},
+  part: {
+    inOutQuantity: '',
+    changeDate: '',
+    colorCode: '',
+    orderCode: '',
+    mouldNumber: '',
+    remarks: '',
+  },
+  product: {
+    inOutQuantity: '',
+    changeDate: '',
+    productPartNumber: '',
+    orderCode: '',
+    storageLocation: '',
+    remarks: '',
+  },
 })
 const searchContent = ref({
   'packaging-material': {
