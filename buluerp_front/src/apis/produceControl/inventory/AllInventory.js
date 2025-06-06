@@ -18,6 +18,14 @@ export function changeRecording(data, type) {
   })
 }
 
+export function changeSafeNumber(id, number, type) {
+  return httpInstance({
+    url: `system/inventory/${type}/safe-quantity/${id}?safeQuantity=${number}`,
+    method: 'put',
+    headers,
+  })
+}
+
 export function detailRecording(id, type) {
   return httpInstance({
     url: `system/inventory/${type}/${id}`,
@@ -25,9 +33,14 @@ export function detailRecording(id, type) {
     headers: headers,
   })
 }
-export function storeRecording(type) {
+export function storeRecording(pageNum, pageSize, type, searchContent = {}) {
+  let concatText = Object.keys(searchContent)
+    .map((key) => {
+      return `&${key}=${searchContent[key]}`
+    })
+    .join('')
   return httpInstance({
-    url: `system/inventory/${type}/store`,
+    url: `system/inventory/${type}/store?pageNum=${pageNum}&pageSize=${pageSize}${concatText}`,
     method: 'get',
     headers: headers,
   })

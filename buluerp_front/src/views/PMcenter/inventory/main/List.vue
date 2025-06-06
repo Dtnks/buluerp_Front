@@ -310,29 +310,18 @@ const tableData = ref({
     },
   ],
 })
-const operation = ref({
-  'packaging-material': [
-    {
-      func: (row) => {
-        const id = row.id
-        title.value = '编辑'
-        editDialogVisible.value = true
-        newSubmit.value[type.value] = { ...row }
-      },
-      value: '编辑',
-      disabled: props.control[1].disabled,
+const operation = ref([
+  {
+    func: (row) => {
+      const id = row.id
+      title.value = '编辑'
+      editDialogVisible.value = true
+      newSubmit.value[type.value] = { ...row }
     },
-    // {
-    //   func: (row) => {
-    //     props.addTab('采购计划-' + row.id, PlanDetail, row, null)
-    //   },
-    //   value: '查看',
-    //   disabled: false,
-    // },
-  ],
-  part: [],
-  product: [],
-})
+    value: '编辑',
+    disabled: props.control[1].disabled,
+  },
+])
 
 //新增与修改
 const importDialogVisible = ref(false)
@@ -572,7 +561,7 @@ listRecording(page.value, pageSize.value, type.value).then((res) => {
       </FormSearch>
       <TableList
         :tableData="tableData[type]"
-        :operations="operation[type]"
+        :operations="operation"
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"

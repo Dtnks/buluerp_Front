@@ -327,7 +327,7 @@ const exportFunc = (row) => {
   formData.append('ids', ids)
   exportSelectTable(formData).then((res) => {
     const now = new Date()
-    downloadBinaryFile(res, '客户信息_' + now.toLocaleDateString() + '_' + count + '.xlsx')
+    downloadBinaryFile(res, '采购计划_' + now.toLocaleDateString() + '_' + count + '.xlsx')
     count += 1
   })
 }

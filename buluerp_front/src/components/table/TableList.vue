@@ -12,16 +12,23 @@
           >
           <el-button
             type="danger"
+            v-if="DeleteFunc"
             @click="DeleteFunc(select!.getSelectionRows())"
             :disabled="control[2].disabled"
             >删除</el-button
+          >
+          <el-button
+            type="primary"
+            v-if="exportCharts"
+            @click="exportCharts(select!.getSelectionRows())"
+            >图表</el-button
           >
         </div>
       </div>
     </template>
     <div>
-      <el-table :data="listData" border style="width: 100%" ref="select">
-        <el-table-column type="selection" width="55" />
+      <el-table :data="listData" border style="width: 100%" ref="select" :row-key="(row) => row.id">
+        <el-table-column type="selection" width="55" reserve-selection="true" />
 
         <el-table-column
           :prop="item.value"
@@ -51,7 +58,7 @@
             <span v-else-if="item.type == 'text'">{{ row[item.value] }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right">
+        <el-table-column label="操作" fixed="right" v-if="operations">
           <template #default="{ row }">
             <el-button
               size="small"
@@ -76,7 +83,15 @@
 import { ref } from 'vue'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 import axios from 'axios'
-defineProps(['tableData', 'operations', 'listData', 'exportFunc', 'DeleteFunc', 'control'])
+defineProps([
+  'tableData',
+  'operations',
+  'listData',
+  'exportFunc',
+  'DeleteFunc',
+  'control',
+  'exportCharts',
+])
 const select = ref()
 
 const donwLoadFile = async (Fileurl, miniType) => {
