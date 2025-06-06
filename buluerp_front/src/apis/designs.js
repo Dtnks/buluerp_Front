@@ -45,7 +45,7 @@ export function importDesignFile(formData) {
 
 export function getDesignTemplate() {
   return httpInstance({
-    url: 'system/patterns/export/template',
+    url: 'system/patterns/template',
     method: 'get',
     responseType: 'blob'
   })
@@ -68,4 +68,16 @@ export function searchDesign(params) {
   })
 }
 
+export function pmcConfirm(id){
+    return httpInstance({
+        url: `system/patterns/${id}`,
+        method: 'put',
+    })
+}
 
+export function pmcCancel(id){
+    return httpInstance({
+        url: `system/patterns/cancel/${id}`,
+        method: 'put',
+    })
+}

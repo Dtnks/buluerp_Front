@@ -12,8 +12,10 @@ const searchParams = ref<Record<string, any>>({}) // 初始为空对象
 const handleSearch = (params: Record<string, any>) => {
   console.log('父组件收到搜索参数', params)
   const filteredParams = {
-    mouldNumber: params.mouldNumber || null,
-    mouldManufacturer: params.mouldManufacturer || null,
+    confirm: params.confirm || null,
+    createUserId: params.createUserId || null,
+    orderId: params.orderId || null,
+    productId: params.productId || null,
   }
   searchParams.value = filteredParams
   console.log('父组件发送搜索参数', searchParams.value)

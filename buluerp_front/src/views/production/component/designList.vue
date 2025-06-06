@@ -4,7 +4,7 @@
       <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
         <span>展示</span>
         <div>
-          <el-button type="danger" @click="onDelete">删除</el-button>
+          <!-- <el-button type="danger" @click="onDelete">删除</el-button> -->
           <el-button type="primary" @click="onExport">导出</el-button>
         </div>
       </div>
@@ -12,34 +12,26 @@
     <div>
       <el-table :data="data" border style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" />
-        <el-table-column label="胶件图片">
-          <template #default="{ row }">
-            <img
-              v-if="row.drawingReference"
-              :src="getFullImageUrl(row.drawingReference)"
-              alt="产品图片"
-              style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;"
-            />
-            <span v-else>暂无图片</span>
-          </template>
+        <el-table-column prop="id" label="ID" />
+        <el-table-column prop="productId" label="产品ID" />
+        <el-table-column prop="createUserId" label="创建人ID" />
+        <el-table-column prop="orderId" label="订单ID" />
+        <el-table-column prop="createTime" label="创建时间" />
+        <el-table-column prop="confirm" label="是否确认">
+            <template #default="{ row }">
+            <el-tag :type="row.confirm ? 'success' : 'info'">
+                {{ row.confirm ? '已确认' : '未确认' }}
+            </el-tag>
+            </template>
         </el-table-column>
-        <el-table-column prop="mouldNumber" label="模具编号" />
-        <el-table-column prop="specificationName" label="规格名称" />
-        <el-table-column prop="DesignType" label="料别" />
-        <el-table-column prop="standardCode" label="常规编码" />
-        <el-table-column prop="singleWeight" label="单重" />
-        <el-table-column prop="mouldStatus" label="模具状态" />
-        <el-table-column prop="mouldManufacturer" label="模具厂家" />
-        <el-table-column prop="cycleTime" label="周期/s" />
-        <el-table-column prop="remarks" label="备注" />
-        <el-table-column prop="spareCode" label="备用编号" />
-        <el-table-column prop="updateTime" label="更新时间" />
         <el-table-column label="操作" fixed="right" width="75">
-          <template #default="{ row }">
+            <template #default="{ row }">
             <el-button size="small" type="primary" text @click="onEdit(row)">编辑</el-button>
-          </template>
+            <el-button size="small" type="primary" text @click="onView(row)">查看</el-button>
+            </template>
         </el-table-column>
       </el-table>
+
 
       <!-- 分页器 -->
       <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
@@ -68,7 +60,6 @@
 
 <script lang="ts" setup>
 import { ref, watch, onMounted } from 'vue'
-// import { ElMessage, ElMessageBox } from 'element-plus' ✅ 已移除
 import {
   deleteDesign,
   exportDesignFile,
@@ -77,7 +68,9 @@ import {
 } from '@/apis/designs.js'
 import { exportToExcel } from '@/utils/file/exportExcel'
 import { downloadBinaryFile } from '@/utils/file/base64'
-import { messageBox } from '@/components/message/messageBox' // ✅ 使用封装后的消息模块
+import { messageBox } from '@/components/message/messageBox' 
+import Style from '@/views/production/main/StyleTable.vue'
+
 
 import DesignDialog from '@/views/production/component/designDialog.vue'
 
@@ -185,13 +178,13 @@ const onDelete = async () => {
     },
     '删除成功',
     '删除失败',
-    '确认要删除选中的产品吗？'
+    '确认要删除选中的造型表吗？'
   )
 }
 
 const onExport = async () => {
   if (selectedRows.value.length === 0) {
-    messageBox('warning', () => Promise.reject(), '', '请先选择要导出的物料', '')
+    messageBox('warning', () => Promise.reject(), '', '请先选择要导出的造型表', '')
     return
   }
 
@@ -202,11 +195,14 @@ const onExport = async () => {
   try {
     const res = await exportDesignFile(formData)
     const blob = new Blob([res], { type: 'application/vnd.ms-excel' })
-    downloadBinaryFile(blob, '物料导出.xlsx')
+    downloadBinaryFile(blob, '设计总表导出.xlsx')
   } catch (err) {
     messageBox('error', () => Promise.reject(), '', '导出失败', '')
     console.error('导出错误:', err)
   }
+}
+const onView = (row: any) => {
+  props.addTab(`造型表 - ID: ${row.id}`, Style, { designId: row.id })
 }
 
 </script>

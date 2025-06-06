@@ -1,7 +1,6 @@
 import httpInstance from '@/utils/httpsInstance.js'
 let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
 export function newPurchaseList(data) {
-  console.log(data)
   return httpInstance({
     url: `system/purchase/order`,
     method: 'post',
@@ -43,8 +42,9 @@ export function detailPurchaseList(id) {
 }
 
 export function deletePurchaseList(ids) {
+  console.log(`system/purchase/order/${ids.join(',')}`)
   return httpInstance({
-    url: `system/purchase-collection/${ids.join(',')}`,
+    url: `system/purchase/order/${ids.join(',')}`,
     method: 'delete',
     headers: headers,
   })
@@ -57,7 +57,6 @@ export function listPurchaseList(pageNum, pageSize, searchContent = {}) {
     })
     .join('')
 
-  console.log(`system/purchase/order/list?pageNum=${pageNum}&pageSize=${pageSize}${concatText}`)
   return httpInstance({
     url: `system/purchase/order/list?pageNum=${pageNum}&pageSize=${pageSize}${concatText}`,
     method: 'get',
@@ -66,7 +65,7 @@ export function listPurchaseList(pageNum, pageSize, searchContent = {}) {
 }
 export function exportSelectTable(data) {
   return httpInstance({
-    url: `system/purchase-collection/export`,
+    url: `system/purchase/order/export`,
     method: 'post',
     headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
     responseType: 'blob',
@@ -76,7 +75,7 @@ export function exportSelectTable(data) {
 
 export function importFile(formData) {
   return httpInstance({
-    url: 'system/purchase-collection/import',
+    url: 'system/purchase/order/import',
     method: 'post',
     data: formData,
     headers: {

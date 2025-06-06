@@ -43,12 +43,11 @@
         </el-form-item>
         <el-form-item :label="ele.label" v-else-if="ele.type === 'fileList'">
           <el-upload
-            v-model:file-list="FileList"
             class="upload-demo"
             multiple
             :auto-upload="false"
-            :on-change="()=>handleFileChange(ele.key)"
-            :on-remove="(file)=>onRemove(file,ele.key)"
+            :on-change="(file) => handleFileChange(file, ele.key)"
+            :on-remove="(file) => onRemove(file, ele.key)"
             ><el-button>点击上传</el-button>
           </el-upload>
         </el-form-item>
@@ -63,21 +62,23 @@
 import upload from '../upload/uploadImage.vue'
 import { ref } from 'vue'
 const props = defineProps(['data', 'formState', 'formRef', 'Formvalue'])
-const FileList = ref([])
-const handleFileChange = (key) => {
-  if (FileList.value.length > 0) {
-    props.Formvalue[key] = FileList.value.map((item) => {
-      return item.raw
-    })
+const FileList = []
+const handleFileChange = (file, key) => {
+  FileList.push(file.raw)
+  console.log(FileList)
+  if (FileList.length >= 0) {
+    props.Formvalue[key] = FileList
   }
 }
-const onRemove=(file, key)=> {
-        const index = props.Formvalue[key].indexOf(file.raw);
-        if (index >= 0) {
-            props.Formvalue[key].splice(index, 1); // 移除指定索引处的一个元素
-        }
-        console.log(props.Formvalue[key])
-    }
+const onRemove = (file, key) => {
+  const index = FileList.indexOf(file.raw)
+  FileList.splice(index, 1)
+  if (index >= 0) {
+    // 移除指定索引处的一个元素
+    props.Formvalue[key] = FileList
+  }
+  console.log(props.Formvalue[key])
+}
 </script>
 
 <style scoped>

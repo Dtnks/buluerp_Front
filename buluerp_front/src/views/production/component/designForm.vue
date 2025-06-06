@@ -2,40 +2,36 @@
   <el-card style="margin: 0 20px">
     <template #header>
       <div class="card-header">
-        <span>物料查询</span>
+        <span>设计总表查询</span>
       </div>
     </template>
 
     <el-row>
-      <el-form :model="formState" label-width="100px" class="search-form" style="flex: 1;">
+      <el-form :model="formState" label-width="120px" class="search-form" style="flex: 1;">
         <el-row :gutter="20" align="middle">
-          <el-col :span="8">
-            <el-form-item label="模具编号">
-              <el-select v-model="formState.mouldNumber" placeholder="请选择模具编号">
-                <el-option
-                  v-for="item in mouldNumberOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
+          <el-col :span="12">
+            <el-form-item label="PMC确认状态">
+              <el-select v-model="formState.confirm" placeholder="请选择确认状态">
+                <el-option label="未确认" :value="0" />
+                <el-option label="已确认" :value="1" />
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="8">
-            <el-form-item label="模具厂家">
-              <el-select v-model="formState.mouldManufacturer" placeholder="请选择模具厂家">
-                <el-option
-                  v-for="item in mouldManufacturerOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
+          <el-col :span="12">
+            <el-form-item label="创建用户ID">
+              <el-input v-model="formState.createUserId" placeholder="请输入用户ID" />
             </el-form-item>
           </el-col>
-          <el-col :span="8">
-            <el-form-item label="搜索关键字">
-              <el-input v-model="formState.keyword" placeholder="请输入关键字" />
+        </el-row>
+        <el-row :gutter="20" align="middle">
+          <el-col :span="12">
+            <el-form-item label="订单ID">
+              <el-input v-model="formState.orderId" placeholder="请输入订单ID" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="产品编码">
+              <el-input v-model="formState.productId" placeholder="请输入产品编码" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -76,7 +72,7 @@
       </el-upload>
     </el-dialog>
 
-    <!-- 新建模具弹窗 -->
+    <!-- 新建弹窗 -->
     <DesignDialog
       v-model="dialogVisible"
       :isEdit="false"
@@ -85,50 +81,21 @@
   </el-card>
 </template>
 
-<script lang="ts" setup>
-import { ref, reactive, onMounted } from 'vue'
-import {
-  getMaterialList,
-  importMaterialFile,
-  addMaterial,
-  getMaterialTemplate,
-} from '@/apis/materials'
+<script setup lang="ts">
+import { ref, reactive } from 'vue'
 import { messageBox } from '@/components/message/messageBox'
-import DesignDialog from '@/views/production/component/designDialog.vue'
 import { ElMessageBox } from 'element-plus'
+import { importDesignFile, getDesignTemplate, addDesign } from '@/apis/designs'
 import { downloadBinaryFile } from '@/utils/file/base64'
+import DesignDialog from '@/views/production/component/designDialog.vue'
 
 const emit = defineEmits(['search'])
 
 const formState = reactive({
-  mouldManufacturer: '',
-  keyword: '',
-  mouldNumber: '',
-})
-
-const mouldNumberOptions = ref<{ label: string; value: string }[]>([])
-const mouldManufacturerOptions = ref<{ label: string; value: string }[]>([])
-
-const fetchMaterialOptions = async () => {
-  try {
-    const res = await getMaterialList({})
-    const rows = res.rows || []
-
-    mouldNumberOptions.value = [...new Set(rows.map(item => item.mouldNumber))].map(val => ({
-      label: String(val),
-      value: String(val),
-    }))
-    mouldManufacturerOptions.value = [...new Set(rows.map(item => item.mouldManufacturer))].map(val => ({
-      label: String(val),
-      value: String(val),
-    }))
-  } catch (error) {
-    messageBox('error', null, '', '获取物料失败', '')
-  }
-}
-
-onMounted(() => {
-  fetchMaterialOptions()
+  confirm: '',
+  createUserId: '',
+  orderId: '',
+  productId: '',
 })
 
 const importDialogVisible = ref(false)
@@ -139,9 +106,10 @@ const handleSearch = () => {
 }
 
 const handleClear = () => {
-  formState.mouldManufacturer = ''
-  formState.mouldNumber = ''
-  formState.keyword = ''
+  formState.confirm = ''
+  formState.createUserId = ''
+  formState.orderId = ''
+  formState.productId = ''
 }
 
 const handleCreate = () => {
@@ -150,7 +118,7 @@ const handleCreate = () => {
 
 const handleCreateSubmit = async (formData: any) => {
   try {
-    await addMaterial(formData)
+    await addDesign(formData)
     messageBox('success', null, '新建成功', '', '')
     dialogVisible.value = false
     emit('search')
@@ -181,11 +149,12 @@ const handleUpload = async (option: any) => {
   formData.append('file', option.file)
 
   try {
-    const res = await importMaterialFile(formData)
+    const res = await importDesignFile(formData)
 
     if (res.code === 200) {
       messageBox('success', null, '导入成功', '', '')
       importDialogVisible.value = false
+      emit('search')
     } else {
       const error_text = res.data
         .map((ele) => '第' + ele.rowNum + '行：' + ele.errorMsg)
@@ -204,17 +173,16 @@ const handleUpload = async (option: any) => {
 
 const handleDownloadTemplate = async () => {
   try {
-    const res = await getMaterialTemplate()
+    const res = await getDesignTemplate()
     downloadBinaryFile(
       res,
-      '模具模板.xlsx',
+      '设计总表模板.xlsx',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
   } catch (e) {
     messageBox('error', null, '', '下载失败', '')
   }
 }
-
 </script>
 
 <style scoped>
