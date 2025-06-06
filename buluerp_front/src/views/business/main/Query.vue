@@ -81,22 +81,20 @@ const handleAdd = async (newData: TableDataType) => {
   else {
     messageBox('error', null, null, '新增订单失败', '请检查输入数据是否正确')
   }
-  
+
 };
 
 // handleUpdate: 处理编辑更新
 const handleUpdate = async (updatedData: TableDataType) => {
-  try {
+
     const res = await putOrder(updatedData);
     if (res.code == 200) {
       console.log('更新结果(handelUpdate):', res);
       messageBox('success', null, '订单已成功更新')
       fetchTableData();
+    } else {
+      messageBox('error', null, null, '更新订单失败，请检查输入数据是否正确')
     }
-  } catch (err) {
-    console.error('更新失败:', err);
-    messageBox('error', null, null, '更新订单失败', '请稍后重试')
-  }
 };
 
 // handlePageChange: 处理分页

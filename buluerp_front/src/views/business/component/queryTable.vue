@@ -195,6 +195,9 @@ const onDelete = async () => {
   try {
     await ElMessageBox.confirm('确认要删除选中的产品吗？', '提示', {
       type: 'warning',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      showCancelButton: true,
     })
     const ids = selectedRows.value.map((item) => item.id)
     try {
