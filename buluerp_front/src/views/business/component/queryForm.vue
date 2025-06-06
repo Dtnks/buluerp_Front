@@ -1,14 +1,6 @@
 <template>
-  <Form
-    :data="data"
-    :title="title"
-    :onSubmit="onSubmit"
-    :onCreate="onCreate"
-    :onImport="onImport"
-    :onDownloadTemplate="onDownloadTemplate"
-    :searchForm="searchForm"
-    :control="control"
-  ></Form>
+  <Form :data="data" :title="title" :onSubmit="onSubmit" :onCreate="onCreate" :onImport="onImport"
+    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm" :control="control"></Form>
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
       <el-form-item label="创建人姓名">
@@ -32,8 +24,8 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="onAddConfirm"> Confirm </el-button>
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="onAddConfirm"> 确定 </el-button>
       </div>
     </template>
   </el-dialog>
@@ -52,28 +44,28 @@
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
-// import BordShow from '@/components/board/SecBoard.vue';
 import type { FormInstance } from 'element-plus'
-// import type { ElForm } from 'element-plus';
 import {
   ElInput,
   ElSelect,
   ElOption,
-  ElDatePicker,
+  ElMessageBox,
   ElButton,
   ElDialog,
   ElUpload,
   ElMessage,
 } from 'element-plus'
-// import { Search } from '@element-plus/icons-vue';
 import Form from '@/components/form/Form.vue'
-import { importOrderFile } from '@/apis/orders'
+import { importOrderFile, getProductTemplate } from '@/apis/orders'
 import { id } from 'element-plus/es/locale'
 import { dayjs } from 'element-plus'
 import { useQueryTableDataStore } from '@/stores/queryTableData'
 import { number } from 'echarts'
 import type { TableDataType } from '@/types/orderResponse'
 import { getStatusText, Status } from '../utils/statusMap'
+import { downloadBinaryFile } from '@/utils/file/base64'
+import { messageBox } from '@/components/message/messageBox'
+
 const dialogFormVisible = ref(false)
 const tableStores = useQueryTableDataStore()
 
@@ -173,7 +165,7 @@ const searchForm = ref({
   customerName: '',
   remark: '',
 })
-defineExpose({ formState,  formRef, searchForm })
+defineExpose({ formState, formRef, searchForm })
 
 
 
@@ -186,7 +178,6 @@ const onSubmit = () => {
 // onCreate: 点击新建按钮
 const onCreate = () => {
   dialogFormVisible.value = true
-  console.log('点击新建')
 }
 
 // onAddConfirm: 确认新增订单
@@ -195,23 +186,29 @@ const onAddConfirm = () => {
   console.log('新增订单数据：', { ...dialogForm })
   dialogFormVisible.value = false
 }
+
 const importDialogVisible = ref(false)
+
 const onImport = () => {
   importDialogVisible.value = true
 }
 
 // 文件校验（限制大小）
 const beforeUpload = (file: File) => {
+  console.log('beforeUpload file:mmmmmmm');
+  
   const isExcel =
     file.type === 'application/vnd.ms-excel' ||
     file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   const isLt5M = file.size / 1024 / 1024 < 5
   if (!isExcel) {
-    ElMessage.error('只能上传 Excel 文件（xls/xlsx）')
+    console.log('beforeUpload file: !isExcel');
+    messageBox('error', null, null,  '只能上传 xls/xlsx 文件')
     return false
   }
   if (!isLt5M) {
-    ElMessage.error('文件大小不能超过 5MB')
+    console.log('beforeUpload file: !isLt5M');
+    messageBox('error', null, null,  '文件大小不能超过 5MB') 
     return false
   }
   return true
@@ -220,23 +217,34 @@ const beforeUpload = (file: File) => {
 const handleUpload = async (option: any) => {
   const formData = new FormData()
   formData.append('file', option.file)
-
-  try {
-    const res = await importOrderFile(formData)
-    console.log(res)
-    ElMessage.success('导入成功')
-    importDialogVisible.value = false
-  } catch (e) {
-    ElMessage.error('导入失败')
+  const res = await importOrderFile(formData)  
+  if (res.code == 200) {
+    messageBox('success', null, res.msg || '导入成功')
+  } else {
+    ElMessage.error(res.msg || '导入失败')
+    console.log('导入失败2222:', res);
+    if (res.data && Array.isArray(res.data)) {
+      const error_text = res.data
+        .map((ele: any) => {
+          return '第' + ele.rowNum + '行：' + ele.errorMsg
+        })
+        .join('<br>')
+      ElMessageBox.alert(error_text, {
+        confirmButtonText: '继续',
+        type: 'error',
+        dangerouslyUseHTMLString: true,
+      })
+    }
   }
+
+  importDialogVisible.value = false
+
 }
 
 const onDownloadTemplate = () => {
-  // 下载 Excel 模板，可以是静态文件或接口返回
-  const link = document.createElement('a')
-  link.href = '/template/import-order-template.xlsx' // 替换成你的模板文件路径
-  link.download = '订单导入模板.xlsx'
-  link.click()
+  getProductTemplate().then((res) => {
+    downloadBinaryFile(res, '订单信息模板.xlsx')
+  })
 }
 
 

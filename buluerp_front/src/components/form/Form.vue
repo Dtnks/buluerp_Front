@@ -3,6 +3,7 @@
     <template #header>
       <div class="card-header">
         <span>{{ title }}</span>
+        <slot></slot>
       </div>
     </template>
     <el-row>
@@ -47,7 +48,7 @@ const props = defineProps([
   'onDownloadTemplate',
   'formState',
   'searchForm',
-  'control'
+  'control',
 ])
 const onClear = () => {
   console.log(props.searchForm)
@@ -57,4 +58,10 @@ const onClear = () => {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+</style>

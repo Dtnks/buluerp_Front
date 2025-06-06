@@ -54,6 +54,21 @@
         <el-form-item :label="ele.label" v-else-if="ele.type === 'number'">
           <el-input-number v-model="Formvalue[ele.key]" :min="0" style="width: 100%" />
         </el-form-item>
+        <el-form-item :label="ele.label" v-else-if="ele.type === 'fileListShow'">
+          <el-select
+            v-model="Formvalue[ele.key]"
+            multiple
+            placeholder="Select"
+            style="width: 240px"
+          >
+            <el-option
+              v-for="item in ele.options"
+              :key="item.value"
+              :label="item.invoiceUrl.split('/').pop(-1)"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
       </el-col>
     </el-row>
   </el-form>
@@ -65,7 +80,6 @@ const props = defineProps(['data', 'formState', 'formRef', 'Formvalue'])
 const FileList = []
 const handleFileChange = (file, key) => {
   FileList.push(file.raw)
-  console.log(FileList)
   if (FileList.length >= 0) {
     props.Formvalue[key] = FileList
   }
@@ -77,7 +91,6 @@ const onRemove = (file, key) => {
     // 移除指定索引处的一个元素
     props.Formvalue[key] = FileList
   }
-  console.log(props.Formvalue[key])
 }
 </script>
 

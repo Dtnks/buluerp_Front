@@ -74,14 +74,11 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
+import { getFullImageUrl } from '@/utils/image/getUrl'
 import axios from 'axios'
 defineProps(['tableData', 'operations', 'listData', 'exportFunc', 'DeleteFunc', 'control'])
 const select = ref()
-const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
-const getFullImageUrl = (path: string) => {
-  // 防止多余斜杠：/profile//2025/... => /profile/2025/...
-  return BASE_IMAGE_URL + path.replace('//', '/')
-}
+
 const donwLoadFile = async (Fileurl, miniType) => {
   const content = await axios.get(Fileurl, { responseType: 'blob' })
   const blob = new Blob([content.data], { type: miniType })

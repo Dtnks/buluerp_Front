@@ -9,7 +9,7 @@ import { messageBox } from '../../../components/message/messageBox'
 
 const props = defineProps<{
   data: { id: number }
-  
+  addTab: (targetName: string, component: any, data?: any) => void
   control: Array<object>
 }>();
 
@@ -37,8 +37,7 @@ onMounted(async () => {
 <template>
   <div class="col">
     <BordShow content="业务订单详情页" path="业务中心/详情" />
-    <DetailShow :id="props.data.id" v-if="detail" :detail="detail" :basicData="basicData" 
-      :control="control" />
+    <DetailShow :id="props.data.id" v-if="detail" :detail="detail" :basicData="basicData" :addTab="addTab"  :control="control" />
   </div>
 </template>
 
