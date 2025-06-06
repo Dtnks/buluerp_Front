@@ -112,7 +112,4 @@ const donwLoadFile = async (Fileurl, miniType) => {
   display: flex;
   justify-content: space-between;
 }
-.cell .el-button + .el-button {
-  margin-left: 0;
-}
 </style>

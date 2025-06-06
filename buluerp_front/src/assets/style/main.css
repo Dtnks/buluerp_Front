@@ -15,3 +15,6 @@
   background-color: rgba(240, 242, 245, 1);
   padding: 20px 40px 0 40px;
 }
+.cell .el-button + .el-button {
+  margin-left: 0;
+}
