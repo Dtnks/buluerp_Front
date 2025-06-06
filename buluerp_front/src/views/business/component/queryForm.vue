@@ -81,7 +81,6 @@ const dialogForm = reactive({
   remark: '',
   operatorId: '0',
   quantity: 0,
-  customerId: 0,
   productId: 0,
   productName: '',
   customerName: '',
@@ -196,7 +195,7 @@ const onImport = () => {
 // 文件校验（限制大小）
 const beforeUpload = (file: File) => {
   console.log('beforeUpload file:mmmmmmm');
-  
+
   const isExcel =
     file.type === 'application/vnd.ms-excel' ||
     file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -208,7 +207,7 @@ const beforeUpload = (file: File) => {
   }
   if (!isLt5M) {
     console.log('beforeUpload file: !isLt5M');
-    messageBox('error', null, null,  '文件大小不能超过 5MB') 
+    messageBox('error', null, null,  '文件大小不能超过 5MB')
     return false
   }
   return true
@@ -217,7 +216,7 @@ const beforeUpload = (file: File) => {
 const handleUpload = async (option: any) => {
   const formData = new FormData()
   formData.append('file', option.file)
-  const res = await importOrderFile(formData)  
+  const res = await importOrderFile(formData)
   if (res.code == 200) {
     messageBox('success', null, res.msg || '导入成功')
   } else {

@@ -10,8 +10,8 @@
         </div>
       </div>
     </template>
-    <el-table :data="props.tableData" border @selection-change="handleSelectionChange">
-      <el-table-column type="selection" />
+    <el-table :data="props.tableData" border @selection-change="handleSelectionChange" :row-key="row=> row.id">
+      <el-table-column type="selection"  :reserve-selection="true"/>
       <el-table-column v-for="column in columns" :key="column.prop" :prop="column.prop" :label="column.label">
         <template v-if="column.slot" #default="{ row }">
           <span style="display: flex; align-items: center">
@@ -195,6 +195,9 @@ const onDelete = async () => {
   try {
     await ElMessageBox.confirm('确认要删除选中的产品吗？', '提示', {
       type: 'warning',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      showCancelButton: true,
     })
     const ids = selectedRows.value.map((item) => item.id)
     try {

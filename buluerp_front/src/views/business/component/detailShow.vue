@@ -14,7 +14,7 @@
                 <div v-else class="field-value">
                   <el-input v-if="field.label == '客户姓名'" v-model="updateFields.customerName" placeholder="请输入" />
                   <el-input v-else-if="field.label == '其他基本信息'" v-model="updateFields.remark" placeholder="请输入" />
-                  <el-date-picker v-else v-model="updateFields.deliveryDate" style="width: 200px;" placeholder="请选择" />
+                  <el-date-picker v-else v-model="updateFields.deliveryTime" style="width: 200px;" placeholder="请选择" />
                 </div>
               </div>
             </el-col>
@@ -127,12 +127,13 @@ import informationCard from './informationCard.vue'
 import { computed, onMounted, ref } from 'vue'
 import { getStatusText } from '../utils/statusMap'
 import { getPackagingListByOrderId, getProductsByOrderId, getProductDetailById, getOrderDetail } from '../function/oders'
-import { putOrder } from '@/apis/orders'
+import { getOrdersList, putOrder } from '@/apis/orders'
 import { deleteProduct } from '@/apis/products'
-import { ElMessage, ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElMessageBox, ElDialog } from 'element-plus'
+import { ElMessage, ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElMessageBox, ElDialog, dayjs } from 'element-plus'
 import CreateForm from '@/components/form/CreateForm.vue'
 import PackagingList from './packagingList.vue'
 import ProductionSchedule from './productionSchedule.vue'
+import { messageBox } from '@/components/message/messageBox'
 
 // Props
 const props = defineProps<{
@@ -167,16 +168,17 @@ const fields = ref([
   { label: '创建日期', value: props.detail.createTime },
   { label: '订单状态', value: statusText.value },
   { label: '客户姓名', value: props.detail.customerName },
-  { label: '交付日期', value: props.detail.deliveryDate },
+  { label: '交付日期', value: props.detail.deliveryTime },
   { label: '其他基本信息', value: props.detail.remark },
 ])
 
 // 修改订单基本信息
 const updateFields = ref({
-  ...fields.value,
-  deliveryDate: '',
-  remark: '',
-  customerName: '',
+  ...orderDetail.value,
+  id: props.detail.id,
+  deliveryTime: props.detail.deliveryTime || '',
+  remark: props.detail.remark || '',
+  customerName: props.detail.customerName || '',
 })
 
 // 订单详情-产品数据
@@ -185,17 +187,15 @@ const orderProducts = ref([]);
 const fetchOrderProducts = async (orderId: number) => {
   try {
     const res = await getOrderDetail(orderId);
-    console.log('获取订单产品数据www:', res.products);
     if (res.products) {
       orderProducts.value = res.products || [];
-      console.log('订单产品数据:11111111', orderProducts.value);
-
     } else {
-      ElMessage.error('获取订单产品数据失败');
+      messageBox('error', null, null, '获取订单产品数据失败, 请检查订单是否存在产品信息');
+
     }
   } catch (error) {
     console.error('获取订单产品数据失败:', error);
-    ElMessage.error('获取订单产品数据失败，请稍后再试');
+    messageBox('error', null, null, '获取订单产品数据失败, 请稍后再试');
   }
 }
 
@@ -256,14 +256,14 @@ const onDeleteProduct = (row: any) => {
           // 从订单产品列表中移除该产品
           orderProducts.value = orderProducts.value.filter(item => item.productId !== row.productId);
           fetchOrderProducts(props.id);
-          ElMessage.success('产品删除成功');
+          messageBox('success', null, '产品已成功删除');
         })
         .catch(error => {
           console.error('删除产品失败:', error);
-          ElMessage.error('删除产品失败，请稍后再试');
+          messageBox('error', null, null, '删除产品失败, 请稍后再试');
         });
-      }).catch(() => {
-      ElMessage.info('已取消删除');
+    }).catch(() => {
+      messageBox('success', null, '已取消删除操作');
     });
 }
 
@@ -292,11 +292,12 @@ const onEditProductConfirm = async (product: any) => {
       } : item)
     });
     fetchOrderProducts(props.id);
-    ElMessage.success('更新订单产品成功');
+    messageBox('success', null, '订单产品已成功更新');
 
   } catch (error) {
     console.error('更新订单产品失败:', error);
-    ElMessage.error('更新订单产品失败，请稍后再试');
+    messageBox('error', null, null, '更新订单产品失败，请稍后再试');
+
   }
   editproductVisible.value = false;
 }
@@ -377,13 +378,26 @@ const relatedOrdersTable = ref([
 // onBoxSubmit: 提交按钮
 const onBoxSubmit = () => {
   console.log('提交1111', updateFields.value);
-  ElMessage.success('提交成功')
+  const submitData = { ...updateFields.value }
+  if (submitData.deliveryTime instanceof Date) {
+    submitData.deliveryTime = dayjs(submitData.deliveryTime).format('YYYY-MM-DD')
+  }
+
+  putOrder(submitData)
+    .then(() => {
+      messageBox('success', null, '订单已成功提交');
+    })
+    .catch((error) => {
+      console.error('提交订单失败:', error);
+      messageBox('error', null, null, '提交订单失败，请稍后再试');
+    });
+  const res = getOrdersList()
 }
 
 // onBoxCancel: 取消按钮
 const onBoxCancel = () => {
   console.log('取消');
-  ElMessage.info('已取消操作')
+  messageBox('success', null, '已取消提交');
 }
 
 </script>
