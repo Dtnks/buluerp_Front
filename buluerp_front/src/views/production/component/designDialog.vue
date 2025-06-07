@@ -76,14 +76,22 @@ watch(
   { immediate: true }
 )
 
+const resetForm = () => {
+  form.value = {
+    orderId: '',
+    productId: '',
+  }
+}
+
 const handleClose = () => {
   visible.value = false
+  resetForm()
 }
 
 const handleSubmit = async () => {
   try {
     emit('submit', { ...form.value })
-    handleClose()
+    // handleClose()
   } catch (err) {
     console.error('校验失败', err)
   }

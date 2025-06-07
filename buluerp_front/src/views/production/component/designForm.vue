@@ -89,7 +89,7 @@ import { importDesignFile, getDesignTemplate, addDesign } from '@/apis/designs'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import DesignDialog from '@/views/production/component/designDialog.vue'
 
-const emit = defineEmits(['search'])
+const emit = defineEmits(['search','created'])
 
 const formState = reactive({
   confirm: '',
@@ -118,14 +118,19 @@ const handleCreate = () => {
 
 const handleCreateSubmit = async (formData: any) => {
   try {
-    await addDesign(formData)
-    messageBox('success', null, '新建成功', '', '')
-    dialogVisible.value = false
-    emit('search')
+    const res = await addDesign(formData)
+    if (res.code === 200) {
+      messageBox('success', null, '新建成功', '', '')
+      dialogVisible.value = false
+      emit('search', { ...formState }) 
+    } else {
+      messageBox('error', null, '', res.msg || '新建失败', '')
+    }
   } catch (error) {
     messageBox('error', null, '', '新建失败', '')
   }
 }
+
 
 const handleImport = () => {
   importDialogVisible.value = true
@@ -154,7 +159,7 @@ const handleUpload = async (option: any) => {
     if (res.code === 200) {
       messageBox('success', null, '导入成功', '', '')
       importDialogVisible.value = false
-      emit('search')
+      emit('created')
     } else {
       const error_text = res.data
         .map((ele) => '第' + ele.rowNum + '行：' + ele.errorMsg)
