@@ -4,6 +4,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { updateProduct } from '@/apis/products.js'
 import { addMaterial, searchMaterial } from '@/apis/materials'
 import { messageBox } from '@/components/message/messageBox' // 替换弹窗组件
+import  uploadPicture  from '@/components/upload/editUpload.vue'
 
 const props = defineProps<{
   detail: any
@@ -32,6 +33,12 @@ const mainFormState = reactive({
 })
 
 const fileList = ref<{ url: string; raw?: File }[]>([])
+const pictureFile = ref<File | null>(null)
+const pictureUrl = ref('')
+
+const setFile = (file: File | null) => {
+  pictureFile.value = file
+}
 
 const BASE_URL = 'http://154.201.77.135:8080'
 
@@ -48,8 +55,8 @@ watch(
       mainFormState.productName = val.name || ''
       mainFormState.designStatus = Number(val.designStatus ?? 0)
       if (val.pictureUrl) {
-        const url = resolveImageUrl(val.pictureUrl)
-        fileList.value = [{ url }]
+        pictureUrl.value = resolveImageUrl(val.pictureUrl) 
+        pictureFile.value = null  
       }
 
       if (Array.isArray(val.materialIds) && val.materialIds.length > 0) {
@@ -96,13 +103,13 @@ const submitMainForm = async () => {
   try {
     await mainFormRef.value.validate()
 
-    const rawFile = fileList.value[0]?.raw ?? null
+    // const rawFile = fileList.value[0]?.raw ?? null
 
     await updateProduct({
       id: Number(props.detail?.id),
       name: mainFormState.productName,
       designStatus: Number(mainFormState.designStatus),
-      pictureFile: rawFile,
+      picture: pictureFile.value ?? null,
     })
 
     messageBox('success', null, '提交成功', '', '')
@@ -267,16 +274,7 @@ const resetMaterialForm = () => {
       <el-row :gutter="20" style="margin-top: 20px">
         <el-col :span="8">
           <el-form-item label="上传图片" prop="uploadImage">
-            <el-upload
-              class="upload-demo"
-              action="#"
-              :http-request="dummyRequest"
-              :show-file-list="false"
-              :file-list="fileList"
-              :on-change="handleChange"
-            >
-              <el-button icon="el-icon-upload"  :disabled="control[1].disabled">点击上传</el-button>
-            </el-upload>
+            <uploadPicture :setFile="setFile" :initialUrl="pictureUrl" />
           </el-form-item>
         </el-col>
         <el-col :span="16">
