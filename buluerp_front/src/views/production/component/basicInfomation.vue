@@ -68,7 +68,7 @@ watch(
       }
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 const dummyRequest = (options: any) => {
@@ -183,7 +183,7 @@ const submitMaterial = async () => {
 const onDelete = async (materialId: number) => {
   const deleteAction = async () => {
     const oldIds = props.detail.materialIds || []
-    const newIds = oldIds.filter(id => id !== materialId)
+    const newIds = oldIds.filter((id) => id !== materialId)
 
     await updateProduct({
       ...props.detail,
@@ -200,7 +200,7 @@ const onDelete = async (materialId: number) => {
     deleteAction,
     '删除物料并更新产品成功',
     '删除物料失败',
-    '确认删除该物料吗？'
+    '确认删除该物料吗？',
   )
 }
 
@@ -217,7 +217,6 @@ const resetMaterialForm = () => {
   materialFormState.standardCode = 0
   materialFormState.singleWeight = 0
 }
-
 </script>
 
 <template>
@@ -275,7 +274,7 @@ const resetMaterialForm = () => {
               :file-list="fileList"
               :on-change="handleChange"
             >
-              <el-button icon="el-icon-upload"  :disabled="control[1].disabled">点击上传</el-button>
+              <el-button icon="el-icon-upload" :disabled="control[1].disabled">点击上传</el-button>
             </el-upload>
           </el-form-item>
         </el-col>
@@ -307,7 +306,12 @@ const resetMaterialForm = () => {
         <el-table-column prop="singleWeight" label="单重" width="150" />
         <el-table-column fixed="right" label="操作" width="150">
           <template #default="scope">
-            <el-button link type="primary" size="small" @click="onEdit(scope.row, scope.$index)" :disabled="control[1].disabled"
+            <el-button
+              link
+              type="primary"
+              size="small"
+              @click="onEdit(scope.row, scope.$index)"
+              :disabled="control[1].disabled"
               >编辑</el-button
             >
             <el-button
@@ -322,11 +326,19 @@ const resetMaterialForm = () => {
         </el-table-column>
       </el-table>
 
-      <el-button class="mt-4" style="width: 100%" @click="openDialog"  :disabled="control[1].disabled">新增物料</el-button>
+      <el-button
+        class="mt-4"
+        style="width: 100%"
+        @click="openDialog"
+        :disabled="control[1].disabled"
+        >新增物料</el-button
+      >
       <div style="text-align: right; margin-top: 20px">
         <el-space>
           <el-button @click="onCancel">取消</el-button>
-          <el-button type="primary" @click="submitMainForm" :disabled="control[1].disabled">提交</el-button>
+          <el-button type="primary" @click="submitMainForm" :disabled="control[1].disabled"
+            >提交</el-button
+          >
           <el-button @click="onClear">重置</el-button>
         </el-space>
       </div>

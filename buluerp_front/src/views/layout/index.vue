@@ -3,41 +3,16 @@ import LayoutLeft from '@/views/layout/main/LayoutLeft.vue'
 import LayoutTop from '@/views/layout/main/LayoutTop.vue'
 import { ref } from 'vue'
 import type { TabPaneName } from 'element-plus'
-import BusinessQuery from '../business/main/Query.vue'
-
+import useTabStore from '@/stores/modules/tabs'
 const editableTabsValue = ref('')
-const editableTabs = ref([])
-
+const store = useTabStore()
 const addTab = (targetName: string, component, data, control = null) => {
-  if (editableTabs.value.filter((item) => item.title == targetName).length > 0) {
-    editableTabsValue.value = targetName
-    return
-  }
-  editableTabs.value.push({
-    title: targetName,
-    name: targetName,
-    component: component,
-    data: data,
-    control: control,
-  })
-  editableTabsValue.value = targetName
+  editableTabsValue.value = store.addTab(targetName, component, data, control)
+  console.log('addTab:', useTabStore)
 }
 
 const removeTab = (targetName: TabPaneName) => {
-  const tabs = editableTabs.value
-  let activeName = editableTabsValue.value
-  if (activeName === targetName) {
-    tabs.forEach((tab, index) => {
-      if (tab.name === targetName) {
-        const nextTab = tabs[index + 1] || tabs[index - 1]
-        if (nextTab) {
-          activeName = nextTab.name
-        }
-      }
-    })
-  }
-  editableTabsValue.value = activeName
-  editableTabs.value = tabs.filter((tab) => tab.name !== targetName)
+  editableTabsValue.value = store.removeTab(targetName, editableTabsValue.value)
 }
 const isCollapse = ref(false)
 const handleHiddenMenu = () => {
@@ -55,10 +30,15 @@ const handleHiddenMenu = () => {
         class="demo-tabs"
         closable
         @tab-remove="removeTab"
+        @tab-click="
+          (tab, event) => {
+            console.log(tab, event)
+          }
+        "
       >
         <el-tab-pane
           class="col"
-          v-for="item in editableTabs"
+          v-for="item in store.editableTabs"
           :key="item.name"
           :label="item.title"
           :name="item.name"
@@ -69,6 +49,7 @@ const handleHiddenMenu = () => {
               :addTab="addTab"
               :data="item.data"
               :control="item.control"
+              :key="item.key"
             ></component>
           </KeepAlive>
         </el-tab-pane>
@@ -85,4 +66,3 @@ const handleHiddenMenu = () => {
   height: 100%;
 }
 </style>
-

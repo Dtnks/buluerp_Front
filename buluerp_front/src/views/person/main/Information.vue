@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import upload from '@/components/upload/uploadImage.vue'
-let fileValue = {}
-const setFile = (file: any) => {
-  fileValue = file
-}
+import useTabStore from '@/stores/modules/tabs'
+const store = useTabStore()
 </script>
 <template>
-  <div>dwadwa</div>
-  <upload :setFile="setFile" />
+  <div
+    @click="
+      () => {
+        store.changeTabName('产品查询', '产品查询修改')
+      }
+    "
+  ></div>
 </template>

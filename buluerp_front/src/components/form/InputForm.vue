@@ -29,7 +29,6 @@
             style="width: 100%"
           />
         </el-form-item>
-        
       </el-col>
     </el-row>
   </el-form>
@@ -41,6 +40,7 @@ defineProps(['data', 'formState', 'formRef', 'searchForm'])
 <style scoped>
 .search-form {
   background: #ffffff;
+  flex: 1;
   padding: 20px;
   border-radius: 8px;
 }
