@@ -64,7 +64,7 @@ const newFormData = ref([
   ],
   [{ type: 'input', label: 'orderId', key: 'orderCode', width: 12 }],
   [{ type: 'textarea', label: '客户备注', key: 'remarks', width: 24 }],
-  [{ type: 'image', label: '图片', key: 'picture', width: 12 }],
+  [{ type: 'image', label: '封面', key: 'picture', width: 12 }],
 ])
 const newSubmit = ref({
   creationTime: '',
