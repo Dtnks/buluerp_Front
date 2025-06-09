@@ -39,6 +39,11 @@ const newFormData = ref([
     { type: 'input', label: '产品ID', key: 'productId', width: 8 },
   ],
   [
+    { type: 'input', label: '单重', key: 'singleWeight', width: 8 },
+    { type: 'input', label: '采购重量', key: 'purchaseWeight', width: 8 },
+    { type: 'input', label: '料别', key: 'materialType', width: 8 },
+  ],
+  [
     {
       type: 'timer',
       label: '预交时间',
@@ -52,11 +57,6 @@ const newFormData = ref([
     { type: 'timer', label: '下单时间', key: 'orderTime', width: 12, timerType: 'date' },
     { type: 'input', label: '供应商', key: 'supplier', width: 12 },
   ],
-  [
-    { type: 'input', label: '单重', key: 'singleWeight', width: 8 },
-    { type: 'input', label: '采购重量', key: 'purchaseWeight', width: 8 },
-    { type: 'input', label: '料别', key: 'materialType', width: 8 },
-  ],
 
   [
     { type: 'input', label: '模具编号', key: 'mouldNumber', width: 12 },
@@ -64,7 +64,7 @@ const newFormData = ref([
   ],
   [{ type: 'input', label: 'orderId', key: 'orderCode', width: 12 }],
   [{ type: 'textarea', label: '客户备注', key: 'remarks', width: 24 }],
-  [{ type: 'image', label: '图片', key: 'picture', width: 12 }],
+  [{ type: 'image', label: '封面', key: 'picture', width: 12 }],
 ])
 const newSubmit = ref({
   creationTime: '',
@@ -183,6 +183,7 @@ const operation = ref([
       title.value = '编辑'
       editDialogVisible.value = true
       newSubmit.value = { ...row }
+      console.log(newSubmit.value)
     },
     value: '编辑',
     disabled: props.control[1].disabled,

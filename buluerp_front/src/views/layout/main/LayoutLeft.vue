@@ -57,7 +57,6 @@ const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
     id="layout"
     :collapse="isCollapse"
     background-color="rgba(0, 21, 41, 1)"
-    class="el-menu-vertical-demo"
     text-color="#fff"
     :collapse-transition="false"
   >
@@ -69,7 +68,7 @@ const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
       <el-sub-menu :index="item.id" v-if="!item.disabled">
         <template #title
           ><el-icon><component :is="IconGroup[item.path]"></component></el-icon
-          ><span>{{ item.label }}</span></template
+          ><span v-if="!isCollapse">{{ item.label }}</span></template
         >
         <div v-for="subItem in item.children" :key="subItem.id">
           <el-menu-item
@@ -101,37 +100,6 @@ const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
         </div>
       </el-sub-menu>
     </div>
-
-    <el-sub-menu index="4">
-      <template #title
-        ><el-icon><img src="@/assets/icon/u29.png" class="icon" /></el-icon>
-        <span>生产管理中心</span></template
-      >
-      <el-sub-menu index="4-1">
-        <template #title><span>采购</span></template>
-        <el-menu-item index="4-1-1" @click="addTab('采购计划', PMProcurementPlan)"
-          >采购计划</el-menu-item
-        >
-        <el-menu-item index="4-1-2" @click="addTab('采购单', PMProcurementQuery)"
-          >采购单</el-menu-item
-        >
-      </el-sub-menu>
-      <el-sub-menu index="4-2">
-        <template #title><span>库存</span></template>
-        <el-menu-item index="4-2-1" @click="addTab('出入库存', PMInventoryList)"
-          >出入库单</el-menu-item
-        >
-        <el-menu-item index="4-2-2" @click="addTab('库存查询', PMInventoryQuery)"
-          >库存查询</el-menu-item
-        >
-      </el-sub-menu>
-      <el-sub-menu index="4-3">
-        <template #title><span>生产</span></template>
-        <el-menu-item index="4-3-1">布包表</el-menu-item>
-        <el-menu-item index="4-3-2">分包表</el-menu-item>
-        <el-menu-item index="4-3-3">排产表</el-menu-item>
-      </el-sub-menu>
-    </el-sub-menu>
   </el-menu>
 </template>
 <style scoped>

@@ -6,8 +6,19 @@
     @close="handleClose"
   >
 
-    <ImageUpload :initialUrl="imageUrl" :setFile="setDrawingFile" />
+    <div style="position: relative; display: inline-block; margin-bottom: 16px;">
+      <ImageUpload :initialUrl="imageUrl" :setFile="setDrawingFile" />
 
+      <el-button
+        v-if="imageUrl"
+        type="danger"
+        size="small"
+        style="position: absolute; top: 4px; right: 4px; z-index: 0;"
+        @click="removeImage"
+        circle
+      ><el-icon><Delete /></el-icon></el-button>
+    </div>
+    
     <CustomForm
       :data="formConfig"
       :formState="formState"
@@ -26,6 +37,7 @@
 import { ref, defineProps, defineEmits, watch } from 'vue'
 import CustomForm from '@/components/form/CreateForm.vue' // 替换为你封装组件的路径
 import ImageUpload from '@/components/upload/editUpload.vue'
+import { Delete } from '@element-plus/icons-vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -54,19 +66,23 @@ const form = ref<Record<string, any>>({
   sampleLocation: '',
   remarks: '',
   spareCode: '',
-  drawingReferenceFile: null
+  drawingReferenceFile: null,
+  deleteDrawingReference: false
 })
 
 const drawingFile = ref<File | null>(null)
 const setDrawingFile = (file: File | null) => {
   drawingFile.value = file
   if (file) {
-    form.value.drawingReferenceFile = ''  // 清除旧图片路径，避免提交旧图
+    form.value.drawingReferenceFile = ''
+    form.value.deleteDrawingReference = false  // 新图上传，不删除旧图
   } else {
     form.value.drawingReferenceFile = null
-    imageUrl.value = ''  // 删除图片时清空回显地址
+    form.value.deleteDrawingReference = true   // 删除图片
+    imageUrl.value = ''
   }
 }
+
 
 
 const imageUrl = ref('')
@@ -167,11 +183,14 @@ watch(
 
       if (data.drawingReference) {
         imageUrl.value = getFullImageUrl(data.drawingReference)
-        drawingFile.value = null  // 旧图片，不是新上传文件
+        drawingFile.value = null
+        form.value.deleteDrawingReference = false  // 回显时不删除
       } else {
         imageUrl.value = ''
         drawingFile.value = null
+        form.value.deleteDrawingReference = false
       }
+
     }
   },
   { immediate: true }
@@ -194,6 +213,9 @@ watch(
 const handleClose = () => {
   visible.value = false
 }
+const removeImage = () => {
+  setDrawingFile(null)
+}
 
 const handleSubmit = async () => {
   try {
@@ -212,6 +234,9 @@ const handleSubmit = async () => {
           formData.append('drawingReference', form.value.drawingReferenceFile)
         }
         continue
+      }
+      if (form.value.deleteDrawingReference) {
+        formData.append('deleteDrawingReference', 'true')  // 转为字符串发送
       }
 
       const value = form.value[key]

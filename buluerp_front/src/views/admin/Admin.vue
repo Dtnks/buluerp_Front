@@ -66,7 +66,7 @@ const newDialogVisible = ref(false)
 </script>
 <template>
   <div style="height: 100%; display: flex; flex-direction: column">
-    <BordShow content="用户管理" path="管理员/用户管理" />
+    <BordShow content="授权管理" path="管理员/授权管理" />
     <div class="greyBack">
       <el-card class="col">
         <div class="row">
@@ -158,7 +158,7 @@ const newDialogVisible = ref(false)
             </template>
           </el-dialog>
         </div>
-        <Table :tableData="tableData" :options="options" :setPage="setPage" :control="control"  />
+        <Table :tableData="tableData" :options="options" :setPage="setPage" :control="control" />
         <div style="right: 40px; bottom: 20px">
           <el-pagination
             v-model:current-page="currentPage"

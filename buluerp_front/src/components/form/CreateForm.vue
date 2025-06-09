@@ -39,6 +39,7 @@
                 Formvalue[ele.key] = file
               }
             "
+            :ImgUrl="Formvalue[ele.key + 'Url']"
           />
         </el-form-item>
         <el-form-item :label="ele.label" v-else-if="ele.type === 'fileList'">
