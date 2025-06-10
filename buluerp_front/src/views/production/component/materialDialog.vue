@@ -5,6 +5,20 @@
     width="800px"
     @close="handleClose"
   >
+
+    <div style="position: relative; display: inline-block; margin-bottom: 16px;">
+      <ImageUpload :initialUrl="imageUrl" :setFile="setDrawingFile" />
+
+      <el-button
+        v-if="imageUrl"
+        type="danger"
+        size="small"
+        style="position: absolute; top: 4px; right: 4px; z-index: 0;"
+        @click="removeImage"
+        circle
+      ><el-icon><Delete /></el-icon></el-button>
+    </div>
+    
     <CustomForm
       :data="formConfig"
       :formState="formState"
@@ -23,6 +37,7 @@
 import { ref, defineProps, defineEmits, watch } from 'vue'
 import CustomForm from '@/components/form/CreateForm.vue' // 替换为你封装组件的路径
 import ImageUpload from '@/components/upload/editUpload.vue'
+import { Delete } from '@element-plus/icons-vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -51,26 +66,28 @@ const form = ref<Record<string, any>>({
   sampleLocation: '',
   remarks: '',
   spareCode: '',
-  drawingReferenceFile: null
+  drawingReferenceFile: null,
+  deleteDrawingReference: false
 })
 
 const drawingFile = ref<File | null>(null)
-const setDrawingFile = (file: File) => {
+const setDrawingFile = (file: File | null) => {
   drawingFile.value = file
-  form.value.drawingReferenceFile = file
+  if (file) {
+    form.value.drawingReferenceFile = ''
+    form.value.deleteDrawingReference = false  // 新图上传，不删除旧图
+  } else {
+    form.value.drawingReferenceFile = null
+    form.value.deleteDrawingReference = true   // 删除图片
+    imageUrl.value = ''
+  }
 }
+
+
 
 const imageUrl = ref('')
 
 const formConfig = [
-  [
-    {
-      label: '胶件图引',
-      key: 'drawingReferenceFile',
-      type: 'image',
-      width: 24
-    }
-  ],
   [
     {
       label: '模具编号',
@@ -96,19 +113,14 @@ const formConfig = [
       type: 'input',
       width: 12
     },{
-      label: '腔口数量',
-      key: 'cavityCount',
+      label: '单重',
+      key: 'singleWeight',
       type: 'number',
       width: 8
     }
   ],
   [
     {
-      label: '单重',
-      key: 'singleWeight',
-      type: 'number',
-      width: 8
-    },{
       label: '模具状态',
       key: 'mouldStatus',
       type: 'input',
@@ -166,16 +178,19 @@ watch(
         sampleLocation: data.sampleLocation || '',
         remarks: data.remarks || '',
         spareCode: data.spareCode || '',
-        drawingReferenceFile: null
+        drawingReferenceFile: data.drawingReference || null,
       }
-
-      drawingFile.value = null
 
       if (data.drawingReference) {
         imageUrl.value = getFullImageUrl(data.drawingReference)
+        drawingFile.value = null
+        form.value.deleteDrawingReference = false  // 回显时不删除
       } else {
         imageUrl.value = ''
+        drawingFile.value = null
+        form.value.deleteDrawingReference = false
       }
+
     }
   },
   { immediate: true }
@@ -186,23 +201,56 @@ const getFullImageUrl = (path: string) => {
   return BASE_IMAGE_URL + path.replace('//', '/')
 }
 
+watch(
+  () => form.value.drawingReferenceFile,
+  (newFile) => {
+    if (newFile instanceof File) {
+      drawingFile.value = newFile
+    }
+  }
+)
+
 const handleClose = () => {
   visible.value = false
+}
+const removeImage = () => {
+  setDrawingFile(null)
 }
 
 const handleSubmit = async () => {
   try {
-    await formRef.value.validate?.()
-
     const formData = new FormData()
+
     for (const key in form.value) {
-      formData.append(key, form.value[key])
+      if (key === 'drawingReferenceFile') {
+        if (drawingFile.value) {
+          // 新上传的图片
+          formData.append('drawingReferenceFile', drawingFile.value)
+        } else if (
+          typeof form.value.drawingReferenceFile === 'string' &&
+          form.value.drawingReferenceFile !== ''
+        ) {
+          // 旧图片路径，保持不变
+          formData.append('drawingReference', form.value.drawingReferenceFile)
+        }
+        continue
+      }
+      if (form.value.deleteDrawingReference) {
+        formData.append('deleteDrawingReference', 'true')  // 转为字符串发送
+      }
+
+      const value = form.value[key]
+      if (Array.isArray(value)) {
+        value.forEach(v => formData.append(key, v))
+      } else if (value !== null && value !== undefined) {
+        formData.append(key, value)
+      }
     }
 
     emit('submit', formData)
     handleClose()
   } catch (err) {
-    console.error('校验失败', err)
+    console.error('表单提交失败:', err)
   }
 }
 </script>
