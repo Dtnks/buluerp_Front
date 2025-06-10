@@ -1,8 +1,8 @@
 import httpInstance from '@/utils/httpsInstance.js'
 let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
-export function newArrange(data) {
+export function newSchedule(data) {
   return httpInstance({
-    url: `system/production-arrange`,
+    url: `system/products-schedule`,
     method: 'post',
     headers: headers,
     data: data,
@@ -13,9 +13,9 @@ export function newArrange(data) {
   })
 }
 
-export function changeArrange(data) {
+export function changeSchedule(data) {
   return httpInstance({
-    url: `system/production-arrange`,
+    url: `system/products-schedule`,
     method: 'put',
     headers: {
       ...headers,
@@ -27,36 +27,36 @@ export function changeArrange(data) {
 
 export function downLoadModule() {
   return httpInstance({
-    url: `system/production-arrange/export/template`,
+    url: `system/products-schedule/export/template`,
     method: 'get',
     headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
     responseType: 'blob',
   })
 }
 
-export function deleteArrange(ids) {
+export function deleteSchedule(ids) {
   return httpInstance({
-    url: `system/production-arrange/${ids.join(',')}`,
+    url: `system/products-schedule/${ids.join(',')}`,
     method: 'delete',
     headers: headers,
   })
 }
 
-export function listArrange(pageNum, pageSize, searchContent = {}) {
+export function listSchedule(pageNum, pageSize, searchContent = {}) {
   let concatText = Object.keys(searchContent)
     .map((key) => {
       return `&${key}=${searchContent[key]}`
     })
     .join('')
   return httpInstance({
-    url: `system/production-arrange/list?pageNum=${pageNum}&pageSize=${pageSize}${concatText}`,
+    url: `system/products-schedule/list?pageNum=${pageNum}&pageSize=${pageSize}${concatText}`,
     method: 'get',
     headers: headers,
   })
 }
 export function exportSelectTable(data) {
   return httpInstance({
-    url: `system/production-arrange/export`,
+    url: `system/products-schedule/export`,
     method: 'post',
     headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
     responseType: 'blob',
@@ -66,7 +66,7 @@ export function exportSelectTable(data) {
 
 export function importFile(formData) {
   return httpInstance({
-    url: 'system/production-arrange/import',
+    url: 'system/products-schedule/import',
     method: 'post',
     data: formData,
     headers: {

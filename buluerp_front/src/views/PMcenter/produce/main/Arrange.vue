@@ -3,11 +3,11 @@ import FormSearch from '@/components/form/Form.vue'
 import CreateForm from '@/components/form/CreateForm.vue'
 import BordShow from '@/components/board/SecBoard.vue'
 import {
-  listPurchaseArrange,
-  changePurchaseArrange,
-  newPurchaseArrange,
+  listArrange,
+  changeArrange,
+  newArrange,
   exportSelectTable,
-  deletePurchaseArrange,
+  deleteArrange,
   importFile,
   downLoadModule,
 } from '@/apis/produceControl/produce/arrange'
@@ -116,8 +116,8 @@ const tableData = ref([
     type: 'text',
   },
   {
-    value: 'productId',
-    label: '产品ID',
+    value: 'mouldOutput',
+    label: '模具产量',
     type: 'text',
   },
   {
@@ -126,23 +126,48 @@ const tableData = ref([
     type: 'picture',
   },
   {
-    value: 'colorCode',
-    label: '颜色编号',
+    value: 'orderCode',
+    label: '订单编号',
     type: 'text',
   },
   {
-    value: 'deliveryDate',
-    label: '预交时间',
+    value: 'productCode',
+    label: '产品编码',
     type: 'text',
   },
   {
-    value: 'orderTime',
-    label: '下单时间',
+    value: 'productId',
+    label: '产品编号',
     type: 'text',
   },
   {
-    value: 'purchaseQuantity',
-    label: '采购数量',
+    value: 'productionId',
+    label: '布产编号',
+    type: 'text',
+  },
+  {
+    value: 'productionMouldCount',
+    label: '排产模数',
+    type: 'text',
+  },
+  {
+    value: 'productionQuantity',
+    label: '排产数量',
+    type: 'text',
+  },
+  {
+    value: 'productionTime',
+    label: '布产时间',
+    type: 'text',
+  },
+  {
+    value: 'productionWeight',
+    label: '排产重量',
+    type: 'text',
+  },
+  {
+    value: 'scheduledTime',
+    label: '安排时间',
     type: 'text',
   },
   {
@@ -150,17 +175,6 @@ const tableData = ref([
     label: '单重',
     type: 'text',
   },
-  {
-    value: 'purchaseWeight',
-    label: '采购重量',
-    type: 'text',
-  },
-  {
-    value: 'supplier',
-    label: '供应商',
-    type: 'text',
-  },
-
   {
     value: 'remarks',
     label: '备注',
@@ -203,10 +217,10 @@ const editDialogVisible = ref(false)
 const handleSubmit = () => {
   if (title.value == '编辑') {
     console.log(newSubmit.value)
-    changePurchasePlan(newSubmit.value).then((res) => {
+    changePlan(newSubmit.value).then((res) => {
       if (res.code == 200) {
         page.value = 1
-        listPurchasePlan(page.value, pageSize.value).then((res) => {
+        listPlan(page.value, pageSize.value).then((res) => {
           listData.value = res.rows
           total.value = res.total
         })
@@ -222,10 +236,10 @@ const handleSubmit = () => {
     newSubmit.value.deliveryDate = parseTime(newSubmit.value.deliveryDate, '{y}-{m}-{d}')
     newSubmit.value.deliveryTime = parseTime(newSubmit.value.deliveryTime, '{y}-{m}-{d}')
     newSubmit.value.orderTime = parseTime(newSubmit.value.orderTime, '{y}-{m}-{d}')
-    newPurchasePlan(newSubmit.value).then((res) => {
+    newArrange(newSubmit.value).then((res) => {
       if (res.msg == '操作成功') {
         page.value = 1
-        listPurchasePlan(page.value, pageSize.value).then((res) => {
+        listArrange(page.value, pageSize.value).then((res) => {
           listData.value = res.rows
           total.value = res.total
         })
@@ -271,7 +285,7 @@ const onSubmit = () => {
   searchContent.value.creationTime = parseTime(searchContent.value.creationTime, '{y}-{m}-{d}')
   searchContent.value.deliveryDate = parseTime(searchContent.value.deliveryDate, '{y}-{m}-{d}')
   page.value = 1
-  listPurchasePlan(page.value, pageSize.value, searchContent.value).then((res) => {
+  listArrange(page.value, pageSize.value, searchContent.value).then((res) => {
     listData.value = res.rows
     total.value = res.total
   })
@@ -292,7 +306,7 @@ const handleUpload = async (option: any) => {
   importFile(formData).then((res) => {
     if (res.code == 200) {
       ElMessage.success(res.msg)
-      listPurchasePlan(page.value, pageSize.value).then((res) => {
+      listArrange(page.value, pageSize.value).then((res) => {
         listData.value = res.rows
         total.value = res.total
       })
@@ -328,7 +342,7 @@ const exportFunc = (row) => {
   formData.append('ids', ids)
   exportSelectTable(formData).then((res) => {
     const now = new Date()
-    downloadBinaryFile(res, '采购计划_' + now.toLocaleDateString() + '_' + count + '.xlsx')
+    downloadBinaryFile(res, '排产表_' + now.toLocaleDateString() + '_' + count + '.xlsx')
     count += 1
   })
 }
@@ -338,11 +352,11 @@ const DeleteFunc = (row) => {
     return ele.id
   })
   const func = () => {
-    return deletePurchasePlan(ids).then((res) => {
+    return deleteArrange(ids).then((res) => {
       if (res.code == 500) {
         throw new Error('权限不足')
       } else {
-        listPurchasePlan(page.value, pageSize.value).then((res) => {
+        listArrange(page.value, pageSize.value).then((res) => {
           listData.value = res.rows
           total.value = res.total
         })
@@ -366,20 +380,20 @@ const total = ref(0)
 const listData = ref([])
 const handlePageChange = async (val: number) => {
   page.value = val
-  listPurchasePlan(page.value, pageSize.value).then((res) => {
+  listArrange(page.value, pageSize.value).then((res) => {
     listData.value = res.rows
   })
 }
 const handleSizeChange = async (val: number) => {
   pageSize.value = val
   page.value = 1
-  listPurchasePlan(page.value, pageSize.value).then((res) => {
+  listArrange(page.value, pageSize.value).then((res) => {
     listData.value = res.rows
   })
 }
 
 //初次渲染
-listPurchaseArrange(page.value, pageSize.value).then((res) => {
+listArrange(page.value, pageSize.value).then((res) => {
   console.log(res)
   total.value = res.total
   listData.value = res.rows
@@ -387,7 +401,7 @@ listPurchaseArrange(page.value, pageSize.value).then((res) => {
 </script>
 <template>
   <div class="col">
-    <BordShow content="采购计划" path="生产管理/采购/采购计划" />
+    <BordShow content="排产表" path="生产管理/采购/排产表" />
     <div class="greyBack">
       <FormSearch
         title="查询"

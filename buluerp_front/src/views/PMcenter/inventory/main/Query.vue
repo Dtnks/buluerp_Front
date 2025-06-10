@@ -35,22 +35,11 @@ const formData = ref({
   'packaging-material': [
     [
       { type: 'input', label: '料包编号', key: 'packingNumber' },
-      { type: 'input', label: '订单编号', key: 'orderCode' },
       { type: 'input', label: '产品货号', key: 'productPartNumber' },
     ],
   ],
-  part: [
-    [
-      { type: 'input', label: '模具编号', key: 'mouldNumber' },
-      { type: 'input', label: '订单编号', key: 'orderCode' },
-    ],
-  ],
-  product: [
-    [
-      { type: 'input', label: '订单编号', key: 'orderCode' },
-      { type: 'input', label: '产品货号', key: 'productPartNumber' },
-    ],
-  ],
+  part: [[{ type: 'input', label: '模具编号', key: 'mouldNumber' }]],
+  product: [[{ type: 'input', label: '产品货号', key: 'productPartNumber' }]],
 })
 
 const searchContent = ref({
@@ -87,11 +76,6 @@ const tableData = ref({
       type: 'text',
     },
     {
-      value: 'orderCode',
-      label: '订单编号',
-      type: 'text',
-    },
-    {
       value: 'packingNumber',
       label: '料包编号',
       type: 'text',
@@ -125,11 +109,6 @@ const tableData = ref({
       type: 'text',
     },
     {
-      value: 'orderCode',
-      label: '订单编号',
-      type: 'text',
-    },
-    {
       value: 'mouldNumber',
       label: '模具编号',
       type: 'text',
@@ -160,11 +139,6 @@ const tableData = ref({
     {
       value: 'totalQuantity',
       label: '当前库存',
-      type: 'text',
-    },
-    {
-      value: 'orderCode',
-      label: '订单编号',
       type: 'text',
     },
     {
@@ -233,7 +207,21 @@ const ChartVisible = ref(false)
 const mapKey = { 'packaging-material': 'packingNumber', part: 'mouldNumber', product: '成品' }
 const option = {
   title: { text: mapList[type.value] + '库存' },
-  tooltip: {},
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'shadow',
+    },
+    formatter: function (params) {
+      const name = params[0].name
+      const currentStock = params[0].value
+      if (params.length === 1) {
+        return name + '<br/>当前库存:' + currentStock
+      }
+      const safetyThreshold = params[1].data.value
+      return name + '<br/>当前库存: ' + currentStock + '<br/>安全阈值: ' + safetyThreshold
+    },
+  },
   xAxis: {
     type: 'category',
     data: [],
@@ -249,17 +237,9 @@ const option = {
     },
     {
       name: '安全阈值',
-      type: 'line',
+      type: 'bar',
       data: [],
-      symbol: 'none',
-      itemStyle: {
-        normal: {
-          color: 'red',
-          lineStyle: {
-            color: 'red',
-          },
-        },
-      },
+      barGap: '-100%',
     },
   ],
 }
@@ -273,6 +253,24 @@ const openDialog = (rows) => {
   }
   option.xAxis.data = rows.map((item) => item[mapKey[type.value]])
   option.series[0].data = rows.map((item) => item.totalQuantity)
+  if (type.value === 'part') {
+    option.series[1].data = rows
+      .map((item) => item.safeQuantity)
+      .map(function (threshold, index) {
+        // 安全阈值始终显示为红色
+        return {
+          value: threshold,
+          itemStyle: {
+            color: 'rgba(255, 0, 0, 0.7)', // 红色透明，用于显示阈值但不完全覆盖
+          },
+          label: {
+            show: false, // 不显示阈值的标签
+          },
+        }
+      })
+  } else {
+    option.series[1].data = []
+  }
   option.title.text = mapList[type.value] + '库存'
   ChartVisible.value = true
 }

@@ -379,7 +379,7 @@ listPurchaseList(page.value, pageSize.value).then((res) => {
 </script>
 <template>
   <div class="col">
-    <BordShow content="采购计划" path="生产管理/采购/采购计划" />
+    <BordShow content="采购单" path="生产管理/采购/采购单" />
     <div class="greyBack">
       <FormSearch
         title="查询"
