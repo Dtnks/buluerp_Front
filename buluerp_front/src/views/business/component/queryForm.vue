@@ -43,7 +43,6 @@
 
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue'
-import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import type { FormInstance } from 'element-plus'
 import {
   ElInput,
@@ -57,17 +56,13 @@ import {
 } from 'element-plus'
 import Form from '@/components/form/Form.vue'
 import { importOrderFile, getProductTemplate } from '@/apis/orders'
-import { id } from 'element-plus/es/locale'
-import { dayjs } from 'element-plus'
-import { useQueryTableDataStore } from '@/stores/queryTableData'
-import { number } from 'echarts'
-import type { TableDataType } from '@/types/orderResponse'
 import { getStatusText, Status } from '../utils/statusMap'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import { messageBox } from '@/components/message/messageBox'
 
 const dialogFormVisible = ref(false)
-const tableStores = useQueryTableDataStore()
+
+// const tableStores = useQueryTableDataStore()
 
 const emit = defineEmits(['onSubmit', 'onAdd'])
 defineProps(['control'])
@@ -202,12 +197,12 @@ const beforeUpload = (file: File) => {
   const isLt5M = file.size / 1024 / 1024 < 5
   if (!isExcel) {
     console.log('beforeUpload file: !isExcel');
-    messageBox('error', null, null,  '只能上传 xls/xlsx 文件')
+    messageBox('error', null, null, '只能上传 xls/xlsx 文件')
     return false
   }
   if (!isLt5M) {
     console.log('beforeUpload file: !isLt5M');
-    messageBox('error', null, null,  '文件大小不能超过 5MB')
+    messageBox('error', null, null, '文件大小不能超过 5MB')
     return false
   }
   return true

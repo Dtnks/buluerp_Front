@@ -156,16 +156,10 @@
 import informationCard from './informationCard.vue'
 import { computed, onMounted, ref } from 'vue'
 import { getStatusText } from '../utils/statusMap'
-import {
-  getPackagingListByOrderId,
-  getProductsByOrderId,
-  getProductDetailById,
-  getOrderDetail,
-} from '../function/oders'
+import { getOrderDetail } from '../function/oders'
 import { getOrdersList, putOrder } from '@/apis/orders'
 import { deleteProduct } from '@/apis/products'
 import {
-  ElMessage,
   ElButton,
   ElInput,
   ElDatePicker,
@@ -231,6 +225,7 @@ const updateFields = ref({
 
 // 订单详情-产品数据
 const orderProducts = ref([])
+
 // 获取订单产品数据
 const fetchOrderProducts = async (orderId: number) => {
   try {
@@ -248,9 +243,9 @@ const fetchOrderProducts = async (orderId: number) => {
 
 // 用户选择的产品编号
 const selectedProductIds = ref({})
+
 // 用户输入的新增的行数
 const addRowCount = ref(0)
-// const newRowCount = computed(()=> addRowCount.value-0 + 2)
 const newRowCount = computed(() => Number(addRowCount.value) + 2)
 
 // 展示出来的产品数据
@@ -365,6 +360,10 @@ const purchaseTable = ref([])
 // viewPuchaseOrder: 查看外购表
 const viewPuchaseOrder = (row: any) => {
   console.log('查看外购表', row)
+  props.addTab(`外购表 ${row.orderId}`, PackagingList, {
+    orderId: props.id,
+    control: props.control,
+  })
 }
 
 // addProductsSchedule: 创建布产表

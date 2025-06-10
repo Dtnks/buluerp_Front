@@ -10,8 +10,8 @@
         </div>
       </div>
     </template>
-    <el-table :data="props.tableData" border @selection-change="handleSelectionChange" :row-key="row=> row.id">
-      <el-table-column type="selection"  :reserve-selection="true"/>
+    <el-table :data="props.tableData" border @selection-change="handleSelectionChange" :row-key="row => row.id">
+      <el-table-column type="selection" :reserve-selection="true" />
       <el-table-column v-for="column in columns" :key="column.prop" :prop="column.prop" :label="column.label">
         <template v-if="column.slot" #default="{ row }">
           <span style="display: flex; align-items: center">
@@ -67,13 +67,13 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, onMounted, ref, watch } from 'vue'
-import { ElButton, ElTable, ElTableColumn, ElPagination, ElDialog, ElForm, ElFormItem, ElSelect, ElOption, ElInput, ElMessage, ElMessageBox } from 'element-plus'
-import { getOrdersList, deleteOrders } from '@/apis/orders'
+import { reactive, onMounted, ref } from 'vue'
+import { ElButton, ElTable, ElTableColumn, ElPagination, ElDialog, ElForm, ElFormItem, ElInput, ElMessageBox } from 'element-plus'
+import { deleteOrders } from '@/apis/orders'
 import type { TableDataType } from '@/types/orderResponse'
 import BusinessDetail from '@/views/business/main/Detail.vue'
 import { exportToExcel } from '@/utils/file/exportExcel'
-import { Status, getStatusText } from '../utils/statusMap'
+import { getStatusText } from '../utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
 
 // 加载数据
@@ -189,7 +189,7 @@ const handleSelectionChange = (selection: any[]) => {
 // onDelete: 点击删除
 const onDelete = async () => {
   if (selectedRows.value.length === 0) {
-    messageBox('error', null, null,    '请先选择要删除的产品')
+    messageBox('error', null, null, '请先选择要删除的产品')
     return
   }
   try {
@@ -231,7 +231,7 @@ const exportFields = [
 
 const onExport = () => {
   if (selectedRows.value.length === 0) {
-    messageBox('error', null, null,  '请先选择要导出的订单')
+    messageBox('error', null, null, '请先选择要导出的订单')
     return
   }
   const today = new Date()
