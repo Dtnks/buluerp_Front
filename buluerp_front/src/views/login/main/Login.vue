@@ -18,6 +18,7 @@ const handleLogin = () => {
 
     if (res.msg != '操作成功') {
       ElMessage({ type: 'error', message: '账号或密码错误' })
+      fullscreenLoading.value = false
     } else {
       localStorage.setItem('Authorization', res.token)
       await store.refreshMenu()

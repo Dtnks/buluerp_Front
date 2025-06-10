@@ -18,72 +18,120 @@ import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessageBox } from 'element-plus'
-const props = defineProps(['control'])
+const props = defineProps(['control', 'addTab'])
 //渲染页面
 const formData = ref([
   [
-    { type: 'input', label: '操作人', key: 'operator' },
-    { type: 'timer', label: '创建曰期', timerType: 'date', key: 'creationTime' },
-    { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
+    { type: 'timer', label: '交货日期', timerType: 'date', key: 'deliveryDate' },
+
+    { type: 'timer', label: '布产时间', timerType: 'date', key: 'productionTime' },
   ],
   [
-    { type: 'timer', label: '预交时间', key: 'deliveryDate', timerType: 'date' },
+    { type: 'input', label: '操作人', key: 'operator' },
+    { type: 'input', label: '颜色编号', key: 'colorCode' },
+    { type: 'input', label: '模具状态', key: 'mouldCondition' },
+  ],
+  [
+    { type: 'input', label: '订单编号', key: 'orderCode' },
+    { type: 'input', label: '产品编码', key: 'productCode' },
+
     { type: 'input', label: '供应商', key: 'supplier' },
-    { type: 'input', label: '料别', key: 'materialType' },
+  ],
+  [
+    { type: 'input', label: '模具编码', key: 'mouldCode' },
+    { type: 'input', label: '模具厂家', key: 'mouldManufacturer' },
+    { type: 'input', label: '客户', key: 'customer' },
   ],
 ])
 const newFormData = ref([
   [
-    { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
-    { type: 'number', label: '采购数量', key: 'purchaseQuantity', width: 8 },
+    { type: 'input', label: '订单编号', key: 'orderCode', width: 8 },
     { type: 'input', label: '产品ID', key: 'productId', width: 8 },
+    { type: 'input', label: '产品编码', key: 'productCode', width: 8 },
   ],
   [
-    { type: 'input', label: '单重', key: 'singleWeight', width: 8 },
-    { type: 'input', label: '采购重量', key: 'purchaseWeight', width: 8 },
-    { type: 'input', label: '料别', key: 'materialType', width: 8 },
+    { type: 'timer', label: '布产时间', key: 'productionTime', timerType: 'date', width: 12 },
+    { type: 'timer', label: '出货时间', key: 'shipmentTime', timerType: 'date', width: 12 },
+  ],
+  [
+    { type: 'input', label: '模具编码', key: 'mouldCode', width: 8 },
+    {
+      type: 'select',
+      label: '模具状态',
+      key: 'mouldCondition',
+      width: 8,
+      options: [
+        { label: '未生产', value: '未生产' },
+        { label: '已生产', value: '已生产' },
+      ],
+    },
+    { type: 'input', label: '客户', key: 'customer', width: 8 },
   ],
   [
     {
-      type: 'timer',
-      label: '预交时间',
-      key: 'deliveryDate',
-      width: 12,
-      timerType: 'date',
+      type: 'inputSelect',
+      label: '颜色编号',
+      key: 'colorCode',
+      width: 8,
+      remoteFunc: (ele) => {
+        console.log(ele)
+        ele.loading = true
+        ele.options = [
+          { label: '1', value: '1' },
+          { label: '2', value: '2' },
+          { label: '3', value: '3' },
+        ]
+        ele.loading = false
+      },
+      loading: false,
+      options: [],
     },
-    { type: 'timer', label: '交货时间', key: 'deliveryTime', width: 12, timerType: 'date' },
+    { type: 'input', label: '模具厂家', key: 'mouldManufacturer', width: 8 },
+    { type: 'input', label: '用量', key: 'usage', width: 8 },
   ],
   [
-    { type: 'timer', label: '下单时间', key: 'orderTime', width: 12, timerType: 'date' },
-    { type: 'input', label: '供应商', key: 'supplier', width: 12 },
+    { type: 'input', label: '单重', key: 'singleWeight', width: 8 },
+    { type: 'input', label: '布产重量', key: 'productionWeight', width: 8 },
+    { type: 'input', label: '供应商', key: 'supplier', width: 8 },
   ],
-
   [
-    { type: 'input', label: '模具编号', key: 'mouldNumber', width: 12 },
-    { type: 'input', label: '规格', key: 'specification', width: 12 },
+    { type: 'input', label: '腔数PCS', key: 'cavityCount', width: 8 },
+    { type: 'input', label: '布产模数PCS', key: 'productionMouldCount', width: 8 },
+    { type: 'input', label: '布产数量PCS', key: 'productionQuantity', width: 8 },
   ],
-  [{ type: 'input', label: 'orderId', key: 'orderCode', width: 12 }],
-  [{ type: 'textarea', label: '客户备注', key: 'remarks', width: 24 }],
-  [{ type: 'image', label: '封面', key: 'picture', width: 12 }],
+  [
+    { type: 'input', label: '色粉数量', key: 'colorPowderNeeded', width: 12 },
+    { type: 'input', label: '料别', key: 'materialType', width: 12 },
+  ],
+  [
+    { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 12 },
+    { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 12 },
+  ],
+  [{ type: 'image', label: '封面', key: 'picture', width: 24 }],
 ])
 const newSubmit = ref({
-  creationTime: '',
-  remarks: '',
-  email: '',
-  colorCode: '',
-  deliveryDate: '',
-  deliveryTime: '',
-  orderTime: '',
-  purchaseQuantity: '',
-  singleWeight: '',
-  purchaseWeight: '',
-  supplier: '',
-  materialType: '',
-  picture: '',
-  mouldNumber: '',
-  specification: '',
   orderCode: '',
   productId: '',
+  productionTime: '',
+  productCode: '',
+  mouldCode: '',
+  mouldCondition: '',
+  picture: '',
+  colorCode: '',
+  usage: '',
+  supplier: '',
+  mouldManufacturer: '',
+  customer: '',
+  shipmentTime: '',
+  singleWeight: '',
+  productionWeight: '',
+  cavityCount: '',
+  productionMouldCount: '',
+  productionQuantity: '',
+  colorPowderNeeded: '',
+  materialType: '',
+  cycleTime: '',
+  timeHours: '',
 })
 const searchContent = ref({
   creationTime: '',
@@ -95,64 +143,18 @@ const searchContent = ref({
 })
 const tableData = ref([
   {
-    value: 'id',
-    label: '采购单号',
-    type: 'text',
-  },
-  { value: 'creationTime', label: '创建时间', type: 'text' },
-  {
-    value: 'operator',
-    label: '操作人',
-    type: 'text',
-  },
-  {
-    value: 'materialType',
-    label: '料别',
-    type: 'text',
-  },
-  {
-    value: 'mouldNumber',
-    label: '模具编号',
-    type: 'text',
-  },
-  {
-    value: 'mouldOutput',
-    label: '模具产量',
-    type: 'text',
-  },
-  {
-    value: 'pictureUrl',
-    label: '产品图片',
-    type: 'picture',
-  },
-  {
     value: 'orderCode',
     label: '订单编号',
     type: 'text',
   },
   {
-    value: 'productCode',
-    label: '产品编码',
-    type: 'text',
-  },
-  {
     value: 'productId',
-    label: '产品编号',
+    label: '产品ID',
     type: 'text',
   },
   {
-    value: 'productionId',
-    label: '布产编号',
-    type: 'text',
-  },
-  {
-    value: 'productionMouldCount',
-    label: '排产模数',
-    type: 'text',
-  },
-  {
-    value: 'productionQuantity',
-    label: '排产数量',
+    value: 'operator',
+    label: '操作人',
     type: 'text',
   },
   {
@@ -161,63 +163,62 @@ const tableData = ref([
     type: 'text',
   },
   {
-    value: 'productionWeight',
-    label: '排产重量',
+    value: 'productCode',
+    label: '产品编码',
     type: 'text',
   },
   {
-    value: 'scheduledTime',
-    label: '安排时间',
+    value: 'mouldCode',
+    label: '模具编码',
     type: 'text',
   },
   {
-    value: 'singleWeight',
-    label: '单重',
+    value: 'mouldCondition',
+    label: '模具状态',
+    type: 'text',
+  },
+  { value: 'pictureUrl', label: '图片', type: 'picture' },
+  {
+    value: 'colorCode',
+    label: '颜色编号',
     type: 'text',
   },
   {
-    value: 'remarks',
-    label: '备注',
+    value: 'usage',
+    label: '用量',
+    type: 'text',
+  },
+  { value: 'supplier', label: '供应商', type: 'text' },
+  { value: 'mouldManufacturer', label: '模具厂家', type: 'text' },
+  {
+    value: 'customer',
+    label: '客户',
     type: 'text',
   },
 ])
 const operation = ref([
-  // {
-  //   func: (id) => {
-  //     console.log(id)
-  //     detailCustomer(id).then((res) => {
-  //       console.log(res)
-  //     })
-  //   },
-  //   value: '查看',
-  // },
   {
     func: (row) => {
       const id = row.id
       title.value = '编辑'
       editDialogVisible.value = true
       newSubmit.value = { ...row }
-      console.log(newSubmit.value)
     },
     value: '编辑',
     disabled: props.control[1].disabled,
   },
-  // {
-  //   func: (row) => {
-  //     props.addTab('采购计划-' + row.id, PlanDetail, row, null)
-  //   },
-  //   value: '查看',
-  //   disabled: false,
-  // },
 ])
-
+const title = ref('新增')
 //新增与修改
 const importDialogVisible = ref(false)
 const editDialogVisible = ref(false)
 const handleSubmit = () => {
+  if (newSubmit.value.picture == '') {
+    delete newSubmit.value.picture
+  }
   if (title.value == '编辑') {
-    console.log(newSubmit.value)
     changeSchedule(newSubmit.value).then((res) => {
+      console.log(res)
       if (res.code == 200) {
         page.value = 1
         listSchedule(page.value, pageSize.value).then((res) => {
@@ -232,10 +233,6 @@ const handleSubmit = () => {
       }
     })
   } else {
-    newSubmit.value.creationTime = parseTime(newSubmit.value.creationTime, '{y}-{m}-{d}')
-    newSubmit.value.deliveryDate = parseTime(newSubmit.value.deliveryDate, '{y}-{m}-{d}')
-    newSubmit.value.deliveryTime = parseTime(newSubmit.value.deliveryTime, '{y}-{m}-{d}')
-    newSubmit.value.orderTime = parseTime(newSubmit.value.orderTime, '{y}-{m}-{d}')
     newSchedule(newSubmit.value).then((res) => {
       if (res.msg == '操作成功') {
         page.value = 1
@@ -252,27 +249,31 @@ const handleSubmit = () => {
     })
   }
 }
-const title = ref('编辑')
 //传给form组件的参数
 const resetSubmit = () => {
   newSubmit.value = {
-    creationTime: '',
-    remarks: '',
-    email: '',
-    colorCode: '',
-    deliveryDate: '',
-    deliveryTime: '',
-    orderTime: '',
-    purchaseQuantity: '',
-    singleWeight: '',
-    purchaseWeight: '',
-    supplier: '',
-    materialType: '',
-    picture: '',
-    mouldNumber: '',
-    specification: '',
     orderCode: '',
     productId: '',
+    productionTime: '',
+    productCode: '',
+    mouldCode: '',
+    mouldCondition: '',
+    picture: '',
+    colorCode: '',
+    usage: '',
+    supplier: '',
+    mouldManufacturer: '',
+    customer: '',
+    shipmentTime: '',
+    singleWeight: '',
+    productionWeight: '',
+    cavityCount: '',
+    productionMouldCount: '',
+    productionQuantity: '',
+    colorPowderNeeded: '',
+    materialType: '',
+    cycleTime: '',
+    timeHours: '',
   }
 }
 const onCreate = () => {
@@ -296,7 +297,7 @@ const onImport = () => {
 }
 const onDownloadTemplate = () => {
   downLoadModule().then((res) => {
-    downloadBinaryFile(res, '采购计划模板.xlsx')
+    downloadBinaryFile(res, '布产表导入模板.xlsx')
   })
 }
 const handleUpload = async (option: any) => {

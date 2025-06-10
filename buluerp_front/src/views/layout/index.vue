@@ -8,7 +8,6 @@ const editableTabsValue = ref('')
 const store = useTabStore()
 const addTab = (targetName: string, component, data, control = null) => {
   editableTabsValue.value = store.addTab(targetName, component, data, control)
-  console.log('addTab:', useTabStore)
 }
 
 const removeTab = (targetName: TabPaneName) => {
@@ -30,11 +29,6 @@ const handleHiddenMenu = () => {
         class="demo-tabs"
         closable
         @tab-remove="removeTab"
-        @tab-click="
-          (tab, event) => {
-            console.log(tab, event)
-          }
-        "
       >
         <el-tab-pane
           class="col"
