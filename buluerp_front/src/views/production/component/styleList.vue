@@ -23,7 +23,7 @@
       </div>
     </template>
 
-    <el-table :data="data" border style="width: 100%" @selection-change="handleSelectionChange">
+    <el-table :data="data" border style="width: 100%" ref="tableRef" :row-key="getRowKey" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" />
       <el-table-column prop="id" label="ID" />
       <el-table-column label="胶件图片">
@@ -115,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted ,nextTick } from 'vue'
 import { getStyleList, deleteStyle, exportStyleFile, updateStyle , addStyle,importStyleFile,getStyleTemplate} from '@/apis/styles'
 import { pmcConfirm , pmcCancel } from '@/apis/designs'
 import { messageBox } from '@/components/message/messageBox'
@@ -127,6 +127,7 @@ const props = defineProps<{
   detail: { designId: number }
   control: any[]
 }>()
+const getRowKey = (row: any) => row.id
 
 const data = ref([])
 const page = ref(1)
@@ -151,6 +152,8 @@ const fetchData = async () => {
   })
   data.value = res.rows || []
   total.value = res.total || 0
+
+  restoreSelection()
 }
 
 const importDialogVisible = ref(false)
@@ -162,8 +165,29 @@ const handleSizeChange = (val: number) => {
   pageSize.value = val
   page.value = 1
 }
-const handleSelectionChange = (val: any[]) => {
-  selectedRows.value = val
+
+const tableRef = ref()
+
+const handleSelectionChange = (selection: any[]) => {
+  const currentIds = data.value.map(item => item.id)
+
+  // 删除当前页取消选中的
+  selectedRows.value = selectedRows.value.filter(item => !currentIds.includes(item.id))
+
+  // 添加当前页选中的（去重）
+  selectedRows.value.push(...selection.filter(item =>
+    !selectedRows.value.some(existing => existing.id === item.id)
+  ))
+}
+const restoreSelection = () => {
+  nextTick(() => {
+    data.value.forEach(row => {
+      const found = selectedRows.value.find(item => item.id === row.id)
+      if (found) {
+        tableRef.value?.toggleRowSelection(row, true)
+      }
+    })
+  })
 }
 
 const onCreate = () => {

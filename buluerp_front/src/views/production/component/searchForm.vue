@@ -224,7 +224,7 @@ const onSubmit = () => {
   const params = {
     productCode: formState.productCode || '',
     productName: formState.productName || '',
-    productStatus: formState.productStatus || '',
+    productStatus: formState.productStatus,
     creatorName: formState.creatorName || '',
     createDate: formState.createDate || [],
     otherSearch: formState.otherSearch || '',

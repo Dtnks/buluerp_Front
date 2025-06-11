@@ -16,7 +16,7 @@ const handleSearch = (params: Record<string, any>) => {
   const filteredParams = {
     id: params.productCode || null,
     name: params.productName || null,
-    designStatus: params.productStatus || null,
+    designStatus: params.productStatus,
     createUsername: params.creatorName || null,
     createTimeFrom: params.createDate?.[0] || null,
     createTimeTo: params.createDate?.[1] || null,
