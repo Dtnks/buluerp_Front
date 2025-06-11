@@ -22,6 +22,25 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item :label="ele.label" v-else-if="ele.type === 'inputSelect'">
+          <el-select
+            v-model="Formvalue[ele.key]"
+            multiple
+            filterable
+            remote
+            allow-create
+            :remote-method="ele.remoteFunc(ele)"
+            default-first-option
+            :loading="ele.loading"
+          >
+            <el-option
+              v-for="item in ele.options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item :label="ele.label" v-else-if="ele.type === 'timer'">
           <el-date-picker
             v-model="Formvalue[ele.key]"
@@ -39,6 +58,7 @@
                 Formvalue[ele.key] = file
               }
             "
+            :ImgUrl="Formvalue[ele.key + 'Url']"
           />
         </el-form-item>
         <el-form-item :label="ele.label" v-else-if="ele.type === 'fileList'">

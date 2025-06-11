@@ -15,8 +15,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { genFileId } from 'element-plus'
-const imgShowUrl = ref('')
-const props = defineProps(['setFile'])
+import { getFullImageUrl } from '@/utils/image/getUrl'
+const props = defineProps(['setFile', 'ImgUrl'])
+
+const imgShowUrl = props.ImgUrl ? ref(getFullImageUrl(props.ImgUrl)) : ref('')
 const handleFileChange = (file, fileList) => {
   props.setFile(file.raw)
   imgShowUrl.value = URL.createObjectURL(file.raw)

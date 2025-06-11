@@ -54,9 +54,9 @@ export function updateProduct(data) {
       formData.append('materialIds', String(id));
     });
   }
-  if (data.pictureFile) {
-    console.log('上传图片文件：', data.pictureFile);
-    formData.append('picture', data.pictureFile);
+  if (data.picture) {
+    console.log('上传图片文件：', data.picture);
+    formData.append('picture', data.picture);
   }
   return httpInstance({
     url: 'system/products',

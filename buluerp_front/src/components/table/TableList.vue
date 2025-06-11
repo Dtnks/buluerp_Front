@@ -13,7 +13,12 @@
           <el-button
             type="danger"
             v-if="DeleteFunc"
-            @click="DeleteFunc(select!.getSelectionRows())"
+            @click="
+              () => {
+                DeleteFunc(select!.getSelectionRows())
+                select.clearSelection()
+              }
+            "
             :disabled="control[2].disabled"
             >删除</el-button
           >
@@ -74,6 +79,7 @@
       </el-table>
 
       <!-- 分页器 -->
+      <div style="height: 20px"></div>
       <slot></slot>
     </div>
   </el-card>

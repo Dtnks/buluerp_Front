@@ -8,8 +8,8 @@
     </template>
     <el-row>
       <InputForm :data="data" :formState="formState" :searchForm="searchForm" />
-      <el-col :span="4" style="text-align: right; padding: 20px">
-        <el-space direction="vertical">
+      <el-col :span="4" style="text-align: right; padding: 20px 0; align-items: right">
+        <el-space direction="vertical" alignment="normal">
           <el-row>
             <el-button type="primary" @click="onSubmit" v-if="onSubmit">查询</el-button>
             <el-button @click="onClear">重置</el-button>
@@ -19,6 +19,7 @@
               type="primary"
               @click="onCreate"
               :disabled="control[0].disabled"
+              style="width: auto"
               v-if="onCreate"
               >新建</el-button
             >

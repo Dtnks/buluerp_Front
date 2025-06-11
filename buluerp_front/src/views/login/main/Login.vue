@@ -10,18 +10,22 @@ const account = ref()
 const password = ref()
 const router = useRouter()
 const store = useMenuState()
+const fullscreenLoading = ref(false)
 const handleLogin = () => {
+  fullscreenLoading.value = true
   Login({ username: account.value, password: password.value }).then(async (res) => {
     console.log('login-response', res)
 
     if (res.msg != '操作成功') {
       ElMessage({ type: 'error', message: '账号或密码错误' })
+      fullscreenLoading.value = false
     } else {
       localStorage.setItem('Authorization', res.token)
       await store.refreshMenu()
       router.push({
         path: '/main',
       })
+      fullscreenLoading.value = false
       ElMessage({ type: 'success', message: '登录成功' })
     }
   })
@@ -47,7 +51,9 @@ const handleLogin = () => {
           <el-checkbox v-model="autoLogin" label="自动登录" size="large" />
           <el-text style="cursor: pointer">忘记密码</el-text>
         </div>
-        <el-button type="primary" @click="handleLogin">登录</el-button>
+        <el-button type="primary" @click="handleLogin" v-loading.fullscreen.lock="fullscreenLoading"
+          >登录</el-button
+        >
       </div>
     </div>
   </div>
