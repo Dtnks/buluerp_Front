@@ -95,72 +95,76 @@ const newDialogVisible = ref(false)
           <el-form-item class="input row" label="姓名">
             <el-input v-model="searchContent.nickName" />
           </el-form-item>
+
+          <div class="row" style="justify-content: flex-end; margin: 15px">
+            <el-button
+              type="primary"
+              @click="
+                () => {
+                  resetSubmit()
+                  newDialogVisible = true
+                }
+              "
+              :disabled="control[0].disabled"
+              >新建</el-button
+            >
+            <el-button type="primary" @click="search">查询</el-button>
+            <el-dialog v-model="newDialogVisible" title="新建系统账号" width="500" center>
+              <div class="col cardCenter">
+                <div class="input row">
+                  <span>帐号 </span><el-input v-model="newSubmit.userName" style="width: 240px" />
+                </div>
+                <div class="input row">
+                  <span>姓名 </span><el-input v-model="newSubmit.nickName" style="width: 240px" />
+                </div>
+                <div class="input row">
+                  <span>密码 </span
+                  ><el-input v-model="newSubmit.password" style="width: 240px" type="password" />
+                </div>
+                <div class="input row">
+                  <span>角色 </span
+                  ><el-select
+                    v-model="newSubmit.roleIds"
+                    multiple
+                    collapse-tags
+                    collapse-tags-tooltip
+                    :max-collapse-tags="2"
+                    placeholder="Select"
+                    style="width: 240px"
+                  >
+                    <el-option
+                      v-for="item in options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.value"
+                    />
+                  </el-select>
+                </div>
+              </div>
+              <template #footer>
+                <div class="dialog-footer">
+                  <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
+                  <el-button
+                    type="info"
+                    @click="
+                      () => {
+                        newDialogVisible = false
+                      }
+                    "
+                  >
+                    取消
+                  </el-button>
+                </div>
+              </template>
+            </el-dialog>
+          </div>
         </div>
-        <div class="row" style="justify-content: flex-end; margin: 15px">
-          <el-button
-            type="primary"
-            @click="
-              () => {
-                resetSubmit()
-                newDialogVisible = true
-              }
-            "
-            :disabled="control[0].disabled"
-            >新建</el-button
-          >
-          <el-button type="primary" @click="search">查询</el-button>
-          <el-dialog v-model="newDialogVisible" title="新建系统账号" width="500" center>
-            <div class="col cardCenter">
-              <div class="input row">
-                <span>帐号 </span><el-input v-model="newSubmit.userName" style="width: 240px" />
-              </div>
-              <div class="input row">
-                <span>姓名 </span><el-input v-model="newSubmit.nickName" style="width: 240px" />
-              </div>
-              <div class="input row">
-                <span>密码 </span
-                ><el-input v-model="newSubmit.password" style="width: 240px" type="password" />
-              </div>
-              <div class="input row">
-                <span>角色 </span
-                ><el-select
-                  v-model="newSubmit.roleIds"
-                  multiple
-                  collapse-tags
-                  collapse-tags-tooltip
-                  :max-collapse-tags="2"
-                  placeholder="Select"
-                  style="width: 240px"
-                >
-                  <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
-                </el-select>
-              </div>
-            </div>
-            <template #footer>
-              <div class="dialog-footer">
-                <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-                <el-button
-                  type="info"
-                  @click="
-                    () => {
-                      newDialogVisible = false
-                    }
-                  "
-                >
-                  取消
-                </el-button>
-              </div>
-            </template>
-          </el-dialog>
-        </div>
+        <div style="height: 20px"></div>
         <Table :tableData="tableData" :options="options" :setPage="setPage" :control="control" />
+        <div style="height: 20px"></div>
         <div style="right: 40px; bottom: 20px">
           <el-pagination
+            style="float: right"
             v-model:current-page="currentPage"
             background
             layout="prev, pager, next"

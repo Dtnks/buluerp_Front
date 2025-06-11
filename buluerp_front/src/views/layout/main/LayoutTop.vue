@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps({ handleHiddenMenu: { type: Function } })
+const props = defineProps({ handleHiddenMenu: { type: Function }, reverse: { type: String } })
 import { GetUserInfo } from '@/apis/layout'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 import { ref } from 'vue'
@@ -12,7 +12,12 @@ GetUserInfo().then((res) => {
 <template>
   <div id="menu" class="row">
     <div class="center">
-      <img class="icon" src="@/assets/icon/u35.png" @click="props.handleHiddenMenu()" />
+      <img
+        class="icon"
+        src="@/assets/icon/u35.png"
+        @click="props.handleHiddenMenu()"
+        :class="reverse"
+      />
     </div>
     <div style="flex: 1"></div>
     <div style="width: 15vw" class="row pad">
@@ -50,5 +55,9 @@ GetUserInfo().then((res) => {
 .pad {
   justify-content: flex-end;
   padding-right: 20px;
+}
+.flipped-image {
+  display: inline-block; /* 确保transform生效 */
+  transform: scaleX(-1);
 }
 </style>

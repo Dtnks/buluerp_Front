@@ -16,7 +16,6 @@ import TableList from '@/components/table/TableList.vue'
 import { ref } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
-import { importCustomFile } from '@/apis/custom.js'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessage } from 'element-plus'
 //渲染页面
@@ -33,7 +32,7 @@ const formData = ref([
   ],
 ])
 const tableData = ref([
-   {
+  {
     value: 'id',
     label: '用户ID',
     type: 'text',
@@ -263,7 +262,7 @@ listManufacturers(page.value, pageSize.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :search-form="searchContent"
-         :control="control"
+        :control="control"
       />
       <TableList
         :tableData="tableData"
@@ -271,7 +270,7 @@ listManufacturers(page.value, pageSize.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
-         :control="control"
+        :control="control"
       >
         <slot>
           <div

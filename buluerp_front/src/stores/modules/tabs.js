@@ -21,6 +21,9 @@ const useTabStore = defineStore('tabs', {
       return targetName
     },
     removeTab(targetName, currentName) {
+      if (targetName == 'all') {
+        this.$state.editableTabs = []
+      }
       const tabs = this.$state.editableTabs
       let activeName = currentName
       if (activeName === targetName) {

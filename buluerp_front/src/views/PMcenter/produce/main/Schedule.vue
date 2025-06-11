@@ -147,6 +147,57 @@ const tableData = ref([
     label: '订单编号',
     type: 'text',
   },
+  { value: 'pictureUrl', label: '图片', type: 'picture' },
+  {
+    value: 'productionTime',
+    label: '布产时间',
+    type: 'text',
+  },
+  {
+    value: 'mouldCode',
+    label: '模具编码',
+    type: 'text',
+  },
+  {
+    value: 'colorCode',
+    label: '颜色编号',
+    type: 'text',
+  },
+  {
+    value: 'materialType',
+    label: '料别',
+    type: 'text',
+  },
+  {
+    value: 'cavityCount',
+    label: '腔数PCS',
+    type: 'text',
+  },
+  {
+    value: 'singleWeight',
+    label: '单重',
+    type: 'text',
+  },
+  {
+    value: 'productionQuantity',
+    label: '布产数量PCS',
+    type: 'text',
+  },
+  {
+    value: 'productionMouldCount',
+    label: '布产模数PCS',
+    type: 'text',
+  },
+  {
+    value: 'productionWeight',
+    label: '布产重量',
+    type: 'text',
+  },
+  {
+    value: 'shipmentTime',
+    label: '出货时间',
+    type: 'text',
+  },
   {
     value: 'productId',
     label: '产品ID',
@@ -158,29 +209,13 @@ const tableData = ref([
     type: 'text',
   },
   {
-    value: 'productionTime',
-    label: '布产时间',
-    type: 'text',
-  },
-  {
     value: 'productCode',
     label: '产品编码',
     type: 'text',
   },
   {
-    value: 'mouldCode',
-    label: '模具编码',
-    type: 'text',
-  },
-  {
     value: 'mouldCondition',
     label: '模具状态',
-    type: 'text',
-  },
-  { value: 'pictureUrl', label: '图片', type: 'picture' },
-  {
-    value: 'colorCode',
-    label: '颜色编号',
     type: 'text',
   },
   {
@@ -190,6 +225,21 @@ const tableData = ref([
   },
   { value: 'supplier', label: '供应商', type: 'text' },
   { value: 'mouldManufacturer', label: '模具厂家', type: 'text' },
+  {
+    value: 'colorPowderNeeded',
+    label: '色粉数量',
+    type: 'text',
+  },
+  {
+    value: 'cycleTime',
+    label: '生产周期(s)',
+    type: 'text',
+  },
+  {
+    value: 'timeHours',
+    label: '生产时间(h)',
+    type: 'text',
+  },
   {
     value: 'customer',
     label: '客户',
