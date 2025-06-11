@@ -3,16 +3,13 @@
     :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm" :control="control"></Form>
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
-      <el-form-item label="创建人姓名">
-        <el-input v-model="dialogForm.createdBy" />
-      </el-form-item>
       <el-form-item label="订单状态">
-        <el-select v-model="dialogForm.status" placeholder="Please select the status">
-          <el-option label="初始状态" value="0" />
-          <el-option label="设计中" value="1" />
-          <el-option label="已完成" value="2" />
-          <el-option label="作废" value="3" />
-          <el-option label="布产中" value="4" />
+        <el-select v-model="dialogForm.status" placeholder="请选择">
+          <el-option label="初始状态" :value="Status.Initial" />
+          <el-option label="设计中" :value="Status.Designing" />
+          <el-option label="已完成" :value="Status.Completed" />
+          <el-option label="作废" :value="Status.Canceled" />
+          <el-option label="布产中" :value="Status.Producing" />
         </el-select>
       </el-form-item>
       <el-form-item label="客户姓名">
@@ -67,7 +64,7 @@ const dialogFormVisible = ref(false)
 const emit = defineEmits(['onSubmit', 'onAdd'])
 defineProps(['control'])
 const dialogForm = reactive({
-  status: 0,
+  status: Status.Initial, // 确保 status 有默认值
   createTime: '',
   createdBy: '',
   otherInfo: '',
@@ -167,6 +164,7 @@ defineExpose({ formState, formRef, searchForm })
 // onSubmit: 提交查询条件
 const onSubmit = () => {
   emit('onSubmit', searchForm.value)
+  console.log('查询条件eq2eq2q：', searchForm.value)
 }
 
 // onCreate: 点击新建按钮

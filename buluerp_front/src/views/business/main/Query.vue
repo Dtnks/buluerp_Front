@@ -74,12 +74,14 @@ const handleQuery = (params: any) => {
 const handleAdd = async (newData: TableDataType) => {
   console.log('1111新增数据(handleAdd):', newData);
   const res = await addOrder(newData)
+  console.log('33333',res);
+
   if (res.code === 200) {
     messageBox('success', null, '订单已成功添加')
     fetchTableData()
   }
   else {
-    messageBox('error', null, null, '新增订单失败', '请检查输入数据是否正确')
+    messageBox('error', null, null, '新增订单失败，请检查输入数据是否正确')
   }
 
 };

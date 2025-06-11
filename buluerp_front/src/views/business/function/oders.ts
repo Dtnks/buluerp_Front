@@ -51,21 +51,13 @@ export const getOrderDetail = async (id: number) => {
 
 // addOrder: 添加订单
 export const addOrder = async (data: any) => {
-  try {
     const res = await postOrder(data)
     if (res.code === 200) {
       console.log('添加订单成功：', res)
       return res
     } else {
       console.log('添加订单失败：', res)
-      messageBox({
-        type: 'error',
-        message: res.message || '添加订单失败，请稍后再试！',
-      })
     }
-  } catch (err) {
-    console.log('添加订单失败：', err)
-  }
 }
 
 // searchOrders: 查询订单
