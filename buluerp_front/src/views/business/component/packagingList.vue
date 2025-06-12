@@ -3,7 +3,6 @@ import FormSearch from '@/components/form/Form.vue'
 import CreateForm from '@/components/form/CreateForm.vue'
 import BordShow from '@/components/board/SecBoard.vue'
 import {
-  listPackaging,
   changePackaging,
   newPackaging,
   getPackagingByOrderCode,

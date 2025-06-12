@@ -159,6 +159,7 @@ import { getStatusText } from '../utils/statusMap'
 import { getOrderDetail } from '../function/oders'
 import { getOrdersList, putOrder } from '@/apis/orders'
 import { deleteProduct } from '@/apis/products'
+import { getPackagingByOrderCode } from '@/apis/produceControl/produce/packaging'
 import {
   ElButton,
   ElInput,
@@ -176,7 +177,6 @@ import CreateForm from '@/components/form/CreateForm.vue'
 import PackagingList from './packagingList.vue'
 import ProductionSchedule from './productionSchedule.vue'
 import { messageBox } from '@/components/message/messageBox'
-
 // Props
 const props = defineProps<{
   detail: any
@@ -185,6 +185,8 @@ const props = defineProps<{
   control: Array<object>
 }>()
 
+const packagingInstance = getPackagingByOrderCode(props.id)
+packagingInstance().then((res) => (relatedOrdersTable.value[2].xxx = res.total))
 const orderDetail = computed(() => props.detail)
 
 onMounted(() => {
