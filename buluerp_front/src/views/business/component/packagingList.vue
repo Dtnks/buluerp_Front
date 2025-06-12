@@ -30,10 +30,8 @@ const formData = ref([
 ])
 const newFormData = ref([
   [
-    { type: 'input', label: '产品编号', key: 'productId', width: 8 },
-    { type: 'input', label: '产品名称', key: 'productNameCn', width: 8 },
-
-    { type: 'input', label: '订单编号', key: 'orderCode', width: 8 },
+    { type: 'input', label: '产品编号', key: 'productId', width: 12 },
+    { type: 'input', label: '产品名称', key: 'productNameCn', width: 12 },
   ],
   [
     { type: 'input', label: '生产线', key: 'productionLine', width: 12 },
@@ -86,7 +84,7 @@ const newFormData = ref([
 ])
 const newSubmit = ref({
   mouldNumber: '',
-  orderCode: '',
+  orderCode: props.data.orderCode,
   materialType: '',
   productId: '',
   productNameCn: '',
@@ -233,7 +231,6 @@ const editDialogVisible = ref(false)
 const handleSubmit = () => {
   newSubmit.value.releaseDate = parseTime(newSubmit.value.releaseDate, '{y}-{m}-{d}')
   if (title.value == '编辑') {
-    console.log(newSubmit.value)
     changePackaging(newSubmit.value).then((res) => {
       if (res.code == 200) {
         page.value = 1
@@ -250,7 +247,6 @@ const handleSubmit = () => {
     })
   } else {
     newPackaging(newSubmit.value).then((res) => {
-      console.log(res)
       if (res.msg == '操作成功') {
         page.value = 1
         searchInstance(page.value, pageSize.value).then((res) => {
@@ -270,22 +266,22 @@ const title = ref('编辑')
 //传给form组件的参数
 const resetSubmit = () => {
   newSubmit.value = {
-    remarks: '',
-    email: '',
-    colorCode: '',
-    deliveryDate: '',
-    deliveryTime: '',
-    orderTime: '',
-    purchaseQuantity: '',
-    singleWeight: '',
-    purchaseWeight: '',
-    supplier: '',
-    materialType: '',
-    picture: '',
     mouldNumber: '',
-    specification: '',
-    orderCode: '',
+    orderCode: props.data.orderCode,
+    materialType: '',
     productId: '',
+    productNameCn: '',
+    releaseDate: '',
+    bagSpecification: '',
+    bagWeight: '',
+    packageQuantity: '',
+    isManual: '',
+    isMinifigure: '',
+    isTool: '',
+    packageAccessories: '',
+    accessoryType: '',
+    accessoryTotal: '',
+    remark: '',
   }
 }
 const onCreate = () => {
