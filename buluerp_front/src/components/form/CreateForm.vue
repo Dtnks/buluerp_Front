@@ -12,8 +12,16 @@
           <el-input v-model="searchForm.customer[ele.children[0].key]" />
           {{searchForm.customer['name'] }}
         </el-form-item> -->
-        <el-form-item :label="ele.label" v-else-if="ele.type === 'select'">
-          <el-select v-model="Formvalue[ele.key]">
+        <el-form-item :label="ele.label" v-else-if="ele.type === 'select'" clearable>
+          <el-select
+            v-model="Formvalue[ele.key]"
+            clearable
+            @clear="
+              () => {
+                Formvalue[ele.key] = ''
+              }
+            "
+          >
             <el-option
               v-for="option in ele.options"
               :key="option.value"

@@ -390,10 +390,14 @@ const addPackagingList = (row: any) => {
 
 // viewPackagingList: 查看分包表
 const viewPackagingList = async (row: any) => {
-  props.addTab(`分包表 ${row.orderId}`, PackagingList, {
-    orderId: props.id,
-    control: props.control,
-  })
+  props.addTab(
+    `分包表 ${row.orderId}`,
+    PackagingList,
+    {
+      orderCode: props.id,
+    },
+    props.control,
+  )
 }
 // handleAction: 处理关联订单的操作
 const handleAction = (method: Function, row: any) => {

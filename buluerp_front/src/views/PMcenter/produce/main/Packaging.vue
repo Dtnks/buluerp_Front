@@ -22,72 +22,124 @@ const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
   [
-    { type: 'input', label: '操作人', key: 'operator' },
-    { type: 'timer', label: '创建曰期', timerType: 'date', key: 'creationTime' },
-    { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
+    { type: 'input', label: '产品名称', key: 'productNameCn' },
+    { type: 'input', label: '产品编号', key: 'productId' },
+    { type: 'timer', label: '发布日期', key: 'releaseDate', timerType: 'date' },
   ],
   [
-    { type: 'timer', label: '预交时间', key: 'deliveryDate', timerType: 'date' },
-    { type: 'input', label: '供应商', key: 'supplier' },
-    { type: 'input', label: '料别', key: 'materialType' },
+    { type: 'input', label: '生产线', key: 'productionLine' },
+    { type: 'input', label: '操作人', key: 'operator' },
+  ],
+  [
+    { type: 'input', label: '订单编号', key: 'orderCode' },
+    { type: 'input', label: '本袋规格', key: 'bagSpecification' },
+  ],
+  [
+    {
+      type: 'select',
+      label: '说明书',
+      key: 'isManual',
+      options: [
+        { value: 1, label: '是' },
+        { value: 0, label: '否' },
+      ],
+    },
+    {
+      type: 'select',
+      label: '人偶',
+      key: 'isMinifigure',
+      options: [
+        { value: 1, label: '是' },
+        { value: 0, label: '否' },
+      ],
+    },
+    {
+      type: 'select',
+      label: '起件器',
+      key: 'isTool',
+      options: [
+        { value: 1, label: '是' },
+        { value: 0, label: '否' },
+      ],
+    },
   ],
 ])
 const newFormData = ref([
   [
-    { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
-    { type: 'number', label: '采购数量', key: 'purchaseQuantity', width: 8 },
-    { type: 'input', label: '产品ID', key: 'productId', width: 8 },
+    { type: 'input', label: '产品编号', key: 'productId', width: 8 },
+    { type: 'input', label: '产品名称', key: 'productNameCn', width: 8 },
+
+    { type: 'input', label: '订单编号', key: 'orderCode', width: 8 },
   ],
   [
-    { type: 'input', label: '单重', key: 'singleWeight', width: 8 },
-    { type: 'input', label: '采购重量', key: 'purchaseWeight', width: 8 },
-    { type: 'input', label: '料别', key: 'materialType', width: 8 },
+    { type: 'input', label: '生产线', key: 'productionLine', width: 12 },
+
+    { type: 'timer', label: '发布日期', key: 'releaseDate', timerType: 'date', width: 12 },
+  ],
+  [
+    { type: 'input', label: '本袋规格', key: 'bagSpecification', width: 8 },
+    { type: 'input', label: '本袋重量', key: 'bagWeight', width: 8 },
+    { type: 'input', label: '本袋数量', key: 'packageQuantity', width: 8 },
   ],
   [
     {
-      type: 'timer',
-      label: '预交时间',
-      key: 'deliveryDate',
-      width: 12,
-      timerType: 'date',
+      type: 'select',
+      label: '说明书',
+      key: 'isManual',
+      width: 8,
+      options: [
+        { value: 0, label: '否' },
+        { value: 1, label: '是' },
+      ],
     },
-    { type: 'timer', label: '交货时间', key: 'deliveryTime', width: 12, timerType: 'date' },
+    {
+      type: 'select',
+      label: '人偶',
+      key: 'isMinifigure',
+      width: 8,
+      options: [
+        { value: 0, label: '否' },
+        { value: 1, label: '是' },
+      ],
+    },
+    {
+      type: 'select',
+      label: '起件器',
+      key: 'isTool',
+      width: 8,
+      options: [
+        { value: 0, label: '否' },
+        { value: 1, label: '是' },
+      ],
+    },
   ],
   [
-    { type: 'timer', label: '下单时间', key: 'orderTime', width: 12, timerType: 'date' },
-    { type: 'input', label: '供应商', key: 'supplier', width: 12 },
+    { type: 'number', label: '本袋配件', key: 'packageAccessories', width: 8 },
+    { type: 'number', label: '配件种类', key: 'accessoryType', width: 8 },
+    { type: 'number', label: '配件数量', key: 'accessoryTotal', width: 8 },
   ],
-
-  [
-    { type: 'input', label: '模具编号', key: 'mouldNumber', width: 12 },
-    { type: 'input', label: '规格', key: 'specification', width: 12 },
-  ],
-  [{ type: 'input', label: 'orderId', key: 'orderCode', width: 12 }],
-  [{ type: 'textarea', label: '客户备注', key: 'remarks', width: 24 }],
-  [{ type: 'image', label: '封面', key: 'picture', width: 12 }],
+  [{ type: 'textarea', label: '备注', key: 'remark', width: 24 }],
 ])
 const newSubmit = ref({
-  creationTime: '',
-  remarks: '',
-  email: '',
-  colorCode: '',
-  deliveryDate: '',
-  deliveryTime: '',
-  orderTime: '',
-  purchaseQuantity: '',
-  singleWeight: '',
-  purchaseWeight: '',
-  supplier: '',
-  materialType: '',
-  picture: '',
   mouldNumber: '',
-  specification: '',
   orderCode: '',
+  materialType: '',
   productId: '',
+  productNameCn: '',
+  releaseDate: '',
+  bagSpecification: '',
+  bagWeight: '',
+  packageQuantity: '',
+  isManual: '',
+  isMinifigure: '',
+  isTool: '',
+  packageAccessories: '',
+  accessoryType: '',
+  accessoryTotal: '',
+  remark: '',
 })
 const searchContent = ref({
-  creationTime: '',
-  deliveryDate: '',
+  releaseDate: '',
   operator: '',
   colorCode: '',
   supplier: '',
@@ -96,8 +148,91 @@ const searchContent = ref({
 const tableData = ref([
   {
     value: 'id',
-    label: '采购单号',
+    label: 'ID',
     type: 'text',
+  },
+  {
+    value: 'orderCode',
+    label: '订单编号',
+    type: 'text',
+  },
+  {
+    value: 'productId',
+    label: '产品编号',
+    type: 'text',
+  },
+  {
+    value: 'productNameCn',
+    label: '产品名称',
+    type: 'text',
+  },
+  {
+    value: 'productionLine',
+    label: '生产线',
+    type: 'text',
+  },
+  {
+    value: 'packagingListNumber',
+    label: '分包单编号',
+    type: 'text',
+  },
+  {
+    value: 'releaseDate',
+    label: '发布日期',
+    type: 'date',
+  },
+  {
+    value: 'accessoryType',
+    label: '配件种类',
+    type: 'text',
+  },
+  {
+    value: 'accessoryTotal',
+    label: '配件数量/PCS',
+    type: 'text',
+  },
+  {
+    value: 'bagSpecification',
+    label: '本袋规格',
+    type: 'text',
+  },
+  {
+    value: 'bagWeight',
+    label: '本袋重量/KG',
+    type: 'text',
+  },
+  {
+    value: 'packageAccessories',
+    label: '本袋配件',
+    type: 'text',
+  },
+  {
+    value: 'packageQuantity',
+    label: '本袋数量/PCS',
+    type: 'text',
+  },
+  {
+    value: 'operator',
+    label: '操作人',
+    type: 'text',
+  },
+  {
+    value: 'isManual',
+    label: '说明书',
+    type: 'Maptext',
+    map: { '0': '否', '1': '是' },
+  },
+  {
+    value: 'isMinifigure',
+    label: '人偶',
+    type: 'Maptext',
+    map: { '0': '否', '1': '是' },
+  },
+  {
+    value: 'isTool',
+    label: '起见器',
+    type: 'Maptext',
+    map: { '0': '否', '1': '是' },
   },
 ])
 const operation = ref([
@@ -134,6 +269,7 @@ const operation = ref([
 const importDialogVisible = ref(false)
 const editDialogVisible = ref(false)
 const handleSubmit = () => {
+  newSubmit.value.releaseDate = parseTime(newSubmit.value.releaseDate, '{y}-{m}-{d}')
   if (title.value == '编辑') {
     console.log(newSubmit.value)
     changePackaging(newSubmit.value).then((res) => {
@@ -151,11 +287,8 @@ const handleSubmit = () => {
       }
     })
   } else {
-    newSubmit.value.creationTime = parseTime(newSubmit.value.creationTime, '{y}-{m}-{d}')
-    newSubmit.value.deliveryDate = parseTime(newSubmit.value.deliveryDate, '{y}-{m}-{d}')
-    newSubmit.value.deliveryTime = parseTime(newSubmit.value.deliveryTime, '{y}-{m}-{d}')
-    newSubmit.value.orderTime = parseTime(newSubmit.value.orderTime, '{y}-{m}-{d}')
     newPackaging(newSubmit.value).then((res) => {
+      console.log(res)
       if (res.msg == '操作成功') {
         page.value = 1
         listPackaging(page.value, pageSize.value).then((res) => {
@@ -175,7 +308,6 @@ const title = ref('编辑')
 //传给form组件的参数
 const resetSubmit = () => {
   newSubmit.value = {
-    creationTime: '',
     remarks: '',
     email: '',
     colorCode: '',
@@ -201,8 +333,7 @@ const onCreate = () => {
 }
 
 const onSubmit = () => {
-  searchContent.value.creationTime = parseTime(searchContent.value.creationTime, '{y}-{m}-{d}')
-  searchContent.value.deliveryDate = parseTime(searchContent.value.deliveryDate, '{y}-{m}-{d}')
+  searchContent.value.releaseDate = parseTime(searchContent.value.releaseDate, '{y}-{m}-{d}')
   page.value = 1
   listPackaging(page.value, pageSize.value, searchContent.value).then((res) => {
     listData.value = res.rows
@@ -215,7 +346,7 @@ const onImport = () => {
 }
 const onDownloadTemplate = () => {
   downLoadModule().then((res) => {
-    downloadBinaryFile(res, '采购计划模板.xlsx')
+    downloadBinaryFile(res, '分包表导入模板.xlsx')
   })
 }
 const handleUpload = async (option: any) => {
@@ -261,7 +392,7 @@ const exportFunc = (row) => {
   formData.append('ids', ids)
   exportSelectTable(formData).then((res) => {
     const now = new Date()
-    downloadBinaryFile(res, '排产表_' + now.toLocaleDateString() + '_' + count + '.xlsx')
+    downloadBinaryFile(res, '分包表_' + now.toLocaleDateString() + '_' + count + '.xlsx')
     count += 1
   })
 }
@@ -320,7 +451,7 @@ listPackaging(page.value, pageSize.value).then((res) => {
 </script>
 <template>
   <div class="col">
-    <BordShow content="布产表" path="生产管理/采购/布产表" />
+    <BordShow content="分包表" path="生产管理/采购/分包表" />
     <div class="greyBack">
       <FormSearch
         title="查询"

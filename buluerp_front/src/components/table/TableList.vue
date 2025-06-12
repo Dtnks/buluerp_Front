@@ -61,6 +61,7 @@
               </el-button>
             </span>
             <span v-else-if="item.type == 'text'">{{ row[item.value] }}</span>
+            <span v-else-if="item.type == 'Maptext'">{{ item.map[row[item.value]] }}</span>
           </template>
         </el-table-column>
         <el-table-column label="操作" fixed="right" v-if="operations">

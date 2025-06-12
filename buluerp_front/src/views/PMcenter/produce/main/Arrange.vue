@@ -115,7 +115,7 @@ const tableData = ref([
   },
   {
     value: 'id',
-    label: '采购单号',
+    label: 'ID',
     type: 'text',
   },
   { value: 'pictureUrl', label: '图片', type: 'picture' },
@@ -264,23 +264,21 @@ const title = ref('编辑')
 //传给form组件的参数
 const resetSubmit = () => {
   newSubmit.value = {
-    creationTime: '',
-    remarks: '',
-    email: '',
     colorCode: '',
-    deliveryDate: '',
-    deliveryTime: '',
-    orderTime: '',
-    purchaseQuantity: '',
-    singleWeight: '',
-    purchaseWeight: '',
-    supplier: '',
+    completionTime: '',
+    productionTime: '',
     materialType: '',
-    picture: '',
     mouldNumber: '',
-    specification: '',
+    mouldOutput: '',
     orderCode: '',
+    productionId: '',
+    productCode: '',
     productId: '',
+    productionMouldCount: '',
+    productionQuantity: '',
+    scheduledTime: '',
+    singleWeight: '',
+    picture: null,
   }
 }
 const onCreate = () => {
@@ -306,7 +304,7 @@ const onImport = () => {
 }
 const onDownloadTemplate = () => {
   downLoadModule().then((res) => {
-    downloadBinaryFile(res, '采购计划模板.xlsx')
+    downloadBinaryFile(res, '排产表导入模板.xlsx')
   })
 }
 const handleUpload = async (option: any) => {

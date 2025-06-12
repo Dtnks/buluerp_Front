@@ -6,10 +6,7 @@ export function newPackaging(data) {
     method: 'post',
     headers: headers,
     data: data,
-    headers: {
-      ...headers,
-      'Content-Type': 'multipart/form-data',
-    },
+    headers,
   })
 }
 
@@ -17,10 +14,7 @@ export function changePackaging(data) {
   return httpInstance({
     url: `system/packaging-list`,
     method: 'put',
-    headers: {
-      ...headers,
-      'Content-Type': 'multipart/form-data',
-    },
+    headers,
     data: data,
   })
 }
@@ -53,6 +47,20 @@ export function listPackaging(pageNum, pageSize, searchContent = {}) {
     method: 'get',
     headers: headers,
   })
+}
+export function getPackagingByOrderCode(id) {
+  return (pageNum = '', pageSize = '', searchContent = {}) => {
+    let concatText = Object.keys(searchContent)
+      .map((key) => {
+        return `&${key}=${searchContent[key]}`
+      })
+      .join('')
+    return httpInstance({
+      url: `system/packaging-list/list?orderCode=${id}&pageNum=${pageNum}&pageSize=${pageSize}${concatText}`,
+      method: 'get',
+      headers: headers,
+    })
+  }
 }
 export function exportSelectTable(data) {
   return httpInstance({
