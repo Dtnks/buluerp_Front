@@ -3,14 +3,14 @@
     <template #header>
       <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
         <span>展示</span>
-        <div>
+        <div class="card-actions">
           <el-button type="danger" @click="onDelete">删除</el-button>
           <el-button type="primary" @click="onExport">导出</el-button>
         </div>
       </div>
     </template>
     <div>
-      <el-table :data="data" border style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table :data="data" border style="width: 100%" ref="tableRef" :row-key="getRowKey" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" />
         <el-table-column label="胶件图片">
           <template #default="{ row }">
@@ -67,7 +67,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted , nextTick} from 'vue'
 // import { ElMessage, ElMessageBox } from 'element-plus' ✅ 已移除
 import {
   deleteMaterial,
@@ -89,6 +89,7 @@ const props = defineProps<{
   queryParams: Record<string, any>
   addTab: (targetName: string, component: any, data?: any) => void
 }>()
+const getRowKey = (row: any) => row.id
 
 const data = ref([])
 const page = ref(1)
@@ -109,6 +110,8 @@ const fetchData = async () => {
   })
   data.value = res.rows || []
   total.value = res.total || 0
+
+  restoreSelection()
 }
 
 const onEdit = (row: any) => {
@@ -160,9 +163,28 @@ const handleSizeChange = (val: number) => {
 }
 
 const selectedRows = ref<any[]>([])
+const tableRef = ref()
 
 const handleSelectionChange = (selection: any[]) => {
-  selectedRows.value = selection
+  const currentIds = data.value.map(item => item.id)
+
+  // 删除当前页取消选中的
+  selectedRows.value = selectedRows.value.filter(item => !currentIds.includes(item.id))
+
+  // 添加当前页选中的（去重）
+  selectedRows.value.push(...selection.filter(item =>
+    !selectedRows.value.some(existing => existing.id === item.id)
+  ))
+}
+const restoreSelection = () => {
+  nextTick(() => {
+    data.value.forEach(row => {
+      const found = selectedRows.value.find(item => item.id === row.id)
+      if (found) {
+        tableRef.value?.toggleRowSelection(row, true)
+      }
+    })
+  })
 }
 
 const onDelete = async () => {
@@ -210,3 +232,8 @@ const onExport = async () => {
 }
 
 </script>
+<style>
+.card-actions{
+  margin-right: 20px;
+}
+</style>
