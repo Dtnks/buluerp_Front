@@ -3,7 +3,7 @@
     :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm" :control="control"></Form>
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
-      <el-form-item label="订单状态">
+      <!-- <el-form-item label="订单状态">
         <el-select v-model="dialogForm.status" placeholder="请选择">
           <el-option label="初始状态" :value="Status.Initial" />
           <el-option label="设计中" :value="Status.Designing" />
@@ -11,7 +11,7 @@
           <el-option label="作废" :value="Status.Canceled" />
           <el-option label="布产中" :value="Status.Producing" />
         </el-select>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="客户姓名">
         <el-input v-model="dialogForm.customerName" placeholder="请输入" />
       </el-form-item>
@@ -64,7 +64,7 @@ const dialogFormVisible = ref(false)
 const emit = defineEmits(['onSubmit', 'onAdd'])
 defineProps(['control'])
 const dialogForm = reactive({
-  status: Status.Initial, // 确保 status 有默认值
+  status: Status.PendingDesign, // 确保 status 有默认值
   createTime: '',
   createdBy: '',
   otherInfo: '',
@@ -72,14 +72,11 @@ const dialogForm = reactive({
   id: 14,
   remark: '',
   operatorId: '0',
-  quantity: 0,
+  quantity: 1,
   productId: 0,
   productName: '',
   customerName: '',
-})
 
-const statusText = computed(() => {
-  return getStatusText(dialogForm.status)
 })
 
 const title = '查询表单'
@@ -97,18 +94,19 @@ const data = reactive([
       type: 'select',
       key: 'status',
       options: [
-        { label: '初始状态', value: '0' },
-        { label: '设计中', value: '1' },
-        { label: '已完成', value: '2' },
-        { label: '作废', value: '3' },
-        { label: '布产中', value: '4' },
+        { label: getStatusText(Status.Initial), value: Status.Initial },
+        { label: getStatusText(Status.PendingDesign), value: Status.PendingDesign },
+        { label: getStatusText(Status.Designing), value: Status.Designing },
+        { label: getStatusText(Status.Completed), value: Status.Completed },
+        { label: getStatusText(Status.Canceled), value: Status.Canceled },
+        { label: getStatusText(Status.Producing), value: Status.Producing },
       ],
     },
     {
       label: '创建时间',
       type: 'timer',
       key: 'createTime',
-      timerType: 'daterange',
+      timerType: 'datetimerange',
     },
   ],
   [
@@ -135,7 +133,7 @@ const formRef = ref<FormInstance>()
 const formState = reactive({
   // orderId: '',
   status: null,
-  createTime: '',
+  createTime: [],
   createdBy: '',
   otherInfo: '',
   innerId: '',
@@ -151,7 +149,10 @@ const formState = reactive({
 const searchForm = ref({
   id: null,
   status: null,
-  createTime: '',
+  createTime: [],
+  createTineFrom: '',
+  createTimeTo: '',
+  deliveryDeadline: '',
   createdBy: '',
   customerName: '',
   remark: '',
@@ -163,7 +164,15 @@ defineExpose({ formState, formRef, searchForm })
 
 // onSubmit: 提交查询条件
 const onSubmit = () => {
-  emit('onSubmit', searchForm.value)
+  // emit('onSubmit', searchForm.value)
+  searchForm.value = {
+
+    ...searchForm.value, // 确保 searchForm.value 是一个对象
+    createTineFrom: searchForm.value.createTime ? searchForm.value.createTime[0].toISOString() : '',
+    createTimeTo: searchForm.value.createTime ? searchForm.value.createTime[1].toISOString() : '',
+
+  }
+
   console.log('查询条件eq2eq2q：', searchForm.value)
 }
 
@@ -173,7 +182,7 @@ const onCreate = () => {
 }
 
 // onAddConfirm: 确认新增订单
-const onAddConfirm = () => {
+const onAddConfirm = () => { 
   emit('onAdd', { ...dialogForm })
   console.log('新增订单数据：', { ...dialogForm })
   dialogFormVisible.value = false

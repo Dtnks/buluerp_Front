@@ -19,10 +19,11 @@
 
 export enum Status {
   Initial = 0,
-  Designing = 1,
-  Completed = 2,
-  Canceled = 3,
-  Producing = 4,
+  PendingDesign = 1, // 待设计
+  Designing = 2,
+  Completed = 3,
+  Canceled = 4,
+  Producing = 5,
 }
 
 /**
@@ -33,16 +34,19 @@ export enum Status {
 export const getStatusText = (status: Status): string => {
   switch (status) {
     case Status.Initial:
-      return '初始状态';
+      return '初始状态'
+    case Status.PendingDesign:
+      return '待设计'
     case Status.Designing:
-      return '设计中';
+      return '设计中'
     case Status.Completed:
-      return '已完成';
+      return '已完成'
     case Status.Canceled:
-      return '作废';
+      return '作废'
     case Status.Producing:
-      return '布产中';
+      return '布产中'
+
     default:
-      return '未知状态';
+      return '未知状态'
   }
 }
