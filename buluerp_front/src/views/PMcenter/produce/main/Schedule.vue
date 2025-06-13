@@ -22,14 +22,22 @@ const props = defineProps(['control', 'addTab'])
 //渲染页面
 const formData = ref([
   [
-    { type: 'timer', label: '交货日期', timerType: 'date', key: 'deliveryDate' },
+    { type: 'timer', label: '出货日期', timerType: 'date', key: 'shipmentTime' },
 
     { type: 'timer', label: '布产时间', timerType: 'date', key: 'productionTime' },
   ],
   [
     { type: 'input', label: '操作人', key: 'operator' },
     { type: 'input', label: '颜色编号', key: 'colorCode' },
-    { type: 'input', label: '模具状态', key: 'mouldCondition' },
+    {
+      type: 'select',
+      label: '模具状态',
+      key: 'mouldCondition',
+      options: [
+        { label: '未生产', value: '未生产' },
+        { label: '已生产', value: '已生产' },
+      ],
+    },
   ],
   [
     { type: 'input', label: '订单编号', key: 'orderCode' },
@@ -134,17 +142,27 @@ const newSubmit = ref({
   timeHours: '',
 })
 const searchContent = ref({
-  creationTime: '',
-  deliveryDate: '',
+  shipmentTime: '',
+  productionTime: '',
   operator: '',
   colorCode: '',
+  mouldCondition: '',
+  orderCode: '',
+  productCode: '',
+  mouldCode: '',
   supplier: '',
-  materialType: '',
+  mouldManufacturer: '',
+  customer: '',
 })
 const tableData = ref([
   {
     value: 'orderCode',
     label: '订单编号',
+    type: 'text',
+  },
+  {
+    value: 'productCode',
+    label: '产品编码',
     type: 'text',
   },
   { value: 'pictureUrl', label: '图片', type: 'picture' },
@@ -266,6 +284,8 @@ const handleSubmit = () => {
   if (newSubmit.value.picture == '') {
     delete newSubmit.value.picture
   }
+  newSubmit.value.productionTime = parseTime(newSubmit.value.productionTime, '{y}-{m}-{d}')
+  newSubmit.value.shipmentTime = parseTime(newSubmit.value.shipmentTime, '{y}-{m}-{d}')
   if (title.value == '编辑') {
     changeSchedule(newSubmit.value).then((res) => {
       console.log(res)
@@ -333,9 +353,10 @@ const onCreate = () => {
 }
 
 const onSubmit = () => {
-  searchContent.value.creationTime = parseTime(searchContent.value.creationTime, '{y}-{m}-{d}')
-  searchContent.value.deliveryDate = parseTime(searchContent.value.deliveryDate, '{y}-{m}-{d}')
   page.value = 1
+  searchContent.value.productionTime = parseTime(searchContent.value.productionTime, '{y}-{m}-{d}')
+  searchContent.value.shipmentTime = parseTime(searchContent.value.shipmentTime, '{y}-{m}-{d}')
+
   listSchedule(page.value, pageSize.value, searchContent.value).then((res) => {
     listData.value = res.rows
     total.value = res.total

@@ -10,7 +10,15 @@
           {{searchForm.customer['name'] }}
         </el-form-item> -->
         <el-form-item :label="ele.label" v-else-if="ele.type === 'select'">
-          <el-select v-model="searchForm[ele.key]">
+          <el-select
+            v-model="searchForm[ele.key]"
+            clearable
+            @clear="
+              () => {
+                searchForm[ele.key] = ''
+              }
+            "
+          >
             <el-option
               v-for="option in ele.options"
               :key="option.value"

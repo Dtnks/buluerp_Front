@@ -52,7 +52,7 @@ const props = defineProps([
   'control',
 ])
 const onClear = () => {
-  console.log(props.searchForm)
+  // props.searchForm = {}
   Object.keys(props.searchForm)?.forEach((key) => {
     props.searchForm[key] = ''
   })

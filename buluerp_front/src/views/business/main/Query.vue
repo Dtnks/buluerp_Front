@@ -4,9 +4,16 @@
       <BordShow content="业务订单查询列表" path="业务中心/查询" />
       <div class="greyBack">
         <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd" :control="control"></QueryForm>
-        <QueryTable :addTab="props.addTab" :pagination="pagination" :tableData="tableData" :control="control"
-          @onPageChange="handlePageChange" @onPageSizeChange="handleSizeChange" @fetchData="fetchTableData"
-          @onUpdated="handleUpdate">
+        <QueryTable
+          :addTab="props.addTab"
+          :pagination="pagination"
+          :tableData="tableData"
+          :control="control"
+          @onPageChange="handlePageChange"
+          @onPageSizeChange="handleSizeChange"
+          @fetchData="fetchTableData"
+          @onUpdated="handleUpdate"
+        >
         </QueryTable>
       </div>
     </el-config-provider>
@@ -25,7 +32,7 @@ import type { OrderResponse, TableDataType } from '@/types/orderResponse'
 import { messageBox } from '@/components/message/messageBox'
 
 const props = defineProps<{
-  addTab: (targetName: string, component: any, data?: any) => void
+  addTab: (targetName: string, component: any, data?: any, control: Array<object>) => void
   control: Array<object>
 }>()
 
@@ -45,15 +52,15 @@ const queryParams = reactive({})
 const fetchTableData = async () => {
   try {
     const filteredParams = Object.fromEntries(
-      Object.entries(queryParams).filter(([key, value]) => value != '')
-    );
+      Object.entries(queryParams).filter(([key, value]) => value != ''),
+    )
     const params = {
       ...filteredParams,
       pageNum: pagination.page,
       pageSize: pagination.pageSize,
     }
-    const res = await getOrdersList(params);
-    console.log('获取订单数据(queryTable.vue):', res);
+    const res = await getOrdersList(params)
+    console.log('获取订单数据(queryTable.vue):', res)
     tableData.value = res.rows || []
     pagination.total = res.total || 0
   } catch (error) {
@@ -68,11 +75,11 @@ const handleQuery = (params: any) => {
   Object.assign(queryParams, params); // 更新查询条件
   console.log('查询参数(handleQuery)', params);
   fetchTableData()
-};
+}
 
 // handleAdd: 处理新增
 const handleAdd = async (newData: TableDataType) => {
-  console.log('1111新增数据(handleAdd):', newData);
+  console.log('1111新增数据(handleAdd):', newData)
   const res = await addOrder(newData)
   console.log('33333',res);
 
@@ -83,21 +90,19 @@ const handleAdd = async (newData: TableDataType) => {
   else {
     messageBox('error', null, null, '新增订单失败，请检查输入数据是否正确')
   }
-
-};
+}
 
 // handleUpdate: 处理编辑更新
 const handleUpdate = async (updatedData: TableDataType) => {
-
-    const res = await putOrder(updatedData);
-    if (res.code == 200) {
-      console.log('更新结果(handelUpdate):', res);
-      messageBox('success', null, '订单已成功更新')
-      fetchTableData();
-    } else {
-      messageBox('error', null, null, '更新订单失败，请检查输入数据是否正确')
-    }
-};
+  const res = await putOrder(updatedData)
+  if (res.code == 200) {
+    console.log('更新结果(handelUpdate):', res)
+    messageBox('success', null, '订单已成功更新')
+    fetchTableData()
+  } else {
+    messageBox('error', null, null, '更新订单失败，请检查输入数据是否正确')
+  }
+}
 
 // handlePageChange: 处理分页
 const handlePageChange = (page: number) => {

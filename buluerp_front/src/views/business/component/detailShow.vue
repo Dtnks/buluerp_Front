@@ -159,6 +159,7 @@ import { getStatusText } from '../utils/statusMap'
 import { getOrderDetail } from '../function/oders'
 import { getOrdersList, putOrder } from '@/apis/orders'
 import { deleteProduct } from '@/apis/products'
+import { getPackagingByOrderCode } from '@/apis/produceControl/produce/packaging'
 import {
   ElButton,
   ElInput,
@@ -176,7 +177,6 @@ import CreateForm from '@/components/form/CreateForm.vue'
 import PackagingList from './packagingList.vue'
 import ProductionSchedule from './productionSchedule.vue'
 import { messageBox } from '@/components/message/messageBox'
-
 // Props
 const props = defineProps<{
   detail: any
@@ -185,6 +185,8 @@ const props = defineProps<{
   control: Array<object>
 }>()
 
+const packagingInstance = getPackagingByOrderCode(props.id)
+packagingInstance().then((res) => (relatedOrdersTable.value[2].xxx = res.total))
 const orderDetail = computed(() => props.detail)
 
 onMounted(() => {
@@ -390,10 +392,14 @@ const addPackagingList = (row: any) => {
 
 // viewPackagingList: 查看分包表
 const viewPackagingList = async (row: any) => {
-  props.addTab(`分包表 ${row.orderId}`, PackagingList, {
-    orderId: props.id,
-    control: props.control,
-  })
+  props.addTab(
+    `分包表 ${row.orderId}`,
+    PackagingList,
+    {
+      orderCode: props.id,
+    },
+    props.control,
+  )
 }
 // handleAction: 处理关联订单的操作
 const handleAction = (method: Function, row: any) => {
