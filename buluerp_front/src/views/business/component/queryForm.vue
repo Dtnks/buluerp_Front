@@ -105,7 +105,7 @@ const data = reactive([
       ],
     },
     {
-      label: '创建日期',
+      label: '创建时间',
       type: 'timer',
       key: 'createTime',
       timerType: 'daterange',

@@ -66,7 +66,7 @@ const fetchTableData = async () => {
 const handleQuery = (params: any) => {
   pagination.page = 1; // 查询时重置页码为 1
   Object.assign(queryParams, params); // 更新查询条件
-  console.log('查询参数(handleQuery):', params);
+  console.log('查询参数(handleQuery)', params);
   fetchTableData()
 };
 

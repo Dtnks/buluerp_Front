@@ -38,9 +38,11 @@
     </el-table>
 
     <!-- 分页 -->
-    <el-pagination background layout="prev, pager, next, sizes, total" :total="pagination.total"
-      :page-size="pagination.pageSize" :current-page="pagination.page" @size-change="emit('onPageSizeChange', $event)"
-      @current-change="emit('onPageChange', $event)" :page-sizes="[5, 10, 20, 50]" />
+    <div class="pagination-box">
+      <el-pagination background layout="prev, pager, next, sizes, total" :total="pagination.total"
+        :page-size="pagination.pageSize" :current-page="pagination.page" @size-change="emit('onPageSizeChange', $event)"
+        @current-change="emit('onPageChange', $event)" :page-sizes="[5, 10, 20, 50]" class="pagination" />
+    </div>
 
     <!-- 编辑弹窗 -->
     <el-dialog title="编辑订单" v-model="editDialogVisible" width="500px">
@@ -247,4 +249,10 @@ const onExport = () => {
 }
 </script>
 
-<style scoped></style>
+<style scoped lang="less">
+.pagination-box {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+</style>
