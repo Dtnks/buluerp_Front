@@ -177,11 +177,12 @@ import CreateForm from '@/components/form/CreateForm.vue'
 import PackagingList from './packagingList.vue'
 import ProductionSchedule from './productionSchedule.vue'
 import { messageBox } from '@/components/message/messageBox'
+import PurchaseInfo from './purchaseInfo.vue'
 // Props
 const props = defineProps<{
   detail: any
   id: number
-  addTab: (targetName: string, component: any, data?: any) => void
+  addTab: (targetName: string, component: any, data?: any, control?: any) => void
   control: Array<object>
 }>()
 
@@ -362,10 +363,9 @@ const purchaseTable = ref([])
 // viewPuchaseOrder: 查看外购表
 const viewPuchaseOrder = (row: any) => {
   console.log('查看外购表', row)
-  props.addTab(`外购表 ${row.orderId}`, PackagingList, {
-    orderId: props.id,
-    control: props.control,
-  })
+  props.addTab(`外购表 ${row.orderId}`, PurchaseInfo, {
+    orderCode: props.id,
+  },props.control)
 }
 
 // addProductsSchedule: 创建布产表
@@ -377,9 +377,9 @@ const addProductsSchedule = (row: any) => {
 const viewProductsSchedule = (row: any) => {
   console.log('查看布产表', row)
   props.addTab(`布产表 ${row.orderId}`, ProductionSchedule, {
-    orderId: props.id,
-    control: props.control,
-  })
+    orderCode: props.id,
+
+  }, props.control,)
 }
 
 // addPackagingList: 创建分包表

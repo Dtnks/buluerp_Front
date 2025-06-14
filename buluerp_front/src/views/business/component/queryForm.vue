@@ -43,8 +43,6 @@ import { reactive, ref, computed } from 'vue'
 import type { FormInstance } from 'element-plus'
 import {
   ElInput,
-  ElSelect,
-  ElOption,
   ElMessageBox,
   ElButton,
   ElDialog,
@@ -56,6 +54,7 @@ import { importOrderFile, getProductTemplate } from '@/apis/orders'
 import { getStatusText, Status } from '../utils/statusMap'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import { messageBox } from '@/components/message/messageBox'
+import { format } from 'date-fns'
 
 const dialogFormVisible = ref(false)
 
@@ -149,7 +148,7 @@ const formState = reactive({
 const searchForm = ref({
   id: null,
   status: null,
-  createTime: [],
+  createTime: [], // 使用数组来存储时间范围
   createTineFrom: '',
   createTimeTo: '',
   deliveryDeadline: '',
@@ -164,16 +163,18 @@ defineExpose({ formState, formRef, searchForm })
 
 // onSubmit: 提交查询条件
 const onSubmit = () => {
-  // emit('onSubmit', searchForm.value)
-  searchForm.value = {
+
+  const submitForm = {
 
     ...searchForm.value, // 确保 searchForm.value 是一个对象
-    createTineFrom: searchForm.value.createTime ? searchForm.value.createTime[0].toISOString() : '',
-    createTimeTo: searchForm.value.createTime ? searchForm.value.createTime[1].toISOString() : '',
+    createTimeFrom: searchForm.value.createTime ? format(new Date(searchForm.value.createTime[0]), 'yyyy-MM-dd HH:mm:ss') : '',
+    createTimeTo: searchForm.value.createTime ? format(new Date(searchForm.value.createTime[1]), 'yyyy-MM-dd HH:mm:ss') : '',
 
   }
+  delete submitForm.createTime // 删除 createTime 属性，避免重复提交
+  console.log('查询条件eq2eq2q：', submitForm)
+  emit('onSubmit', submitForm)
 
-  console.log('查询条件eq2eq2q：', searchForm.value)
 }
 
 // onCreate: 点击新建按钮
@@ -182,7 +183,7 @@ const onCreate = () => {
 }
 
 // onAddConfirm: 确认新增订单
-const onAddConfirm = () => { 
+const onAddConfirm = () => {
   emit('onAdd', { ...dialogForm })
   console.log('新增订单数据：', { ...dialogForm })
   dialogFormVisible.value = false

@@ -1,5 +1,14 @@
 import httpInstance from '@/utils/httpsInstance.js'
 let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
+
+export function getProdunctionSchedeuleByOrderCode(orderCode) {
+  return httpInstance({
+    url: `system/products-schedule/list?orderCode=${orderCode}`,
+    method: 'get',
+    headers: headers,
+  })
+  
+}
 export function newSchedule(data) {
   return httpInstance({
     url: `system/products-schedule`,
