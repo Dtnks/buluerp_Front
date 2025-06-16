@@ -22,15 +22,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import BordShow from '@/components/board/SecBoard.vue'
 import { ElRow, ElCol } from 'element-plus';
 import informationCard from './informationCard.vue';
+import { getOrderDetail } from '../function/oders';
+import { getPurchaseInfo } from '@/apis/produceControl/purchase/purchaseInfo';
+
 
 const props = defineProps<{
   addTab: (targetName: string, component: any, data?: any) => void
   control: Array<object>
-  data: { orderCode: number }
+  data: { orderCode: number, purchaseId: number }
 }>();
 
 const purchaseData = ref({});
@@ -48,7 +51,16 @@ const fields = ref([
   { label: '单价', key: 'unitPrice', type: 'number' },
 ])
 
+onMounted(() => {
+  // 初始化获取外购表数据
+  getPurchaseData();
+});
 
+// getPurchaseData: 获取外购表数据
+const getPurchaseData = async () => {
+  const res = await getPurchaseInfo(props.data.purchaseId);
+  console.log('获取外购表数据:', res);
+}
 
 </script>
 

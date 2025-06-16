@@ -19,6 +19,7 @@
 
 export enum Status {
   Initial = 0,
+  ApprovedFalse = -1, // 审核未通过
   PendingDesign = 1, // 待设计
   Designing = 2,
   Completed = 3,
@@ -34,7 +35,9 @@ export enum Status {
 export const getStatusText = (status: Status): string => {
   switch (status) {
     case Status.Initial:
-      return '初始状态'
+      return '创建(未审核)'
+    case Status.ApprovedFalse:
+      return '审核未通过'
     case Status.PendingDesign:
       return '待设计'
     case Status.Designing:

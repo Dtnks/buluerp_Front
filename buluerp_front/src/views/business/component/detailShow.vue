@@ -1,13 +1,6 @@
 <template>
   <div class="detail-box">
-    <div
-      style="
-        flex: 1;
-        background-color: rgba(240, 242, 245, 1);
-        padding: 20px 40px 0 40px;
-        overflow-y: auto;
-      "
-    >
+    <div style=" flex: 1; background-color: rgba(240, 242, 245, 1); padding: 20px 40px 0 40px;  overflow-y: auto; ">
       <div class="main">
         <!-- 业务订单基本信息 -->
         <informationCard title="业务订单基本信息">
@@ -19,36 +12,16 @@
                   {{ field.value }}
                 </div>
                 <div v-else class="field-value">
-                  <el-input
-                    v-if="field.label == '客户姓名'"
-                    v-model="updateFields.customerName"
-                    placeholder="请输入"
-                  />
-                  <el-input
-                    v-else-if="field.label == '其他基本信息'"
-                    v-model="updateFields.remark"
-                    placeholder="请输入"
-                  />
-                  <el-date-picker
-                    v-else
-                    v-model="updateFields.deliveryTime"
-                    style="width: 200px"
-                    placeholder="请选择"
-                  />
+                  <el-input v-if="field.label == '客户姓名'" v-model="updateFields.customerName" placeholder="请输入" />
+                  <el-input v-else-if="field.label == '其他基本信息'" v-model="updateFields.remark" placeholder="请输入" />
+                  <el-date-picker v-else v-model="updateFields.deliveryTime" style="width: 200px" placeholder="请选择" />
                 </div>
               </div>
             </el-col>
           </el-row>
         </informationCard>
-
         <!-- 订单详情 -->
         <informationCard title="订单详情">
-          <!-- <el-select v-model="seletedProdunctId">
-            <el-option v-for="product in orderDetail.products" :key="product.id" :label="product.id"
-              :value="product.id">
-            </el-option>
-          </el-select> -->
-
           <el-table :data="displayProducts" style="width: 100%">
             <el-table-column prop="productId" label="产品编号">
               <!-- <template #default="scope">
@@ -69,9 +42,7 @@
             <el-table-column prop="remark" label="其他信息" />
             <el-table-column prop="action" label="操作" width="180">
               <template #default="scope">
-                <el-button @click="onEditProduct(scope.row)" link type="primary" size="small"
-                  >编辑</el-button
-                >
+                <el-button @click="onEditProduct(scope.row)" link type="primary" size="small">编辑</el-button>
                 <el-button link type="primary" size="small" @click="onDeleteProduct(scope.row)">
                   删除
                 </el-button>
@@ -84,7 +55,6 @@
             <span class="add-row-text">行</span>
           </div>
         </informationCard>
-
         <!-- 关联订单 -->
         <informationCard title="关联订单">
           <el-table :data="relatedOrdersTable" style="width: 100%">
@@ -92,14 +62,8 @@
             <el-table-column prop="orderId" label="订单ID" />
             <el-table-column prop="action" label="操作" width="180">
               <template #default="scope">
-                <el-button
-                  v-for="action in scope.row.actions"
-                  :key="action.name"
-                  link
-                  type="primary"
-                  size="small"
-                  @click="handleAction(action.method, scope.row)"
-                >
+                <el-button v-for="action in scope.row.actions" :key="action.name" link type="primary" size="small"
+                  @click="handleAction(action.method, scope.row)">
                   {{ action.name }}
                 </el-button>
               </template>
@@ -118,14 +82,11 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button
-            type="info"
-            @click="
-              () => {
-                editDialogVisible = false
-              }
-            "
-          >
+          <el-button type="info" @click="
+            () => {
+              editDialogVisible = false
+            }
+          ">
             取消
           </el-button>
         </div>
@@ -160,24 +121,13 @@ import { getOrderDetail } from '../function/oders'
 import { getOrdersList, putOrder } from '@/apis/orders'
 import { deleteProduct } from '@/apis/products'
 import { getPackagingByOrderCode } from '@/apis/produceControl/produce/packaging'
-import {
-  ElButton,
-  ElInput,
-  ElDatePicker,
-  ElRow,
-  ElCol,
-  ElTable,
-  ElTableColumn,
-  ElFooter,
-  ElMessageBox,
-  ElDialog,
-  dayjs,
-} from 'element-plus'
+import { ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElMessageBox, ElDialog, dayjs } from 'element-plus'
 import CreateForm from '@/components/form/CreateForm.vue'
 import PackagingList from './packagingList.vue'
 import ProductionSchedule from './productionSchedule.vue'
 import { messageBox } from '@/components/message/messageBox'
 import PurchaseInfo from './purchaseInfo.vue'
+
 // Props
 const props = defineProps<{
   detail: any
@@ -266,28 +216,7 @@ const updatedProduct = ref({
   productQuantity: 0,
 })
 
-// 根据id查找出来的产品数据
-const productDetail = ref([])
-
-// updateRow: 更新产品行
-const updateRow = (row, rowIndex) => {
-  //  const selectedProduct = orderProducts.value.find(item => item.productId === row.productId);
-  const selectedProduct = orderProducts.value.find(
-    (item) => item.productId == selectedProductIds.value[rowIndex],
-  )
-  console.log(selectedProductIds.value, 'selectedProductIds.value')
-  console.log('orderProducts.value', orderProducts.value)
-  console.log('selectedProduct', selectedProduct)
-  // if (selectedProduct) {
-  //   row.product.name = selectedProduct.product.name;
-  //   row.quantity = selectedProduct.quantity;
-  //   row.remark = selectedProduct.remark;
-  // } else {
-  //   row.product.name = '';
-  //   row.quantity = 0;
-  //   row.remark = '';
-  // }
-}
+// todo: 根据下拉框的选择更新产品行
 
 // onDeleteProduct: 删除订单产品
 const onDeleteProduct = (row: any) => {
@@ -338,9 +267,9 @@ const onEditProductConfirm = async (product: any) => {
       products: orderProducts.value.map((item) =>
         item.productId === product.productId
           ? {
-              ...item,
-              quantity: Number(product.productQuantity),
-            }
+            ...item,
+            quantity: Number(product.productQuantity),
+          }
           : item,
       ),
     })
@@ -353,19 +282,11 @@ const onEditProductConfirm = async (product: any) => {
   editproductVisible.value = false
 }
 
-// 关联订单数据和操作
-// 分包表
-const packagingList = ref([])
-
-// 采购表
-const purchaseTable = ref([])
-
+// // 关联订单数据和操作
 // viewPuchaseOrder: 查看外购表
 const viewPuchaseOrder = (row: any) => {
   console.log('查看外购表', row)
-  props.addTab(`外购表 ${row.orderId}`, PurchaseInfo, {
-    orderCode: props.id,
-  },props.control)
+  props.addTab(`外购表 ${row.orderId}`, PurchaseInfo, { orderCode: props.id, purchaseId: orderDetail.value.purchaseId }, props.control)
 }
 
 // addProductsSchedule: 创建布产表
@@ -376,31 +297,20 @@ const addProductsSchedule = (row: any) => {
 // viewProductsSchedule: 查看布产表
 const viewProductsSchedule = (row: any) => {
   console.log('查看布产表', row)
-  props.addTab(`布产表 ${row.orderId}`, ProductionSchedule, {
-    orderCode: props.id,
-
-  }, props.control,)
+  props.addTab(`布产表 ${row.orderId}`, ProductionSchedule, { orderCode: props.id, }, props.control,)
 }
 
 // addPackagingList: 创建分包表
 const addPackagingList = (row: any) => {
   console.log('创建分包表', row)
-  // // 创建分包表逻辑
   openCreateForm()
-  // getPackagingList(props.id)
 }
 
 // viewPackagingList: 查看分包表
 const viewPackagingList = async (row: any) => {
-  props.addTab(
-    `分包表 ${row.orderId}`,
-    PackagingList,
-    {
-      orderCode: props.id,
-    },
-    props.control,
-  )
+  props.addTab(`分包表 ${row.orderId}`, PackagingList, { orderCode: props.id, }, props.control)
 }
+
 // handleAction: 处理关联订单的操作
 const handleAction = (method: Function, row: any) => {
   method(row)
@@ -409,7 +319,6 @@ const handleAction = (method: Function, row: any) => {
 // 关联订单
 const relatedOrdersTable = ref([
   {
-    // todo: 后端还没写外购表
     type: '外购表',
     orderId: props.id,
     actions: [{ name: '查看', method: viewPuchaseOrder }],
@@ -437,18 +346,11 @@ const relatedOrdersTable = ref([
 const onBoxSubmit = () => {
   console.log('提交1111', updateFields.value)
   const submitData = { ...updateFields.value }
-  if (submitData.deliveryTime instanceof Date) {
-    submitData.deliveryTime = dayjs(submitData.deliveryTime).format('YYYY-MM-DD')
-  }
-
-  putOrder(submitData)
-    .then(() => {
-      messageBox('success', null, '订单已成功提交')
-    })
-    .catch((error) => {
-      console.error('提交订单失败:', error)
-      messageBox('error', null, null, '提交订单失败，请稍后再试')
-    })
+  if (submitData.deliveryTime instanceof Date) { submitData.deliveryTime = dayjs(submitData.deliveryTime).format('YYYY-MM-DD') }
+  putOrder(submitData).then(() => { messageBox('success', null, '订单已成功提交') }).catch((error) => {
+    console.error('提交订单失败:', error)
+    messageBox('error', null, null, '提交订单失败，请稍后再试')
+  })
   const res = getOrdersList()
 }
 

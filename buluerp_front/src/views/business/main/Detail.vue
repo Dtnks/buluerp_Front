@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import BordShow from '@/components/board/SecBoard.vue'
-import informationCard from '../component/informationCard.vue'
 import { onMounted, ref } from 'vue'
 import DetailShow from '../component/detailShow.vue'
 import { getOrderDetail, getOderProducts } from '../function/oders'
-import { dialogEmits } from 'element-plus'
 import { messageBox } from '../../../components/message/messageBox'
 
 const props = defineProps<{

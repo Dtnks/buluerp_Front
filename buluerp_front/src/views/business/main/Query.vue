@@ -21,18 +21,18 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, onMounted } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import BordShow from '@/components/board/SecBoard.vue'
 import QueryForm from '../component/queryForm.vue'
 import QueryTable from '../component/queryTable.vue'
 import { getOrdersList, putOrder } from '@/apis/orders'
-import { addOrder, searchOrders } from '../function/oders'
-import type { OrderResponse, TableDataType } from '@/types/orderResponse'
+import { addOrder, } from '../function/oders'
+import type { TableDataType } from '@/types/orderResponse'
 import { messageBox } from '@/components/message/messageBox'
 
 const props = defineProps<{
-  addTab: (targetName: string, component: any, data?: any, control: Array<object>) => void
+  addTab: (targetName: string, component: any, data?: any, control?: Array<object>) => void
   control: Array<object>
 }>()
 
@@ -52,7 +52,7 @@ const queryParams = reactive({})
 const fetchTableData = async () => {
   try {
     const filteredParams = Object.fromEntries(
-      Object.entries(queryParams).filter(([key, value]) => value != ''),
+      Object.entries(queryParams).filter(([key, value]) =>  value || value === 0)
     )
     const params = {
       ...filteredParams,
@@ -60,7 +60,6 @@ const fetchTableData = async () => {
       pageSize: pagination.pageSize,
     }
     const res = await getOrdersList(params)
-    console.log('获取订单数据(queryTable.vue):', res)
     tableData.value = res.rows || []
     pagination.total = res.total || 0
   } catch (error) {

@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import {
   ElInput,
@@ -55,10 +55,9 @@ import { getStatusText, Status } from '../utils/statusMap'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import { messageBox } from '@/components/message/messageBox'
 import { format } from 'date-fns'
+import type { SubmitFormType } from '../types'
 
 const dialogFormVisible = ref(false)
-
-// const tableStores = useQueryTableDataStore()
 
 const emit = defineEmits(['onSubmit', 'onAdd'])
 defineProps(['control'])
@@ -93,6 +92,7 @@ const data = reactive([
       type: 'select',
       key: 'status',
       options: [
+        { label: getStatusText(Status.ApprovedFalse), value: Status.ApprovedFalse },
         { label: getStatusText(Status.Initial), value: Status.Initial },
         { label: getStatusText(Status.PendingDesign), value: Status.PendingDesign },
         { label: getStatusText(Status.Designing), value: Status.Designing },
@@ -163,15 +163,21 @@ defineExpose({ formState, formRef, searchForm })
 
 // onSubmit: 提交查询条件
 const onSubmit = () => {
+  console.log('onSubmit searchForm.value:', searchForm.value);
+  const createTimeFrom = searchForm.value.createTime && searchForm.value.createTime.length > 0
+    ? format(new Date(searchForm.value.createTime[0]), 'yyyy-MM-dd HH:mm:ss')
+    : null;
 
-  const submitForm = {
-
-    ...searchForm.value, // 确保 searchForm.value 是一个对象
-    createTimeFrom: searchForm.value.createTime ? format(new Date(searchForm.value.createTime[0]), 'yyyy-MM-dd HH:mm:ss') : '',
-    createTimeTo: searchForm.value.createTime ? format(new Date(searchForm.value.createTime[1]), 'yyyy-MM-dd HH:mm:ss') : '',
-
+  const createTimeTo = searchForm.value.createTime && searchForm.value.createTime.length > 1
+    ? format(new Date(searchForm.value.createTime[1]), 'yyyy-MM-dd HH:mm:ss')
+    : null;
+  const submitForm: SubmitFormType = {
+    ...searchForm.value, 
+    createTimeFrom,
+    createTimeTo,
   }
   delete submitForm.createTime // 删除 createTime 属性，避免重复提交
+
   console.log('查询条件eq2eq2q：', submitForm)
   emit('onSubmit', submitForm)
 
