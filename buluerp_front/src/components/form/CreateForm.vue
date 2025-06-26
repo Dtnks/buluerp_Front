@@ -103,7 +103,6 @@
 </template>
 <script lang="ts" setup>
 import upload from '../upload/uploadImage.vue'
-import { ref } from 'vue'
 const props = defineProps(['data', 'formState', 'formRef', 'Formvalue'])
 const FileList = []
 const handleFileChange = (file, key) => {

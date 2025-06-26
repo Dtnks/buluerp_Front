@@ -13,12 +13,24 @@
   </el-upload>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { genFileId } from 'element-plus'
 import { getFullImageUrl } from '@/utils/image/getUrl'
-const props = defineProps(['setFile', 'ImgUrl'])
 
-const imgShowUrl = props.ImgUrl ? ref(getFullImageUrl(props.ImgUrl)) : ref('')
+const props = defineProps(['setFile', 'ImgUrl'])
+const imgShowUrl = ref('')
+const upload = ref()
+watch(
+  () => props.ImgUrl,
+  (newImgUrl) => {
+    console.log(newImgUrl)
+    imgShowUrl.value = newImgUrl ? getFullImageUrl(newImgUrl) : ''
+    if (!newImgUrl && upload.value) {
+      upload.value.clearFiles()
+    }
+  },
+)
+imgShowUrl.value = props.ImgUrl ? getFullImageUrl(props.ImgUrl) : ''
 const handleFileChange = (file, fileList) => {
   props.setFile(file.raw)
   imgShowUrl.value = URL.createObjectURL(file.raw)
@@ -26,7 +38,6 @@ const handleFileChange = (file, fileList) => {
 const handleFileRemove = () => {
   imgShowUrl.value = ''
 }
-const upload = ref()
 const handleFileExceed = (files) => {
   upload.value.clearFiles()
   const file = files[0]
