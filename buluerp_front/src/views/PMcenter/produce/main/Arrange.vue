@@ -207,10 +207,7 @@ const operation = ref([
       if (row.pictureUrl) {
         newSubmit.value.pictureUrl = row.pictureUrl
       } else {
-        newSubmit.value.pictureUrl = '11'
-        setTimeout(() => {
-          newSubmit.value.pictureUrl = ''
-        }, 0)
+        delete newSubmit.value.pictureUrl
       }
       console.log(newSubmit.value)
     },

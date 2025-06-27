@@ -17,14 +17,16 @@ import { ref, watch } from 'vue'
 import { genFileId } from 'element-plus'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 
-const props = defineProps(['setFile', 'ImgUrl'])
+const props = defineProps(['setFile', 'ImgUrl', 'setImgUrl'])
 const imgShowUrl = ref('')
 const upload = ref()
 watch(
   () => props.ImgUrl,
   (newImgUrl) => {
-    console.log(newImgUrl)
-    imgShowUrl.value = newImgUrl ? getFullImageUrl(newImgUrl) : ''
+    if (newImgUrl != 'created') {
+      imgShowUrl.value = newImgUrl ? getFullImageUrl(newImgUrl) : ''
+    }
+
     if (!newImgUrl && upload.value) {
       upload.value.clearFiles()
     }
@@ -34,6 +36,7 @@ imgShowUrl.value = props.ImgUrl ? getFullImageUrl(props.ImgUrl) : ''
 const handleFileChange = (file, fileList) => {
   props.setFile(file.raw)
   imgShowUrl.value = URL.createObjectURL(file.raw)
+  props.setImgUrl('created')
 }
 const handleFileRemove = () => {
   imgShowUrl.value = ''

@@ -66,6 +66,11 @@
                 Formvalue[ele.key] = file
               }
             "
+            :setImgUrl="
+              (url) => {
+                Formvalue[ele.key + 'Url'] = url
+              }
+            "
             :ImgUrl="Formvalue[ele.key + 'Url']"
           />
         </el-form-item>
