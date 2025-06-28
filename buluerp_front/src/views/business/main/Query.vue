@@ -56,6 +56,8 @@ const fetchTableData = async () => {
     )
     const params = {
       ...filteredParams,
+      orderByColumn: 'createTime', // 默认按创建时间排序
+      isAsc: 'desc', // 默认降序
       pageNum: pagination.page,
       pageSize: pagination.pageSize,
     }
@@ -98,9 +100,10 @@ const handleUpdate = async (updatedData: TableDataType) => {
     console.log('更新结果(handelUpdate):', res)
     messageBox('success', null, '订单已成功更新')
     fetchTableData()
-  } else {
-    messageBox('error', null, null, '更新订单失败，请检查输入数据是否正确')
   }
+  //  else {
+  //   messageBox('error', null, null, '更新订单失败，请检查输入数据是否正确')
+  // }
 }
 
 // handlePageChange: 处理分页

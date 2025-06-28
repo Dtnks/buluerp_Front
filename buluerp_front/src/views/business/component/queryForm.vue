@@ -146,7 +146,7 @@ const formState = reactive({
   id: 14,
   remark: '',
   operatorId: '0',
-  quantity: 0,
+  quantity: 1,
   customerId: 0,
   customerName: '',
 })

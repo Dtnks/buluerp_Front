@@ -201,7 +201,7 @@ const fetchOrderProduct = async (orderId: number) => {
 const updatedProduct = ref({
   id: 0,
   productName: '',
-  productQuantity: 0,
+  productQuantity: 1,
 })
 
 // todo: 根据下拉框的选择更新产品行
