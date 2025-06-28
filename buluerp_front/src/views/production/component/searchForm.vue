@@ -93,7 +93,15 @@
       <el-form-item label="产品名称" prop="name">
         <el-input v-model="createForm.name" placeholder="请输入产品名称" />
       </el-form-item>
-
+      <el-form-item label="内部编号" prop="innerId">
+        <el-input v-model="createForm.innerId" placeholder="请输入内部编号" />
+      </el-form-item>
+      <el-form-item label="外部编号" prop="outerId">
+        <el-input v-model="createForm.outerId" placeholder="请输入外部编号" />
+      </el-form-item>
+      <el-form-item label="订单ID" prop="orderId">
+        <el-input v-model="createForm.orderId" placeholder="请输入订单ID" />
+      </el-form-item>
       <el-form-item label="产品图片" prop="image">
         <el-upload
           class="avatar-uploader"
@@ -144,6 +152,9 @@ defineProps(['control'])
 const createDialogVisible = ref(false)
 const createForm = reactive({
   name: '',
+  innerId: '',
+  outerId: '',
+  orderId: '',
   image: '',
   materialIds: [] as number[],
 })
@@ -151,6 +162,9 @@ const createForm = reactive({
 const createFormRef = ref<FormInstance>()
 const createFormRules = {
   name: [{ required: true, message: '请输入产品名称', trigger: 'blur' }],
+  innerId: [{ required: true, message: '请输入内部编号', trigger: 'blur' }],
+  outerId: [{ required: true, message: '请输入外部编号', trigger: 'blur' }],
+  orderId: [{ required: true, message: '请输入订单ID', trigger: 'blur' }],
   image: [{ required: true, message: '请上传产品图片', trigger: 'change' }],
   materialIds: [
     {
@@ -177,6 +191,9 @@ const handleCreateSubmit = async () => {
   const formData = new FormData()
   formData.append('name', createForm.name)
   formData.append('picture', imageFile.value)
+  formData.append('innerId', createForm.innerId)
+  formData.append('outerId', createForm.outerId)
+  formData.append('orderId', createForm.orderId)
 
   createForm.materialIds.forEach((id) => {
     formData.append('materialIds', id)
@@ -203,6 +220,9 @@ const handleCreateSubmit = async () => {
 const resetCreateForm = () => {
   createForm.name = ''
   createForm.image = ''
+  createForm.outerId = ''
+  createForm.innerId = ''
+  createForm.orderId = ''
   createForm.materialIds = []
   imageFile.value = null
   createFormRef.value?.clearValidate?.()
