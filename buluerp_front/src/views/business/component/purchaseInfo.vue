@@ -60,6 +60,9 @@ onMounted(() => {
 const getPurchaseData = async () => {
   const res = await getPurchaseInfo(props.data.purchaseId);
   console.log('获取外购表数据:', res);
+  if( res.code == 200) {
+    purchaseData.value = res.data || {};
+  }
 }
 
 </script>

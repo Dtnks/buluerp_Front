@@ -54,10 +54,10 @@ export const addOrder = async (data: any) => {
     const res = await postOrder(data)
     if (res.code === 200) {
       console.log('添加订单成功：', res)
-      return res
     } else {
       console.log('添加订单失败：', res)
-    }
+      
+    }return res
 }
 
 // searchOrders: 查询订单

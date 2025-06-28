@@ -14,14 +14,14 @@ const props = defineProps<{
 // 数据
 const detail = ref<any>()
 const basicData = ref<any[]>([])
-const orderProduct = ref<any[]>([])
+// const orderProduct = ref<any[]>([])
 
 onMounted(async () => {
   if (props.data.id) {
     const detailRes = await getOrderDetail(props.data.id)
     detail.value = detailRes
-    const productsRes = await getOderProducts(props.data.id)
-    orderProduct.value = productsRes
+    // const productsRes = await getOderProducts(props.data.id)
+    // orderProduct.value = productsRes
     console.log('1231323242424');
 
   } else {
