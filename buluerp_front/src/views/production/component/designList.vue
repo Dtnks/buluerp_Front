@@ -68,7 +68,7 @@ import {
 } from '@/apis/designs.js'
 import { exportToExcel } from '@/utils/file/exportExcel'
 import { downloadBinaryFile } from '@/utils/file/base64'
-import { messageBox } from '@/components/message/messageBox' 
+import { messageBox } from '@/components/message/messageBox'
 import Style from '@/views/production/main/StyleTable.vue'
 
 
@@ -116,6 +116,8 @@ const onEdit = (row: any) => {
 const handleSubmit = async (formData: any) => {
   try {
     if (isEdit.value) {
+      formData.id = currentRow.value.id
+
       const res = await updateDesign(formData)
       if (res.code === 200) {
         messageBox('success', Promise.resolve, '更新成功', '', '')
@@ -130,6 +132,7 @@ const handleSubmit = async (formData: any) => {
     showDialog.value = false
   }
 }
+
 
 onMounted(() => {
   fetchData()

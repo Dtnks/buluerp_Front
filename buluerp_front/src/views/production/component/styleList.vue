@@ -122,6 +122,7 @@ import { messageBox } from '@/components/message/messageBox'
 import { ElMessageBox } from 'element-plus'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import StyleDialog from '../component/styleDialog.vue'
+import useTabStore from '@/stores/modules/tabs'
 
 const props = defineProps<{
   detail: { designId: number }
@@ -135,6 +136,7 @@ const pageSize = ref(10)
 const total = ref(0)
 const selectedRows = ref<any[]>([])
 
+const tabStore = useTabStore()
 const showDialog = ref(false)
 const isEdit = ref(false)
 const currentRow = ref({})
@@ -192,7 +194,7 @@ const restoreSelection = () => {
 
 const onCreate = () => {
   isEdit.value = false
-  currentRow.value = {} 
+  currentRow.value = {}
   showDialog.value = true
 }
 
@@ -389,6 +391,7 @@ const handleConfirm = async () => {
     const res = await pmcConfirm(props.detail.designId)
     if (res.code === 200) {
       messageBox('success', null, '确认成功', '', '')
+      tabStore.freshTab('设计总表')
     } else {
       messageBox('error', null, '', '确认失败', '')
     }
@@ -402,6 +405,7 @@ const handleCancelConfirm = async () => {
     const res = await pmcCancel(props.detail.designId)
     if (res.code === 200) {
       messageBox('success', null, '取消确认成功', '', '')
+      tabStore.freshTab('设计总表')
     } else {
       messageBox('error', null, '', '取消确认失败', '')
     }

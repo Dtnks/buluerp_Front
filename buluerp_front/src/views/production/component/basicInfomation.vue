@@ -31,6 +31,7 @@ const originalProductName = ref('')
 const mainFormRef = ref<FormInstance>()
 const mainFormState = reactive({
   productPrice: '',
+  orderId: '',
   productName: '',
   productIntro: '',
   designStatus: 0,
@@ -58,10 +59,11 @@ watch(
     if (val) {
       mainFormState.productName = val.name || ''
       originalProductName.value = val.name || ''
+      mainFormState.orderId = val.orderId || ''
       mainFormState.designStatus = Number(val.designStatus ?? 0)
       if (val.pictureUrl) {
-        pictureUrl.value = resolveImageUrl(val.pictureUrl) 
-        pictureFile.value = null  
+        pictureUrl.value = resolveImageUrl(val.pictureUrl)
+        pictureFile.value = null
       }
 
       if (Array.isArray(val.materialIds) && val.materialIds.length > 0) {
@@ -113,6 +115,7 @@ const submitMainForm = async () => {
     await updateProduct({
       id: Number(props.detail?.id),
       name: mainFormState.productName,
+      orderId: mainFormState.orderId,
       designStatus: Number(mainFormState.designStatus),
       picture: pictureFile.value ?? null,
     })
@@ -123,7 +126,7 @@ const submitMainForm = async () => {
       const newTabName = `详情页-${mainFormState.productName}`
       tabStore.changeTabName(oldTabName, newTabName)
 
-      originalProductName.value = mainFormState.productName 
+      originalProductName.value = mainFormState.productName
     }
     messageBox('success', null, '提交成功', '', '')
   } catch (err) {
@@ -269,8 +272,8 @@ const resetMaterialForm = () => {
           </el-form-item>
         </el-col>
         <el-col :span="8">
-          <el-form-item label="产品介绍" prop="productIntro">
-            <el-input v-model="mainFormState.productIntro" placeholder="请输入" />
+          <el-form-item label="订单ID" prop="orderId">
+            <el-input v-model="mainFormState.orderId" placeholder="请输入" />
           </el-form-item>
         </el-col>
         <el-col :span="8">
@@ -305,7 +308,6 @@ const resetMaterialForm = () => {
 
       <el-steps :active="1" align-center>
         <el-step title="填写产品组装物料信息" />
-        <el-step title="填写产品包装信息" />
         <el-step title="完成" />
       </el-steps>
 
