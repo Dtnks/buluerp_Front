@@ -34,7 +34,7 @@
                   删除
                 </el-button>
               </template>
-            </el-table-column> -->
+</el-table-column> -->
           </el-table>
 
         </informationCard>
@@ -331,16 +331,25 @@ const relatedOrdersTable = ref([
 
 // //  页脚按钮
 // onBoxSubmit: 提交按钮
-const onBoxSubmit = () => {
+const onBoxSubmit = async () => {
   console.log('提交1111', updateFields.value)
   const submitData = { ...updateFields.value }
   if (submitData.deliveryTime instanceof Date) { submitData.deliveryTime = dayjs(submitData.deliveryTime).format('YYYY-MM-DD') }
-  putOrder(submitData).then(() => { messageBox('success', null, '订单已成功提交') }).catch((error) => {
-    console.error('提交订单失败:', error)
-    messageBox('error', null, null, '提交订单失败，请稍后再试')
-  })
-  const res = getOrdersList()
-  tabStore.freshTab('订单查询')
+  const res = await putOrder(submitData)
+  console.log('提交订单数据:555', res)
+  if (res.code == 200) {
+    messageBox('success', null, '订单已成功提交')
+    tabStore.freshTab('订单查询')
+  } else {
+    console.error('提交订单失败')
+    console.log('提交订单失败:', res);
+
+    messageBox('error', null, null, res.msg)
+  }
+
+
+  getOrdersList()
+
 }
 
 // onBoxCancel: 取消按钮
