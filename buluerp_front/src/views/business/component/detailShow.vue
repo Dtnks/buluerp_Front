@@ -22,38 +22,21 @@
         </informationCard>
         <!-- 订单详情 -->
         <informationCard title="订单详情">
-          <el-table :data="displayProducts" style="width: 100%">
-            <el-table-column prop="productId" label="产品编号">
-              <!-- <template #default="scope">
-              <el-select  v-if="scope.$index >= 2" v-model="selectedProductIds.value[scope.$index]" @change="updateRow(scope.row, scope.$index)">
-                <el-option v-for="product in orderDetail.products" :key="product.productId" :label="product.productId"
-                  :value="product.productId">
-                </el-option>
-              </el-select>
-              <span v-else>{{ scope.row.productId }}</span>
-            </template> -->
-            </el-table-column>
-            <el-table-column prop="product.name" label="产品名称">
-              <template #default="scope">
-                {{ scope.row.product ? scope.row.product.name : '未选择产品' }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="quantity" label="数量" />
-            <el-table-column prop="remark" label="其他信息" />
-            <el-table-column prop="action" label="操作" width="180">
+          <el-table :data="orderProduct" style="width: 100%">
+            <el-table-column label="产品ID" prop="id" />
+            <el-table-column label="产品名称" prop="name" />
+            <el-table-column label="创建时间" prop="createTime" />
+            <el-table-column label="更新时间" prop="updateTime" />
+            <!-- <el-table-column prop="action" label="操作" width="180">
               <template #default="scope">
                 <el-button @click="onEditProduct(scope.row)" link type="primary" size="small">编辑</el-button>
                 <el-button link type="primary" size="small" @click="onDeleteProduct(scope.row)">
                   删除
                 </el-button>
               </template>
-            </el-table-column>
+            </el-table-column> -->
           </el-table>
-          <div class="add-row">
-            <span class="add-row-text">增加</span>
-            <el-input v-model="addRowCount" class="input-blank" />
-            <span class="add-row-text">行</span>
-          </div>
+
         </informationCard>
         <!-- 关联订单 -->
         <informationCard title="关联订单">
@@ -96,7 +79,7 @@
     <el-dialog v-model="editproductVisible" title="编辑产品" width="500px">
       <el-form :model="updatedProduct" label-width="100px">
         <el-form-item label="产品编号">
-          <el-input v-model="updatedProduct.productId" disabled />
+          <el-input v-model="updatedProduct.id" disabled />
         </el-form-item>
         <el-form-item label="产品名称">
           <el-input v-model="updatedProduct.productName" disabled />
@@ -119,7 +102,6 @@ import { computed, onMounted, ref } from 'vue'
 import { getStatusText } from '../utils/statusMap'
 import { getOrderDetail } from '../function/oders'
 import { getOrdersList, putOrder } from '@/apis/orders'
-import { deleteProduct } from '@/apis/products'
 import { getPackagingByOrderCode } from '@/apis/produceControl/produce/packaging'
 import { ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElMessageBox, ElDialog, dayjs } from 'element-plus'
 import CreateForm from '@/components/form/CreateForm.vue'
@@ -144,7 +126,7 @@ const orderDetail = computed(() => props.detail)
 
 onMounted(() => {
   console.log('订单详情组件加载', props.id)
-  fetchOrderProducts(props.id)
+  fetchOrderProduct(props.id)
 })
 
 // 控制 CreateForm 的显示
@@ -179,14 +161,18 @@ const updateFields = ref({
 })
 
 // 订单详情-产品数据
-const orderProducts = ref([])
+const orderProduct = ref([])
 
 // 获取订单产品数据
-const fetchOrderProducts = async (orderId: number) => {
+const fetchOrderProduct = async (orderId: number) => {
   try {
     const res = await getOrderDetail(orderId)
-    if (res.products) {
-      orderProducts.value = res.products || []
+    console.log('订单产品数据:22222222', res.product);
+
+    if (res.product) {
+      // orderProduct.value = res.product
+      orderProduct.value = Array.isArray(res.product) ? res.product : [res.product]
+      console.log('orderProduct.value', orderProduct.value)
     } else {
       messageBox('error', null, null, '获取订单产品数据失败, 请检查订单是否存在产品信息')
     }
@@ -196,24 +182,24 @@ const fetchOrderProducts = async (orderId: number) => {
   }
 }
 
-// 用户选择的产品编号
-const selectedProductIds = ref({})
+// // 用户选择的产品编号
+// const selectedProductIds = ref({})
 
-// 用户输入的新增的行数
-const addRowCount = ref(0)
-const newRowCount = computed(() => Number(addRowCount.value) + 2)
+// // 用户输入的新增的行数
+// const addRowCount = ref(0)
+// const newRowCount = computed(() => Number(addRowCount.value) + 2)
 
-// 展示出来的产品数据
-const displayProducts = computed(() => {
-  if (addRowCount.value == 0) {
-    return orderProducts.value.slice(0, 2)
-  }
-  return [...orderProducts.value.slice(0, newRowCount.value)]
-})
+// // 展示出来的产品数据
+// const displayProducts = computed(() => {
+//   if (addRowCount.value == 0) {
+//     return orderProduct.value.slice(0, 2)
+//   }
+//   return [...orderProduct.value.slice(0, newRowCount.value)]
+// })
 
 // 编辑弹窗的产品数据
 const updatedProduct = ref({
-  productId: 0,
+  id: 0,
   productName: '',
   productQuantity: 0,
 })
@@ -227,25 +213,25 @@ const onDeleteProduct = (row: any) => {
     cancelButtonText: '取消',
     type: 'warning',
   })
-    .then(() => {
-      // 删除逻辑
-      deleteProduct(row.productId)
-        .then(() => {
-          // 从订单产品列表中移除该产品
-          orderProducts.value = orderProducts.value.filter(
-            (item) => item.productId !== row.productId,
-          )
-          fetchOrderProducts(props.id)
-          messageBox('success', null, '产品已成功删除')
-        })
-        .catch((error) => {
-          console.error('删除产品失败:', error)
-          messageBox('error', null, null, '删除产品失败, 请稍后再试')
-        })
-    })
-    .catch(() => {
-      messageBox('success', null, '已取消删除操作')
-    })
+  // .then(() => {
+  //   // 删除逻辑
+  //   deleteProduct(row.productId)
+  //     .then(() => {
+  //       // // 从订单产品列表中移除该产品
+  //       // orderProduct.value = orderProduct.value.filter(
+  //       //   (item) => item.productId !== row.productId,
+  //       // )
+  //       fetchOrderProduct(props.id)
+  //       messageBox('success', null, '产品已成功删除')
+  //     })
+  //     .catch((error) => {
+  //       console.error('删除产品失败:', error)
+  //       messageBox('error', null, null, '删除产品失败, 请稍后再试')
+  //     })
+  // })
+  // .catch(() => {
+  //   messageBox('success', null, '已取消删除操作')
+  // })
 }
 
 // onEditProduct: 编辑订单产品
@@ -266,7 +252,7 @@ const onEditProductConfirm = async (product: any) => {
   try {
     await putOrder({
       ...orderDetail.value,
-      products: orderProducts.value.map((item) =>
+      products: orderProduct.value.map((item) =>
         item.productId === product.productId
           ? {
             ...item,
@@ -275,7 +261,7 @@ const onEditProductConfirm = async (product: any) => {
           : item,
       ),
     })
-    fetchOrderProducts(props.id)
+    fetchOrderProduct(props.id)
     messageBox('success', null, '订单产品已成功更新')
   } catch (error) {
     console.error('更新订单产品失败:', error)

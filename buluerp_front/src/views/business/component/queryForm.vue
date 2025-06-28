@@ -15,6 +15,12 @@
       <el-form-item label="客户姓名">
         <el-input v-model="dialogForm.customerName" placeholder="请输入" />
       </el-form-item>
+      <el-form-item label="外部编号" required>
+        <el-input v-model="dialogForm.outerId" placeholder="请输入" />
+      </el-form-item>
+      <el-form-item label="内部编号" required>
+        <el-input v-model="dialogForm.innerId" placeholder="请输入" />
+      </el-form-item>
       <el-form-item label="其他信息">
         <el-input v-model="dialogForm.remark" autocomplete="off" placeholder="请输入" />
       </el-form-item>
@@ -67,6 +73,7 @@ const dialogForm = reactive({
   createdBy: '',
   otherInfo: '',
   innerId: '',
+  outerId: '',
   id: 14,
   remark: '',
   operatorId: '0',
@@ -172,7 +179,7 @@ const onSubmit = () => {
     ? format(new Date(searchForm.value.createTime[1]), 'yyyy-MM-dd HH:mm:ss')
     : null;
   const submitForm: SubmitFormType = {
-    ...searchForm.value, 
+    ...searchForm.value,
     createTimeFrom,
     createTimeTo,
   }

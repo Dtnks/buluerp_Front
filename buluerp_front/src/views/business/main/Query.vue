@@ -87,7 +87,7 @@ const handleAdd = async (newData: TableDataType) => {
     fetchTableData()
   }
   else {
-    messageBox('error', null, null, '新增订单失败，请检查输入数据是否正确')
+    messageBox('error', null, null, res.msg)
   }
 }
 
