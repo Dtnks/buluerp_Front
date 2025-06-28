@@ -127,6 +127,7 @@ import PackagingList from './packagingList.vue'
 import ProductionSchedule from './productionSchedule.vue'
 import { messageBox } from '@/components/message/messageBox'
 import PurchaseInfo from './purchaseInfo.vue'
+import useTabStore from '@/stores/modules/tabs'
 
 // Props
 const props = defineProps<{
@@ -135,9 +136,10 @@ const props = defineProps<{
   addTab: (targetName: string, component: any, data?: any, control?: any) => void
   control: Array<object>
 }>()
-
+const tabStore = useTabStore()
 const packagingInstance = getPackagingByOrderCode(props.id)
 packagingInstance().then((res) => (relatedOrdersTable.value[2].xxx = res.total))
+
 const orderDetail = computed(() => props.detail)
 
 onMounted(() => {
@@ -352,6 +354,7 @@ const onBoxSubmit = () => {
     messageBox('error', null, null, '提交订单失败，请稍后再试')
   })
   const res = getOrdersList()
+  tabStore.freshTab('订单查询')
 }
 
 // onBoxCancel: 取消按钮
