@@ -74,7 +74,7 @@ const newFormData = ref([
     { type: 'timer', label: '完成时间', key: 'completionTime', width: 12, timerType: 'date' },
   ],
   [{ type: 'textarea', label: '备注', key: 'remarks', width: 24 }],
-  [{ type: 'image', label: '封面', key: 'picture', width: 12 }],
+  [{ type: 'image', label: '样例图', key: 'picture', width: 12 }],
 ])
 const newSubmit = ref({
   colorCode: '',
@@ -238,7 +238,7 @@ const handleSubmit = () => {
       console.log(res)
       if (res.code == 200) {
         page.value = 1
-        listPlan(page.value, pageSize.value).then((res) => {
+        listArrange(page.value, pageSize.value).then((res) => {
           listData.value = res.rows
           total.value = res.total
         })

@@ -9,7 +9,7 @@
     style="margin: 20px; width: 200px; height: 200px; text-align: center"
   >
     <img v-if="imgShowUrl" :src="imgShowUrl" class="cover" style="width: 150px; height: 150px" />
-    <div v-else class="centerText">上传封面</div>
+    <div v-else class="centerText">上传样例图</div>
   </el-upload>
 </template>
 
@@ -28,11 +28,10 @@ const imgShowUrl = ref('')
 watch(
   () => props.initialUrl,
   (url) => {
-    imgShowUrl.value = url || '' 
+    imgShowUrl.value = url || ''
   },
-  { immediate: true }
+  { immediate: true },
 )
-
 
 const handleFileChange = (file, fileList) => {
   const rawFile = file.raw

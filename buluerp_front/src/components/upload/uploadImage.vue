@@ -9,7 +9,7 @@
     :limit="1"
   >
     <img v-if="imgShowUrl" :src="imgShowUrl" class="cover" style="width: 150px; height: 150px" />
-    <div v-else class="centerText">上传封面</div>
+    <div v-else class="centerText">上传样例图</div>
   </el-upload>
 </template>
 <script setup lang="ts">

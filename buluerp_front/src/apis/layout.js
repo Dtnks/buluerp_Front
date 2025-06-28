@@ -23,3 +23,12 @@ export async function GetUserInfo() {
   })
   return res
 }
+
+export async function GetMessage() {
+  let res = await httpInstance({
+    url: `/system/notification/unread`,
+    method: 'get',
+    headers: headers,
+  })
+  return res
+}

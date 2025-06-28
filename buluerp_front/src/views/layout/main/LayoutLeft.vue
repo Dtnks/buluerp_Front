@@ -13,43 +13,40 @@ onMounted(async () => {
   console.log('menuStore.menu.children:', menuStore.menu.children)
   menuOptions.value = menuStore.menu.children
 })
+import { defineAsyncComponent } from 'vue'
 
-import UserInformation from '@/views/person/main/Information.vue'
-import CustomQuery from '@/views/person/main/Custom.vue'
-import Manufacturers from '@/views/person/main/Manufacturers.vue'
-import BusinessShow from '@/views/business/main/Show.vue'
-import BusinessQuery from '@/views/business/main/Query.vue'
-import ProQuery from '@/views/production/main/Query.vue'
-import ProMaterial from '@/views/production/main/Material.vue'
-import DesignTable from '@/views/production/main/DesignTable.vue'
-import Admin from '@/views/admin/Admin.vue'
-import Role from '@/views/admin/Role.vue'
-import PMInventoryList from '@/views/PMcenter/inventory/main/List.vue'
-import PMInventoryQuery from '@/views/PMcenter/inventory/main/Query.vue'
-import PMProcurementQuery from '@/views/PMcenter/procurement/main/List.vue'
-import PMProcurementPlan from '@/views/PMcenter/procurement/main/Plan.vue'
-import PMProduceArrange from '@/views/PMcenter/produce/main/Arrange.vue'
-import PMProduceSchedule from '@/views/PMcenter/produce/main/Schedule.vue'
-import PMProducePackaging from '@/views/PMcenter/produce/main/Packaging.vue'
 const ComponentsGroup = {
-  UserInformation,
-  CustomQuery,
-  Manufacturers,
-  BusinessShow,
-  BusinessQuery,
-  ProQuery,
-  ProMaterial,
-  DesignTable,
-  Admin,
-  Role,
-  PMInventoryList,
-  PMInventoryQuery,
-  PMProcurementQuery,
-  PMProcurementPlan,
-  PMProduceArrange,
-  PMProduceSchedule,
-  PMProducePackaging,
+  UserInformation: () => import('@/views/person/main/Information.vue'),
+  CustomQuery: () => import('@/views/person/main/Custom.vue'),
+  Manufacturers: () => import('@/views/person/main/Manufacturers.vue'),
+  BusinessShow: () => import('@/views/business/main/Show.vue'),
+  BusinessQuery: () => import('@/views/business/main/Query.vue'),
+  ProQuery: () => import('@/views/production/main/Query.vue'),
+  ProMaterial: () => import('@/views/production/main/Material.vue'),
+  DesignTable: () => import('@/views/production/main/DesignTable.vue'),
+  Admin: () => import('@/views/admin/Admin.vue'),
+  Role: () => import('@/views/admin/Role.vue'),
+  PMInventoryList: () => import('@/views/PMcenter/inventory/main/List.vue'),
+  PMInventoryQuery: () => import('@/views/PMcenter/inventory/main/Query.vue'),
+  PMProcurementQuery: () => import('@/views/PMcenter/procurement/main/List.vue'),
+  PMProcurementPlan: () => import('@/views/PMcenter/procurement/main/Plan.vue'),
+  PMProduceArrange: () => import('@/views/PMcenter/produce/main/Arrange.vue'),
+  PMProduceSchedule: () => import('@/views/PMcenter/produce/main/Schedule.vue'),
+  PMProducePackaging: () => import('@/views/PMcenter/produce/main/Packaging.vue'),
 }
+const LazyComponentsGroup = new Proxy(
+  {},
+  {
+    get(target, prop) {
+      console.log(ComponentsGroup[prop], 111)
+      if (!target[prop] && ComponentsGroup[prop]) {
+        // 首次访问时解析动态导入
+        target[prop] = defineAsyncComponent(ComponentsGroup[prop])
+      }
+      return target[prop]
+    },
+  },
+)
 const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
 </script>
 <template>
@@ -73,7 +70,9 @@ const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
         <div v-for="subItem in item.children" :key="subItem.id">
           <el-menu-item
             :index="subItem.id"
-            @click="addTab(subItem.label, ComponentsGroup[subItem.path], null, subItem.children)"
+            @click="
+              addTab(subItem.label, LazyComponentsGroup[subItem.path], null, subItem.children)
+            "
             v-if="!subItem.disabled && subItem.path != '/'"
           >
             {{ subItem.label }}
@@ -89,7 +88,7 @@ const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
               @click="
                 addTab(
                   subSubItem.label,
-                  ComponentsGroup[subSubItem.path],
+                  LazyComponentsGroup[subSubItem.path],
                   null,
                   subSubItem.children,
                 )
