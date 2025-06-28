@@ -15,6 +15,7 @@ export function newArrange(data) {
 }
 
 export function changeArrange(data) {
+  console.log(data)
   return httpInstance({
     url: `system/production-arrange`,
     method: 'put',

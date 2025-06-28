@@ -52,6 +52,11 @@ const newFormData = ref([
     { type: 'input', label: '布产编号', key: 'productionId', width: 8 },
   ],
   [
+    { type: 'input', label: '排产模数', key: 'productionMouldCount', width: 8, timerType: 'date' },
+    { type: 'input', label: '排产数量', key: 'productionQuantity', width: 8 },
+    { type: 'input', label: '排产重量', key: 'productionWeight', width: 8 },
+  ],
+  [
     {
       type: 'input',
       label: '产品编号',
@@ -59,10 +64,6 @@ const newFormData = ref([
       width: 12,
     },
     { type: 'input', label: '产品编码', key: 'productCode', width: 12, timerType: 'date' },
-  ],
-  [
-    { type: 'input', label: '排产模数', key: 'productionMouldCount', width: 12, timerType: 'date' },
-    { type: 'input', label: '排产数量', key: 'productionQuantity', width: 12 },
   ],
   [
     { type: 'timer', label: '安排时间', key: 'scheduledTime', width: 12, timerType: 'date' },
@@ -73,7 +74,7 @@ const newFormData = ref([
     { type: 'timer', label: '完成时间', key: 'completionTime', width: 12, timerType: 'date' },
   ],
   [{ type: 'textarea', label: '备注', key: 'remarks', width: 24 }],
-  [{ type: 'image', label: '封面', key: 'picture', width: 12 }],
+  [{ type: 'image', label: '样例图', key: 'picture', width: 12 }],
 ])
 const newSubmit = ref({
   colorCode: '',
@@ -201,7 +202,13 @@ const operation = ref([
       const id = row.id
       title.value = '编辑'
       editDialogVisible.value = true
+      resetSubmit()
       newSubmit.value = { ...row }
+      if (row.pictureUrl) {
+        newSubmit.value.pictureUrl = row.pictureUrl
+      } else {
+        delete newSubmit.value.pictureUrl
+      }
       console.log(newSubmit.value)
     },
     value: '编辑',
@@ -227,11 +234,11 @@ const handleSubmit = () => {
   newSubmit.value.completionTime = parseTime(newSubmit.value.completionTime, '{y}-{m}-{d}')
   newSubmit.value.productionTime = parseTime(newSubmit.value.productionTime, '{y}-{m}-{d}')
   if (title.value == '编辑') {
-    console.log(newSubmit.value)
-    changePlan(newSubmit.value).then((res) => {
+    changeArrange(newSubmit.value).then((res) => {
+      console.log(res)
       if (res.code == 200) {
         page.value = 1
-        listPlan(page.value, pageSize.value).then((res) => {
+        listArrange(page.value, pageSize.value).then((res) => {
           listData.value = res.rows
           total.value = res.total
         })
@@ -278,7 +285,8 @@ const resetSubmit = () => {
     productionQuantity: '',
     scheduledTime: '',
     singleWeight: '',
-    picture: null,
+    picture: '',
+    pictureUrl: null,
   }
 }
 const onCreate = () => {
@@ -404,6 +412,7 @@ const handleSizeChange = async (val: number) => {
 listArrange(page.value, pageSize.value).then((res) => {
   total.value = res.total
   listData.value = res.rows
+  console.log(res.rows)
 })
 </script>
 <template>

@@ -115,7 +115,7 @@ const newFormData = ref([
     { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 12 },
     { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 12 },
   ],
-  [{ type: 'image', label: '封面', key: 'picture', width: 24 }],
+  [{ type: 'image', label: '样例图', key: 'picture', width: 24 }],
 ])
 const newSubmit = ref({
   orderCode: '',
@@ -414,7 +414,7 @@ const exportFunc = (row) => {
   formData.append('ids', ids)
   exportSelectTable(formData).then((res) => {
     const now = new Date()
-    downloadBinaryFile(res, '排产表_' + now.toLocaleDateString() + '_' + count + '.xlsx')
+    downloadBinaryFile(res, '布产表_' + now.toLocaleDateString() + '_' + count + '.xlsx')
     count += 1
   })
 }
