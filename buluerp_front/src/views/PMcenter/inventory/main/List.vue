@@ -19,6 +19,8 @@ import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessageBox } from 'element-plus'
+import { searchFunc } from '@/utils/search/search'
+import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 const type = ref('packaging-material')
 const refreshList = () => {
   listRecording(page.value, pageSize.value, type.value).then((res) => {
@@ -45,6 +47,7 @@ const TypeOptions = [
 const mapList = { 'packaging-material': '料包', part: '胶件', product: '成品' }
 const props = defineProps(['control'])
 //渲染页面
+const createFormRef = ref(null)
 const formData = ref({
   'packaging-material': [
     [
@@ -96,40 +99,136 @@ const formData = ref({
 const newFormData = ref({
   'packaging-material': [
     [
-      { type: 'input', label: '进出数量', key: 'inOutQuantity', width: 12 },
-      { type: 'input', label: '料包编号', key: 'packagingNumber', width: 12 },
+      {
+        type: 'input',
+        label: '进出数量',
+        key: 'inOutQuantity',
+        width: 12,
+        rules: [positiveNumberRule],
+      },
+      {
+        type: 'input',
+        label: '料包编号',
+        key: 'packagingNumber',
+        width: 12,
+        rules: [requiredRule],
+      },
     ],
     [
-      { type: 'timer', label: '日期', key: 'changeDate', width: 12, timerType: 'date' },
-      { type: 'input', label: '订单编号', key: 'orderCode', width: 12 },
+      {
+        type: 'timer',
+        label: '日期',
+        key: 'changeDate',
+        width: 12,
+        timerType: 'date',
+        rules: [requiredRule],
+      },
+      {
+        type: 'inputSelect',
+        label: '订单Id',
+        key: 'orderCode',
+        width: 12,
+        rules: [requiredRule],
+        remoteFunc: searchFunc('system/orders/list', 'innerId'),
+        options: [],
+        loading: false,
+      },
     ],
     [
-      { type: 'input', label: '产品货号', key: 'productPartNumber', width: 12 },
-      { type: 'input', label: '仓库位置', key: 'storageLocation', width: 12 },
+      {
+        type: 'inputSelect',
+        label: '产品ID',
+        key: 'productId',
+        width: 12,
+        rules: [requiredRule],
+        remoteFunc: searchFunc('system/products/list', 'id'),
+        options: [],
+        loading: false,
+      },
+      {
+        type: 'input',
+        label: '仓库位置',
+        key: 'storageLocation',
+        width: 12,
+        rules: [requiredRule],
+      },
     ],
     [{ type: 'textarea', label: '客户备注', key: 'remarks', width: 24 }],
   ],
   part: [
     [
-      { type: 'input', label: '进出数量', key: 'inOutQuantity', width: 12 },
-      { type: 'timer', label: '日期', key: 'changeDate', width: 12, timerType: 'date' },
+      {
+        type: 'input',
+        label: '进出数量',
+        key: 'inOutQuantity',
+        width: 12,
+        rules: [positiveNumberRule],
+      },
+      {
+        type: 'timer',
+        label: '日期',
+        key: 'changeDate',
+        width: 12,
+        timerType: 'date',
+        rules: [requiredRule],
+      },
     ],
     [
-      { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
-      { type: 'input', label: '订单编号', key: 'orderCode', width: 8 },
-      { type: 'input', label: '模具编号', key: 'mouldNumber', width: 8 },
+      { type: 'input', label: '颜色编号', key: 'colorCode', width: 8, rules: [requiredRule] },
+      {
+        type: 'inputSelect',
+        label: '订单Id',
+        key: 'orderCode',
+        width: 8,
+        rules: [requiredRule],
+        remoteFunc: searchFunc('system/orders/list', 'innerId'),
+        options: [],
+        loading: false,
+      },
+      { type: 'input', label: '模具编号', key: 'mouldNumber', width: 8, rules: [requiredRule] },
     ],
     [{ type: 'textarea', label: '客户备注', key: 'remarks', width: 24 }],
   ],
   product: [
     [
-      { type: 'input', label: '进出数量', key: 'inOutQuantity', width: 12 },
-      { type: 'timer', label: '日期', key: 'changeDate', width: 12, timerType: 'date' },
+      {
+        type: 'input',
+        label: '进出数量',
+        key: 'inOutQuantity',
+        width: 12,
+        rules: [positiveNumberRule],
+      },
+      {
+        type: 'timer',
+        label: '日期',
+        key: 'changeDate',
+        width: 12,
+        timerType: 'date',
+        rules: [requiredRule],
+      },
     ],
     [
-      { type: 'input', label: '料包编号', key: 'productPartNumber', width: 8 },
-      { type: 'input', label: '订单编号', key: 'orderCode', width: 8 },
-      { type: 'input', label: '仓库位置', key: 'storageLocation', width: 8 },
+      {
+        type: 'inputSelect',
+        label: '料包编号',
+        key: 'productPartNumber',
+        width: 8,
+        rules: [requiredRule],
+        remoteFunc: searchFunc('system/inventory/packaging-material/list', 'id'),
+        options: [],
+        loading: false,
+      },
+      {
+        type: 'inputSelect',
+        label: '订单Id',
+        key: 'orderCode',
+        width: 8,
+        rules: [requiredRule],
+        remoteFunc: searchFunc('system/orders/list', 'innerId'),
+        options: [],
+        loading: false,
+      },
+      { type: 'input', label: '仓库位置', key: 'storageLocation', width: 8, rules: [requiredRule] },
     ],
     [{ type: 'textarea', label: '客户备注', key: 'remarks', width: 24 }],
   ],
@@ -316,6 +415,8 @@ const operation = ref([
       const id = row.id
       title.value = '编辑'
       editDialogVisible.value = true
+
+      createFormRef.value.clearValidate()
       newSubmit.value[type.value] = { ...row }
     },
     value: '编辑',
@@ -327,39 +428,43 @@ const operation = ref([
 const importDialogVisible = ref(false)
 const editDialogVisible = ref(false)
 const handleSubmit = () => {
-  if (title.value == '编辑') {
-    changeRecording(newSubmit.value[type.value], type.value).then((res) => {
-      console.log(res)
-      if (res.code == 200) {
-        page.value = 1
-        listRecording(page.value, pageSize.value, type.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
+  createFormRef.value.validateForm((valid) => {
+    if (valid) {
+      if (title.value == '编辑') {
+        changeRecording(newSubmit.value[type.value], type.value).then((res) => {
+          console.log(res)
+          if (res.code == 200) {
+            page.value = 1
+            listRecording(page.value, pageSize.value, type.value).then((res) => {
+              listData.value = res.rows
+              total.value = res.total
+            })
+            ElMessage.success(res.msg)
+            editDialogVisible.value = false
+          } else {
+            ElMessage.error(res.msg)
+            return
+          }
         })
-        ElMessage.success(res.msg)
-        editDialogVisible.value = false
       } else {
-        ElMessage.error(res.msg)
-        return
-      }
-    })
-  } else {
-    newRecording(newSubmit.value[type.value], type.value).then((res) => {
-      console.log(res, newSubmit.value[type.value], type.value)
-      if (res.msg == '操作成功') {
-        page.value = 1
-        listRecording(page.value, pageSize.value, type.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
+        newRecording(newSubmit.value[type.value], type.value).then((res) => {
+          console.log(res, newSubmit.value[type.value], type.value)
+          if (res.msg == '操作成功') {
+            page.value = 1
+            listRecording(page.value, pageSize.value, type.value).then((res) => {
+              listData.value = res.rows
+              total.value = res.total
+            })
+            ElMessage.success(res.msg)
+            editDialogVisible.value = false
+          } else {
+            ElMessage.error('操作失败')
+            return
+          }
         })
-        ElMessage.success(res.msg)
-        editDialogVisible.value = false
-      } else {
-        ElMessage.error('操作失败')
-        return
       }
-    })
-  }
+    }
+  })
 }
 const title = ref('编辑')
 //传给form组件的参数
@@ -396,6 +501,8 @@ const onCreate = () => {
   resetSubmit()
   title.value = '新增'
   editDialogVisible.value = true
+
+  createFormRef.value.clearValidate()
 }
 
 const onSubmit = () => {
@@ -593,7 +700,7 @@ listRecording(page.value, pageSize.value, type.value).then((res) => {
     </div>
 
     <el-dialog v-model="editDialogVisible" :title="title" width="800px"
-      ><CreateForm :data="newFormData[type]" :Formvalue="newSubmit[type]" />
+      ><CreateForm :data="newFormData[type]" :Formvalue="newSubmit[type]" ref="createFormRef" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>

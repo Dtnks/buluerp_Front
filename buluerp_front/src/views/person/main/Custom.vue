@@ -17,8 +17,19 @@ import { ref } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox, FormInstance, FormRules } from 'element-plus'
 const props = defineProps(['control'])
+
+// 定义表单校验规则
+const rules = ref<FormRules>({
+  name: [{ required: true, message: '姓名不能为空', trigger: 'blur' }],
+  contact: [{ required: true, message: '联系方式不能为空', trigger: 'blur' }],
+  email: [{ required: true, message: '邮箱不能为空', trigger: 'blur' }],
+})
+
+// 表单引用
+const formRef = ref<FormInstance>()
+
 //渲染页面
 const formData = ref([
   [
@@ -91,38 +102,44 @@ const newSubmit = ref({
   remarks: '',
   creatTime: '',
 })
+
 const handleSubmit = () => {
-  if (title.value == '编辑') {
-    changeCustomer(newSubmit.value).then((res) => {
-      if (res.code == 200) {
-        page.value = 1
-        listCustomer(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
+  if (!formRef.value) return
+  formRef.value.validate((valid) => {
+    if (valid) {
+      if (title.value === '编辑') {
+        changeCustomer(newSubmit.value).then((res) => {
+          if (res.code === 200) {
+            page.value = 1
+            listCustomer(page.value, pageSize.value).then((res) => {
+              listData.value = res.rows
+              total.value = res.total
+            })
+            editDialogVisible.value = false
+            ElMessage.success(res.msg)
+          } else {
+            ElMessage.error(res.msg)
+          }
         })
-        editDialogVisible.value = false
-        ElMessage.success(res.msg)
       } else {
-        ElMessage.error(res.msg)
-        return
-      }
-    })
-  } else {
-    newCustomer(newSubmit.value).then((res) => {
-      if (res.msg == '操作成功') {
-        page.value = 1
-        listCustomer(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
+        newCustomer(newSubmit.value).then((res) => {
+          if (res.msg === '操作成功') {
+            page.value = 1
+            listCustomer(page.value, pageSize.value).then((res) => {
+              listData.value = res.rows
+              total.value = res.total
+            })
+            ElMessage.success(res.msg)
+            editDialogVisible.value = false
+          } else {
+            ElMessage.error(res.msg)
+          }
         })
-        ElMessage.success(res.msg)
-        editDialogVisible.value = false
-      } else {
-        ElMessage.error(res.msg)
-        return
       }
-    })
-  }
+    } else {
+      ElMessage.error('请填写完整必填信息')
+    }
+  })
 }
 const title = ref('编辑')
 //传给form组件的参数
@@ -304,20 +321,20 @@ listCustomer(page.value, pageSize.value).then((res) => {
     </div>
 
     <el-dialog v-model="editDialogVisible" :title="title" width="400px"
-      ><div class="col cardCenter">
-        <div class="input row">
-          <span>姓名 </span><el-input v-model="newSubmit.name" style="width: 240px" />
-        </div>
-        <div class="input row">
-          <span>联系方式 </span><el-input v-model="newSubmit.contact" style="width: 240px" />
-        </div>
-        <div class="input row">
-          <span>邮箱 </span><el-input v-model="newSubmit.email" style="width: 240px" />
-        </div>
-        <div class="input row">
-          <span>备注 </span><el-input v-model="newSubmit.remarks" style="width: 240px" />
-        </div>
-      </div>
+      ><el-form ref="formRef" :model="newSubmit" :rules="rules" label-width="80px">
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="newSubmit.name" style="width: 240px" />
+        </el-form-item>
+        <el-form-item label="联系方式" prop="contact">
+          <el-input v-model="newSubmit.contact" style="width: 240px" />
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="newSubmit.email" style="width: 240px" />
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="newSubmit.remarks" style="width: 240px" />
+        </el-form-item>
+      </el-form>
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
@@ -352,16 +369,4 @@ listCustomer(page.value, pageSize.value).then((res) => {
     </el-dialog>
   </div>
 </template>
-<style scoped>
-.input .el-input {
-  width: 240px;
-}
-.cardCenter .el-input {
-  margin-bottom: 20px;
-}
-.input span {
-  text-align: right;
-  padding-right: 5px;
-  width: 60px;
-}
-</style>
+<style scoped></style>
