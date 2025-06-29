@@ -23,10 +23,11 @@
         <!-- 订单详情 -->
         <informationCard title="订单详情">
           <el-table :data="orderProduct" style="width: 100%">
-            <el-table-column label="产品ID" prop="id" />
+            <el-table-column label="产品编码" prop="id" />
             <el-table-column label="产品名称" prop="name" />
             <el-table-column label="创建时间" prop="createTime" />
             <el-table-column label="更新时间" prop="updateTime" />
+            <el-table-column label="产品状态" prop="designStatus" />
             <!-- <el-table-column prop="action" label="操作" width="180">
               <template #default="scope">
                 <el-button @click="onEditProduct(scope.row)" link type="primary" size="small">编辑</el-button>
@@ -60,39 +61,17 @@
       <el-button type="primary" @click="onBoxSubmit">提交</el-button>
     </el-footer>
 
-    <el-dialog v-model="editDialogVisible" width="800px">
-      <CreateForm :data="newPackagingList" :Formvalue="newSubmit" />
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button type="info" @click="
-            () => {
-              editDialogVisible = false
-            }
-          ">
-            取消
-          </el-button>
-        </div>
-      </template>
-    </el-dialog>
-
-    <el-dialog v-model="editproductVisible" title="编辑产品" width="500px">
+    <!-- <el-dialog v-model="editproductVisible" title="编辑产品" width="500px">
       <el-form :model="updatedProduct" label-width="100px">
-        <el-form-item label="产品编号">
-          <el-input v-model="updatedProduct.id" disabled />
-        </el-form-item>
-        <el-form-item label="产品名称">
-          <el-input v-model="updatedProduct.productName" disabled />
-        </el-form-item>
-        <el-form-item label="产品数量">
-          <el-input v-model="updatedProduct.productQuantity" type="number" />
-        </el-form-item>
+        <el-form-item label="产品编号"> <el-input v-model="updatedProduct.id" disabled /> </el-form-item>
+        <el-form-item label="产品名称"> <el-input v-model="updatedProduct.productName" disabled /> </el-form-item>
+        <el-form-item label="产品数量"> <el-input v-model="updatedProduct.productQuantity" type="number" /> </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="editproductVisible = false">取消</el-button>
         <el-button type="primary" @click="onEditProductConfirm(updatedProduct)">保存</el-button>
       </template>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 
@@ -104,7 +83,6 @@ import { getOrderDetail } from '../function/oders'
 import { getOrdersList, putOrder } from '@/apis/orders'
 import { getPackagingByOrderCode } from '@/apis/produceControl/produce/packaging'
 import { ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElMessageBox, ElDialog, dayjs } from 'element-plus'
-import CreateForm from '@/components/form/CreateForm.vue'
 import PackagingList from './packagingList.vue'
 import ProductionSchedule from './productionSchedule.vue'
 import { messageBox } from '@/components/message/messageBox'
@@ -136,7 +114,6 @@ const openCreateForm = () => {
   showCreateForm.value = true
 }
 
-const editDialogVisible = ref(false)
 const editproductVisible = ref(false)
 // 订单状态
 const statusText = ref(getStatusText(props.detail.status))
@@ -144,8 +121,10 @@ const statusText = ref(getStatusText(props.detail.status))
 // 业务订单基本信息的字段信息
 const fields = ref([
   { label: '订单ID', value: props.detail.id },
-  { label: '创建日期', value: props.detail.createTime },
+  { label: '创建时间', value: props.detail.createTime },
   { label: '订单状态', value: statusText.value },
+  { label: '内部编号', value: props.detail.innerId },
+  { label: '外部编号', value: props.detail.outerId },
   { label: '客户姓名', value: props.detail.customerName },
   { label: '交付日期', value: props.detail.deliveryTime },
   { label: '其他基本信息', value: props.detail.remark },
