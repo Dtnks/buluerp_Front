@@ -25,6 +25,7 @@ declare module 'vue' {
     ATable: typeof import('ant-design-vue/es')['Table']
     CreateForm: typeof import('./src/components/form/CreateForm.vue')['default']
     EditUpload: typeof import('./src/components/upload/editUpload.vue')['default']
+    ElAutocomplete: typeof import('element-plus/es')['ElAutocomplete']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']

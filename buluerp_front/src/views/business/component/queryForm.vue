@@ -62,7 +62,7 @@ import { listCustomerAll } from '@/apis/custom'
 
 const dialogFormVisible = ref(false)
 
-const emit = defineEmits(['onSubmit', 'onAdd'])
+const emit = defineEmits(['onSubmit', 'onAdd', 'checkCustomerName', 'customerSuggestions'])
 defineProps(['control'])
 const dialogForm = reactive({
   status: Status.PendingDesign, // 确保 status 有默认值
@@ -191,37 +191,48 @@ const onCreate = () => {
 
 // 获取客户列表
 const customers = ref([])
+const suggestionResult = ref([])
 
 onMounted(async () => {
   // const res = await listCustomerAll()
   // customers.value = res.rows || []
 })
 
-// customerSuggestions: 客户姓名建议
-const customerSuggestions = async (queryString: string, cb) => {
-  const res = await listCustomerAll(queryString)
-  const customerNames = ref(res.rows.map(customer => customer.name))
-  // 如果没有查询字符串，返回所有客户名称
-  if (!queryString) {
-    cb(customerNames.value.map(name => ({ value: name })))
-    return
-  }
-  const results = queryString ? customerNames.value.filter(customer => customer.includes(queryString)) : customerNames.value
-  cb(results.map(name => ({ value: name })))
-}
+// // customerSuggestions: 客户姓名建议
+// const customerSuggestions = async (queryString: string, cb) => {
+//   const res = await listCustomerAll(queryString)
+//   const customerNames = ref(res.rows.map(customer => customer.name))
+//   // 如果没有查询字符串，返回客户表第一页客户名称
+//   if (!queryString) {
+//     cb(customerNames.value.map(name => ({ value: name })))
+//     return
+//   }
+
+//   const results = queryString ? customerNames.value.filter(customer => customer.includes(queryString)) : customerNames.value
+//   suggestionResult.value = queryString ? customerNames.value.filter(customer => customer.includes(queryString)) : customerNames.value
+//   cb(results.map(name => ({ value: name })))
+// }
 
 // // checkCustomerName: 校验客户姓名
-const checkCustomerName = () => {
-  if (!customers.value.map(customer => customer.name).includes(dialogForm.customerName)) {
-    messageBox('error', null, null, '客户姓名不存在，请重新输入')
-  }
-}
+// const checkCustomerName = () => {
+//   console.log('校验客户姓名:', dialogForm.customerName)
+//   if (suggestionResult.value.length === 0) {
+//     messageBox('error', null, null, '没有找到匹配的客户姓名, 请先添加客户')
+//   }
+// }
 
-watch(dialogForm, (newValue, oldValue) => {
-  if (newValue.customerName !== oldValue.customerName) {
-    checkCustomerName()
-  }
-})
+// watch(dialogForm, (newValue, oldValue) => {
+//   if (newValue.customerName !== oldValue.customerName) {
+//     checkCustomerName()
+//   }
+// })
+
+const customerSuggestions = (queryString: string, cb) => {
+  emit('customerSuggestions', queryString, cb)
+}
+const checkCustomerName = () => {
+  emit('checkCustomerName')
+}
 
 // onAddConfirm: 确认新增订单
 const onAddConfirm = () => {
