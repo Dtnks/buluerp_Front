@@ -316,7 +316,7 @@ const relatedOrdersTable = ref([
     type: '布产表',
     orderId: props.id,
     actions: [
-      { name: '创建', method: addProductsSchedule },
+      // { name: '创建', method: addProductsSchedule },
       { name: '查看', method: viewProductsSchedule },
     ],
   },
@@ -324,7 +324,7 @@ const relatedOrdersTable = ref([
     type: '分包表',
     orderId: props.id,
     actions: [
-      { name: '创建', method: addPackagingList },
+      // { name: '创建', method: addPackagingList },
       { name: '查看', method: viewPackagingList },
     ],
   },

@@ -165,7 +165,6 @@ defineExpose({ formState, formRef, searchForm })
 
 // onSubmit: 提交查询条件
 const onSubmit = () => {
-  console.log('onSubmit searchForm.value:', searchForm.value);
   const createTimeFrom = searchForm.value.createTime && searchForm.value.createTime.length > 0
     ? format(new Date(searchForm.value.createTime[0]), 'yyyy-MM-dd HH:mm:ss')
     : null;
@@ -179,8 +178,6 @@ const onSubmit = () => {
     createTimeTo,
   }
   delete submitForm.createTime // 删除 createTime 属性，避免重复提交
-
-  console.log('查询条件eq2eq2q：', submitForm)
   emit('onSubmit', submitForm)
 
 }
@@ -196,20 +193,12 @@ const customers = ref([])
 onMounted(async () => {
   const res = await listCustomerAll()
   customers.value = res.rows || []
-  console.log('获取kehu列表:ccc', customers.value);
-// // 获取所有客户姓名
-// const customerNames = computed(() => customers.value.map(customer => customer.name))
-// console.log('获取所有客户姓名:', customerNames.value);
 })
 
 // 客户姓名建议
 const customerSuggestions = (queryString: string, cb) => {
-  //   const res = await listCustomerAll()
-  // customers.value = res.rows || []
-  // console.log('获取kehu列表:ccc', customers.value);
-// 获取所有客户姓名
+
 const customerNames = computed(() => customers.value.map(customer => customer.name))
-console.log('获取所有客户姓名:', customerNames.value);
  const results = queryString
     ? customerNames.value.filter(customer => customer.includes(queryString))
     : customerNames.value
