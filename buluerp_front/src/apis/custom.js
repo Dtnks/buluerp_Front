@@ -47,9 +47,9 @@ export function listCustomer(pageNum, pageSize, searchContent = {}) {
   })
 }
 
-export function listCustomerAll() {
+export function listCustomerAll(name) {
   return httpInstance({
-    url: `system/customers/list`,
+    url: `system/customers/list?name=${name || ''}`,
     method: 'get',
     headers: headers,
   })

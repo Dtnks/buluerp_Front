@@ -191,14 +191,21 @@ const onCreate = () => {
 const customers = ref([])
 
 onMounted(async () => {
-  const res = await listCustomerAll()
-  customers.value = res.rows || []
+  // const res = await listCustomerAll()
+  // customers.value = res.rows || []
 })
 
 // 客户姓名建议
-const customerSuggestions = (queryString: string, cb) => {
-
-const customerNames = computed(() => customers.value.map(customer => customer.name))
+const customerSuggestions = async (queryString: string, cb) => {
+const res = await listCustomerAll(queryString)
+// const customerNames = computed(() => customers.value.map(customer => customer.name))
+const customerNames = ref(res.rows.map(customer => customer.name))
+  // 如果没有查询字符串，返回所有客户名称
+  if (!queryString) {
+    cb(customerNames.value.map(name => ({ value: name })))
+    return
+  }
+  // 根据查询字符串过滤客户名称
  const results = queryString
     ? customerNames.value.filter(customer => customer.includes(queryString))
     : customerNames.value
