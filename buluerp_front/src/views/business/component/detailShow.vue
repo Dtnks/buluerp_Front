@@ -173,9 +173,10 @@ const fetchOrderProduct = async (orderId: number) => {
       // orderProduct.value = res.product
       orderProduct.value = Array.isArray(res.product) ? res.product : [res.product]
       console.log('orderProduct.value', orderProduct.value)
-    } else {
-      messageBox('error', null, null, '获取订单产品数据失败, 请检查订单是否存在产品信息')
     }
+    // else {
+    //   messageBox('error', null, null, '获取订单产品数据失败, 请检查订单是否存在产品信息')
+    // }
   } catch (error) {
     console.error('获取订单产品数据失败:', error)
     messageBox('error', null, null, '获取订单产品数据失败, 请稍后再试')
