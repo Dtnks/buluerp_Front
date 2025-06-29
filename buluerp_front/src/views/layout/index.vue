@@ -25,7 +25,7 @@ const handleHiddenMenu = () => {
   <div class="row">
     <LayoutLeft :isCollapse="isCollapse" :addTab="addTab" />
     <div class="col" style="flex: 1; height: 100vh; overflow-y: scroll">
-      <LayoutTop :handleHiddenMenu="handleHiddenMenu" :reverse="reverse"></LayoutTop>
+      <LayoutTop :handleHiddenMenu="handleHiddenMenu" :reverse="reverse" :addTab="addTab" />
       <el-tabs
         v-model="editableTabsValue"
         type="card"

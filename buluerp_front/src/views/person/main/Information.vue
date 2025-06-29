@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import useTabStore from '@/stores/modules/tabs'
-const store = useTabStore()
+import { GetMessage } from '@/apis/layout'
+const message = ref()
+GetMessage().then((res) => {
+  message.value = res
+})
 </script>
 <template>
-  <div
-    @click="
-      () => {
-        store.changeTabName('产品查询', '产品查询修改')
-      }
-    "
-  ></div>
+  <div>{{ message.value }}</div>
 </template>

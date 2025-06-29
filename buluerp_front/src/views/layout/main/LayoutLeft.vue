@@ -38,7 +38,6 @@ const LazyComponentsGroup = new Proxy(
   {},
   {
     get(target, prop) {
-      console.log(ComponentsGroup[prop], 111)
       if (!target[prop] && ComponentsGroup[prop]) {
         // 首次访问时解析动态导入
         target[prop] = defineAsyncComponent(ComponentsGroup[prop])
