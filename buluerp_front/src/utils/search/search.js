@@ -2,12 +2,13 @@ import httpInstance from '../httpsInstance'
 let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
 
 export const searchFunc = (url, key) => {
+  let tempUrl = `${url}?${key}=`
   return (ele, content) => {
     if (content) {
       ele.loading = true
-      console.log(`${url}?${key}=${content}`)
+      console.log(`${tempUrl}${content}`)
       httpInstance({
-        url: `${url}?${key}=${content}`,
+        url: `${tempUrl}${content}`,
         method: 'get',
         headers: headers,
       }).then((res) => {

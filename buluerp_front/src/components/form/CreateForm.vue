@@ -151,7 +151,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, computed, onMounted, nextTick } from 'vue'
+import { defineProps, ref, computed, nextTick } from 'vue'
 import upload from '../upload/uploadImage.vue'
 import type { FormInstance } from 'element-plus'
 const formRef = ref<FormInstance | null>(null)
@@ -165,15 +165,6 @@ const props = defineProps({
     required: true,
   },
 })
-const onRemove = (file, key) => {
-  const index = FileList.indexOf(file.raw)
-  FileList.splice(index, 1)
-  if (index >= 0) {
-    // 移除指定索引处的一个元素
-    props.Formvalue[key] = FileList
-  }
-}
-
 // 从 data 中提取所有规则
 const formRules = computed(() => {
   const rules: Record<string, any[]> = {}
