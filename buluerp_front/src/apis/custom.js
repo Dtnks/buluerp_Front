@@ -46,6 +46,16 @@ export function listCustomer(pageNum, pageSize, searchContent = {}) {
     headers: headers,
   })
 }
+
+export function listCustomerAll() {
+  return httpInstance({
+    url: `system/customers/list`,
+    method: 'get',
+    headers: headers,
+  })
+}
+
+
 export function exportSelectTable(data) {
   return httpInstance({
     url: `system/customers/export`,

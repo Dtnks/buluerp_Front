@@ -13,7 +13,7 @@
         </el-select>
       </el-form-item> -->
       <el-form-item label="客户姓名">
-        <el-input v-model="dialogForm.customerName" placeholder="请输入" />
+        <el-autocomplete v-model="dialogForm.customerName" :fetch-suggestions="customerSuggestions" :value-key="'value'" placeholder="请输入" />
       </el-form-item>
       <el-form-item label="外部编号" required>
         <el-input v-model="dialogForm.outerId" placeholder="请输入" />
@@ -45,23 +45,18 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import {
-  ElInput,
-  ElMessageBox,
-  ElButton,
-  ElDialog,
-  ElUpload,
-  ElMessage,
-} from 'element-plus'
+  ElInput,  ElMessageBox, ElButton, ElDialog, ElUpload, ElMessage, ElAutocomplete } from 'element-plus'
 import Form from '@/components/form/Form.vue'
-import { importOrderFile, getProductTemplate } from '@/apis/orders'
+import { importOrderFile, getProductTemplate, getOrdersList } from '@/apis/orders'
 import { getStatusText, Status } from '../utils/statusMap'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import { messageBox } from '@/components/message/messageBox'
 import { format } from 'date-fns'
 import type { SubmitFormType } from '../types'
+import { listCustomerAll } from '@/apis/custom'
 
 const dialogFormVisible = ref(false)
 
@@ -193,6 +188,33 @@ const onSubmit = () => {
 // onCreate: 点击新建按钮
 const onCreate = () => {
   dialogFormVisible.value = true
+}
+
+// 获取客户列表
+const customers = ref([])
+
+onMounted(async () => {
+  const res = await listCustomerAll()
+  customers.value = res.rows || []
+  console.log('获取kehu列表:ccc', customers.value);
+// // 获取所有客户姓名
+// const customerNames = computed(() => customers.value.map(customer => customer.name))
+// console.log('获取所有客户姓名:', customerNames.value);
+})
+
+// 客户姓名建议
+const customerSuggestions = (queryString: string, cb) => {
+  //   const res = await listCustomerAll()
+  // customers.value = res.rows || []
+  // console.log('获取kehu列表:ccc', customers.value);
+// 获取所有客户姓名
+const customerNames = computed(() => customers.value.map(customer => customer.name))
+console.log('获取所有客户姓名:', customerNames.value);
+ const results = queryString
+    ? customerNames.value.filter(customer => customer.includes(queryString))
+    : customerNames.value
+  // 返回对象数组
+  cb(results.map(name => ({ value: name })))
 }
 
 // onAddConfirm: 确认新增订单
