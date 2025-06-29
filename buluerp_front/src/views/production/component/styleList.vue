@@ -1,117 +1,119 @@
 <template>
-  <el-card style="margin: 0 20px;">
-    <template #header>
-      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-        <span>设计总表 ID: {{ detail.designId }} 对应的造型表列表</span>
-        <div>
-          <el-button type="success" @click="onCreate">新建</el-button>
-          <el-button type="primary" @click="onImport">导入</el-button>
-          <el-button type="primary" @click="handleDownloadTemplate">下载导入模板</el-button>
-          <el-button type="danger" @click="onDelete">删除</el-button>
-          <el-dropdown>
-            <el-button type="primary">
-              导出 <i class="el-icon-arrow-down el-icon--right"></i>
-            </el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item @click="openGroupExportDialog">选择导出造型表分组</el-dropdown-item>
-                <el-dropdown-item @click="onExportSelected">导出所选项</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+  <div class="bg">
+    <el-card class="greyBack" style="margin:30px,30px; padding:0;">
+      <template #header>
+        <div class="card-header card-header-flex">
+          <span>产品ID: {{ detail.id }} 对应的造型表列表</span>
+          <div>
+            <el-button type="success" @click="onCreate">新建</el-button>
+            <el-button type="primary" @click="onImport">导入</el-button>
+            <el-button type="primary" @click="handleDownloadTemplate">下载导入模板</el-button>
+            <el-button type="danger" @click="onDelete">删除</el-button>
+            <el-dropdown>
+              <el-button type="primary">
+                导出 <i class="el-icon-arrow-down el-icon--right"></i>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="openGroupExportDialog">选择导出造型表分组</el-dropdown-item>
+                  <el-dropdown-item @click="onExportSelected">导出所选项</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </div>
-      </div>
-    </template>
-
-    <el-table :data="data" border style="width: 100%" ref="tableRef" :row-key="getRowKey" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" />
-      <el-table-column prop="id" label="ID" />
-      <el-table-column label="胶件图片">
-        <template #default="{ row }">
-          <img
-            v-if="row.pictureUrl"
-            :src="getFullImageUrl(row.pictureUrl)"
-            alt="产品图片"
-            style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;"
-          />
-          <span v-else>暂无图片</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="productName" label="产品名称" />
-      <el-table-column prop="lddNumber" label="LDD编号" />
-      <el-table-column prop="mouldNumber" label="模具编号" />
-      <el-table-column prop="mouldCategory" label="模具类别" />
-      <el-table-column prop="material" label="模具用料" />
-      <el-table-column prop="color" label="颜色" />
-      <el-table-column prop="quantity" label="数量" />
-      <el-table-column prop="groupId" label="造型表的分组" />
-      <el-table-column prop="confirm" label="是否确认">
-        <template #default="{ row }">
-          <el-tag :type="row.confirm ? 'success' : 'info'">
-            {{ row.confirm ? '已确认' : '未确认' }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" fixed="right" width="120">
-        <template #default="{ row }">
-          <el-button size="small" type="primary" text @click="onEdit(row)">编辑</el-button>
-          <el-button size="small" type="primary" text @click="onView(row)">查看</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
-      <div>共 {{ total }} 条</div>
-      <el-pagination
-        background
-        layout="prev, pager, next, jumper, ->, total, sizes"
-        :current-page="page"
-        :page-size="pageSize"
-        :page-sizes="[5, 10, 20, 50]"
-        :total="total"
-        @current-change="handlePageChange"
-        @size-change="handleSizeChange"
-      />
-        <div style="margin-top: 20px; text-align: right;">
-        <el-button type="success" @click="handleConfirm">PMC确认</el-button>
-        <el-button type="warning" @click="handleCancelConfirm">取消确认</el-button>
-        </div>
-    </div>
-
-    <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
-      <el-upload
-        class="upload-demo"
-        drag
-        :show-file-list="false"
-        :before-upload="beforeUpload"
-        :http-request="handleUpload"
-        accept=".xlsx,.xls"
-      >
-        <i class="el-icon-upload"></i>
-        <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
-        <template #tip>
-          <div class="el-upload__tip">只能上传 xls/xlsx 文件，大小不超过 5MB</div>
-        </template>
-      </el-upload>
-    </el-dialog>
-
-    <el-dialog v-model="groupExportDialogVisible" title="选择要导出的分组" width="400px">
-      <el-select v-model="groupId" placeholder="请选择分组" style="width: 100%">
-        <el-option v-for="item in groupOptions" :key="item" :label="item" :value="item" />
-      </el-select>
-      <template #footer>
-        <el-button @click="groupExportDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="onExportByGroup">确认导出</el-button>
       </template>
-    </el-dialog>
 
-    <StyleDialog
-      v-model="showDialog"
-      :isEdit="isEdit"
-      :currentData="currentRow"
-      @submit="handleSubmit"
-    />
-  </el-card>
+      <el-table :data="data" border style="width: 100%" ref="tableRef" :row-key="getRowKey" @selection-change="handleSelectionChange">
+        <el-table-column type="selection" width="55" />
+        <el-table-column prop="id" label="ID" />
+        <el-table-column label="胶件图片">
+          <template #default="{ row }">
+            <img
+              v-if="row.pictureUrl"
+              :src="getFullImageUrl(row.pictureUrl)"
+              alt="产品图片"
+              style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;"
+            />
+            <span v-else>暂无图片</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="productName" label="产品名称" />
+        <el-table-column prop="lddNumber" label="LDD编号" />
+        <el-table-column prop="mouldNumber" label="模具编号" />
+        <el-table-column prop="mouldCategory" label="模具类别" />
+        <el-table-column prop="material" label="模具用料" />
+        <el-table-column prop="color" label="颜色" />
+        <el-table-column prop="quantity" label="数量" />
+        <el-table-column prop="groupId" label="造型表的分组" />
+        <el-table-column prop="confirm" label="是否确认">
+          <template #default="{ row }">
+            <el-tag :type="row.confirm ? 'success' : 'info'">
+              {{ row.confirm ? '已确认' : '未确认' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" fixed="right" width="120">
+          <template #default="{ row }">
+            <el-button size="small" type="primary" text @click="onEdit(row)">编辑</el-button>
+            <el-button size="small" type="primary" text @click="onView(row)">查看</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div>共 {{ total }} 条</div>
+        <el-pagination
+          background
+          layout="prev, pager, next, jumper, ->, total, sizes"
+          :current-page="page"
+          :page-size="pageSize"
+          :page-sizes="[5, 10, 20, 50]"
+          :total="total"
+          @current-change="handlePageChange"
+          @size-change="handleSizeChange"
+        />
+          <div style="margin-top: 20px; text-align: right;">
+          <el-button type="success" @click="handleConfirm">PMC确认</el-button>
+          <el-button type="warning" @click="handleCancelConfirm">取消确认</el-button>
+          </div>
+      </div>
+
+      <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
+        <el-upload
+          class="upload-demo"
+          drag
+          :show-file-list="false"
+          :before-upload="beforeUpload"
+          :http-request="handleUpload"
+          accept=".xlsx,.xls"
+        >
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
+          <template #tip>
+            <div class="el-upload__tip">只能上传 xls/xlsx 文件，大小不超过 5MB</div>
+          </template>
+        </el-upload>
+      </el-dialog>
+
+      <el-dialog v-model="groupExportDialogVisible" title="选择要导出的分组" width="400px">
+        <el-select v-model="groupId" placeholder="请选择分组" style="width: 100%">
+          <el-option v-for="item in groupOptions" :key="item" :label="item" :value="item" />
+        </el-select>
+        <template #footer>
+          <el-button @click="groupExportDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="onExportByGroup">确认导出</el-button>
+        </template>
+      </el-dialog>
+
+      <StyleDialog
+        v-model="showDialog"
+        :isEdit="isEdit"
+        :currentData="currentRow"
+        @submit="handleSubmit"
+      />
+    </el-card>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -121,13 +123,15 @@ import { pmcConfirm , pmcCancel } from '@/apis/designs'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessageBox } from 'element-plus'
 import { downloadBinaryFile } from '@/utils/file/base64'
+import { getFullImageUrl } from '@/utils/image/getUrl'
 import StyleDialog from '../component/styleDialog.vue'
 import useTabStore from '@/stores/modules/tabs'
 
 const props = defineProps<{
-  detail: { designId: number }
+  detail: any
   control: any[]
 }>()
+
 const getRowKey = (row: any) => row.id
 
 const data = ref([])
@@ -140,15 +144,15 @@ const tabStore = useTabStore()
 const showDialog = ref(false)
 const isEdit = ref(false)
 const currentRow = ref({})
-const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
+// const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
 
-const getFullImageUrl = (path: string) => {
-  return BASE_IMAGE_URL + path.replace('//', '/')
-}
+// const getFullImageUrl = (path: string) => {
+//   return BASE_IMAGE_URL + path.replace('//', '/')
+// }
 const fetchData = async () => {
-  console.log('props.detail:', props.detail.designId)
+  console.log('props.detail:', props.detail.id)
   const res = await getStyleList({
-    designPatternId: props.detail.designId,
+    productId: props.detail.id,
     pageNum: page.value,
     pageSize: pageSize.value,
   })
@@ -369,7 +373,7 @@ const handleSubmit = async (rawForm: Record<string, any>) => {
     if (isEdit.value) {
       res = await updateStyle(formData)
     } else {
-      formData.append('designPatternId', props.detail.designId)
+      formData.append('productId', props.detail.id)
       res = await addStyle(formData)
     }
 
@@ -388,7 +392,7 @@ const handleSubmit = async (rawForm: Record<string, any>) => {
 //Dialog 中只负责传值，FormData 永远由父组件构造和发送。!!!!!!!!!
 const handleConfirm = async () => {
   try {
-    const res = await pmcConfirm(props.detail.designId)
+    const res = await pmcConfirm(props.detail.id)
     if (res.code === 200) {
       messageBox('success', null, '确认成功', '', '')
       tabStore.freshTab('设计总表')
@@ -402,7 +406,7 @@ const handleConfirm = async () => {
 
 const handleCancelConfirm = async () => {
   try {
-    const res = await pmcCancel(props.detail.designId)
+    const res = await pmcCancel(props.detail.id)
     if (res.code === 200) {
       messageBox('success', null, '取消确认成功', '', '')
       tabStore.freshTab('设计总表')
@@ -425,3 +429,18 @@ watch(showDialog, (val) => {
 })
 
 </script>
+<style>
+.card-header {
+  font-weight: bold;
+  font-size: 16px;
+}
+.card-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.bg {
+  padding: 0 40px 0 40px;
+  background-color: rgb(240,242,245);
+}
+</style>

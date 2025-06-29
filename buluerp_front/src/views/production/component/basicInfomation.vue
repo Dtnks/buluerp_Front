@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
+import type { FormInstance, } from 'element-plus'
 import { updateProduct } from '@/apis/products.js'
-import { addMaterial, searchMaterial } from '@/apis/materials'
+import { searchMaterial } from '@/apis/materials'
+import { searchDesignDetail } from '@/apis/designs.js'
 import { messageBox } from '@/components/message/messageBox' // 替换弹窗组件
+import { getFullImageUrl } from '@/utils/image/getUrl'
 import  uploadPicture  from '@/components/upload/editUpload.vue'
 import useTabStore from '@/stores/modules/tabs'
 
@@ -16,14 +18,18 @@ const props = defineProps<{
 const tableData = ref<MaterialItem[]>([])
 const dialogVisible = ref(false)
 const editingIndex = ref<number | null>(null)
-const materialFormRef = ref<FormInstance>()
-const materialFormState = reactive<MaterialItem>({
-  mouldNumber: 0,
-  specificationName: '',
-  materialType: '',
-  standardCode: 0,
-  singleWeight: 0,
-})
+
+interface DesignMaterialItem {
+  mouldNumber: string
+  lddNumber: string
+  mouldCategory: string
+  mouldId: string
+  pictureUrl: string
+  color: string
+  productName: string
+  quantity: number
+  material: string
+}
 
 const tabStore = useTabStore()
 const originalProductName = ref('')
@@ -45,12 +51,43 @@ const setFile = (file: File | null) => {
   pictureFile.value = file
 }
 
-const BASE_URL = 'http://154.201.77.135:8080'
+function flattenDesignDetail(data: any): DesignMaterialItem[] {
+  const length = Math.max(
+    data.mouldNumber?.length || 0,
+    data.lddNumber?.length || 0,
+    data.mouldCategory?.length || 0,
+    data.mouldId?.length || 0,
+    data.pictureUrl?.length || 0,
+    data.color?.length || 0,
+    data.productName?.length || 0,
+    data.material?.length || 0,
+  )
 
-function resolveImageUrl(path: string) {
-  if (!path) return ''
-  return `${BASE_URL}${path.replace('//', '/')}`
+  const result: DesignMaterialItem[] = []
+
+  for (let i = 0; i < length; i++) {
+    result.push({
+      mouldNumber: data.mouldNumber?.[i] || '',
+      lddNumber: data.lddNumber?.[i] || '',
+      mouldCategory: data.mouldCategory?.[i] || '',
+      mouldId: data.mouldId?.[i] || '',
+      pictureUrl: data.pictureUrl?.[i] || '',
+      color: data.color?.[i] || '',
+      productName: data.productName?.[i] || '',
+      quantity: data.quantity ?? 0, // 公共字段
+      material: data.material?.[i] || '',
+    })
+  }
+
+  return result
 }
+
+// const BASE_URL = 'http://154.201.77.135:8080'
+
+// function resolveImageUrl(path: string) {
+//   if (!path) return ''
+//   return `${BASE_URL}${path.replace('//', '/')}`
+// }
 const materialIds = ref<number[]>([])
 
 watch(
@@ -61,45 +98,24 @@ watch(
       originalProductName.value = val.name || ''
       mainFormState.orderId = val.orderId || ''
       mainFormState.designStatus = Number(val.designStatus ?? 0)
+
       if (val.pictureUrl) {
-        pictureUrl.value = resolveImageUrl(val.pictureUrl)
+        pictureUrl.value = getFullImageUrl(val.pictureUrl)
         pictureFile.value = null
       }
 
-      if (Array.isArray(val.materialIds) && val.materialIds.length > 0) {
-        materialIds.value = [...val.materialIds]
-        try {
-          const idsStr = materialIds.value.join(',')
-          const res = await searchMaterial({ ids: idsStr })
-          tableData.value = res.data || []
-        } catch (err) {
-          console.error('获取物料信息失败', err)
-          messageBox('error', null, '', '获取物料信息失败', '')
-        }
-      } else {
-        materialIds.value = []
+      try {
+        const res = await searchDesignDetail(val.id)
+        tableData.value = flattenDesignDetail(res.data)
+      } catch (err) {
+        console.error('获取设计明细失败', err)
         tableData.value = []
+        messageBox('error', null, '', '获取设计明细失败', '')
       }
     }
   },
   { immediate: true },
 )
-
-const dummyRequest = (options: any) => {
-  const { onSuccess } = options
-  setTimeout(() => {
-    onSuccess('ok')
-  }, 1000)
-}
-
-const handleChange = (file: any) => {
-  fileList.value = [
-    {
-      url: URL.createObjectURL(file.raw),
-      raw: file.raw,
-    },
-  ]
-}
 
 const removeImage = (index: number) => {
   fileList.value.splice(index, 1)
@@ -152,13 +168,6 @@ interface MaterialItem {
   singleWeight: number
 }
 
-const materialRules = reactive<FormRules>({
-  mouldNumber: [{ required: true, message: '请输入模具编号', trigger: 'blur' }],
-  specificationName: [{ required: true, message: '请输入规格名称', trigger: 'blur' }],
-  materialType: [{ required: true, message: '请输入料别', trigger: 'blur' }],
-  standardCode: [{ required: true, message: '请输入标准编码', trigger: 'blur' }],
-  singleWeight: [{ required: true, message: '请输入单重', trigger: 'blur' }],
-})
 
 const openDialog = () => {
   editingIndex.value = null
@@ -166,80 +175,7 @@ const openDialog = () => {
   dialogVisible.value = true
 }
 
-const submitMaterial = async () => {
-  await materialFormRef.value?.validate()
-  const formData = new FormData()
-  try {
-    formData.append('mouldNumber', materialFormState.mouldNumber.toString())
-    formData.append('specificationName', materialFormState.specificationName)
-    formData.append('materialType', materialFormState.materialType)
-    formData.append('standardCode', materialFormState.standardCode.toString())
-    formData.append('singleWeight', materialFormState.singleWeight.toString())
-    const res = await addMaterial(formData)
-    const newId = res.data
 
-    if (!newId) {
-      throw new Error('新增物料返回无效 id')
-    }
-
-    const oldIds = props.detail.materialIds || []
-    const newIds = [...oldIds, newId]
-
-    await updateProduct({
-      ...props.detail,
-      materialIds: newIds,
-    })
-
-    const queryRes = await searchMaterial({ ids: newIds.join(',') })
-    tableData.value = queryRes.data || []
-
-    dialogVisible.value = false
-    messageBox('success', null, '新增物料并关联产品成功', '', '')
-
-    props.detail.materialIds = newIds
-  } catch (err) {
-    console.error('新建物料失败', err)
-    messageBox('error', null, '', '新建物料失败', '')
-  }
-}
-
-const onDelete = async (materialId: number) => {
-  const deleteAction = async () => {
-    const oldIds = props.detail.materialIds || []
-    const newIds = oldIds.filter((id) => id !== materialId)
-
-    await updateProduct({
-      ...props.detail,
-      materialIds: newIds,
-    })
-
-    const queryRes = await searchMaterial({ ids: newIds.join(',') })
-    tableData.value = queryRes.data || []
-    props.detail.materialIds = newIds
-  }
-
-  messageBox(
-    'warning',
-    deleteAction,
-    '删除物料并更新产品成功',
-    '删除物料失败',
-    '确认删除该物料吗？',
-  )
-}
-
-const onEdit = (row: MaterialItem, index: number) => {
-  editingIndex.value = index
-  Object.assign(materialFormState, row)
-  dialogVisible.value = true
-}
-
-const resetMaterialForm = () => {
-  materialFormState.mouldNumber = 0
-  materialFormState.specificationName = ''
-  materialFormState.materialType = ''
-  materialFormState.standardCode = 0
-  materialFormState.singleWeight = 0
-}
 </script>
 
 <template>
@@ -301,6 +237,15 @@ const resetMaterialForm = () => {
           </div>
         </el-col>
       </el-row>
+      <div style="text-align: right; margin-top: 20px">
+        <el-space>
+          <el-button @click="onCancel">取消</el-button>
+          <el-button type="primary" @click="submitMainForm" :disabled="control[1].disabled"
+            >提交</el-button
+          >
+          <el-button @click="onClear">重置</el-button>
+        </el-space>
+      </div>
     </el-card>
 
     <el-card>
@@ -312,79 +257,23 @@ const resetMaterialForm = () => {
       </el-steps>
 
       <el-table :data="tableData" style="width: 100%" max-height="400">
-        <el-table-column prop="mouldNumber" label="模具编号" width="150" />
-        <el-table-column prop="specificationName" label="规格名称" width="150" />
-        <el-table-column prop="materialType" label="料别" width="120" />
-        <el-table-column prop="standardCode" label="常规编码" width="120" />
-        <el-table-column prop="singleWeight" label="单重" width="150" />
-        <el-table-column fixed="right" label="操作" width="150">
+        <el-table-column prop="mouldNumber" label="模具编号" width="120" />
+        <el-table-column prop="lddNumber" label="LDD编号" width="120" />
+        <el-table-column prop="mouldCategory" label="模具分类" width="120" />
+        <el-table-column prop="mouldId" label="模具ID" width="120" />
+        <el-table-column prop="pictureUrl" label="图片">
           <template #default="scope">
-            <el-button
-              link
-              type="primary"
-              size="small"
-              @click="onEdit(scope.row, scope.$index)"
-              :disabled="control[1].disabled"
-              >编辑</el-button
-            >
-            <el-button
-              link
-              type="danger"
-              size="small"
-              @click="onDelete(scope.row.id)"
-              :disabled="control[1].disabled"
-              >删除</el-button
-            >
+            <el-image :src="getFullImageUrl(scope.row.pictureUrl)" style="width: 80px; height: 80px;" />
           </template>
         </el-table-column>
+        <el-table-column prop="color" label="颜色" width="100" />
+        <el-table-column prop="productName" label="产品名称" width="120" />
+        <el-table-column prop="quantity" label="数量" width="80" />
+        <el-table-column prop="material" label="原材料" width="120" />
+
       </el-table>
-
-      <el-button
-        class="mt-4"
-        style="width: 100%"
-        @click="openDialog"
-        :disabled="control[1].disabled"
-        >新增物料</el-button
-      >
-      <div style="text-align: right; margin-top: 20px">
-        <el-space>
-          <el-button @click="onCancel">取消</el-button>
-          <el-button type="primary" @click="submitMainForm" :disabled="control[1].disabled"
-            >提交</el-button
-          >
-          <el-button @click="onClear">重置</el-button>
-        </el-space>
-      </div>
     </el-card>
-    <el-dialog v-model="dialogVisible" title="新建物料" width="600px">
-      <el-form
-        ref="materialFormRef"
-        :model="materialFormState"
-        label-width="100px"
-        :rules="materialRules"
-      >
-        <el-form-item label="模具编号" prop="mouldNumber">
-          <el-input v-model="materialFormState.mouldNumber" placeholder="请输入模具编号" />
-        </el-form-item>
-        <el-form-item label="规格名称" prop="specificationName">
-          <el-input v-model="materialFormState.specificationName" placeholder="请输入规格名称" />
-        </el-form-item>
-        <el-form-item label="料别" prop="materialType">
-          <el-input v-model="materialFormState.materialType" placeholder="请输入料别" />
-        </el-form-item>
-        <el-form-item label="常规编码" prop="standardCode">
-          <el-input v-model="materialFormState.standardCode" placeholder="请输入常规编码" />
-        </el-form-item>
-        <el-form-item label="单重" prop="singleWeight">
-          <el-input v-model="materialFormState.singleWeight" placeholder="请输入单重" />
-        </el-form-item>
-      </el-form>
 
-      <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitMaterial">确定</el-button>
-      </template>
-    </el-dialog>
   </el-form>
 </template>
 

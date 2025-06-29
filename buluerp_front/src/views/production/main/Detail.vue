@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import BordShow from '@/components/board/SecBoard.vue'
 import basicInfomation from '../component/basicInfomation.vue'
+import StyleList from '../component/styleList.vue'
 import { getProductDetail } from '@/apis/products.js'
 import { getMaterialList } from '@/apis/materials.js'
 
@@ -14,5 +15,6 @@ const detail = ref(props.data)
   <div class="col">
     <BordShow content="产品详情页" path="产品管理/详情" />
     <basicInfomation v-if="detail" :detail="detail" :materialData="materialData" :control="control" />
+    <StyleList v-if="detail" :detail="detail"  :control="control" />
   </div>
 </template>

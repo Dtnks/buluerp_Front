@@ -118,14 +118,14 @@
           </div>
         </el-upload>
       </el-form-item>
-      <el-form-item label="材料ID" prop="materialIds">
+      <el-form-item label="物料ID" prop="materialIds">
         <el-select
           v-model="createForm.materialIds"
           multiple
           filterable
           allow-create
           default-first-option
-          placeholder="请输入材料ID，按回车确认"
+          placeholder="请输入物料ID，按回车确认"
         >
         </el-select>
       </el-form-item>
@@ -171,7 +171,7 @@ const createFormRules = {
       required: true,
       type: 'array',
       min: 1,
-      message: '请至少输入一个原材料 ID',
+      message: '请至少输入一个物料 ID',
       trigger: 'change',
     },
   ],
