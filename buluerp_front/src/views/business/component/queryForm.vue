@@ -46,12 +46,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import {  onMounted, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
-import {
-  ElInput, ElMessageBox, ElButton, ElDialog, ElUpload, ElMessage, ElAutocomplete
-} from 'element-plus'
-import Form from '@/components/form/Form.vue'
+import { ElInput, ElMessageBox, ElButton, ElDialog, ElUpload, ElMessage, ElAutocomplete, ElFormItem } from 'element-plus'
+import Form from '@/components/form/Form.vue' 
 import { importOrderFile, getProductTemplate, getOrdersList } from '@/apis/orders'
 import { getStatusText, Status } from '../utils/statusMap'
 import { downloadBinaryFile } from '@/utils/file/base64'
