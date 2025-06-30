@@ -51,6 +51,32 @@ const setFile = (file: File | null) => {
   pictureFile.value = file
 }
 
+const refreshData = async () => {
+  const val = props.detail
+  if (val) {
+    mainFormState.productName = val.name || ''
+    originalProductName.value = val.name || ''
+    mainFormState.orderId = val.orderId || ''
+    mainFormState.designStatus = Number(val.designStatus ?? 0)
+
+    if (val.pictureUrl) {
+      pictureUrl.value = getFullImageUrl(val.pictureUrl)
+      pictureFile.value = null
+    }
+
+    try {
+      const res = await searchDesignDetail(val.id)
+      tableData.value = flattenDesignDetail(res.data)
+    } catch (err) {
+      console.error('获取设计明细失败', err)
+      tableData.value = []
+      messageBox('error', null, '', '获取设计明细失败', '')
+    }
+  }
+}
+defineExpose({ refreshData })  // 关键！允许父组件访问此方法
+
+
 function flattenDesignDetail(data: any): DesignMaterialItem[] {
   const length = Math.max(
     data.mouldNumber?.length || 0,
@@ -88,31 +114,11 @@ function flattenDesignDetail(data: any): DesignMaterialItem[] {
 //   if (!path) return ''
 //   return `${BASE_URL}${path.replace('//', '/')}`
 // }
-const materialIds = ref<number[]>([])
 
 watch(
   () => props.detail,
-  async (val) => {
-    if (val) {
-      mainFormState.productName = val.name || ''
-      originalProductName.value = val.name || ''
-      mainFormState.orderId = val.orderId || ''
-      mainFormState.designStatus = Number(val.designStatus ?? 0)
-
-      if (val.pictureUrl) {
-        pictureUrl.value = getFullImageUrl(val.pictureUrl)
-        pictureFile.value = null
-      }
-
-      try {
-        const res = await searchDesignDetail(val.id)
-        tableData.value = flattenDesignDetail(res.data)
-      } catch (err) {
-        console.error('获取设计明细失败', err)
-        tableData.value = []
-        messageBox('error', null, '', '获取设计明细失败', '')
-      }
-    }
+  () => {
+    refreshData()
   },
   { immediate: true },
 )
@@ -167,14 +173,6 @@ interface MaterialItem {
   standardCode: number
   singleWeight: number
 }
-
-
-const openDialog = () => {
-  editingIndex.value = null
-  resetMaterialForm()
-  dialogVisible.value = true
-}
-
 
 </script>
 

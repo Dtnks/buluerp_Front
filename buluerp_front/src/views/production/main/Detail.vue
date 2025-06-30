@@ -9,12 +9,18 @@ import { getMaterialList } from '@/apis/materials.js'
 const props = defineProps<{ data: any; control: Array<object> }>()
 
 const detail = ref(props.data)
+const basicInfoRef = ref()
+
+const refreshBasicInfo = () => {
+  basicInfoRef.value?.refreshData()
+}
+
 </script>
 
 <template>
   <div class="col">
     <BordShow content="产品详情页" path="产品管理/详情" />
-    <basicInfomation v-if="detail" :detail="detail" :materialData="materialData" :control="control" />
-    <StyleList v-if="detail" :detail="detail"  :control="control" />
+    <basicInfomation ref="basicInfoRef" v-if="detail" :detail="detail" :materialData="materialData" :control="control" />
+    <StyleList v-if="detail" :detail="detail"  :control="control" @refresh="refreshBasicInfo"/>
   </div>
 </template>

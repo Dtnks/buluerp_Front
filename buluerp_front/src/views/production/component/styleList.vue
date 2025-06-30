@@ -15,7 +15,7 @@
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item @click="openGroupExportDialog">选择导出造型表分组</el-dropdown-item>
+                  <!-- <el-dropdown-item @click="openGroupExportDialog">导出所有造型表</el-dropdown-item> -->
                   <el-dropdown-item @click="onExportSelected">导出所选项</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
@@ -139,6 +139,7 @@ const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 const selectedRows = ref<any[]>([])
+const emit = defineEmits(['refresh'])
 
 const tabStore = useTabStore()
 const showDialog = ref(false)
@@ -301,7 +302,7 @@ const onExportByGroup = async () => {
     return
   }
   const formData = new FormData()
-  formData.append('designPatternId', props.detail.designId.toString())
+  formData.append('productId', props.detail.id)
   formData.append('groupId', groupId.value.toString())
   try {
     const res = await exportStyleFile(formData)
@@ -319,18 +320,18 @@ const onExportSelected = async () => {
     messageBox('warning', null, '', '请先选择要导出的记录', '')
     return
   }
+
   const ids = selectedRows.value.map(i => i.id).join(',')
-  const formData = new FormData()
-  formData.append('designPatternId', props.detail.designId.toString())
-  formData.append('ids', ids)
+
   try {
-    const res = await exportStyleFile(formData)
+    const res = await exportStyleFile(ids)
     const blob = new Blob([res], { type: 'application/vnd.ms-excel' })
     downloadBinaryFile(blob, '造型表导出_所选项.xlsx')
   } catch (err) {
     messageBox('error', null, '', '导出失败', '')
   }
 }
+
 
 
 const onEdit = (row: any) => {
@@ -380,6 +381,7 @@ const handleSubmit = async (rawForm: Record<string, any>) => {
     if (res.code === 200) {
       messageBox('success', Promise.resolve, isEdit.value ? '更新成功' : '新增成功', '', '')
       fetchData()
+      emit('refresh')
     } else {
       throw new Error('操作失败')
     }
@@ -395,7 +397,7 @@ const handleConfirm = async () => {
     const res = await pmcConfirm(props.detail.id)
     if (res.code === 200) {
       messageBox('success', null, '确认成功', '', '')
-      tabStore.freshTab('设计总表')
+      tabStore.freshTab('产品查询')
     } else {
       messageBox('error', null, '', '确认失败', '')
     }
@@ -409,7 +411,7 @@ const handleCancelConfirm = async () => {
     const res = await pmcCancel(props.detail.id)
     if (res.code === 200) {
       messageBox('success', null, '取消确认成功', '', '')
-      tabStore.freshTab('设计总表')
+      tabStore.freshTab('产品查询')
     } else {
       messageBox('error', null, '', '取消确认失败', '')
     }

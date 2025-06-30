@@ -20,12 +20,12 @@ export function updateStyle(data) {
   return httpInstance({
     url: 'system/style',
     method: 'PUT',
-    data: data 
+    data: data
   })
 }
 
 export function deleteStyle(ids) {
-  const idStr = Array.isArray(ids) ? ids.join(',') : ids 
+  const idStr = Array.isArray(ids) ? ids.join(',') : ids
   return httpInstance({
     url: `system/style/${idStr}`,
     method: 'delete'
@@ -51,14 +51,14 @@ export function getStyleTemplate() {
   })
 }
 
-export function exportStyleFile(formData) {
+export function exportStyleFile(ids) {
   return httpInstance({
-    url: 'system/style/export',
+    url: `/system/style/export/${ids}`,
     method: 'post',
-    data: formData,
     responseType: 'blob'
   })
 }
+
 
 export function searchStyle(params) {
   return httpInstance({
