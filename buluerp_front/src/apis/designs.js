@@ -51,11 +51,10 @@ export function getDesignTemplate() {
   })
 }
 
-export function exportDesignFile(formData) {
+export function exportDesignFile(ids) {
   return httpInstance({
-    url: 'system/patterns/export',
+    url: `system/patterns/export/${ids}`,
     method: 'post',
-    data: formData,
     responseType: 'blob'
   })
 }
