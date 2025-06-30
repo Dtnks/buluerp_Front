@@ -66,9 +66,13 @@
         <el-form-item label="订单ID">
           <el-input v-model="editForm.id" disabled />
         </el-form-item>
-        <el-form-item label="客户姓名">
+        <!-- <el-form-item label="客户姓名">
           <el-input v-model="editForm.customerName" />
-        </el-form-item>
+        </el-form-item> -->
+        <el-form-item label="客户姓名">
+        <el-autocomplete v-model="editForm.customerName" :fetch-suggestions="customerSuggestions" :value-key="'value'"
+          @blur="checkCustomerName" />
+      </el-form-item>
         <el-form-item label="订单状态">
           <el-input v-model="editForm.statusText" disabled />
         </el-form-item>
@@ -86,17 +90,7 @@
 
 <script setup lang="ts">
 import { reactive, onMounted, ref } from 'vue'
-import {
-  ElButton,
-  ElTable,
-  ElTableColumn,
-  ElPagination,
-  ElDialog,
-  ElForm,
-  ElFormItem,
-  ElInput,
-  ElMessageBox,
-} from 'element-plus'
+import { ElButton, ElTable, ElTableColumn, ElPagination, ElDialog, ElForm, ElFormItem, ElInput, ElMessageBox, ElAutocomplete } from 'element-plus'
 import { deleteOrders } from '@/apis/orders'
 import type { TableDataType } from '@/types/orderResponse'
 import BusinessDetail from '@/views/business/main/Detail.vue'
@@ -121,7 +115,7 @@ const props = defineProps<{
   }
 }>()
 
-const emit = defineEmits(['onUpdated', 'fetchData', 'onPageSizeChange', 'onPageChange'])
+const emit = defineEmits(['onUpdated', 'fetchData', 'onPageSizeChange', 'onPageChange', 'customerSuggestions', 'checkCustomerName'])
 
 const columns = [
   { prop: 'createTime', label: '创建时间' },
@@ -209,6 +203,12 @@ const onSaveEdit = () => {
   emit('onUpdated', { ...editForm })
   emit('fetchData')
   editDialogVisible.value = false
+}
+const customerSuggestions = (queryString: string, cb) => {
+  emit('customerSuggestions', queryString, cb)
+}
+const checkCustomerName = () => {
+  emit('checkCustomerName')
 }
 
 // 表格操作--end

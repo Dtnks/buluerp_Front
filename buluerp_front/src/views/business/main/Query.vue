@@ -3,18 +3,10 @@
     <el-config-provider :locale="zhCn">
       <BordShow content="业务订单查询列表" path="业务中心/查询" />
       <div class="greyBack">
-        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd" :control="control"></QueryForm>
-        <QueryTable
-          :addTab="props.addTab"
-          :pagination="pagination"
-          :tableData="tableData"
-          :control="control"
-          @onPageChange="handlePageChange"
-          @onPageSizeChange="handleSizeChange"
-          @fetchData="fetchTableData"
-          @onUpdated="handleUpdate"
-        >
-        </QueryTable>
+        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd" :control="control" @customerSuggestions="customerSuggestions" @checkCustomerName="checkCustomerName"></QueryForm>
+        <QueryTable :addTab="props.addTab" :pagination="pagination" :tableData="tableData" :control="control"
+          @onPageChange="handlePageChange" @onPageSizeChange="handleSizeChange" @fetchData="fetchTableData"
+          @onUpdated="handleUpdate" @customerSuggestions="customerSuggestions" @checkCustomerName="checkCustomerName"> </QueryTable>
       </div>
     </el-config-provider>
   </div>
@@ -30,6 +22,7 @@ import { getOrdersList, putOrder } from '@/apis/orders'
 import { addOrder, } from '../function/oders'
 import type { TableDataType } from '@/types/orderResponse'
 import { messageBox } from '@/components/message/messageBox'
+import { listCustomerAll } from '@/apis/custom'
 
 const props = defineProps<{
   addTab: (targetName: string, component: any, data?: any, control?: Array<object>) => void
@@ -52,7 +45,7 @@ const queryParams = reactive({})
 const fetchTableData = async () => {
   try {
     const filteredParams = Object.fromEntries(
-      Object.entries(queryParams).filter(([key, value]) =>  value || value === 0)
+      Object.entries(queryParams).filter(([key, value]) => value || value === 0)
     )
     const params = {
       ...filteredParams,
@@ -84,7 +77,7 @@ const handleQuery = (params: any) => {
 const handleAdd = async (newData: TableDataType) => {
   console.log('1111新增数据(handleAdd):', newData)
   const res = await addOrder(newData)
-  console.log('33333',res);
+  console.log('33333', res);
 
   if (res.code === 200) {
     messageBox('success', null, '订单已成功添加')
@@ -119,6 +112,30 @@ const handleSizeChange = (pageSize: number) => {
   pagination.pageSize = pageSize
   pagination.page = 1 // 重置页码为 1
   fetchTableData() // 获取数据
+}
+
+const suggestionResult = ref([])
+// customerSuggestions: 客户姓名建议
+const customerSuggestions = async (queryString: string, cb) => {
+  const res = await listCustomerAll(queryString)
+  const customerNames = ref(res.rows.map(customer => customer.name))
+  // 如果没有查询字符串，返回客户表第一页客户名称
+  if (!queryString) {
+    cb(customerNames.value.map(name => ({ value: name })))
+    return
+  }
+
+  const results = queryString ? customerNames.value.filter(customer => customer.includes(queryString)) : customerNames.value
+  suggestionResult.value = queryString ? customerNames.value.filter(customer => customer.includes(queryString)) : customerNames.value
+  cb(results.map(name => ({ value: name })))
+}
+
+// checkCustomerName: 校验客户姓名
+const checkCustomerName = () => {
+  // console.log('校验客户姓名:', dialogForm.customerName)
+  if (suggestionResult.value.length === 0) {
+    messageBox('error', null, null, '没有找到匹配的客户姓名, 请先添加客户')
+  }
 }
 
 // 初始化数据

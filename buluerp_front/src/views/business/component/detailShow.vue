@@ -337,6 +337,7 @@ const onBoxCancel = () => {
   console.log('取消')
   messageBox('success', null, '已取消提交')
 }
+
 </script>
 
 <style scoped lang="less">
