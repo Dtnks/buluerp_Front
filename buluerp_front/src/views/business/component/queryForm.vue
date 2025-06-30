@@ -13,7 +13,8 @@
         </el-select>
       </el-form-item> -->
       <el-form-item label="客户姓名">
-        <el-autocomplete v-model="dialogForm.customerName" :fetch-suggestions="customerSuggestions" :value-key="'value'" placeholder="请输入" />
+        <el-autocomplete v-model="dialogForm.customerName" :fetch-suggestions="customerSuggestions" :value-key="'value'"
+          @blur="checkCustomerName" placeholder="请输入" />
       </el-form-item>
       <el-form-item label="外部编号" required>
         <el-input v-model="dialogForm.outerId" placeholder="请输入" />
@@ -45,10 +46,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import type { FormInstance } from 'element-plus'
 import {
-  ElInput,  ElMessageBox, ElButton, ElDialog, ElUpload, ElMessage, ElAutocomplete } from 'element-plus'
+  ElInput, ElMessageBox, ElButton, ElDialog, ElUpload, ElMessage, ElAutocomplete
+} from 'element-plus'
 import Form from '@/components/form/Form.vue'
 import { importOrderFile, getProductTemplate, getOrdersList } from '@/apis/orders'
 import { getStatusText, Status } from '../utils/statusMap'
@@ -195,23 +197,31 @@ onMounted(async () => {
   // customers.value = res.rows || []
 })
 
-// 客户姓名建议
+// customerSuggestions: 客户姓名建议
 const customerSuggestions = async (queryString: string, cb) => {
-const res = await listCustomerAll(queryString)
-// const customerNames = computed(() => customers.value.map(customer => customer.name))
-const customerNames = ref(res.rows.map(customer => customer.name))
+  const res = await listCustomerAll(queryString)
+  const customerNames = ref(res.rows.map(customer => customer.name))
   // 如果没有查询字符串，返回所有客户名称
   if (!queryString) {
     cb(customerNames.value.map(name => ({ value: name })))
     return
   }
-  // 根据查询字符串过滤客户名称
- const results = queryString
-    ? customerNames.value.filter(customer => customer.includes(queryString))
-    : customerNames.value
-  // 返回对象数组
+  const results = queryString ? customerNames.value.filter(customer => customer.includes(queryString)) : customerNames.value
   cb(results.map(name => ({ value: name })))
 }
+
+// // checkCustomerName: 校验客户姓名
+const checkCustomerName = () => {
+  if (!customers.value.map(customer => customer.name).includes(dialogForm.customerName)) {
+    messageBox('error', null, null, '客户姓名不存在，请重新输入')
+  }
+}
+
+watch(dialogForm, (newValue, oldValue) => {
+  if (newValue.customerName !== oldValue.customerName) {
+    checkCustomerName()
+  }
+})
 
 // onAddConfirm: 确认新增订单
 const onAddConfirm = () => {

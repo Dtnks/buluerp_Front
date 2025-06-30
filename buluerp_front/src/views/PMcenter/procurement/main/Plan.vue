@@ -18,6 +18,8 @@ import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessageBox } from 'element-plus'
+import { searchFunc } from '@/utils/search/search'
+import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
@@ -32,16 +34,28 @@ const formData = ref([
     { type: 'input', label: '料别', key: 'materialType' },
   ],
 ])
+
 const newFormData = ref([
   [
-    { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
-    { type: 'number', label: '采购数量', key: 'purchaseQuantity', width: 8 },
-    { type: 'input', label: '产品ID', key: 'productId', width: 8 },
+    {
+      type: 'input',
+      label: '采购重量',
+      key: 'purchaseWeight',
+      width: 8,
+      rules: [positiveNumberRule],
+    },
+    {
+      type: 'number',
+      label: '采购数量',
+      key: 'purchaseQuantity',
+      width: 8,
+      rules: [positiveNumberRule],
+    },
+    { type: 'input', label: '单重', key: 'singleWeight', width: 8, rules: [positiveNumberRule] },
   ],
   [
-    { type: 'input', label: '单重', key: 'singleWeight', width: 8 },
-    { type: 'input', label: '采购重量', key: 'purchaseWeight', width: 8 },
-    { type: 'input', label: '料别', key: 'materialType', width: 8 },
+    { type: 'input', label: '颜色编号', key: 'colorCode', width: 12, rules: [requiredRule] },
+    { type: 'input', label: '料别', key: 'materialType', width: 12, rules: [requiredRule] },
   ],
   [
     {
@@ -50,20 +64,57 @@ const newFormData = ref([
       key: 'deliveryDate',
       width: 12,
       timerType: 'date',
+      rules: [requiredRule],
     },
-    { type: 'timer', label: '交货时间', key: 'deliveryTime', width: 12, timerType: 'date' },
+    {
+      type: 'timer',
+      label: '交货时间',
+      key: 'deliveryTime',
+      width: 12,
+      timerType: 'date',
+      rules: [requiredRule],
+    },
   ],
   [
-    { type: 'timer', label: '下单时间', key: 'orderTime', width: 12, timerType: 'date' },
-    { type: 'input', label: '供应商', key: 'supplier', width: 12 },
+    {
+      type: 'timer',
+      label: '下单时间',
+      key: 'orderTime',
+      width: 12,
+      timerType: 'date',
+      rules: [requiredRule],
+    },
+    { type: 'input', label: '供应商', key: 'supplier', width: 12, rules: [requiredRule] },
   ],
-
   [
-    { type: 'input', label: '模具编号', key: 'mouldNumber', width: 12 },
-    { type: 'input', label: '规格', key: 'specification', width: 12 },
+    { type: 'input', label: '模具编号', key: 'mouldNumber', width: 12, rules: [requiredRule] },
+    { type: 'input', label: '规格', key: 'specification', width: 12, rules: [requiredRule] },
   ],
-  [{ type: 'input', label: 'orderId', key: 'orderCode', width: 12 }],
-  [{ type: 'textarea', label: '客户备注', key: 'remarks', width: 24 }],
+  [
+    {
+      type: 'inputSelect',
+      label: '订单Id',
+      key: 'orderCode',
+      width: 12,
+      rules: [requiredRule],
+      remoteFunc: searchFunc('system/orders/list', 'innerId'),
+      options: [],
+      loading: false,
+    },
+    {
+      type: 'inputSelect',
+      label: '产品ID',
+      key: 'productId',
+      width: 12,
+      rules: [requiredRule],
+      remoteFunc: searchFunc('system/products/list', 'id'),
+      options: [],
+      loading: false,
+    },
+  ],
+  [
+    { type: 'textarea', label: '客户备注', key: 'remarks', width: 24, rules: [] }, // 备注字段不做必填校验
+  ],
   [{ type: 'image', label: '样例图', key: 'picture', width: 12 }],
 ])
 const newSubmit = ref({
@@ -96,7 +147,7 @@ const searchContent = ref({
 const tableData = ref([
   {
     value: 'id',
-    label: '采购单号',
+    label: 'ID',
     type: 'text',
   },
   { value: 'creationTime', label: '创建时间', type: 'text' },
@@ -183,7 +234,8 @@ const operation = ref([
       title.value = '编辑'
       editDialogVisible.value = true
       newSubmit.value = { ...row }
-      console.log(newSubmit.value)
+
+      createFormRef.value.clearValidate()
     },
     value: '编辑',
     disabled: props.control[1].disabled,
@@ -200,43 +252,49 @@ const operation = ref([
 //新增与修改
 const importDialogVisible = ref(false)
 const editDialogVisible = ref(false)
+const createFormRef = ref(null)
+
 const handleSubmit = () => {
-  if (title.value == '编辑') {
-    console.log(newSubmit.value)
-    changePurchasePlan(newSubmit.value).then((res) => {
-      if (res.code == 200) {
-        page.value = 1
-        listPurchasePlan(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
+  createFormRef.value.validateForm((valid) => {
+    if (valid) {
+      if (title.value === '编辑') {
+        console.log(newSubmit.value)
+        changePurchasePlan(newSubmit.value).then((res) => {
+          if (res.code === 200) {
+            page.value = 1
+            listPurchasePlan(page.value, pageSize.value).then((res) => {
+              listData.value = res.rows
+              total.value = res.total
+            })
+            ElMessage.success(res.msg)
+            editDialogVisible.value = false
+          } else {
+            ElMessage.error(res.msg)
+            return
+          }
         })
-        ElMessage.success(res.msg)
-        editDialogVisible.value = false
       } else {
-        ElMessage.error(res.msg)
-        return
-      }
-    })
-  } else {
-    newSubmit.value.creationTime = parseTime(newSubmit.value.creationTime, '{y}-{m}-{d}')
-    newSubmit.value.deliveryDate = parseTime(newSubmit.value.deliveryDate, '{y}-{m}-{d}')
-    newSubmit.value.deliveryTime = parseTime(newSubmit.value.deliveryTime, '{y}-{m}-{d}')
-    newSubmit.value.orderTime = parseTime(newSubmit.value.orderTime, '{y}-{m}-{d}')
-    newPurchasePlan(newSubmit.value).then((res) => {
-      if (res.msg == '操作成功') {
-        page.value = 1
-        listPurchasePlan(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
+        newSubmit.value.creationTime = parseTime(newSubmit.value.creationTime, '{y}-{m}-{d}')
+        newSubmit.value.deliveryDate = parseTime(newSubmit.value.deliveryDate, '{y}-{m}-{d}')
+        newSubmit.value.deliveryTime = parseTime(newSubmit.value.deliveryTime, '{y}-{m}-{d}')
+        newSubmit.value.orderTime = parseTime(newSubmit.value.orderTime, '{y}-{m}-{d}')
+        newPurchasePlan(newSubmit.value).then((res) => {
+          if (res.msg === '操作成功') {
+            page.value = 1
+            listPurchasePlan(page.value, pageSize.value).then((res) => {
+              listData.value = res.rows
+              total.value = res.total
+            })
+            ElMessage.success(res.msg)
+            editDialogVisible.value = false
+          } else {
+            ElMessage.error('操作失败')
+            return
+          }
         })
-        ElMessage.success(res.msg)
-        editDialogVisible.value = false
-      } else {
-        ElMessage.error('操作失败')
-        return
       }
-    })
-  }
+    }
+  })
 }
 const title = ref('编辑')
 //传给form组件的参数
@@ -265,6 +323,8 @@ const onCreate = () => {
   resetSubmit()
   title.value = '新增'
   editDialogVisible.value = true
+
+  createFormRef.value.clearValidate()
 }
 
 const onSubmit = () => {
@@ -432,7 +492,7 @@ listPurchasePlan(page.value, pageSize.value).then((res) => {
     </div>
 
     <el-dialog v-model="editDialogVisible" :title="title" width="800px"
-      ><CreateForm :data="newFormData" :Formvalue="newSubmit" />
+      ><CreateForm :data="newFormData" :Formvalue="newSubmit" ref="createFormRef" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>

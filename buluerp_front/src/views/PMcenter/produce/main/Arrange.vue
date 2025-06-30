@@ -18,8 +18,11 @@ import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessageBox } from 'element-plus'
+import { searchFunc } from '@/utils/search/search'
+import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 const props = defineProps(['control'])
 //渲染页面
+const createFormRef = ref()
 const formData = ref([
   [
     { type: 'timer', label: '安排日期', timerType: 'date', key: 'scheduledTime' },
@@ -42,36 +45,87 @@ const formData = ref([
 ])
 const newFormData = ref([
   [
-    { type: 'input', label: '颜色编号', key: 'colorCode', width: 8 },
-    { type: 'input', label: '料别', key: 'materialType', width: 8 },
-    { type: 'input', label: '模具编号', key: 'mouldNumber', width: 8 },
+    {
+      type: 'input',
+      label: '排产模数',
+      key: 'productionMouldCount',
+      width: 8,
+      timerType: 'date',
+      rules: [requiredRule],
+    },
+    {
+      type: 'input',
+      label: '排产数量',
+      key: 'productionQuantity',
+      width: 8,
+      rules: [positiveNumberRule],
+    },
+    {
+      type: 'input',
+      label: '排产重量',
+      key: 'productionWeight',
+      width: 8,
+      rules: [positiveNumberRule],
+    },
   ],
   [
-    { type: 'input', label: '出模数', key: 'mouldOutput', width: 8 },
-    { type: 'input', label: '订单编号', key: 'orderCode', width: 8 },
-    { type: 'input', label: '布产编号', key: 'productionId', width: 8 },
+    { type: 'input', label: '颜色编号', key: 'colorCode', width: 12, rules: [requiredRule] },
+    { type: 'input', label: '料别', key: 'materialType', width: 12, rules: [requiredRule] },
   ],
   [
-    { type: 'input', label: '排产模数', key: 'productionMouldCount', width: 8, timerType: 'date' },
-    { type: 'input', label: '排产数量', key: 'productionQuantity', width: 8 },
-    { type: 'input', label: '排产重量', key: 'productionWeight', width: 8 },
+    { type: 'input', label: '出模数', key: 'mouldOutput', width: 12, rules: [positiveNumberRule] },
+    { type: 'input', label: '模具编号', key: 'mouldNumber', width: 12, rules: [requiredRule] },
   ],
   [
     {
-      type: 'input',
-      label: '产品编号',
+      type: 'inputSelect',
+      label: '产品ID',
       key: 'productId',
       width: 12,
+      rules: [requiredRule],
+      options: [],
+      loading: false,
+      remoteFunc: searchFunc('system/products/list', 'id'),
     },
-    { type: 'input', label: '产品编码', key: 'productCode', width: 12, timerType: 'date' },
+    {
+      type: 'inputSelect',
+      label: '订单Id',
+      key: 'orderCode',
+      width: 12,
+      rules: [requiredRule],
+      remoteFunc: searchFunc('system/orders/list', 'innerId'),
+      options: [],
+      loading: false,
+    },
   ],
   [
-    { type: 'timer', label: '安排时间', key: 'scheduledTime', width: 12, timerType: 'date' },
-    { type: 'input', label: '单重', key: 'singleWeight', width: 12 },
+    {
+      type: 'timer',
+      label: '安排时间',
+      key: 'scheduledTime',
+      width: 12,
+      timerType: 'date',
+      rules: [requiredRule],
+    },
+    { type: 'input', label: '单重', key: 'singleWeight', width: 12, rules: [positiveNumberRule] },
   ],
   [
-    { type: 'timer', label: '排产时间', key: 'productionTime', width: 12, timerType: 'date' },
-    { type: 'timer', label: '完成时间', key: 'completionTime', width: 12, timerType: 'date' },
+    {
+      type: 'timer',
+      label: '排产时间',
+      key: 'productionTime',
+      width: 12,
+      timerType: 'date',
+      rules: [requiredRule],
+    },
+    {
+      type: 'timer',
+      label: '完成时间',
+      key: 'completionTime',
+      width: 12,
+      timerType: 'date',
+      rules: [requiredRule],
+    },
   ],
   [{ type: 'textarea', label: '备注', key: 'remarks', width: 24 }],
   [{ type: 'image', label: '样例图', key: 'picture', width: 12 }],
@@ -177,11 +231,6 @@ const tableData = ref([
     type: 'text',
   },
   {
-    value: 'productionId',
-    label: '布产编号',
-    type: 'text',
-  },
-  {
     value: 'remarks',
     label: '备注',
     type: 'text',
@@ -203,6 +252,8 @@ const operation = ref([
       title.value = '编辑'
       editDialogVisible.value = true
       resetSubmit()
+
+      createFormRef.value.clearValidate()
       newSubmit.value = { ...row }
       if (row.pictureUrl) {
         newSubmit.value.pictureUrl = row.pictureUrl
@@ -230,42 +281,46 @@ const handleSubmit = () => {
   if (newSubmit.value.picture == '') {
     delete newSubmit.value.picture
   }
-  newSubmit.value.scheduledTime = parseTime(newSubmit.value.scheduledTime, '{y}-{m}-{d}')
-  newSubmit.value.completionTime = parseTime(newSubmit.value.completionTime, '{y}-{m}-{d}')
-  newSubmit.value.productionTime = parseTime(newSubmit.value.productionTime, '{y}-{m}-{d}')
-  if (title.value == '编辑') {
-    changeArrange(newSubmit.value).then((res) => {
-      console.log(res)
-      if (res.code == 200) {
-        page.value = 1
-        listArrange(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
+  createFormRef.value.validateForm((valid) => {
+    if (valid) {
+      newSubmit.value.scheduledTime = parseTime(newSubmit.value.scheduledTime, '{y}-{m}-{d}')
+      newSubmit.value.completionTime = parseTime(newSubmit.value.completionTime, '{y}-{m}-{d}')
+      newSubmit.value.productionTime = parseTime(newSubmit.value.productionTime, '{y}-{m}-{d}')
+      if (title.value == '编辑') {
+        changeArrange(newSubmit.value).then((res) => {
+          console.log(res)
+          if (res.code == 200) {
+            page.value = 1
+            listArrange(page.value, pageSize.value).then((res) => {
+              listData.value = res.rows
+              total.value = res.total
+            })
+            ElMessage.success(res.msg)
+            editDialogVisible.value = false
+          } else {
+            ElMessage.error(res.msg)
+            return
+          }
         })
-        ElMessage.success(res.msg)
-        editDialogVisible.value = false
       } else {
-        ElMessage.error(res.msg)
-        return
-      }
-    })
-  } else {
-    newArrange(newSubmit.value).then((res) => {
-      console.log(res)
-      if (res.msg == '操作成功') {
-        page.value = 1
-        listArrange(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
+        newArrange(newSubmit.value).then((res) => {
+          console.log(res)
+          if (res.msg == '操作成功') {
+            page.value = 1
+            listArrange(page.value, pageSize.value).then((res) => {
+              listData.value = res.rows
+              total.value = res.total
+            })
+            ElMessage.success(res.msg)
+            editDialogVisible.value = false
+          } else {
+            ElMessage.error('操作失败')
+            return
+          }
         })
-        ElMessage.success(res.msg)
-        editDialogVisible.value = false
-      } else {
-        ElMessage.error('操作失败')
-        return
       }
-    })
-  }
+    }
+  })
 }
 const title = ref('编辑')
 //传给form组件的参数
@@ -293,6 +348,8 @@ const onCreate = () => {
   resetSubmit()
   title.value = '新增'
   editDialogVisible.value = true
+
+  createFormRef.value.clearValidate()
 }
 
 const onSubmit = () => {
@@ -463,7 +520,8 @@ listArrange(page.value, pageSize.value).then((res) => {
     </div>
 
     <el-dialog v-model="editDialogVisible" :title="title" width="800px"
-      ><CreateForm :data="newFormData" :Formvalue="newSubmit" />
+      ><CreateForm :data="newFormData" :Formvalue="newSubmit" ref="createFormRef" />
+
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>

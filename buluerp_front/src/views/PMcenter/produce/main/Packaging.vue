@@ -18,7 +18,10 @@ import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessageBox } from 'element-plus'
+import { searchFunc } from '@/utils/search/search'
+import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 const props = defineProps(['control'])
+const createFormRef = ref()
 //渲染页面
 const formData = ref([
   [
@@ -66,20 +69,49 @@ const formData = ref([
 ])
 const newFormData = ref([
   [
-    { type: 'input', label: '产品编号', key: 'productId', width: 8 },
-    { type: 'input', label: '产品名称', key: 'productNameCn', width: 8 },
-
-    { type: 'input', label: '订单编号', key: 'orderCode', width: 8 },
+    {
+      type: 'inputSelect',
+      label: '产品ID',
+      key: 'productId',
+      width: 12,
+      rules: [requiredRule],
+      options: [],
+      loading: false,
+      remoteFunc: searchFunc('system/products/list', 'id'),
+    },
+    {
+      type: 'inputSelect',
+      label: '订单Id',
+      key: 'orderCode',
+      width: 12,
+      rules: [requiredRule],
+      remoteFunc: searchFunc('system/orders/list', 'innerId'),
+      options: [],
+      loading: false,
+    },
   ],
   [
-    { type: 'input', label: '生产线', key: 'productionLine', width: 12 },
+    { type: 'input', label: '生产线', key: 'productionLine', width: 12, rules: [requiredRule] },
 
-    { type: 'timer', label: '发布日期', key: 'releaseDate', timerType: 'date', width: 12 },
+    {
+      type: 'timer',
+      label: '发布日期',
+      key: 'releaseDate',
+      timerType: 'date',
+      width: 12,
+      rules: [requiredRule],
+    },
   ],
   [
-    { type: 'input', label: '本袋规格', key: 'bagSpecification', width: 8 },
-    { type: 'input', label: '本袋重量', key: 'bagWeight', width: 8 },
-    { type: 'input', label: '本袋数量', key: 'packageQuantity', width: 8 },
+    { type: 'input', label: '本袋规格', key: 'bagSpecification', width: 8, rules: [requiredRule] },
+    { type: 'input', label: '本袋重量', key: 'bagWeight', width: 8, rules: [positiveNumberRule] },
+    {
+      type: 'input',
+      label: '本袋数量',
+      key: 'packageQuantity',
+      width: 8,
+      rules: [positiveNumberRule],
+    },
   ],
   [
     {
@@ -91,6 +123,7 @@ const newFormData = ref([
         { value: 0, label: '否' },
         { value: 1, label: '是' },
       ],
+      rules: [requiredRule],
     },
     {
       type: 'select',
@@ -101,6 +134,7 @@ const newFormData = ref([
         { value: 0, label: '否' },
         { value: 1, label: '是' },
       ],
+      rules: [requiredRule],
     },
     {
       type: 'select',
@@ -111,12 +145,31 @@ const newFormData = ref([
         { value: 0, label: '否' },
         { value: 1, label: '是' },
       ],
+      rules: [requiredRule],
     },
   ],
   [
-    { type: 'number', label: '本袋配件', key: 'packageAccessories', width: 8 },
-    { type: 'number', label: '配件种类', key: 'accessoryType', width: 8 },
-    { type: 'number', label: '配件数量', key: 'accessoryTotal', width: 8 },
+    {
+      type: 'number',
+      label: '本袋配件',
+      key: 'packageAccessories',
+      width: 8,
+      rules: [positiveNumberRule],
+    },
+    {
+      type: 'number',
+      label: '配件种类',
+      key: 'accessoryType',
+      width: 8,
+      rules: [positiveNumberRule],
+    },
+    {
+      type: 'number',
+      label: '配件数量',
+      key: 'accessoryTotal',
+      width: 8,
+      rules: [positiveNumberRule],
+    },
   ],
   [{ type: 'textarea', label: '备注', key: 'remark', width: 24 }],
 ])
@@ -251,7 +304,7 @@ const operation = ref([
       title.value = '编辑'
       editDialogVisible.value = true
       newSubmit.value = { ...row }
-      console.log(newSubmit.value)
+      createFormRef.value.clearValidate()
     },
     value: '编辑',
     disabled: props.control[1].disabled,
@@ -269,40 +322,44 @@ const operation = ref([
 const importDialogVisible = ref(false)
 const editDialogVisible = ref(false)
 const handleSubmit = () => {
-  newSubmit.value.releaseDate = parseTime(newSubmit.value.releaseDate, '{y}-{m}-{d}')
-  if (title.value == '编辑') {
-    console.log(newSubmit.value)
-    changePackaging(newSubmit.value).then((res) => {
-      if (res.code == 200) {
-        page.value = 1
-        listPackaging(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
+  createFormRef.value.validateForm((valid) => {
+    if (valid) {
+      newSubmit.value.releaseDate = parseTime(newSubmit.value.releaseDate, '{y}-{m}-{d}')
+      if (title.value == '编辑') {
+        console.log(newSubmit.value)
+        changePackaging(newSubmit.value).then((res) => {
+          if (res.code == 200) {
+            page.value = 1
+            listPackaging(page.value, pageSize.value).then((res) => {
+              listData.value = res.rows
+              total.value = res.total
+            })
+            ElMessage.success(res.msg)
+            editDialogVisible.value = false
+          } else {
+            ElMessage.error(res.msg)
+            return
+          }
         })
-        ElMessage.success(res.msg)
-        editDialogVisible.value = false
       } else {
-        ElMessage.error(res.msg)
-        return
-      }
-    })
-  } else {
-    newPackaging(newSubmit.value).then((res) => {
-      console.log(res)
-      if (res.msg == '操作成功') {
-        page.value = 1
-        listPackaging(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
+        newPackaging(newSubmit.value).then((res) => {
+          console.log(res)
+          if (res.msg == '操作成功') {
+            page.value = 1
+            listPackaging(page.value, pageSize.value).then((res) => {
+              listData.value = res.rows
+              total.value = res.total
+            })
+            ElMessage.success(res.msg)
+            editDialogVisible.value = false
+          } else {
+            ElMessage.error('操作失败')
+            return
+          }
         })
-        ElMessage.success(res.msg)
-        editDialogVisible.value = false
-      } else {
-        ElMessage.error('操作失败')
-        return
       }
-    })
-  }
+    }
+  })
 }
 const title = ref('编辑')
 //传给form组件的参数
@@ -330,6 +387,7 @@ const onCreate = () => {
   resetSubmit()
   title.value = '新增'
   editDialogVisible.value = true
+  createFormRef.value.clearValidate()
 }
 
 const onSubmit = () => {
@@ -497,7 +555,7 @@ listPackaging(page.value, pageSize.value).then((res) => {
     </div>
 
     <el-dialog v-model="editDialogVisible" :title="title" width="800px"
-      ><CreateForm :data="newFormData" :Formvalue="newSubmit" />
+      ><CreateForm :data="newFormData" :Formvalue="newSubmit" ref="createFormRef" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
