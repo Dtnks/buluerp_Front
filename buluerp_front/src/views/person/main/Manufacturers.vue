@@ -17,7 +17,7 @@ import { ref } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
-import { ElMessage } from 'element-plus'
+import { ElMessage, FormInstance, FormRules } from 'element-plus'
 //渲染页面
 const props = defineProps(['control'])
 const formData = ref([
@@ -87,6 +87,15 @@ const searchContent = ref({ name: '', creatTime: '', email: '', remark: '', tel:
 const importDialogVisible = ref(false)
 const editDialogVisible = ref(false)
 const newSubmit = ref({})
+// 定义表单校验规则
+const rules = ref<FormRules>({
+  name: [{ required: true, message: '姓名不能为空', trigger: 'blur' }],
+  tel: [{ required: true, message: '联系方式不能为空', trigger: 'blur' }],
+  email: [{ required: true, message: '邮箱不能为空', trigger: 'blur' }],
+})
+
+// 表单引用
+const formRef = ref<FormInstance>()
 const handleSubmit = () => {
   if (title.value == '编辑') {
     changeManufacturers(newSubmit.value).then((res) => {
@@ -298,20 +307,20 @@ listManufacturers(page.value, pageSize.value).then((res) => {
     </div>
 
     <el-dialog v-model="editDialogVisible" :title="title" width="400px"
-      ><div class="col cardCenter">
-        <div class="input row">
-          <span>姓名 </span><el-input v-model="newSubmit.name" style="width: 240px" />
-        </div>
-        <div class="input row">
-          <span>联系方式 </span><el-input v-model="newSubmit.tel" style="width: 240px" />
-        </div>
-        <div class="input row">
-          <span>邮箱 </span><el-input v-model="newSubmit.email" style="width: 240px" />
-        </div>
-        <div class="input row">
-          <span>备注 </span><el-input v-model="newSubmit.remark" style="width: 240px" />
-        </div>
-      </div>
+      ><el-form ref="formRef" :model="newSubmit" :rules="rules" label-width="80px">
+        <el-form-item label="姓名" prop="name">
+          <el-input v-model="newSubmit.name" style="width: 240px" />
+        </el-form-item>
+        <el-form-item label="联系方式" prop="tel">
+          <el-input v-model="newSubmit.tel" style="width: 240px" />
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="newSubmit.email" style="width: 240px" />
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="newSubmit.remark" style="width: 240px" />
+        </el-form-item>
+      </el-form>
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
@@ -346,16 +355,4 @@ listManufacturers(page.value, pageSize.value).then((res) => {
     </el-dialog>
   </div>
 </template>
-<style scoped>
-.input .el-input {
-  width: 240px;
-}
-.cardCenter .el-input {
-  margin-bottom: 20px;
-}
-.input span {
-  text-align: right;
-  padding-right: 5px;
-  width: 60px;
-}
-</style>
+<style scoped></style>

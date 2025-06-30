@@ -5,12 +5,12 @@ const props = defineProps({
   addTab: { type: Function },
 })
 import { GetUserInfo, GetMessage } from '@/apis/layout'
+import { defineAsyncComponent } from 'vue'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 import { ref } from 'vue'
 const message = ref({ avatar: '' })
 GetUserInfo().then((res) => {
   message.value = res.user
-  console.log(message.value)
 })
 
 const total = ref(0)
@@ -18,14 +18,12 @@ GetMessage().then((res) => {
   if (res.total !== undefined) {
     total.value = res.total
   }
-  console.log('Initial total:', total.value)
 })
 setInterval(() => {
   GetMessage().then((res) => {
     if (res.total !== undefined) {
       total.value = res.total
     }
-    console.log('Updated total:', total.value)
   })
 }, 2000)
 </script>
@@ -67,7 +65,12 @@ setInterval(() => {
       <div
         class="center"
         style="flex: 1"
-        @click="props.addTab('我的信息', import('@/views/person/main/Information.vue'))"
+        @click="
+          props.addTab(
+            '我的信息',
+            defineAsyncComponent(() => import('@/views/person/main/Information.vue')),
+          )
+        "
       >
         <div
           class="notification-icon-wrapper"

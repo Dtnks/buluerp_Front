@@ -3,7 +3,7 @@ import BordShow from '@/components/board/SecBoard.vue'
 import { getOptionselect, newUser, getUserList } from '@/apis/admin.js'
 import Table from './component/Table.vue'
 import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, FormInstance, FormRules } from 'element-plus'
 defineProps(['control'])
 const options = ref({})
 
@@ -14,7 +14,6 @@ const setPage = (page = 0) => {
   getUserList(page ? page : currentPage.value, searchContent.value).then((res) => renderData(res))
 }
 const renderData = (res) => {
-  console.log(res)
   tableData.value = res.rows.map(({ userId, userName, nickName, roleNames, status, roleIds }) => ({
     userId,
     userName,
@@ -43,15 +42,33 @@ const resetSubmit = () => {
     roleIds: null,
   }
 }
+
+// 定义表单校验规则
+const rules = ref<FormRules>({
+  userName: [{ required: true, message: '账号不能为空', trigger: 'blur' }],
+  nickName: [{ required: true, message: '姓名不能为空', trigger: 'blur' }],
+  password: [{ required: true, message: '密码不能为空', trigger: 'blur' }],
+  roleIds: [{ required: true, message: '角色不能为空', trigger: 'change' }],
+})
+
+const formRef = ref<FormInstance>()
+
 const handleSubmit = () => {
-  newUser(newSubmit.value).then((res) => {
-    newDialogVisible.value = false
-    if (res.code == 500) {
-      ElMessage({ type: 'error', message: '用户已存在' })
+  if (!formRef.value) return
+  formRef.value.validate((valid) => {
+    if (valid) {
+      newUser(newSubmit.value).then((res) => {
+        newDialogVisible.value = false
+        if (res.code === 500) {
+          ElMessage({ type: 'error', message: '用户已存在' })
+        } else {
+          ElMessage({ type: 'success', message: '新增用户成功' })
+          currentPage.value = 1
+          setPage(1)
+        }
+      })
     } else {
-      ElMessage({ type: 'success', message: '新增用户成功' })
-      currentPage.value = 1
-      setPage(1)
+      ElMessage({ type: 'error', message: '请填写完整信息' })
     }
   })
 }
@@ -110,20 +127,19 @@ const newDialogVisible = ref(false)
             >
             <el-button type="primary" @click="search">查询</el-button>
             <el-dialog v-model="newDialogVisible" title="新建系统账号" width="500" center>
-              <div class="col cardCenter">
-                <div class="input row">
-                  <span>帐号 </span><el-input v-model="newSubmit.userName" style="width: 240px" />
-                </div>
-                <div class="input row">
-                  <span>姓名 </span><el-input v-model="newSubmit.nickName" style="width: 240px" />
-                </div>
-                <div class="input row">
-                  <span>密码 </span
-                  ><el-input v-model="newSubmit.password" style="width: 240px" type="password" />
-                </div>
-                <div class="input row">
-                  <span>角色 </span
-                  ><el-select
+              <!-- 绑定表单引用和校验规则 -->
+              <el-form ref="formRef" :model="newSubmit" :rules="rules" label-width="80px">
+                <el-form-item label="帐号" prop="userName">
+                  <el-input v-model="newSubmit.userName" style="width: 240px" />
+                </el-form-item>
+                <el-form-item label="姓名" prop="nickName">
+                  <el-input v-model="newSubmit.nickName" style="width: 240px" />
+                </el-form-item>
+                <el-form-item label="密码" prop="password">
+                  <el-input v-model="newSubmit.password" style="width: 240px" type="password" />
+                </el-form-item>
+                <el-form-item label="角色" prop="roleIds">
+                  <el-select
                     v-model="newSubmit.roleIds"
                     multiple
                     collapse-tags
@@ -139,8 +155,8 @@ const newDialogVisible = ref(false)
                       :value="item.value"
                     />
                   </el-select>
-                </div>
-              </div>
+                </el-form-item>
+              </el-form>
               <template #footer>
                 <div class="dialog-footer">
                   <el-button type="primary" @click="handleSubmit"> 确认 </el-button>

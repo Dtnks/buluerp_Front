@@ -16,6 +16,9 @@ import { ref } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
+import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
+import { searchFunc } from '@/utils/search/search'
+const createFormRef = ref()
 const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
@@ -31,12 +34,66 @@ const formData = ref([
 ])
 const newFormData = ref([
   [
-    { type: 'input', label: '采购计划', key: 'purchaseId', width: 12 },
-    { type: 'input', label: '订单金额', key: 'amount', width: 12 },
+    {
+      type: 'inputSelect',
+      label: '采购计划',
+      key: 'purchaseId',
+      width: 12,
+      rules: [requiredRule],
+      remoteFunc: searchFunc('system/purchase-collection/list', 'id'),
+      loading: false,
+      options: [],
+    },
+    {
+      type: 'input',
+      label: '订单金额',
+      key: 'amount',
+      width: 12,
+      rules: [positiveNumberRule],
+    },
   ],
-  [{ type: 'fileList', label: '发票文件', key: 'invoice', width: 12 }],
+  [
+    {
+      type: 'input',
+      label: '单重',
+      key: 'singleWeight',
+      width: 8,
+      rules: [positiveNumberRule],
+    },
+    {
+      type: 'input',
+      label: '采购重量',
+      key: 'purchaseWeight',
+      width: 8,
+      rules: [positiveNumberRule],
+    },
+    {
+      type: 'number',
+      label: '采购数量',
+      key: 'purchaseQuantity',
+      width: 8,
+      rules: [positiveNumberRule],
+    },
+  ],
+  [
+    {
+      type: 'textarea',
+      label: '备注',
+      key: 'remarks',
+      width: 24,
+      rules: [], // 备注字段不做必填校验
+    },
+  ],
+  [
+    {
+      type: 'fileList',
+      label: '发票文件',
+      key: 'invoice',
+      width: 24,
+      rules: [],
+    },
+  ],
 ])
-
 const newSubmit = ref({
   purchaseId: '',
   amount: '',
@@ -105,7 +162,8 @@ const operation = ref([
       count += 1
       title.value = '编辑'
       editDialogVisible.value = true
-      console.log(row)
+
+      createFormRef.value.clearValidate()
       newSubmit.value = { ...row }
     },
     value: '编辑',
@@ -148,43 +206,47 @@ const editDialogVisible = ref(false)
 const fileChangeVisible = ref(false)
 let count = 0
 const handleSubmit = () => {
-  if (title.value == '编辑') {
-    delete newSubmit.value.invoice
-    console.log(newSubmit.value)
-    changePurchaseList(newSubmit.value).then((res) => {
-      console.log(res)
-      if (res.code == 200) {
-        page.value = 1
-        listPurchaseList(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
+  createFormRef.value.validateForm((valid) => {
+    if (valid) {
+      if (title.value == '编辑') {
+        delete newSubmit.value.invoice
+        console.log(newSubmit.value)
+        changePurchaseList(newSubmit.value).then((res) => {
+          console.log(res)
+          if (res.code == 200) {
+            page.value = 1
+            listPurchaseList(page.value, pageSize.value).then((res) => {
+              listData.value = res.rows
+              total.value = res.total
+            })
+            editDialogVisible.value = false
+            ElMessage.success(res.msg)
+          } else {
+            ElMessage.error(res.msg)
+            return
+          }
         })
-        editDialogVisible.value = false
-        ElMessage.success(res.msg)
       } else {
-        ElMessage.error(res.msg)
-        return
+        if (newSubmit.value.invoice && newSubmit.value.invoice.length === 0) {
+          delete newSubmit.value.invoice
+        }
+        newPurchaseList(newSubmit.value).then((res) => {
+          if (res.msg == '操作成功') {
+            page.value = 1
+            listPurchaseList(page.value, pageSize.value).then((res) => {
+              listData.value = res.rows
+              total.value = res.total
+            })
+            ElMessage.success(res.msg)
+            editDialogVisible.value = false
+          } else {
+            ElMessage.error('操作失败')
+            return
+          }
+        })
       }
-    })
-  } else {
-    if (newSubmit.value.invoice && newSubmit.value.invoice.length === 0) {
-      delete newSubmit.value.invoice
     }
-    newPurchaseList(newSubmit.value).then((res) => {
-      if (res.msg == '操作成功') {
-        page.value = 1
-        listPurchaseList(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
-        })
-        ElMessage.success(res.msg)
-        editDialogVisible.value = false
-      } else {
-        ElMessage.error('操作失败')
-        return
-      }
-    })
-  }
+  })
 }
 const title = ref('编辑')
 //传给form组件的参数
@@ -200,6 +262,8 @@ const onCreate = () => {
   resetSubmit()
   title.value = '新增'
   editDialogVisible.value = true
+
+  createFormRef.value.clearValidate()
 }
 
 const onSubmit = () => {
@@ -428,6 +492,7 @@ listPurchaseList(page.value, pageSize.value).then((res) => {
       ><CreateForm
         :data="title == '新增' ? newFormData : changeFormData"
         :Formvalue="newSubmit"
+        ref="createFormRef"
         :key="count"
       />
       <template #footer>
@@ -463,7 +528,12 @@ listPurchaseList(page.value, pageSize.value).then((res) => {
       </el-upload>
     </el-dialog>
     <el-dialog v-model="fileChangeVisible" title="修改发票文件" width="600px">
-      <CreateForm :data="InvoiceFormData" :Formvalue="FileSubmit" :key="count" />
+      <CreateForm
+        :data="InvoiceFormData"
+        :Formvalue="FileSubmit"
+        :key="count"
+        ref="createFormRef"
+      />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleChangeInvoice"> 确认 </el-button>
