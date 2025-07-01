@@ -154,6 +154,7 @@
 import { defineProps, ref, computed, nextTick } from 'vue'
 import upload from '../upload/uploadImage.vue'
 import type { FormInstance } from 'element-plus'
+
 const formRef = ref<FormInstance | null>(null)
 const props = defineProps({
   data: {

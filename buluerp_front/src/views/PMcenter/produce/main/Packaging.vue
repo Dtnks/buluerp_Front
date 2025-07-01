@@ -13,14 +13,15 @@ import {
 } from '@/apis/produceControl/produce/packaging'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessageBox } from 'element-plus'
 import { searchFunc } from '@/utils/search/search'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
-const props = defineProps(['control'])
+import PackagingDetail from '@/views/PMcenter/produce/component/PackagingDetail.vue'
+const props = defineProps(['control', 'addTab'])
 const createFormRef = ref()
 //渲染页面
 const formData = ref([
@@ -174,10 +175,9 @@ const newFormData = ref([
   [{ type: 'textarea', label: '备注', key: 'remark', width: 24 }],
 ])
 const newSubmit = ref({
-  mouldNumber: '',
+  productId: '',
   orderCode: '',
   materialType: '',
-  productId: '',
   productNameCn: '',
   releaseDate: '',
   bagSpecification: '',
@@ -225,11 +225,6 @@ const tableData = ref([
     type: 'text',
   },
   {
-    value: 'packagingListNumber',
-    label: '分包单编号',
-    type: 'text',
-  },
-  {
     value: 'releaseDate',
     label: '发布日期',
     type: 'date',
@@ -245,26 +240,6 @@ const tableData = ref([
     type: 'text',
   },
   {
-    value: 'bagSpecification',
-    label: '本袋规格',
-    type: 'text',
-  },
-  {
-    value: 'bagWeight',
-    label: '本袋重量/KG',
-    type: 'text',
-  },
-  {
-    value: 'packageAccessories',
-    label: '本袋配件',
-    type: 'text',
-  },
-  {
-    value: 'packageQuantity',
-    label: '本袋数量/PCS',
-    type: 'text',
-  },
-  {
     value: 'operator',
     label: '操作人',
     type: 'text',
@@ -273,19 +248,19 @@ const tableData = ref([
     value: 'isManual',
     label: '说明书',
     type: 'Maptext',
-    map: { '0': '否', '1': '是' },
+    map: { true: '否', false: '是' },
   },
   {
     value: 'isMinifigure',
     label: '人偶',
     type: 'Maptext',
-    map: { '0': '否', '1': '是' },
+    map: { true: '否', false: '是' },
   },
   {
     value: 'isTool',
     label: '起见器',
     type: 'Maptext',
-    map: { '0': '否', '1': '是' },
+    map: { true: '否', false: '是' },
   },
 ])
 const operation = ref([
@@ -304,18 +279,20 @@ const operation = ref([
       title.value = '编辑'
       editDialogVisible.value = true
       newSubmit.value = { ...row }
-      createFormRef.value.clearValidate()
+      nextTick(() => {
+        createFormRef.value.clearValidate()
+      })
     },
     value: '编辑',
     disabled: props.control[1].disabled,
   },
-  // {
-  //   func: (row) => {
-  //     props.addTab('采购计划-' + row.id, PlanDetail, row, null)
-  //   },
-  //   value: '查看',
-  //   disabled: false,
-  // },
+  {
+    func: (row) => {
+      props.addTab('分包-' + row.id, PackagingDetail, row, null)
+    },
+    value: '查看',
+    disabled: false,
+  },
 ])
 
 //新增与修改
@@ -365,22 +342,21 @@ const title = ref('编辑')
 //传给form组件的参数
 const resetSubmit = () => {
   newSubmit.value = {
-    remarks: '',
-    email: '',
-    colorCode: '',
-    deliveryDate: '',
-    deliveryTime: '',
-    orderTime: '',
-    purchaseQuantity: '',
-    singleWeight: '',
-    purchaseWeight: '',
-    supplier: '',
-    materialType: '',
-    picture: '',
-    mouldNumber: '',
-    specification: '',
-    orderCode: '',
     productId: '',
+    orderCode: '',
+    materialType: '',
+    productNameCn: '',
+    releaseDate: '',
+    bagSpecification: '',
+    bagWeight: '',
+    packageQuantity: '',
+    isManual: '',
+    isMinifigure: '',
+    isTool: '',
+    packageAccessories: '',
+    accessoryType: '',
+    accessoryTotal: '',
+    remark: '',
   }
 }
 const onCreate = () => {

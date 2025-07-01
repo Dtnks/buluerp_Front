@@ -19,6 +19,7 @@
 import { ref, watch, defineProps, defineEmits } from 'vue'
 import CustomForm from '@/components/form/CreateForm.vue'
 import ImageUpload from '@/components/upload/editUpload.vue'
+import { getFullImageUrl } from '@/utils/image/getUrl'
 import { toRaw } from 'vue'
 
 
@@ -83,18 +84,19 @@ watch(() => props.currentData, data => {
   } else {
     // 是新建模式或需要清空
     form.value = defaultForm()
+    imageUrl.value = ''
   }
-  if (data?.picture) {
-    imageUrl.value = getFullImageUrl(data.picture)
+  if (data?.pictureUrl) {
+    imageUrl.value = getFullImageUrl(data.pictureUrl)
   } else {
     imageUrl.value = ''
   }
 }, { immediate: true })
 
-const getFullImageUrl = (path: string) => {
-  const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
-  return path ? BASE_IMAGE_URL + path.replace('//', '/') : ''
-}
+// const getFullImageUrl = (path: string) => {
+//   const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
+//   return path ? BASE_IMAGE_URL + path.replace('//', '/') : ''
+// }
 
 const handleClose = () => {
   visible.value = false
@@ -103,21 +105,27 @@ const handleClose = () => {
 
 const handleSubmit = async () => {
   try {
+    const rawForm = toRaw(form.value)
     const formData = new FormData()
-    for (const key in form.value) {
-      formData.append(key, form.value[key])
+
+    for (const key in rawForm) {
+      formData.append(key, rawForm[key])
     }
+
+    const pictureValue = pictureFile.value || rawForm.picture
     if (pictureFile.value) {
-    formData.append('picture', pictureFile.value)
-  } 
-    console.log('提交数据：', form.value)
+      formData.append('picture', pictureFile.value)
+    }
+
     emit('submit', {
-    ...toRaw(form.value),
-    picture: pictureFile.value 
-  })
+      ...rawForm,
+      picture: pictureValue
+    })
+
     handleClose()
   } catch (err) {
     console.error('校验失败', err)
   }
 }
+
 </script>

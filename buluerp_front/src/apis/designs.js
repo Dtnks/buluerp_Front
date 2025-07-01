@@ -20,12 +20,12 @@ export function updateDesign(data) {
   return httpInstance({
     url: 'system/patterns',
     method: 'PUT',
-    data: data 
+    data: data
   })
 }
 
 export function deleteDesign(ids) {
-  const idStr = Array.isArray(ids) ? ids.join(',') : ids 
+  const idStr = Array.isArray(ids) ? ids.join(',') : ids
   return httpInstance({
     url: `system/patterns/${idStr}`,
     method: 'delete'
@@ -51,11 +51,10 @@ export function getDesignTemplate() {
   })
 }
 
-export function exportDesignFile(formData) {
+export function exportDesignFile(ids) {
   return httpInstance({
-    url: 'system/patterns/export',
+    url: `system/patterns/export/${ids}`,
     method: 'post',
-    data: formData,
     responseType: 'blob'
   })
 }
@@ -66,6 +65,13 @@ export function searchDesign(params) {
     method: 'get',
     params
   })
+}
+
+export function searchDesignDetail(id){
+    return httpInstance({
+        url: `system/patterns/${id}`,
+        method: 'get',
+    })
 }
 
 export function pmcConfirm(id){

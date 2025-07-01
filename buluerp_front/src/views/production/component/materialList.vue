@@ -68,7 +68,6 @@
 
 <script lang="ts" setup>
 import { ref, watch, onMounted , nextTick} from 'vue'
-// import { ElMessage, ElMessageBox } from 'element-plus' ✅ 已移除
 import {
   deleteMaterial,
   exportMaterialFile,
@@ -77,8 +76,8 @@ import {
 } from '@/apis/materials.js'
 import { exportToExcel } from '@/utils/file/exportExcel'
 import { downloadBinaryFile } from '@/utils/file/base64'
-import { messageBox } from '@/components/message/messageBox' // ✅ 使用封装后的消息模块
-
+import { messageBox } from '@/components/message/messageBox'
+import { getFullImageUrl } from '@/utils/image/getUrl'
 import MaterialDialog from '@/views/production/component/materialDialog.vue'
 
 const showDialog = ref(false)
@@ -96,11 +95,11 @@ const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
-const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
+// const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
 
-const getFullImageUrl = (path: string) => {
-  return BASE_IMAGE_URL + path.replace('//', '/')
-}
+// const getFullImageUrl = (path: string) => {
+//   return BASE_IMAGE_URL + path.replace('//', '/')
+// }
 
 const fetchData = async () => {
   const res = await getMaterialList({

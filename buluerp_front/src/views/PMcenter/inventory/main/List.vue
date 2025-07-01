@@ -14,7 +14,7 @@ import CreateForm from '@/components/form/CreateForm.vue'
 import BordShow from '@/components/board/SecBoard.vue'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
@@ -415,8 +415,9 @@ const operation = ref([
       const id = row.id
       title.value = '编辑'
       editDialogVisible.value = true
-
-      createFormRef.value.clearValidate()
+      nextTick(() => {
+        createFormRef.value.clearValidate()
+      })
       newSubmit.value[type.value] = { ...row }
     },
     value: '编辑',

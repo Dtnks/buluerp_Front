@@ -17,17 +17,17 @@
         <el-table-column prop="createUserId" label="创建人ID" />
         <el-table-column prop="orderId" label="订单ID" />
         <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column prop="confirm" label="是否确认">
+        <!-- <el-table-column prop="confirm" label="是否确认">
             <template #default="{ row }">
             <el-tag :type="row.confirm ? 'success' : 'info'">
                 {{ row.confirm ? '已确认' : '未确认' }}
             </el-tag>
             </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column label="操作" fixed="right" width="75">
             <template #default="{ row }">
             <el-button size="small" type="primary" text @click="onEdit(row)">编辑</el-button>
-            <el-button size="small" type="primary" text @click="onView(row)">查看</el-button>
+            <!-- <el-button size="small" type="primary" text @click="onView(row)">查看</el-button> -->
             </template>
         </el-table-column>
       </el-table>
@@ -228,7 +228,7 @@ const onExport = async () => {
   }
 }
 const onView = (row: any) => {
-  props.addTab(`造型表 - ID: ${row.id}`, Style, { designId: row.id })
+  props.addTab(`造型表 - ID: ${row.id}`, Style, { productId: row.productId })
 }
 
 </script>

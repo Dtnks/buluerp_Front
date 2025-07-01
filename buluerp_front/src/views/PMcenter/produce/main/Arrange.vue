@@ -13,7 +13,7 @@ import {
 } from '@/apis/produceControl/produce/arrange'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
@@ -252,8 +252,9 @@ const operation = ref([
       title.value = '编辑'
       editDialogVisible.value = true
       resetSubmit()
-
-      createFormRef.value.clearValidate()
+      nextTick(() => {
+        createFormRef.value.clearValidate()
+      })
       newSubmit.value = { ...row }
       if (row.pictureUrl) {
         newSubmit.value.pictureUrl = row.pictureUrl

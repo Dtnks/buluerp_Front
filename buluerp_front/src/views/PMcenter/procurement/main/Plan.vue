@@ -13,7 +13,7 @@ import {
 } from '@/apis/produceControl/purchase/purchasePlan'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
@@ -234,8 +234,9 @@ const operation = ref([
       title.value = '编辑'
       editDialogVisible.value = true
       newSubmit.value = { ...row }
-
-      createFormRef.value.clearValidate()
+      nextTick(() => {
+        createFormRef.value.clearValidate()
+      })
     },
     value: '编辑',
     disabled: props.control[1].disabled,
