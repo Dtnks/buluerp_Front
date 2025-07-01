@@ -194,7 +194,7 @@ const newFormData = ref([
   ],
   [
     {
-      type: 'mutilInputSelect',
+      type: 'number',
       label: '色粉数量',
       key: 'colorPowderNeeded',
       width: 12,

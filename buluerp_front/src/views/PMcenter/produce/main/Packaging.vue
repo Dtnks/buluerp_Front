@@ -225,11 +225,6 @@ const tableData = ref([
     type: 'text',
   },
   {
-    value: 'packagingListNumber',
-    label: '分包单编号',
-    type: 'text',
-  },
-  {
     value: 'releaseDate',
     label: '发布日期',
     type: 'date',
@@ -245,23 +240,8 @@ const tableData = ref([
     type: 'text',
   },
   {
-    value: 'bagSpecification',
+    value: 'bagList',
     label: '本袋规格',
-    type: 'text',
-  },
-  {
-    value: 'bagWeight',
-    label: '本袋重量/KG',
-    type: 'text',
-  },
-  {
-    value: 'packageAccessories',
-    label: '本袋配件',
-    type: 'text',
-  },
-  {
-    value: 'packageQuantity',
-    label: '本袋数量/PCS',
     type: 'text',
   },
   {
