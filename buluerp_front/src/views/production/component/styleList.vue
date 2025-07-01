@@ -15,7 +15,7 @@
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <!-- <el-dropdown-item @click="openGroupExportDialog">导出所有造型表</el-dropdown-item> -->
+                  <el-dropdown-item @click="onExportAll">导出所有造型表</el-dropdown-item>
                   <el-dropdown-item @click="onExportSelected">导出所选项</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
@@ -24,42 +24,63 @@
         </div>
       </template>
 
-      <el-table :data="data" border style="width: 100%" ref="tableRef" :row-key="getRowKey" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55" />
-        <el-table-column prop="id" label="ID" />
-        <el-table-column label="胶件图片">
-          <template #default="{ row }">
-            <img
-              v-if="row.pictureUrl"
-              :src="getFullImageUrl(row.pictureUrl)"
-              alt="产品图片"
-              style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;"
-            />
-            <span v-else>暂无图片</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="productName" label="产品名称" />
-        <el-table-column prop="lddNumber" label="LDD编号" />
-        <el-table-column prop="mouldNumber" label="模具编号" />
-        <el-table-column prop="mouldCategory" label="模具类别" />
-        <el-table-column prop="material" label="模具用料" />
-        <el-table-column prop="color" label="颜色" />
-        <el-table-column prop="quantity" label="数量" />
-        <el-table-column prop="groupId" label="造型表的分组" />
-        <el-table-column prop="confirm" label="是否确认">
-          <template #default="{ row }">
-            <el-tag :type="row.confirm ? 'success' : 'info'">
-              {{ row.confirm ? '已确认' : '未确认' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" fixed="right" width="120">
-          <template #default="{ row }">
-            <el-button size="small" type="primary" text @click="onEdit(row)">编辑</el-button>
-            <el-button size="small" type="primary" text @click="onView(row)">查看</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      <div v-for="[groupId, groupItems] in groupedData" :key="groupId" style="margin-bottom: 40px;">
+        <div style="font-weight: bold; margin: 10px 0;">分组：{{ groupId }}</div>
+
+        <el-table :data="groupItems" border style="width: 100%" :row-key="getRowKey" @selection-change="handleSelectionChange">
+          <!-- 表头保持不变 -->
+          <el-table-column type="selection" width="55" />
+          <el-table-column prop="id" label="ID" />
+          <el-table-column label="胶件图片">
+            <template #default="{ row }">
+              <img
+                v-if="row.pictureUrl"
+                :src="getFullImageUrl(row.pictureUrl)"
+                alt="产品图片"
+                style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;"
+              />
+              <span v-else>暂无图片</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="productName" label="产品名称" />
+          <el-table-column prop="lddNumber" label="LDD编号" />
+          <el-table-column prop="mouldNumber" label="模具编号" />
+          <el-table-column prop="mouldCategory" label="模具类别" />
+          <el-table-column prop="material" label="模具用料" />
+          <el-table-column prop="color" label="颜色" />
+          <el-table-column prop="quantity" label="数量" />
+          <el-table-column prop="confirm" label="是否确认">
+            <template #default="{ row }">
+              <el-tag :type="row.confirm ? 'success' : 'info'">
+                {{ row.confirm ? '已确认' : '未确认' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" fixed="right" width="120">
+            <template #default="{ row }">
+              <el-button size="small" type="primary" text @click="onEdit(row)">编辑</el-button>
+              <el-button size="small" type="primary" text @click="onView(row)">查看</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <!-- 每组下方新增按钮 -->
+        <el-button
+          type="success"
+          style="margin-top: 10px; width: 100%;"
+          @click="onCreateWithGroup(groupId)"
+        >
+          + 新增造型表（分组 {{ groupId }}）
+        </el-button>
+      </div>
+
+      <el-button
+        type="primary"
+        style="margin-top: 30px; width: 100%;"
+        @click="onAddGroup"
+      >
+        + 新增分组
+      </el-button>
 
       <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
         <div>共 {{ total }} 条</div>
@@ -117,9 +138,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted ,nextTick } from 'vue'
+import { ref, watch, onMounted ,nextTick ,computed } from 'vue'
 import { getStyleList, deleteStyle, exportStyleFile, updateStyle , addStyle,importStyleFile,getStyleTemplate} from '@/apis/styles'
-import { pmcConfirm , pmcCancel } from '@/apis/designs'
+import { pmcConfirm , pmcCancel , exportDesignFile} from '@/apis/designs'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessageBox } from 'element-plus'
 import { downloadBinaryFile } from '@/utils/file/base64'
@@ -145,11 +166,17 @@ const tabStore = useTabStore()
 const showDialog = ref(false)
 const isEdit = ref(false)
 const currentRow = ref({})
-// const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
 
-// const getFullImageUrl = (path: string) => {
-//   return BASE_IMAGE_URL + path.replace('//', '/')
-// }
+const groupedData = computed(() => {
+  const groups = new Map()
+  data.value.forEach(item => {
+    const group = item.groupId ?? 0
+    if (!groups.has(group)) groups.set(group, [])
+    groups.get(group).push(item)
+  })
+  return Array.from(groups.entries()).sort((a, b) => a[0] - b[0])
+})
+
 const fetchData = async () => {
   console.log('props.detail:', props.detail.id)
   const res = await getStyleList({
@@ -177,10 +204,8 @@ const tableRef = ref()
 
 const handleSelectionChange = (selection: any[]) => {
   const currentIds = data.value.map(item => item.id)
-
   // 删除当前页取消选中的
   selectedRows.value = selectedRows.value.filter(item => !currentIds.includes(item.id))
-
   // 添加当前页选中的（去重）
   selectedRows.value.push(...selection.filter(item =>
     !selectedRows.value.some(existing => existing.id === item.id)
@@ -201,6 +226,18 @@ const onCreate = () => {
   isEdit.value = false
   currentRow.value = {}
   showDialog.value = true
+}
+
+const onCreateWithGroup = (groupId: number) => {
+  isEdit.value = false
+  currentRow.value = { groupId }
+  showDialog.value = true
+}
+
+const onAddGroup = () => {
+  const allGroupIds = data.value.map(i => i.groupId ?? 0)
+  const nextGroupId = Math.max(...allGroupIds, 0) + 1
+  onCreateWithGroup(nextGroupId)
 }
 
 const onDelete = async () => {
@@ -288,30 +325,16 @@ const handleDownloadTemplate = async () => {
 const groupId = ref(null)
 const groupExportDialogVisible = ref(false)
 
-const openGroupExportDialog = () => {
-  groupExportDialogVisible.value = true
-  const groupSet = new Set(data.value.map(item => item.groupId).filter(Boolean))
-  groupOptions.value = Array.from(groupSet)
-}
-
 const groupOptions = ref<string[]>([])
 
-const onExportByGroup = async () => {
-  if (!groupId.value) {
-    messageBox('warning', null, '', '请选择分组', '')
-    return
-  }
-  const formData = new FormData()
-  formData.append('productId', props.detail.id)
-  formData.append('groupId', groupId.value.toString())
+const onExportAll = async () => {
+
   try {
-    const res = await exportStyleFile(formData)
+    const res = await exportDesignFile(props.detail.id)
     const blob = new Blob([res], { type: 'application/vnd.ms-excel' })
-    downloadBinaryFile(blob, '造型表导出_分组.xlsx')
+    downloadBinaryFile(blob, '造型表导出.xlsx')
   } catch (err) {
     messageBox('error', null, '', '导出失败', '')
-  } finally {
-    groupExportDialogVisible.value = false
   }
 }
 

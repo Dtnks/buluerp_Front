@@ -84,9 +84,10 @@ watch(() => props.currentData, data => {
   } else {
     // 是新建模式或需要清空
     form.value = defaultForm()
+    imageUrl.value = ''
   }
-  if (data?.picture) {
-    imageUrl.value = getFullImageUrl(data.picture)
+  if (data?.pictureUrl) {
+    imageUrl.value = getFullImageUrl(data.pictureUrl)
   } else {
     imageUrl.value = ''
   }
