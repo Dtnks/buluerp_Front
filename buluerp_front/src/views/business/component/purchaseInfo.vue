@@ -3,40 +3,55 @@
     <BordShow content="采购表" path="生产管理/采购/采购表" />
     <div class="greyBack">
       <informationCard :title="`订单-${props.data.orderCode}`" :control="props.control">
-        <el-row :gutter="16" class="information-row">
+        <el-row v-if="purchaseData.id != null" :gutter="16" class="information-row">
           <el-col v-for="field in fields" :key="field.label" :span="10">
             <div class="field">
               <label class="field-label">{{ field.label }}</label>
-              <div v-if="purchaseData[field.key] != null && purchaseData[field.key] != ''" class="field-value">
-                <span v-if="field.key == 'orderCode'">{{ props.data.orderCode }}</span>
-                <span v-else-if="field.key == 'id'">{{ purchaseData[field.key] }}</span>
-                <el-input v-else v-model="updatedFields[field.key]" class="field-input"></el-input>
-              </div>
-              <div v-else class="field-value">
-                <span v-if="field.key == 'orderCode'">{{ props.data.orderCode }}</span>
-                <span v-else-if="field.key == 'id'">暂无数据</span>
-                <el-input v-else v-model="updatedFields[field.key]" placeholder="暂无数据" class="field-input"></el-input>
+              <div class="field-value">
+                <span v-if="field.value == 'orderCode'">{{ props.data.orderCode }}</span>
+                <span v-else-if="field.value == 'id'">{{ purchaseData[field.value] }}</span>
+                <el-input v-else v-model="updatedFields[field.value]"
+                  :placeholder="purchaseData[field.value] ? '' : '暂无数据'" class="field-input"></el-input>
               </div>
             </div>
           </el-col>
         </el-row>
+        <div v-else class="no-data">
+          <span class="no-data-text">暂无数据</span>
+          <el-button @click="onAdd">点击新增</el-button>
+        </div>
       </informationCard>
     </div>
-    <el-footer class="footer">
+    <el-footer class="footer" v-if="purchaseData.id != null">
       <el-button @click="onCancel">取消</el-button>
-
-      <el-button v-if="purchaseData.id == null" type="primary" @click="onAddSubmit">新增</el-button>
-      <el-button v-else type="primary" @click="onUpdateSubmit">修改</el-button>
-
-
+      <!-- <el-button v-if="scheduleData.id == null" type="primary" @click="onAddSubmit">新增</el-button> -->
+      <el-button type="primary" @click="onUpdateSubmit">提交修改</el-button>
     </el-footer>
   </div>
+  <el-dialog v-model="newDialogVisible" title="新增采购表">
+    <el-form :model="updatedFields" label-width="80px">
+      <el-form-item label="订单编号">
+        <el-input v-model="updatedFields.orderCode" placeholder="请输入订单编号"></el-input>
+      </el-form-item>
+      <el-form-item label="产品ID">
+        <el-input v-model="updatedFields.productId" placeholder="请输入产品ID"></el-input>
+      </el-form-item>
+      <el-form-item label="材料类型">
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button type="primary" @click="onAddSubmit"> 确认新增</el-button>
+        <el-button type="info" @click="() => { newDialogVisible = false }"> 取消 </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import BordShow from '@/components/board/SecBoard.vue'
-import { ElRow, ElCol, ElFooter, ElButton, ElInput } from 'element-plus';
+import { ElRow, ElCol, ElFooter, ElButton, ElInput, ElDialog, ElFormItem, ElForm } from 'element-plus';
 import informationCard from './informationCard.vue';
 import { changePurchasePlan, detailPurchasePlan, newPurchasePlan } from '@/apis/produceControl/purchase/purchasePlan';
 import { messageBox } from '@/components/message/messageBox';
@@ -48,6 +63,7 @@ const props = defineProps<{
   control: Array<object>
   data: { orderCode: string, purchaseId: number, orderId: number }
 }>();
+const newDialogVisible = ref(false);
 const tabStore = useTabStore()
 const purchaseData = ref<{ [key: string]: any }>({});
 // updatedFields: 更新字段列表
@@ -106,6 +122,10 @@ const onCancel = () => {
   console.log('取消按钮点击');
   messageBox('success', null, '取消操作');
 };
+
+const onAdd = () => {
+  newDialogVisible.value = true;
+}
 const onAddSubmit = async () => {
   const res = await newPurchasePlan(updatedFields.value);
   console.log('新增采购表请求结果:', res);

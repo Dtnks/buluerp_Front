@@ -7,17 +7,12 @@
           <el-col v-for="field in fields" :key="field.label" :span="10">
             <div class="field">
               <label class="field-label">{{ field.label }}</label>
-              <div v-if="scheduleData[field.value] != null" class="field-value">
+              <div class="field-value">
                 <span v-if="field.value == 'orderCode'">{{ props.data.orderCode }}</span>
                 <span v-else-if="field.value == 'id'">{{ scheduleData[field.value] }}</span>
-                <el-input v-else v-model="updatedFields[field.value]" class="field-input"></el-input>
+                <el-input v-else v-model="updatedFields[field.value]"
+                  :placeholder="scheduleData[field.value] ? '' : '暂无数据'" class="field-input"></el-input>
               </div>
-              <!-- <div v-else-if="scheduleData.id == null"  class="field-value"> -->
-              <!-- <span v-if="field.value == 'orderCode'">{{ props.data.orderCode }}</span> -->
-              <!-- <span v-else-if="field.value == 'id'">暂无数据</span> -->
-              <!-- <span>1111</span> -->
-              <!-- <el-input v-else v-model="updatedFields[field.value]" placeholder="暂无数据" class="field-input"></el-input> -->
-              <!-- </div> -->
             </div>
           </el-col>
         </el-row>
@@ -65,7 +60,7 @@
       <el-form-item label="库存">
         <el-input v-model="updatedFields.inventory"></el-input>
       </el-form-item>
-      <el-form-item label="物料ID列表">
+      <el-form-item label="物料ID表">
         <el-input v-model="updatedFields.materialIds"></el-input>
       </el-form-item>
       <el-form-item label="物料类型">
@@ -84,17 +79,16 @@
         <el-button type="info" @click="() => { newDialogVisible = false }"> 取消 </el-button>
       </div>
     </template>
-
   </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import BordShow from '@/components/board/SecBoard.vue'
-import { ElRow, ElCol, ElFooter, ElButton, ElInput, ElDialog, ElFormItem } from 'element-plus';
+import { ElRow, ElCol, ElFooter, ElButton, ElInput, ElDialog, ElFormItem, ElForm } from 'element-plus';
 import informationCard from './informationCard.vue';
 import { getProdunctionSchedeuleByOrderCode, newSchedule } from '@/apis/produceControl/produce/schedule';
-import useProductionSchedule from '../function/productionSchedule';
+// import useProductionSchedule from '../function/productionSchedule';
 const updatedFields = ref({})
 const props = defineProps<{
   addTab: (targetName: string, component: any, data?: any) => void
@@ -105,7 +99,7 @@ const newDialogVisible = ref(false);
 const scheduleData = ref<{ [value: string]: any }>({});
 const fields = ref([
   { value: 'id', label: 'ID', },
-  { value: 'codeOrder', label: '订单编号' },
+  { value: 'orderCode', label: '订单编号' },
   { value: 'cavityCount', label: '腔数PCS' },
   { value: 'colorCode', label: '颜色编码' },
   { value: 'colorPowderNeeded', label: '色粉需求KG', },

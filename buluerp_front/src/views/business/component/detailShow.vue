@@ -83,7 +83,7 @@ import { getOrderDetail } from '../function/oders'
 import { getOrdersList, putOrder } from '@/apis/orders'
 import { getPackagingByOrderCode } from '@/apis/produceControl/produce/packaging'
 import { ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElMessageBox, ElDialog, dayjs } from 'element-plus'
-import PackagingList from './packagingList.vue'
+// import PackagingList from './packagingList.vue'
 import ProductionSchedule from './productionSchedule.vue'
 import { messageBox } from '@/components/message/messageBox'
 import PurchaseInfo from './purchaseInfo.vue'
@@ -245,10 +245,10 @@ const viewProductsSchedule = (row: any) => {
   props.addTab(`布产表 ${row.orderId}`, ProductionSchedule, { orderCode: props.orderCode, }, props.control,)
 }
 
-// viewPackagingList: 查看分包表
-const viewPackagingList = async (row: any) => {
-  props.addTab(`分包表 ${row.orderId}`, PackagingList, { orderCode: props.orderCode, }, props.control)
-}
+// // viewPackagingList: 查看分包表
+// const viewPackagingList = async (row: any) => {
+//   props.addTab(`分包表 ${row.orderId}`, PackagingList, { orderCode: props.orderCode, }, props.control)
+// }
 
 // handleAction: 处理关联订单的操作
 const handleAction = (method: Function, row: any) => {
@@ -277,7 +277,7 @@ const relatedOrdersTable = ref([
     orderId: props.id,
     actions: [
       // { name: '创建', method: addPackagingList },
-      { name: '查看', method: viewPackagingList },
+      // { name: '查看', method: viewPackagingList },
     ],
   },
 ])
