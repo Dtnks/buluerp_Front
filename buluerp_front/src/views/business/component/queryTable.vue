@@ -5,39 +5,25 @@
       <div style="display: flex; justify-content: space-between; align-items: center">
         <span>列表</span>
         <div>
-          <el-button type="danger" @click="onDelete" :disabled="control[2].disabled"
-            >删除</el-button
-          >
+          <el-button type="danger" @click="onDelete" :disabled="control[2].disabled">删除</el-button>
           <el-button type="primary" @click="onExport">导出</el-button>
         </div>
       </div>
     </template>
-    <el-table
-      :data="props.tableData"
-      border
-      @selection-change="handleSelectionChange"
-      :row-key="(row) => row.id"
-    >
+    <el-table :data="props.tableData" border @selection-change="handleSelectionChange" :row-key="(row) => row.id">
       <el-table-column type="selection" :reserve-selection="true" />
-      <el-table-column
-        v-for="column in columns"
-        :key="column.prop"
-        :prop="column.prop"
-        :label="column.label"
-      >
+      <el-table-column v-for="column in columns" :key="column.prop" :prop="column.prop" :label="column.label">
         <template v-if="column.slot" #default="{ row }">
           <span style="display: flex; align-items: center">
-            <span
-              :style="{
-                backgroundColor: getStatusColor(row[column.prop]),
-                display: 'inline-block',
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                margin: '0 5px 0 0',
-                border: '1px solid #ccc',
-              }"
-            ></span>
+            <span :style="{
+              backgroundColor: getStatusColor(row[column.prop]),
+              display: 'inline-block',
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              margin: '0 5px 0 0',
+              border: '1px solid #ccc',
+            }"></span>
             <!-- {{ row[column.prop] }} -->
             {{ getStatusText(row[column.prop]) }}
           </span>
@@ -45,9 +31,7 @@
       </el-table-column>
       <el-table-column label="操作">
         <template #default="{ row }">
-          <el-button link type="primary" @click="onEdit(row)" :disabled="control[1].disabled"
-            >编辑</el-button
-          >
+          <el-button link type="primary" @click="onEdit(row)" :disabled="control[1].disabled">编辑</el-button>
           <el-button link type="primary" @click="onCheck(row)">查看</el-button>
         </template>
       </el-table-column>
@@ -70,9 +54,9 @@
           <el-input v-model="editForm.customerName" />
         </el-form-item> -->
         <el-form-item label="客户姓名">
-        <el-autocomplete v-model="editForm.customerName" :fetch-suggestions="customerSuggestions" :value-key="'value'"
-          @blur="checkCustomerName" />
-      </el-form-item>
+          <el-autocomplete v-model="editForm.customerName" :fetch-suggestions="customerSuggestions" :value-key="'value'"
+            @blur="checkCustomerName" />
+        </el-form-item>
         <el-form-item label="订单状态">
           <el-input v-model="editForm.statusText" disabled />
         </el-form-item>
@@ -150,18 +134,7 @@ const getStatusColor = (status: number) => {
 const onCheck = (row: TableDataType) => {
   console.log('查看：', row)
   props.addTab(
-    `订单详情 ${row.id}`,
-    BusinessDetail,
-    {
-      addTab: props.addTab,
-      id: row.id,
-      innerId: row.innerId,
-      status: row.status,
-      remark: row.remark,
-      createTime: row.createTime,
-      customerName: row.customerName,
-    },
-    props.control,
+    `订单详情 ${row.id}`, BusinessDetail, { addTab: props.addTab, id: row.id, orderCode: row.innerId, status: row.status, remark: row.remark, createTime: row.createTime, customerName: row.customerName, }, props.control,
   )
 }
 
