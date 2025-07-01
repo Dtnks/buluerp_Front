@@ -288,7 +288,7 @@ const operation = ref([
   },
   {
     func: (row) => {
-      props.addTab('分包-' + row.id, PackagingDetail, row, null)
+      props.addTab('分包-' + row.id, PackagingDetail, row.id, null)
     },
     value: '查看',
     disabled: false,

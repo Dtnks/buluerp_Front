@@ -70,3 +70,11 @@ export function downLoadModule() {
     responseType: 'blob',
   })
 }
+
+export function getPackagingDetail(id) {
+  return httpInstance({
+    url: `system/packaging-list/${id}`,
+    method: 'get',
+    headers: headers,
+  })
+}

@@ -15,7 +15,7 @@
           </div>
         </div>
       </el-card>
-      <subCardPackaging :id="data.id" :bagList="data.bagList"></subCardPackaging>
+      <subCardPackaging :id="data"></subCardPackaging>
     </div>
   </div>
 </template>
@@ -23,6 +23,8 @@
 <script setup lang="js">
 import BordShow from '@/components/board/SecBoard.vue'
 import { ElCard } from 'element-plus'
+import { getPackagingDetail } from '@/apis/produceControl/produce/packaging'
+import { ref } from 'vue'
 import subCardPackaging from '@/views/PMcenter/produce/component/subCardPackaging.vue'
 const props = defineProps(['data'])
 
@@ -39,27 +41,30 @@ const fieldMap = {
   accessoryTotal: { label: '配件数量/PCS', type: 'text' },
   productionLine: { label: '生产线', type: 'text' },
 }
+let dataByid = {}
+const chunkedDisplayData = ref([])
+getPackagingDetail(props.data).then((res) => {
+  dataByid = res.data
+  const displayData = {}
+  for (const key in dataByid) {
+    if (Object.keys(fieldMap).includes(key)) {
+      displayData[key] = dataByid[key]
+    }
+  }
+  // 将 displayData 拆分成每行包含多个字段的数组，这里每行展示 3 个字段
 
+  const chunkSize = 3
+  const keys = Object.keys(displayData)
+  for (let i = 0; i < keys.length; i += chunkSize) {
+    const chunk = {}
+    for (let j = 0; j < chunkSize && i + j < keys.length; j++) {
+      const key = keys[i + j]
+      chunk[key] = displayData[key]
+    }
+    chunkedDisplayData.value.push(chunk)
+  }
+})
 // 过滤掉值为 null 的字段
-const displayData = {}
-for (const key in props.data) {
-  if (Object.keys(fieldMap).includes(key)) {
-    displayData[key] = props.data[key]
-  }
-}
-
-// 将 displayData 拆分成每行包含多个字段的数组，这里每行展示 3 个字段
-const chunkedDisplayData = []
-const chunkSize = 3
-const keys = Object.keys(displayData)
-for (let i = 0; i < keys.length; i += chunkSize) {
-  const chunk = {}
-  for (let j = 0; j < chunkSize && i + j < keys.length; j++) {
-    const key = keys[i + j]
-    chunk[key] = displayData[key]
-  }
-  chunkedDisplayData.push(chunk)
-}
 
 // 根据 key 获取对应的标签
 const getLabel = (key) => {
