@@ -27,6 +27,7 @@ declare module 'vue' {
     EditUpload: typeof import('./src/components/upload/editUpload.vue')['default']
     ElAutocomplete: typeof import('element-plus/es')['ElAutocomplete']
     ElButton: typeof import('element-plus/es')['ElButton']
+    ElButtoon: typeof import('element-plus/es')['ElButtoon']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElCol: typeof import('element-plus/es')['ElCol']

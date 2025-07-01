@@ -19,15 +19,6 @@ export function changePackaging(data) {
   })
 }
 
-export function downLoadModule() {
-  return httpInstance({
-    url: `system/packaging-list/export/template`,
-    method: 'get',
-    headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
-    responseType: 'blob',
-  })
-}
-
 export function deletePackaging(ids) {
   return httpInstance({
     url: `system/packaging-list/${ids.join(',')}`,
@@ -48,20 +39,7 @@ export function listPackaging(pageNum, pageSize, searchContent = {}) {
     headers: headers,
   })
 }
-export function getPackagingByOrderCode(id) {
-  return (pageNum = '', pageSize = '', searchContent = {}) => {
-    let concatText = Object.keys(searchContent)
-      .map((key) => {
-        return `&${key}=${searchContent[key]}`
-      })
-      .join('')
-    return httpInstance({
-      url: `system/packaging-list/list?orderCode=${id}&pageNum=${pageNum}&pageSize=${pageSize}${concatText}`,
-      method: 'get',
-      headers: headers,
-    })
-  }
-}
+
 export function exportSelectTable(data) {
   return httpInstance({
     url: `system/packaging-list/export`,
@@ -81,5 +59,14 @@ export function importFile(formData) {
       ...headers,
       'Content-Type': 'multipart/form-data',
     },
+  })
+}
+
+export function downLoadModule() {
+  return httpInstance({
+    url: `system/packaging-list/export/template`,
+    method: 'get',
+    headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
+    responseType: 'blob',
   })
 }

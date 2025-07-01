@@ -12,7 +12,7 @@ import {
   // downLoadModule,
 } from '@/apis/produceControl/purchase/purchaseList'
 import TableList from '@/components/table/TableList.vue'
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
@@ -162,8 +162,9 @@ const operation = ref([
       count += 1
       title.value = '编辑'
       editDialogVisible.value = true
-
-      createFormRef.value.clearValidate()
+      nextTick(() => {
+        createFormRef.value.clearValidate()
+      })
       newSubmit.value = { ...row }
     },
     value: '编辑',
