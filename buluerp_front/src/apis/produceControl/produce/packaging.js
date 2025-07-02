@@ -40,10 +40,17 @@ export function listPackaging(pageNum, pageSize, searchContent = {}) {
   })
 }
 
+export function getPackagingListByOrderId(orderId) {
+  return httpInstance({
+    url: `system/packaging-list/list?orderCode=${orderId}`,
+    method: 'get',
+    headers: headers,
+  })
+}
 export function exportSelectTable(id) {
   console.log(`system/packaging-list/export?ids=${id}`)
   return httpInstance({
-    url: `system/packaging-list/export?ids=${id}`,
+    url: `system/packaging-list/export?id=${id}`,
     method: 'post',
     headers,
     responseType: 'blob',

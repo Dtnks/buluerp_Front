@@ -417,16 +417,18 @@ const exportFunc = (row) => {
   if (row.length === 0) {
     ElMessage.warning('请先选择要导出的产品')
     return
-  } else if (row.length !== 1) {
-    ElMessage.warning('请选择一条记录')
-    return
   }
-
-  exportSelectTable(row[0].id).then((res) => {
-    const now = new Date()
-    downloadBinaryFile(res, '分包表_' + now.toLocaleDateString() + '_' + count + '.xlsx')
-    count += 1
-  })
+  for (const i in row) {
+    exportSelectTable(row[i].id).then((res) => {
+      console.log(res)
+      const now = new Date()
+      downloadBinaryFile(
+        res,
+        '分包表_' + row[i].id + '_' + now.toLocaleDateString() + '_' + count + '.xlsx',
+      )
+      count += 1
+    })
+  }
 }
 
 const DeleteFunc = (row) => {
