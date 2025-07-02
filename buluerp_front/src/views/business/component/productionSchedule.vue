@@ -60,7 +60,7 @@ const updatedFields = ref({})
 const props = defineProps<{
   addTab: (targetName: string, component: any, data?: any) => void
   control: Array<object>
-  data: { orderCode: number }
+  data: { orderCode: string }
 }>();
 const newDialogVisible = ref(false);
 const createFormRef = ref(null); // 表单引用

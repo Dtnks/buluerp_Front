@@ -179,82 +179,10 @@ const fetchOrderProduct = async (orderId: number) => {
       orderProduct.value = Array.isArray(res.product) ? res.product : [res.product]
       console.log('orderProduct.value', orderProduct.value)
     }
-    // else {
-    //   messageBox('error', null, null, '获取订单产品数据失败, 请检查订单是否存在产品信息')
-    // }
   } catch (error) {
     console.error('获取订单产品数据失败:', error)
     messageBox('error', null, null, '获取订单产品数据失败, 请稍后再试')
   }
-}
-
-// // 用户选择的产品编号
-// const selectedProductIds = ref({})
-
-// // 用户输入的新增的行数
-// const addRowCount = ref(0)
-// const newRowCount = computed(() => Number(addRowCount.value) + 2)
-
-// // 展示出来的产品数据
-// const displayProducts = computed(() => {
-//   if (addRowCount.value == 0) {
-//     return orderProduct.value.slice(0, 2)
-//   }
-//   return [...orderProduct.value.slice(0, newRowCount.value)]
-// })
-
-// 编辑弹窗的产品数据
-const updatedProduct = ref({
-  id: 0,
-  productName: '',
-  productQuantity: 1,
-})
-
-// todo: 根据下拉框的选择更新产品行
-
-// onDeleteProduct: 删除订单产品
-const onDeleteProduct = (row: any) => {
-  ElMessageBox.confirm('确定删除该产品吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  })
-}
-
-// onEditProduct: 编辑订单产品
-const onEditProduct = async (row: any) => {
-  console.log('编辑产品:', row)
-
-  editproductVisible.value = true
-  updatedProduct.value = {
-    productId: row.productId,
-    productName: row.product?.name || '',
-    productQuantity: row.quantity,
-  }
-}
-
-// onEditProductConfirm: 确认编辑产品
-const onEditProductConfirm = async (product: any) => {
-  console.log('确认编辑产品:', product)
-  try {
-    await putOrder({
-      ...orderDetail.value,
-      products: orderProduct.value.map((item) =>
-        item.productId === product.productId
-          ? {
-            ...item,
-            quantity: Number(product.productQuantity),
-          }
-          : item,
-      ),
-    })
-    fetchOrderProduct(props.id)
-    messageBox('success', null, '订单产品已成功更新')
-  } catch (error) {
-    console.error('更新订单产品失败:', error)
-    messageBox('error', null, null, '更新订单产品失败，请稍后再试')
-  }
-  editproductVisible.value = false
 }
 
 // // 关联订单数据和操作
@@ -262,7 +190,7 @@ const onEditProductConfirm = async (product: any) => {
 const viewPuchaseOrder = (row: any) => {
   console.log('查看采购表', row)
   props.addTab(
-    `采购表 ${row.orderId}`,
+    `订单${props.orderCode} 外购`,
     PurchaseInfo,
     { orderCode: props.orderCode, purchaseId: orderDetail.value.purchaseId, orderId: props.id },
     props.control,
@@ -273,17 +201,13 @@ const viewPuchaseOrder = (row: any) => {
 const viewProductsSchedule = (row: any) => {
   console.log('查看布产表', row)
   props.addTab(
-    `布产表 ${row.orderId}`,
+    `订单${props.orderCode} 布产`,
     ProductionSchedule,
     { orderCode: props.orderCode },
     props.control,
   )
 }
 
-// // viewPackagingList: 查看分包表
-// const viewPackagingList = async (row: any) => {
-//   props.addTab(`分包表 ${row.orderId}`, PackagingList, { orderCode: props.orderCode, }, props.control)
-// }
 
 // handleAction: 处理关联订单的操作
 const handleAction = (method: Function, row: any) => {
@@ -291,8 +215,8 @@ const handleAction = (method: Function, row: any) => {
 }
 
 const viewPackagingList = (row) => {
-  getPackagingListByOrderId('xxxx').then((res) => {
-    props.addTab(`订单 ${row.orderId} 分包`, PackagingDetail, res.rows[0].id, props.control)
+  getPackagingListByOrderId(props.orderCode).then((res) => {
+    props.addTab(`订单${props.orderCode} 分包`, PackagingDetail, res.rows[0].id, props.control)
   })
 }
 const DialogVisible = ref(false)
@@ -415,7 +339,7 @@ const handleSubmit = () => {
     if (valid) {
       newSubmit.value.releaseDate = parseTime(newSubmit.value.releaseDate, '{y}-{m}-{d}')
 
-      newPackaging({ ...newSubmit.value, orderCode: 'xxxx' }).then((res) => {
+      newPackaging({ ...newSubmit.value, orderCode: props.orderCode }).then((res) => {
         console.log(res)
         if (res.msg == '操作成功') {
           relatedOrdersTable.value[2].actions = [{ name: '查看', method: viewPackagingList }]
