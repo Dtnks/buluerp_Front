@@ -27,7 +27,6 @@
     </div>
     <el-footer class="footer" v-if="scheduleData.id != null">
       <el-button @click="onCancel">解绑</el-button>
-      <!-- <el-button v-if="scheduleData.id == null" type="primary" @click="onAddSubmit">新增</el-button> -->
       <el-button type="primary" @click="onUpdate">点击修改</el-button>
     </el-footer>
   </div>
@@ -69,7 +68,7 @@ const scheduleData = ref<{ [value: string]: any }>({});
 const newFormData = ref([
   [
     { type: 'inputSelect', label: '订单Id', key: 'orderCode', width: 12, rules: [requiredRule], remoteFunc: searchFunc('system/orders/list', 'innerId'), options: [], loading: false, },
-    { type: 'inputSelect', label: '产品ID', key: 'productId', width: 12, rules: [requiredRule], options: [], loading: false, remoteFunc: searchFunc('system/products/list', 'id'), },
+    { type: 'inputSelect', label: '产品ID', key: 'productId', width: 12, rules: [requiredRule], remoteFunc: searchFunc('system/products/list', 'id'), options: [], loading: false, },
   ],
   [
     { type: 'input', label: '模具编码', key: 'mouldNumber', width: 8 },

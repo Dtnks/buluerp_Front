@@ -110,7 +110,11 @@ const columns = [
     label: '订单状态',
     slot: 'statusSlot', // 自定义渲染的插槽名称
   },
-  { prop: 'remark', label: '其他基本信息' },
+
+  { prop: 'innerId', label: '内部编号' },
+  { prop: 'outerId', label: '外部编号' },
+  { prop: 'operator', label: '创建人' },
+  { prop: 'remark', label: '备注' },
 ]
 
 // 表格操作--start

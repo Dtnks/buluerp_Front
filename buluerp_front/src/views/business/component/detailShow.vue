@@ -13,7 +13,7 @@
                 </div>
                 <div v-else class="field-value">
                   <el-input v-if="field.label == '客户姓名'" v-model="updateFields.customerName" placeholder="请输入" />
-                  <el-input v-else-if="field.label == '其他基本信息'" v-model="updateFields.remark" placeholder="请输入" />
+                  <el-input v-else-if="field.label == '备注'" v-model="updateFields.remark" placeholder="请输入" />
                   <el-date-picker v-else v-model="updateFields.deliveryTime" style="width: 200px" placeholder="请选择" />
                 </div>
               </div>
@@ -128,7 +128,7 @@ const fields = ref([
   { label: '外部编号', value: props.detail.outerId },
   { label: '客户姓名', value: props.detail.customerName },
   { label: '交付日期', value: props.detail.deliveryTime },
-  { label: '其他基本信息', value: props.detail.remark },
+  { label: '备注', value: props.detail.remark },
 ])
 
 // 修改订单基本信息

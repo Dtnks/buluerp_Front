@@ -66,7 +66,7 @@ const updatedFields = ref({})
 
 const newFormData = ref([
   [
-    { type: 'inputSelect', label: '订单Id', key: 'orderCode', width: 12, rules: [requiredRule], remoteFunc: searchFunc('system/orders/list', 'innerId'), options: [], loading: false, },
+    { type: 'inputSelect', label: '订单Id', key: 'orderCode', width: 12, rules: [requiredRule], remoteFunc: searchFunc('system/orders/list', 'innerId'), disabled: true },
     { type: 'inputSelect', label: '产品ID', key: 'productId', width: 12, rules: [requiredRule], remoteFunc: searchFunc('system/products/list', 'id'), options: [], loading: false, },
   ],
   [{ type: 'input', label: '采购重量', key: 'purchaseWeight', width: 8, rules: [positiveNumberRule], },
@@ -124,16 +124,19 @@ onMounted(async () => {
 // getPurchaseData: 获取采购表数据
 const getPurchaseData = async () => {
   const res = await detailPurchasePlan(props.data.orderCode);
-  if (res.code == 200 && res.rows.length) {
-    purchaseData.value = res.rows[0];
+  if (res.code == 200) {
+    purchaseData.value = res.rows[0] || {};
     updatedFields.value = {
       ...purchaseData.value,
-      orderCode: props.data.orderCode, // 保持订单编号不变
-      id: purchaseData.value.id, // 保持id不变
+      orderCode: props.data.orderCode,
+      id: purchaseData.value.id,
     };
+    console.log('获取采购表数据:', purchaseData.value);
+
     return purchaseData.value;
   } else {
-    purchaseData.value = { id: null }; // 如果没有数据，设置为 null
+    updatedFields.value = purchaseData.value;
+
   }
 }
 
@@ -147,7 +150,7 @@ const onCancel = () => {
     } else {
       messageBox('error', null, null, '解绑失败');
     }
-  }, '解绑成功', '解绑失败', '确定要解绑当前订单吗？');
+  }, '解绑成功', '解绑失败', '确定要解绑当前 订单吗？');
 };
 
 const onAdd = () => {

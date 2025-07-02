@@ -46,10 +46,10 @@
 </template>
 
 <script setup lang="ts">
-import {  onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { ElInput, ElMessageBox, ElButton, ElDialog, ElUpload, ElMessage, ElAutocomplete, ElFormItem } from 'element-plus'
-import Form from '@/components/form/Form.vue' 
+import Form from '@/components/form/Form.vue'
 import { importOrderFile, getProductTemplate, getOrdersList } from '@/apis/orders'
 import { getStatusText, Status } from '../utils/statusMap'
 import { downloadBinaryFile } from '@/utils/file/base64'
@@ -65,7 +65,7 @@ defineProps(['control'])
 const dialogForm = reactive({
   status: Status.PendingDesign, // 确保 status 有默认值
   createTime: '',
-  createdBy: '',
+  operator: '',
   otherInfo: '',
   innerId: '',
   outerId: '',
@@ -76,6 +76,7 @@ const dialogForm = reactive({
   productId: 0,
   productName: '',
   customerName: '',
+  operater: '',
 
 })
 
@@ -119,10 +120,10 @@ const data = reactive([
     {
       label: '创建人姓名',
       type: 'input',
-      key: 'createdBy',
+      key: 'operator',
     },
     {
-      label: '其他搜索框',
+      label: '备注',
       type: 'input',
       key: 'remark',
     },
@@ -135,7 +136,7 @@ const formState = reactive({
   // orderId: '',
   status: null,
   createTime: [],
-  createdBy: '',
+  operator: '',
   otherInfo: '',
   innerId: '',
   id: 14,
@@ -154,7 +155,7 @@ const searchForm = ref({
   createTineFrom: '',
   createTimeTo: '',
   deliveryDeadline: '',
-  createdBy: '',
+  operator: '',
   customerName: '',
   remark: '',
 })
