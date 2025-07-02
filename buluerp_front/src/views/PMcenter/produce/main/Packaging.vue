@@ -17,7 +17,7 @@ import { ref, nextTick } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
-import { ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { searchFunc } from '@/utils/search/search'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 import PackagingDetail from '@/views/PMcenter/produce/component/PackagingDetail.vue'
@@ -417,14 +417,12 @@ const exportFunc = (row) => {
   if (row.length === 0) {
     ElMessage.warning('请先选择要导出的产品')
     return
+  } else if (row.length !== 1) {
+    ElMessage.warning('请选择一条记录')
+    return
   }
-  const formData = new URLSearchParams()
-  const ids = row.map((ele) => {
-    return ele.id
-  })
-  // const idsString = Array.isArray(ids) ? ids.join(',') : ids
-  formData.append('ids', ids)
-  exportSelectTable(formData).then((res) => {
+
+  exportSelectTable(row[0].id).then((res) => {
     const now = new Date()
     downloadBinaryFile(res, '分包表_' + now.toLocaleDateString() + '_' + count + '.xlsx')
     count += 1

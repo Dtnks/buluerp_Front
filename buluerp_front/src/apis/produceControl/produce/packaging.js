@@ -40,13 +40,13 @@ export function listPackaging(pageNum, pageSize, searchContent = {}) {
   })
 }
 
-export function exportSelectTable(data) {
+export function exportSelectTable(id) {
+  console.log(`system/packaging-list/export?ids=${id}`)
   return httpInstance({
-    url: `system/packaging-list/export`,
+    url: `system/packaging-list/export?ids=${id}`,
     method: 'post',
-    headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers,
     responseType: 'blob',
-    data: data,
   })
 }
 
