@@ -40,13 +40,20 @@ export function listPackaging(pageNum, pageSize, searchContent = {}) {
   })
 }
 
-export function exportSelectTable(data) {
+export function getPackagingListByOrderId(orderId) {
   return httpInstance({
-    url: `system/packaging-list/export`,
+    url: `system/packaging-list/list?orderCode=${orderId}`,
+    method: 'get',
+    headers: headers,
+  })
+}
+export function exportSelectTable(id) {
+  console.log(`system/packaging-list/export?ids=${id}`)
+  return httpInstance({
+    url: `system/packaging-list/export?id=${id}`,
     method: 'post',
-    headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers,
     responseType: 'blob',
-    data: data,
   })
 }
 
@@ -68,5 +75,13 @@ export function downLoadModule() {
     method: 'get',
     headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
     responseType: 'blob',
+  })
+}
+
+export function getPackagingDetail(id) {
+  return httpInstance({
+    url: `system/packaging-list/${id}`,
+    method: 'get',
+    headers: headers,
   })
 }

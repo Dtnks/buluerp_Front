@@ -17,7 +17,7 @@ import { ref, nextTick } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
-import { ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { searchFunc } from '@/utils/search/search'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 import PackagingDetail from '@/views/PMcenter/produce/component/PackagingDetail.vue'
@@ -288,7 +288,7 @@ const operation = ref([
   },
   {
     func: (row) => {
-      props.addTab('分包-' + row.id, PackagingDetail, row, null)
+      props.addTab('分包-' + row.id, PackagingDetail, row.id, null)
     },
     value: '查看',
     disabled: false,
@@ -418,17 +418,17 @@ const exportFunc = (row) => {
     ElMessage.warning('请先选择要导出的产品')
     return
   }
-  const formData = new URLSearchParams()
-  const ids = row.map((ele) => {
-    return ele.id
-  })
-  // const idsString = Array.isArray(ids) ? ids.join(',') : ids
-  formData.append('ids', ids)
-  exportSelectTable(formData).then((res) => {
-    const now = new Date()
-    downloadBinaryFile(res, '分包表_' + now.toLocaleDateString() + '_' + count + '.xlsx')
-    count += 1
-  })
+  for (const i in row) {
+    exportSelectTable(row[i].id).then((res) => {
+      console.log(res)
+      const now = new Date()
+      downloadBinaryFile(
+        res,
+        '分包表_' + row[i].id + '_' + now.toLocaleDateString() + '_' + count + '.xlsx',
+      )
+      count += 1
+    })
+  }
 }
 
 const DeleteFunc = (row) => {

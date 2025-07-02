@@ -1,6 +1,11 @@
 <template>
   <div class="detail-box">
-    <div style=" flex: 1; background-color: rgba(240, 242, 245, 1); padding: 20px 40px 0 40px;  overflow-y: auto; ">
+    <div style="
+        flex: 1;
+        background-color: rgba(240, 242, 245, 1);
+        padding: 20px 40px 0 40px;
+        overflow-y: auto;
+      ">
       <div class="main">
         <!-- 业务订单基本信息 -->
         <informationCard title="业务订单基本信息">
@@ -37,7 +42,6 @@
               </template>
 </el-table-column> -->
           </el-table>
-
         </informationCard>
         <!-- 关联订单 -->
         <informationCard title="关联订单">
@@ -61,17 +65,21 @@
       <el-button type="primary" @click="onBoxSubmit">提交</el-button>
     </el-footer>
 
-    <!-- <el-dialog v-model="editproductVisible" title="编辑产品" width="500px">
-      <el-form :model="updatedProduct" label-width="100px">
-        <el-form-item label="产品编号"> <el-input v-model="updatedProduct.id" disabled /> </el-form-item>
-        <el-form-item label="产品名称"> <el-input v-model="updatedProduct.productName" disabled /> </el-form-item>
-        <el-form-item label="产品数量"> <el-input v-model="updatedProduct.productQuantity" type="number" /> </el-form-item>
-      </el-form>
+    <el-dialog v-model="DialogVisible" title="新增分包" width="800px">
+      <CreateForm :data="newFormData" :Formvalue="newSubmit" ref="createFormRef" />
       <template #footer>
-        <el-button @click="editproductVisible = false">取消</el-button>
-        <el-button type="primary" @click="onEditProductConfirm(updatedProduct)">保存</el-button>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
+          <el-button type="info" @click="
+            () => {
+              DialogVisible = false
+            }
+          ">
+            取消
+          </el-button>
+        </div>
       </template>
-    </el-dialog> -->
+    </el-dialog>
   </div>
 </template>
 
@@ -81,14 +89,31 @@ import { computed, onMounted, ref } from 'vue'
 import { getStatusText } from '../utils/statusMap'
 import { getOrderDetail } from '../function/oders'
 import { getOrdersList, putOrder } from '@/apis/orders'
+import { parseTime } from '@/utils/ruoyi'
 // import { getPackagingByOrderCode } from '@/apis/produceControl/produce/packaging'
-import { ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElMessageBox, ElDialog, dayjs } from 'element-plus'
+import {
+  ElButton,
+  ElInput,
+  ElDatePicker,
+  ElRow,
+  ElCol,
+  ElTable,
+  ElTableColumn,
+  ElFooter,
+  ElMessageBox,
+  ElDialog,
+  dayjs,
+} from 'element-plus'
 // import PackagingList from './packagingList.vue'
 import ProductionSchedule from './productionSchedule.vue'
 import { messageBox } from '@/components/message/messageBox'
 import PurchaseInfo from './purchasePlan.vue'
+import CreateForm from '@/components/form/CreateForm.vue'
 import useTabStore from '@/stores/modules/tabs'
-
+import { getPackagingListByOrderId, newPackaging } from '@/apis/produceControl/produce/packaging'
+import PackagingDetail from '@/views/PMcenter/produce/component/PackagingDetail.vue'
+import { searchFunc } from '@/utils/search/search'
+import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 // Props
 const props = defineProps<{
   detail: any
@@ -147,7 +172,7 @@ const orderProduct = ref([])
 const fetchOrderProduct = async (orderId: number) => {
   try {
     const res = await getOrderDetail(orderId)
-    console.log('订单产品数据:22222222', res.product);
+    console.log('订单产品数据:22222222', res.product)
 
     if (res.product) {
       // orderProduct.value = res.product
@@ -236,13 +261,23 @@ const onEditProductConfirm = async (product: any) => {
 // viewPuchaseOrder: 查看采购表
 const viewPuchaseOrder = (row: any) => {
   console.log('查看采购表', row)
-  props.addTab(`采购表 ${row.orderId}`, PurchaseInfo, { orderCode: props.orderCode, purchaseId: orderDetail.value.purchaseId, orderId: props.id, }, props.control)
+  props.addTab(
+    `采购表 ${row.orderId}`,
+    PurchaseInfo,
+    { orderCode: props.orderCode, purchaseId: orderDetail.value.purchaseId, orderId: props.id },
+    props.control,
+  )
 }
 
 // viewProductsSchedule: 查看布产表
 const viewProductsSchedule = (row: any) => {
   console.log('查看布产表', row)
-  props.addTab(`布产表 ${row.orderId}`, ProductionSchedule, { orderCode: props.orderCode, }, props.control,)
+  props.addTab(
+    `布产表 ${row.orderId}`,
+    ProductionSchedule,
+    { orderCode: props.orderCode },
+    props.control,
+  )
 }
 
 // // viewPackagingList: 查看分包表
@@ -255,6 +290,149 @@ const handleAction = (method: Function, row: any) => {
   method(row)
 }
 
+const viewPackagingList = (row) => {
+  getPackagingListByOrderId('xxxx').then((res) => {
+    props.addTab(`订单 ${row.orderId} 分包`, PackagingDetail, res.rows[0].id, props.control)
+  })
+}
+const DialogVisible = ref(false)
+const newFormData = ref([
+  [
+    {
+      type: 'inputSelect',
+      label: '产品ID',
+      key: 'productId',
+      width: 24,
+      rules: [requiredRule],
+      options: [],
+      loading: false,
+      remoteFunc: searchFunc('system/products/list', 'id'),
+    },
+  ],
+  [
+    { type: 'input', label: '生产线', key: 'productionLine', width: 12, rules: [requiredRule] },
+
+    {
+      type: 'timer',
+      label: '发布日期',
+      key: 'releaseDate',
+      timerType: 'date',
+      width: 12,
+      rules: [requiredRule],
+    },
+  ],
+  [
+    { type: 'input', label: '本袋规格', key: 'bagSpecification', width: 8, rules: [requiredRule] },
+    { type: 'input', label: '本袋重量', key: 'bagWeight', width: 8, rules: [positiveNumberRule] },
+    {
+      type: 'input',
+      label: '本袋数量',
+      key: 'packageQuantity',
+      width: 8,
+      rules: [positiveNumberRule],
+    },
+  ],
+  [
+    {
+      type: 'select',
+      label: '说明书',
+      key: 'isManual',
+      width: 8,
+      options: [
+        { value: 0, label: '否' },
+        { value: 1, label: '是' },
+      ],
+      rules: [requiredRule],
+    },
+    {
+      type: 'select',
+      label: '人偶',
+      key: 'isMinifigure',
+      width: 8,
+      options: [
+        { value: 0, label: '否' },
+        { value: 1, label: '是' },
+      ],
+      rules: [requiredRule],
+    },
+    {
+      type: 'select',
+      label: '起件器',
+      key: 'isTool',
+      width: 8,
+      options: [
+        { value: 0, label: '否' },
+        { value: 1, label: '是' },
+      ],
+      rules: [requiredRule],
+    },
+  ],
+  [
+    {
+      type: 'number',
+      label: '本袋配件',
+      key: 'packageAccessories',
+      width: 8,
+      rules: [positiveNumberRule],
+    },
+    {
+      type: 'number',
+      label: '配件种类',
+      key: 'accessoryType',
+      width: 8,
+      rules: [positiveNumberRule],
+    },
+    {
+      type: 'number',
+      label: '配件数量',
+      key: 'accessoryTotal',
+      width: 8,
+      rules: [positiveNumberRule],
+    },
+  ],
+  [{ type: 'textarea', label: '备注', key: 'remark', width: 24 }],
+])
+
+const newSubmit = ref({
+  productId: '',
+  materialType: '',
+  productNameCn: '',
+  releaseDate: '',
+  bagSpecification: '',
+  bagWeight: '',
+  packageQuantity: '',
+  isManual: '',
+  isMinifigure: '',
+  isTool: '',
+  packageAccessories: '',
+  accessoryType: '',
+  accessoryTotal: '',
+  remark: '',
+})
+const createFormRef = ref()
+const handleSubmit = () => {
+  createFormRef.value.validateForm((valid) => {
+    if (valid) {
+      newSubmit.value.releaseDate = parseTime(newSubmit.value.releaseDate, '{y}-{m}-{d}')
+
+      newPackaging({ ...newSubmit.value, orderCode: 'xxxx' }).then((res) => {
+        console.log(res)
+        if (res.msg == '操作成功') {
+          relatedOrdersTable.value[2].actions = [{ name: '查看', method: viewPackagingList }]
+          ElMessage.success(res.msg)
+          DialogVisible.value = false
+        } else {
+          ElMessage.error('操作失败')
+          return
+        }
+      })
+    }
+  })
+}
+const addPackagingList = () => {
+  DialogVisible.value = true
+}
+
 // 关联订单
 const relatedOrdersTable = ref([
   {
@@ -262,7 +440,8 @@ const relatedOrdersTable = ref([
     orderId: props.id,
     actions: [
       // { name: '创建', method: addPurchaseOrder },
-      { name: '查看', method: viewPuchaseOrder }],
+      { name: '查看', method: viewPuchaseOrder },
+    ],
   },
   {
     type: '布产表',
@@ -277,17 +456,25 @@ const relatedOrdersTable = ref([
     orderId: props.id,
     actions: [
       // { name: '创建', method: addPackagingList },
-      // { name: '查看', method: viewPackagingList },
+      { name: '查看', method: viewPackagingList },
     ],
   },
 ])
-
+getPackagingListByOrderId('xxxx').then((res) => {
+  if (res.rows.length == 0) {
+    relatedOrdersTable.value[2].actions = [{ name: '创建', method: addPackagingList }]
+  } else {
+    relatedOrdersTable.value[2].actions = [{ name: '查看', method: viewPackagingList }]
+  }
+})
 // //  页脚按钮
 // onBoxSubmit: 提交按钮
 const onBoxSubmit = async () => {
   console.log('提交1111', updateFields.value)
   const submitData = { ...updateFields.value }
-  if (submitData.deliveryTime instanceof Date) { submitData.deliveryTime = dayjs(submitData.deliveryTime).format('YYYY-MM-DD') }
+  if (submitData.deliveryTime instanceof Date) {
+    submitData.deliveryTime = dayjs(submitData.deliveryTime).format('YYYY-MM-DD')
+  }
   const res = await putOrder(submitData)
   console.log('提交订单数据:555', res)
   if (res.code == 200) {
@@ -295,14 +482,12 @@ const onBoxSubmit = async () => {
     tabStore.freshTab('订单查询')
   } else {
     console.error('提交订单失败')
-    console.log('提交订单失败:', res);
+    console.log('提交订单失败:', res)
 
     messageBox('error', null, null, res.msg)
   }
 
-
   getOrdersList()
-
 }
 
 // onBoxCancel: 取消按钮
@@ -310,7 +495,6 @@ const onBoxCancel = () => {
   console.log('取消')
   messageBox('success', null, '已取消提交')
 }
-
 </script>
 
 <style scoped lang="less">

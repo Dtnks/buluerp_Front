@@ -42,48 +42,50 @@
         <el-image :src="getFullImageUrl(detail.partImageUrl)" lazy="true"></el-image>
       </div>
       <div class="col">
-        <div class="detail-item">
-          <span class="detail-label">ID：</span>
-          <span class="detail-value">{{ detail.id || '无' }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">模具编号：</span>
-          <span class="detail-value">{{ detail.mouldNumber || '无' }}</span>
-        </div>
+        <div class="row">
+          <div class="detail-item col">
+            <div class="detail-label">ID</div>
+            <div class="detail-value">{{ detail.id || '无' }}</div>
+          </div>
+          <div class="detail-item col">
+            <div class="detail-label">模具编号</div>
+            <div class="detail-value">{{ detail.mouldNumber || '无' }}</div>
+          </div>
 
-        <div class="detail-item">
-          <span class="detail-label">材料类型：</span>
-          <span class="detail-value">{{ detail.materialType || '无' }}</span>
+          <div class="detail-item col">
+            <div class="detail-label">材料类型</div>
+            <div class="detail-value">{{ detail.materialType || '无' }}</div>
+          </div>
+          <div class="detail-item col">
+            <div class="detail-label">颜色代码</div>
+            <div class="detail-value">{{ detail.colorCode || '无' }}</div>
+          </div>
+          <div class="detail-item col">
+            <div class="detail-label">规格名称</div>
+            <div class="detail-value">{{ detail.specificationName || '无' }}</div>
+          </div>
         </div>
-        <div class="detail-item">
-          <span class="detail-label">颜色代码：</span>
-          <span class="detail-value">{{ detail.colorCode || '无' }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">规格名称：</span>
-          <span class="detail-value">{{ detail.specificationName || '无' }}</span>
-        </div>
-      </div>
-      <div class="col">
-        <div class="detail-item">
-          <span class="detail-label">用途：</span>
-          <span class="detail-value">{{ detail.usage || '无' }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">单重：</span>
-          <span class="detail-value">{{ detail.singleWeight || '无' }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">套数：</span>
-          <span class="detail-value">{{ detail.setQuantity || '无' }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">备注：</span>
-          <span class="detail-value">{{ detail.remarks || '无' }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">包装袋 ID：</span>
-          <span class="detail-value">{{ detail.packagingBagId || '无' }}</span>
+        <div class="row">
+          <div class="detail-item col">
+            <div class="detail-label">用途</div>
+            <div class="detail-value">{{ detail.usage || '无' }}</div>
+          </div>
+          <div class="detail-item col">
+            <div class="detail-label">单重</div>
+            <div class="detail-value">{{ detail.singleWeight || '无' }}</div>
+          </div>
+          <div class="detail-item col">
+            <div class="detail-label">套数</div>
+            <div class="detail-value">{{ detail.setQuantity || '无' }}</div>
+          </div>
+          <div class="detail-item col">
+            <div class="detail-label">备注</div>
+            <div class="detail-value">{{ detail.remarks || '无' }}</div>
+          </div>
+          <div class="detail-item col">
+            <div class="detail-label">包装袋 ID</div>
+            <div class="detail-value">{{ detail.packagingBagId || '无' }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -255,8 +257,8 @@ const handleSubSubSubmit = () => {
 
 <style scoped>
 .el-image {
-  width: 200px;
-  height: 200px;
+  width: 120px;
+  height: 120px;
   object-fit: cover;
 }
 .data-card {
@@ -273,7 +275,6 @@ const handleSubSubSubmit = () => {
 .detail-item {
   display: flex;
   align-items: center;
-  margin: 8px 0;
 }
 
 .detail-label {
