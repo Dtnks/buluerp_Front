@@ -5,7 +5,7 @@ import {
   putOrder,
   getOrderProducts,
 } from '@/apis/orders'
-import { getPackagingListById } from '@/apis/packaging'
+// import { getPackagingListById } from '@/apis/packaging'
 import { detailCustomer } from '@/apis/custom'
 import { messageBox } from '@/components/message/messageBox'
 import { getProductDetail } from '@/apis/products'
@@ -51,13 +51,13 @@ export const getOrderDetail = async (id: number) => {
 
 // addOrder: 添加订单
 export const addOrder = async (data: any) => {
-    const res = await postOrder(data)
-    if (res.code === 200) {
-      console.log('添加订单成功：', res)
-    } else {
-      console.log('添加订单失败：', res)
-      
-    }return res
+  const res = await postOrder(data)
+  if (res.code === 200) {
+    console.log('添加订单成功：', res)
+  } else {
+    console.log('添加订单失败：', res)
+  }
+  return res
 }
 
 // searchOrders: 查询订单

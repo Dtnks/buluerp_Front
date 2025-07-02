@@ -81,24 +81,25 @@ import { computed, onMounted, ref } from 'vue'
 import { getStatusText } from '../utils/statusMap'
 import { getOrderDetail } from '../function/oders'
 import { getOrdersList, putOrder } from '@/apis/orders'
-import { getPackagingByOrderCode } from '@/apis/produceControl/produce/packaging'
+// import { getPackagingByOrderCode } from '@/apis/produceControl/produce/packaging'
 import { ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElMessageBox, ElDialog, dayjs } from 'element-plus'
-import PackagingList from './packagingList.vue'
+// import PackagingList from './packagingList.vue'
 import ProductionSchedule from './productionSchedule.vue'
 import { messageBox } from '@/components/message/messageBox'
-import PurchaseInfo from './purchaseInfo.vue'
+import PurchaseInfo from './purchasePlan.vue'
 import useTabStore from '@/stores/modules/tabs'
 
 // Props
 const props = defineProps<{
   detail: any
   id: number
+  orderCode: string
   addTab: (targetName: string, component: any, data?: any, control?: any) => void
   control: Array<object>
 }>()
 const tabStore = useTabStore()
-const packagingInstance = getPackagingByOrderCode(props.id)
-packagingInstance().then((res) => (relatedOrdersTable.value[2].xxx = res.total))
+// const packagingInstance = getPackagingByOrderCode(props.id)
+// packagingInstance().then((res) => (relatedOrdersTable.value[2].xxx = res.total))
 
 const orderDetail = computed(() => props.detail)
 
@@ -193,25 +194,6 @@ const onDeleteProduct = (row: any) => {
     cancelButtonText: '取消',
     type: 'warning',
   })
-  // .then(() => {
-  //   // 删除逻辑
-  //   deleteProduct(row.productId)
-  //     .then(() => {
-  //       // // 从订单产品列表中移除该产品
-  //       // orderProduct.value = orderProduct.value.filter(
-  //       //   (item) => item.productId !== row.productId,
-  //       // )
-  //       fetchOrderProduct(props.id)
-  //       messageBox('success', null, '产品已成功删除')
-  //     })
-  //     .catch((error) => {
-  //       console.error('删除产品失败:', error)
-  //       messageBox('error', null, null, '删除产品失败, 请稍后再试')
-  //     })
-  // })
-  // .catch(() => {
-  //   messageBox('success', null, '已取消删除操作')
-  // })
 }
 
 // onEditProduct: 编辑订单产品
@@ -251,33 +233,22 @@ const onEditProductConfirm = async (product: any) => {
 }
 
 // // 关联订单数据和操作
-// viewPuchaseOrder: 查看外购表
+// viewPuchaseOrder: 查看采购表
 const viewPuchaseOrder = (row: any) => {
-  console.log('查看外购表', row)
-  props.addTab(`外购表 ${row.orderId}`, PurchaseInfo, { orderCode: props.id, purchaseId: orderDetail.value.purchaseId }, props.control)
-}
-
-// addProductsSchedule: 创建布产表
-const addProductsSchedule = (row: any) => {
-  console.log('创建布产表', row)
+  console.log('查看采购表', row)
+  props.addTab(`采购表 ${row.orderId}`, PurchaseInfo, { orderCode: props.orderCode, purchaseId: orderDetail.value.purchaseId, orderId: props.id, }, props.control)
 }
 
 // viewProductsSchedule: 查看布产表
 const viewProductsSchedule = (row: any) => {
   console.log('查看布产表', row)
-  props.addTab(`布产表 ${row.orderId}`, ProductionSchedule, { orderCode: props.id, }, props.control,)
+  props.addTab(`布产表 ${row.orderId}`, ProductionSchedule, { orderCode: props.orderCode, }, props.control,)
 }
 
-// addPackagingList: 创建分包表
-const addPackagingList = (row: any) => {
-  console.log('创建分包表', row)
-  openCreateForm()
-}
-
-// viewPackagingList: 查看分包表
-const viewPackagingList = async (row: any) => {
-  props.addTab(`分包表 ${row.orderId}`, PackagingList, { orderCode: props.id, }, props.control)
-}
+// // viewPackagingList: 查看分包表
+// const viewPackagingList = async (row: any) => {
+//   props.addTab(`分包表 ${row.orderId}`, PackagingList, { orderCode: props.orderCode, }, props.control)
+// }
 
 // handleAction: 处理关联订单的操作
 const handleAction = (method: Function, row: any) => {
@@ -287,9 +258,11 @@ const handleAction = (method: Function, row: any) => {
 // 关联订单
 const relatedOrdersTable = ref([
   {
-    type: '外购表',
+    type: '采购表',
     orderId: props.id,
-    actions: [{ name: '查看', method: viewPuchaseOrder }],
+    actions: [
+      // { name: '创建', method: addPurchaseOrder },
+      { name: '查看', method: viewPuchaseOrder }],
   },
   {
     type: '布产表',
@@ -304,7 +277,7 @@ const relatedOrdersTable = ref([
     orderId: props.id,
     actions: [
       // { name: '创建', method: addPackagingList },
-      { name: '查看', method: viewPackagingList },
+      // { name: '查看', method: viewPackagingList },
     ],
   },
 ])

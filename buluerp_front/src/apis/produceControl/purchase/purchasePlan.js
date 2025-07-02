@@ -54,6 +54,15 @@ export function listPurchasePlan(pageNum, pageSize, searchContent = {}) {
     headers: headers,
   })
 }
+
+export function detailPurchasePlan(orderCode) {
+  return httpInstance({
+    url: `system/purchase-collection/list?orderCode=${orderCode}`,
+    method: 'get',
+    headers: headers,
+  })
+}
+
 export function exportSelectTable(data) {
   return httpInstance({
     url: `system/purchase-collection/export`,
