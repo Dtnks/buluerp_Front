@@ -1,21 +1,24 @@
 <template>
   <div class="col">
     <BordShow content="布产表" path="生产管理/生产/布产表" />
+    <!-- <div v-if="isLoading" class="loading">加载中...</div> -->
     <div class="greyBack">
-      <informationCard :title="`订单-${props.data.orderCode}`" :control="props.control">
-        <el-row v-if="scheduleData.id != null" :gutter="16" class="information-row">
-          <el-col v-for="field in fields" :key="field.label" :span="10">
-            <div class="field">
-              <label class="field-label">{{ field.label }}</label>
-              <div class="field-value">
-                <span v-if="field.value == 'orderCode'">{{ props.data.orderCode }}</span>
-                <span v-else-if="field.value == 'id'">{{ scheduleData[field.value] }}</span>
-                <el-input v-else v-model="updatedFields[field.value]"
-                  :placeholder="scheduleData[field.value] ? '' : '暂无数据'" class="field-input"></el-input>
+      <informationCard v-if="!isLoading" :title="`订单-${props.data.orderCode}`" :control="props.control">
+        <div v-if="scheduleData.id != null" class="informationCard">
+          <el-row :gutter="16" class="information-row">
+            <el-col v-for="field in fields" :key="field.label" :span="10" v-show="scheduleData[field.key] != null">
+              <div class="field">
+                <label class="field-label">{{ field.label }}</label>
+                <div class="field-key">
+                  <span v-if="field.key == 'orderCode'">{{ props.data.orderCode }}</span>
+                  <el-image v-else-if="field.key == 'pictureUrl' && scheduleData[field.key]"
+                    :src="getFullImageUrl(scheduleData[field.key])"></el-image> <span v-else>{{ scheduleData[field.key]
+                    }}</span>
+                </div>
               </div>
-            </div>
-          </el-col>
-        </el-row>
+            </el-col>
+          </el-row>
+        </div>
         <div v-else class="no-data">
           <span class="no-data-text">暂无数据</span>
           <el-button @click="onAdd">点击新增</el-button>
@@ -23,59 +26,17 @@
       </informationCard>
     </div>
     <el-footer class="footer" v-if="scheduleData.id != null">
-      <el-button @click="onCancel">取消</el-button>
+      <el-button @click="onCancel">解绑</el-button>
       <!-- <el-button v-if="scheduleData.id == null" type="primary" @click="onAddSubmit">新增</el-button> -->
-      <el-button type="primary" @click="onUpdateSubmit">提交修改</el-button>
+      <el-button type="primary" @click="onUpdate">点击修改</el-button>
     </el-footer>
   </div>
-  <el-dialog v-model="newDialogVisible" title="新增布产表" width="500px" center>
-    <el-form ref="formRef" :model="updatedFields" label-width="80px">
-      <el-form-item label="订单编号">
-        <el-input v-model="updatedFields.orderCode" disabled></el-input>
-      </el-form-item>
-      <el-form-item label="排产ID">
-        <el-input v-model="updatedFields.arrangeId"></el-input>
-      </el-form-item>
-      <el-form-item label="产品ID">
-        <el-input v-model="updatedFields.productId"></el-input>
-      </el-form-item>
-      <el-form-item label="模具编码">
-        <el-input v-model="updatedFields.mouldCode"></el-input>
-      </el-form-item>
-      <el-form-item label="腔数PCS">
-        <el-input v-model="updatedFields.cavityCount"></el-input>
-      </el-form-item>
-      <el-form-item label="颜色编码">
-        <el-input v-model="updatedFields.colorCode"></el-input>
-      </el-form-item>
-      <el-form-item label="色粉需求KG">
-        <el-input v-model="updatedFields.colorPowderNeeded"></el-input>
-      </el-form-item>
-      <el-form-item label="客户">
-        <el-input v-model="updatedFields.customer"></el-input>
-      </el-form-item>
-      <el-form-item label="生产周期">
-        <el-input v-model="updatedFields.cycleTime"></el-input>
-      </el-form-item>
-      <el-form-item label="库存">
-        <el-input v-model="updatedFields.inventory"></el-input>
-      </el-form-item>
-      <el-form-item label="物料ID表">
-        <el-input v-model="updatedFields.materialIds"></el-input>
-      </el-form-item>
-      <el-form-item label="物料类型">
-        <el-input v-model="updatedFields.materialType"></el-input>
-      </el-form-item>
-      <el-form-item label="模具状态">
-        <el-input v-model="updatedFields.mouldCondition"></el-input>
-      </el-form-item>
-      <el-form-item label="模具厂家">
-        <el-input v-model="updatedFields.mouldManufacturer"></el-input>
-      </el-form-item>
-    </el-form>
+  <el-dialog v-model="newDialogVisible" title="新增布产表">
+    <CreateForm :data="newFormData" :Formvalue="updatedFields"></CreateForm>
     <template #footer>
       <div class="dialog-footer">
-        <el-button type="primary" @click="onAddSubmit"> 确认新增 </el-button>
+        <el-button v-if="scheduleData.id == null" type="primary" @click="onAddSubmit"> 确认新增 </el-button>
+        <el-button v-else type="primary" @click="onUpdateSubmit"> 确认修改 </el-button>
         <el-button type="info" @click="() => { newDialogVisible = false }"> 取消 </el-button>
       </div>
     </template>
@@ -84,11 +45,18 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import CreateForm from '@/components/form/CreateForm.vue';
+import { searchFunc } from '@/utils/search/search'
 import BordShow from '@/components/board/SecBoard.vue'
-import { ElRow, ElCol, ElFooter, ElButton, ElInput, ElDialog, ElFormItem, ElForm } from 'element-plus';
+import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
+import { ElRow, ElCol, ElFooter, ElButton, ElInput, ElDialog, ElImage } from 'element-plus';
 import informationCard from './informationCard.vue';
-import { getProdunctionSchedeuleByOrderCode, newSchedule } from '@/apis/produceControl/produce/schedule';
+import { changeSchedule, deleteSchedule, getProdunctionSchedeuleByOrderCode, newSchedule } from '@/apis/produceControl/produce/schedule';
+import { messageBox } from '@/components/message/messageBox';
+import { getFullImageUrl } from '@/utils/image/getUrl';
 // import useProductionSchedule from '../function/productionSchedule';
+
+const isLoading = ref(true);
 const updatedFields = ref({})
 const props = defineProps<{
   addTab: (targetName: string, component: any, data?: any) => void
@@ -96,55 +64,100 @@ const props = defineProps<{
   data: { orderCode: number }
 }>();
 const newDialogVisible = ref(false);
+const createFormRef = ref(null); // 表单引用
 const scheduleData = ref<{ [value: string]: any }>({});
-const fields = ref([
-  { value: 'id', label: 'ID', },
-  { value: 'orderCode', label: '订单编号' },
-  { value: 'cavityCount', label: '腔数PCS' },
-  { value: 'colorCode', label: '颜色编码' },
-  { value: 'colorPowderNeeded', label: '色粉需求KG', },
-  { value: 'creationTime', label: '创建时间', type: 'date' },
-  { value: 'customer', label: '客户', },
-  { value: 'cycleTime', label: '生产周期', },
-  { value: 'inventory', label: '库存', },
-  { value: 'materialIds', label: '物料ID列表', },
-  { value: 'materialType', label: '物料类型', },
-  { value: 'mouldCondition', label: '模具状态', },
-  { value: 'mouldManufacturer', label: '模具厂家', },
-  { value: 'operator', label: '操作人', },
-  { value: 'picture', label: '图片', type: 'image' },
-])
+const newFormData = ref([
+  [
+    { type: 'inputSelect', label: '订单Id', key: 'orderCode', width: 12, rules: [requiredRule], remoteFunc: searchFunc('system/orders/list', 'innerId'), options: [], loading: false, },
+    { type: 'inputSelect', label: '产品ID', key: 'productId', width: 12, rules: [requiredRule], options: [], loading: false, remoteFunc: searchFunc('system/products/list', 'id'), },
+  ],
+  [
+    { type: 'input', label: '模具编码', key: 'mouldNumber', width: 8 },
+    { type: 'select', label: '模具状态', key: 'mouldCondition', width: 8, options: [{ label: '未生产', value: '未生产' }, { label: '已生产', value: '已生产' },], rules: [requiredRule], },
 
-// const fields = ref({});
+    { type: 'input', label: '用量', key: 'usage', width: 8, rules: [positiveNumberRule] },
+  ],
+  [
+    { type: 'mutilInputSelect', label: '客户', key: 'customer', width: 12, rules: [requiredRule], options: [], loading: false, remoteFunc: searchFunc('system/customers/list', 'name'), },
 
-const getFields = async () => {
-  const res = await getProdunctionSchedeuleByOrderCode(props.data.orderCode)
-  if (res.code === 200) {
-    scheduleData.value = res.data;
-    console.log('获取包装信息成功:', fields.value);
+    { type: 'mutilInputSelect', label: '模具厂家', key: 'mouldManufacturer', width: 12, rules: [requiredRule], options: [], loading: false, remoteFunc: searchFunc('system/manufacturer/list', 'name'), },
+  ],
+  [
+    { type: 'timer', label: '布产时间', key: 'productionTime', timerType: 'date', width: 12, rules: [requiredRule], },
+    { type: 'timer', label: '出货时间', key: 'shipmentTime', timerType: 'date', width: 12, rules: [requiredRule], },
+  ],
+  [
+    {
+      type: 'inputSelect', label: '颜色编号', key: 'colorCode', width: 12,
+      remoteFunc: (ele) => {
+        ele.loading = true
+        ele.options = [{ label: '1', value: '1' }, { label: '2', value: '2' }, { label: '3', value: '3' },]
+        ele.loading = false
+      },
+      loading: false, options: [],
+    },
+    { type: 'inputSelect', label: '排产Id', key: 'arrangeId', width: 12, rules: [requiredRule], options: [], loading: false, remoteFunc: searchFunc('system/production-arrange/list', 'id'), },
+  ],
+  [
+    { type: 'input', label: '单重', key: 'singleWeight', width: 8, rules: [positiveNumberRule] },
+    { type: 'input', label: '布产重量', key: 'productionWeight', width: 8, rules: [positiveNumberRule], },
+    { type: 'input', label: '供应商', key: 'supplier', width: 8, rules: [requiredRule] },
+  ],
+  [
+    { type: 'input', label: '腔数PCS', key: 'cavityCount', width: 8, rules: [requiredRule] },
+    { type: 'input', label: '布产模数PCS', key: 'productionMouldCount', width: 8, rules: [requiredRule], },
+    { type: 'input', label: '布产数量PCS', key: 'productionQuantity', width: 8, rules: [requiredRule], },
+  ],
+  [
+    { type: 'number', label: '色粉数量', key: 'colorPowderNeeded', width: 12, rules: [positiveNumberRule], },
+    { type: 'input', label: '料别', key: 'materialType', width: 12, rules: [requiredRule] },
+  ],
+  [
+    { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 12, rules: [requiredRule] },
+    { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 12, rules: [requiredRule] },
+  ],
+  [{ type: 'image', label: '样例图', key: 'picture', width: 24 }],
+]);
 
-  } else {
-    scheduleData.value = {};
-  }
-  console.log(res, '获取布产表数据axsa');
+const fields = ref(
+  [
+    { label: '订单编号', key: 'orderCode' },
+    { label: '产品ID', key: 'productId' },
+    { label: '产品编码', key: 'productCode' },
+    { label: '模具编码', key: 'mouldNumber' },
+    { label: '模具状态', key: 'mouldCondition' },
+    { label: '用量', key: 'usage' },
+    { label: '客户', key: 'customer' },
+    { label: '模具厂家', key: 'mouldManufacturer' },
+    { label: '布产时间', key: 'productionTime' },
+    { label: '出货时间', key: 'shipmentTime' },
+    { label: '颜色编号', key: 'colorCode' },
+    { label: '排产Id', key: 'arrangeId' },
+    { label: '单重', key: 'singleWeight' },
+    { label: '布产重量', key: 'productionWeight' },
+    { label: '供应商', key: 'supplier' },
+    { label: '腔数PCS', key: 'cavityCount' },
+    { label: '布产模数PCS', key: 'productionMouldCount' },
+    { label: '布产数量PCS', key: 'productionQuantity' },
+    { label: '色粉数量', key: 'colorPowderNeeded' },
+    { label: '料别', key: 'materialType' },
+    { label: '生产周期(s)', key: 'cycleTime' },
+    { label: '生产时间(h)', key: 'timeHours' },
+    { label: '样例图', key: 'pictureUrl', type: 'picture' }
+  ]
+);
 
-}
-
-onMounted(() => {
-  // 初始化获取采购表数据
-  getscheduleData();
-  // updatedFields.value = {
-  //   orderCode: props.data.orderCode, // 保持订单编号不变
-  // };
+onMounted(async () => {
+  await getscheduleData();
+  isLoading.value = false; // 数据加载完成后，设置加载状态为 false
 });
 
-// getscheduleData: 获取采购表数据
+// getscheduleData: 获取布产表数据
 const getscheduleData = async () => {
   const res = await getProdunctionSchedeuleByOrderCode(props.data.orderCode);
-  console.log('获取采购表数据:', res);
+  console.log('获取布产表数据:', res);
   if (res.code == 200) {
     scheduleData.value = res.rows[0] || {};
-    console.log('获取采购表数据成功:', scheduleData.value);
     // 更新 updatedFields 的值
     updatedFields.value = {
       ...scheduleData.value,
@@ -153,47 +166,51 @@ const getscheduleData = async () => {
     };
     return scheduleData.value;
   } else {
-    // scheduleData.value = { id: 0, material: '未知', mouldNumber: '未知', picture: '11', pictureUrl: '11', purchaseCode: '未知', singleWeight: 0, specificationName: '未知', supplier: '未知', unitPrice: 0 };
     updatedFields.value = scheduleData.value;
-    console.log('获取采购表数据失败:', scheduleData.value);
   }
 }
 // footer
 const onCancel = () => {
-
+  messageBox('warning', async () => {
+    // 解绑逻辑
+    const res = await deleteSchedule([scheduleData.value.id]);
+    if (res.code == 200) {
+      messageBox('success', null, '解绑成功');
+      scheduleData.value = { id: null }; // 清空采购数据
+    } else {
+      messageBox('error', null, null, '解绑失败');
+    }
+  }, '解绑成功', '解绑失败', '确定要解绑当前订单吗？');
 }
 
 const onAdd = () => {
   newDialogVisible.value = true;
-  // updatedFields.value = {
-  //   orderCode: props.data.orderCode, // 保持订单编号不变
-  //   cavityCount: '',
-  //   colorCode: '',
-  //   colorPowderNeeded: '',
-  //   customer: '',
-  //   cycleTime: '',
-  //   inventory: '',
-  //   materialIds: '',
-  //   materialType: '',
-  //   mouldCondition: '',
-  //   mouldManufacturer: ''
-  // };
-  console.log('新增布产表数据：', updatedFields.value);
 }
+
 const onAddSubmit = async () => {
-  console.log('新增布产表数据88888', updatedFields.value);
   const res = await newSchedule(updatedFields.value);
-  console.log('新增布产表请求结果:', res);
   if (res.code == 200) {
-    console.log('新增布产表成功:', res);
+    messageBox('success', null, '新增布产表成功');
+    getscheduleData(); // 刷新布产表数据
   } else {
-    console.log('新增布产表失败:', res);
+    messageBox('error', null, null, res.msg);
+  }
+  newDialogVisible.value = false;
+}
+
+const onUpdate = () => {
+  newDialogVisible.value = true;
+}
+
+const onUpdateSubmit = async () => {
+  const res = await changeSchedule(updatedFields.value);
+  if (res.code == 200) {
+    messageBox('success', null, '修改布产表成功');
+  } else {
+    messageBox('error', null, null, res.msg);
   }
   newDialogVisible.value = false;
   getscheduleData();
-}
-
-const onUpdateSubmit = () => {
 }
 </script>
 
@@ -208,7 +225,7 @@ const onUpdateSubmit = () => {
     align-items: center;
     justify-content: center;
     text-align: center;
-    height: 280px;
+    height: 350px;
 
     .no-data-text {
       margin-bottom: 10px;
@@ -230,10 +247,15 @@ const onUpdateSubmit = () => {
 .field {
   margin-bottom: 14px;
 
-  .field-value {
+  .field-key {
     margin-top: 6px;
     font-size: small;
     color: #707070;
   }
+}
+
+.informationCard {
+  margin-bottom: 20px;
+  min-height: 350px;
 }
 </style>

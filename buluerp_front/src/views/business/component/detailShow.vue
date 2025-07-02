@@ -81,12 +81,12 @@ import { computed, onMounted, ref } from 'vue'
 import { getStatusText } from '../utils/statusMap'
 import { getOrderDetail } from '../function/oders'
 import { getOrdersList, putOrder } from '@/apis/orders'
-import { getPackagingByOrderCode } from '@/apis/produceControl/produce/packaging'
+// import { getPackagingByOrderCode } from '@/apis/produceControl/produce/packaging'
 import { ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElMessageBox, ElDialog, dayjs } from 'element-plus'
 // import PackagingList from './packagingList.vue'
 import ProductionSchedule from './productionSchedule.vue'
 import { messageBox } from '@/components/message/messageBox'
-import PurchaseInfo from './purchaseInfo.vue'
+import PurchaseInfo from './purchasePlan.vue'
 import useTabStore from '@/stores/modules/tabs'
 
 // Props
@@ -98,8 +98,8 @@ const props = defineProps<{
   control: Array<object>
 }>()
 const tabStore = useTabStore()
-const packagingInstance = getPackagingByOrderCode(props.id)
-packagingInstance().then((res) => (relatedOrdersTable.value[2].xxx = res.total))
+// const packagingInstance = getPackagingByOrderCode(props.id)
+// packagingInstance().then((res) => (relatedOrdersTable.value[2].xxx = res.total))
 
 const orderDetail = computed(() => props.detail)
 
