@@ -432,6 +432,10 @@ const exportFunc = (row) => {
 }
 
 const DeleteFunc = (row) => {
+  if (row.length === 0) {
+    ElMessage.warning('请先选择要删除的记录')
+    return
+  }
   const ids = row.map((ele) => {
     return ele.id
   })

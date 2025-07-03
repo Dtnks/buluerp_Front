@@ -11,6 +11,18 @@
             >导出</el-button
           >
           <el-button
+            type="primary"
+            v-if="exportCharts"
+            @click="exportCharts(select!.getSelectionRows())"
+            >图表</el-button
+          >
+          <el-button
+            type="primary"
+            v-if="transToArrange"
+            @click="transToArrange(select!.getSelectionRows())"
+            >导入排产</el-button
+          >
+          <el-button
             type="danger"
             v-if="DeleteFunc"
             @click="
@@ -21,12 +33,6 @@
             "
             :disabled="control[2].disabled"
             >删除</el-button
-          >
-          <el-button
-            type="primary"
-            v-if="exportCharts"
-            @click="exportCharts(select!.getSelectionRows())"
-            >图表</el-button
           >
         </div>
       </div>
@@ -101,6 +107,7 @@ defineProps([
   'DeleteFunc',
   'control',
   'exportCharts',
+  'transToArrange',
 ])
 const select = ref()
 const getList = (ele) => {

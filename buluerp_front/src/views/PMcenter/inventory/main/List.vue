@@ -595,6 +595,10 @@ const exportFunc = (row) => {
 }
 
 const DeleteFunc = (row) => {
+  if (row.length === 0) {
+    ElMessage.warning('请先选择要删除的记录')
+    return
+  }
   const ids = row.map((ele) => {
     return ele.id
   })
@@ -648,25 +652,53 @@ listRecording(page.value, pageSize.value, type.value).then((res) => {
   <div class="col">
     <BordShow content="出入库单" path="生产管理中心/出入库单" />
     <div class="greyBack">
-      <FormSearch title="查询" :data="formData[type]" :onCreate="onCreate" :onSubmit="onSubmit" :onImport="onImport"
-        :onDownloadTemplate="onDownloadTemplate" :searchForm="searchContent[type]" :control="control">
+      <FormSearch
+        title="查询"
+        :data="formData[type]"
+        :onCreate="onCreate"
+        :onSubmit="onSubmit"
+        :onImport="onImport"
+        :onDownloadTemplate="onDownloadTemplate"
+        :searchForm="searchContent[type]"
+        :control="control"
+      >
         <el-select v-model="type" placeholder="Select" style="width: 100px" @change="refreshList">
-          <el-option v-for="item in TypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+          <el-option
+            v-for="item in TypeOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
         </el-select>
       </FormSearch>
-      <TableList :tableData="tableData[type]" :operations="operation" :listData="listData" :DeleteFunc="DeleteFunc"
-        :exportFunc="exportFunc" :control="control">
+      <TableList
+        :tableData="tableData[type]"
+        :operations="operation"
+        :listData="listData"
+        :DeleteFunc="DeleteFunc"
+        :exportFunc="exportFunc"
+        :control="control"
+      >
         <slot>
-          <div style="
+          <div
+            style="
               margin-top: 20px;
               display: flex;
               justify-content: space-between;
               align-items: center;
-            ">
+            "
+          >
             <div>共 {{ total }} 条</div>
-            <el-pagination background layout="prev, pager, next, jumper, ->, total, sizes" :current-page="page"
-              :page-size="pageSize" :page-sizes="[5, 10, 20, 50]" :total="total" @current-change="handlePageChange"
-              @size-change="handleSizeChange" />
+            <el-pagination
+              background
+              layout="prev, pager, next, jumper, ->, total, sizes"
+              :current-page="page"
+              :page-size="pageSize"
+              :page-sizes="[5, 10, 20, 50]"
+              :total="total"
+              @current-change="handlePageChange"
+              @size-change="handleSizeChange"
+            />
           </div>
         </slot>
       </TableList>
@@ -677,19 +709,28 @@ listRecording(page.value, pageSize.value, type.value).then((res) => {
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button type="info" @click="
-            () => {
-              editDialogVisible = false
-            }
-          ">
+          <el-button
+            type="info"
+            @click="
+              () => {
+                editDialogVisible = false
+              }
+            "
+          >
             取消
           </el-button>
         </div>
       </template>
     </el-dialog>
     <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
-      <el-upload class="upload-demo" drag :show-file-list="false" :before-upload="beforeUpload"
-        :http-request="handleUpload" accept=".xlsx,.xls">
+      <el-upload
+        class="upload-demo"
+        drag
+        :show-file-list="false"
+        :before-upload="beforeUpload"
+        :http-request="handleUpload"
+        accept=".xlsx,.xls"
+      >
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
         <template v-slot:tip>
