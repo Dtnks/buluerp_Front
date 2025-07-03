@@ -34,6 +34,20 @@
         <el-table-column prop="remarks" label="备注" />
         <el-table-column prop="spareCode" label="备用编号" />
         <el-table-column prop="updateTime" label="更新时间" />
+        <el-table-column label="外购信息" width="100">
+          <template #default="{ row }">
+            <el-button
+              v-if="row.purchaseInfos && row.purchaseInfos.length"
+              size="small"
+              type="primary"
+              text
+              @click="openPurchaseDialog(row.purchaseInfos)"
+            >
+              查看
+            </el-button>
+            <span v-else>无外购信息</span>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" fixed="right" width="75">
           <template #default="{ row }">
             <el-button size="small" type="primary" text @click="onEdit(row)">编辑</el-button>
@@ -56,6 +70,28 @@
         />
       </div>
     </div>
+    <el-dialog
+      v-model="purchaseDialogVisible"
+      title="外购信息"
+      width="600px"
+    >
+      <el-table :data="currentPurchaseInfos" border>
+        <el-table-column label="图片" width="80">
+          <template #default="{ row }">
+            <img
+              v-if="row.pictureUrl"
+              :src="getFullImageUrl(row.pictureUrl)"
+              alt="外购图片"
+              style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
+            />
+            <span v-else>暂无图片</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="purchaseCode" label="采购编码" />
+        <el-table-column prop="unitPrice" label="单价" />
+        <el-table-column prop="supplier" label="供应商" />
+      </el-table>
+    </el-dialog>
   </el-card>
   <MaterialDialog
   v-model="showDialog"
@@ -94,6 +130,13 @@ const data = ref([])
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
+const purchaseDialogVisible = ref(false)
+const currentPurchaseInfos = ref<any[]>([])
+
+const openPurchaseDialog = (infos: any[]) => {
+  currentPurchaseInfos.value = infos
+  purchaseDialogVisible.value = true
+}
 
 // const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
 
