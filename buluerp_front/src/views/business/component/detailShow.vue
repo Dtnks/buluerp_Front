@@ -48,18 +48,12 @@
             <el-table-column label="创建时间" prop="createTime" />
             <el-table-column label="更新时间" prop="updateTime" />
             <el-table-column label="产品状态" prop="designStatus" />
-            <!-- <el-table-column prop="action" label="操作" width="180">
-              <template #default="scope">
-                <el-button @click="onEditProduct(scope.row)" link type="primary" size="small">编辑</el-button>
-                <el-button link type="primary" size="small" @click="onDeleteProduct(scope.row)">
-                  删除
-                </el-button>
-              </template>
-</el-table-column> -->
+
           </el-table>
         </informationCard>
         <!-- 关联订单 -->
         <informationCard title="关联订单">
+<<<<<<< HEAD
           <el-table :data="relatedOrdersTable" style="width: 100%">
             <el-table-column prop="type" label="订单类型" width="100" />
             <el-table-column prop="orderId" label="订单ID" />
@@ -73,11 +67,26 @@
                   size="small"
                   @click="handleAction(action.method, scope.row)"
                 >
+=======
+          <div class="related-orders-grid">
+            <!-- 第一行：订单类型 -->
+            <div class="related-orders-row">
+              <div v-for="item in relatedOrdersTable" :key="item.type" class="related-orders-cell type-cell">
+                {{ item.type }}
+              </div>
+            </div>
+            <!-- 第二行：操作按钮 -->
+            <div class="related-orders-row">
+              <div v-for="(item, idx) in relatedOrdersTable" :key="item.type + '-action'"
+                class="related-orders-cell action-cell">
+                <el-button v-for="action in item.actions" :key="action.name" link type="primary" size="small"
+                  @click="handleAction(action.method, item)">
+>>>>>>> 9809e7e489480ff9f0ae3c55f94b7f3a0f0d958d
                   {{ action.name }}
                 </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
+              </div>
+            </div>
+          </div>
         </informationCard>
       </div>
     </div>
@@ -114,21 +123,7 @@ import { getStatusText } from '../utils/statusMap'
 import { getOrderDetail } from '../function/oders'
 import { getOrdersList, putOrder } from '@/apis/orders'
 import { parseTime } from '@/utils/ruoyi'
-// import { getPackagingByOrderCode } from '@/apis/produceControl/produce/packaging'
-import {
-  ElButton,
-  ElInput,
-  ElDatePicker,
-  ElRow,
-  ElCol,
-  ElTable,
-  ElTableColumn,
-  ElFooter,
-  ElMessageBox,
-  ElDialog,
-  dayjs,
-} from 'element-plus'
-// import PackagingList from './packagingList.vue'
+import { ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElDialog, dayjs, } from 'element-plus'
 import ProductionSchedule from './productionSchedule.vue'
 import { messageBox } from '@/components/message/messageBox'
 import PurchaseInfo from './purchasePlan.vue'
@@ -147,9 +142,6 @@ const props = defineProps<{
   control: Array<object>
 }>()
 const tabStore = useTabStore()
-// const packagingInstance = getPackagingByOrderCode(props.id)
-// packagingInstance().then((res) => (relatedOrdersTable.value[2].xxx = res.total))
-
 const orderDetail = computed(() => props.detail)
 
 onMounted(() => {
@@ -157,14 +149,6 @@ onMounted(() => {
   fetchOrderProduct(props.id)
 })
 
-// 控制 CreateForm 的显示
-const showCreateForm = ref(false)
-// 打开 CreateForm
-const openCreateForm = () => {
-  showCreateForm.value = true
-}
-
-const editproductVisible = ref(false)
 // 订单状态
 const statusText = ref(getStatusText(props.detail.status))
 
@@ -199,7 +183,6 @@ const fetchOrderProduct = async (orderId: number) => {
     console.log('订单产品数据:22222222', res.product)
 
     if (res.product) {
-      // orderProduct.value = res.product
       orderProduct.value = Array.isArray(res.product) ? res.product : [res.product]
       console.log('orderProduct.value', orderProduct.value)
     }
@@ -361,15 +344,13 @@ const handleSubmit = () => {
   createFormRef.value.validateForm((valid) => {
     if (valid) {
       newSubmit.value.releaseDate = parseTime(newSubmit.value.releaseDate, '{y}-{m}-{d}')
-
       newPackaging({ ...newSubmit.value, orderCode: props.orderCode }).then((res) => {
-        console.log(res)
         if (res.msg == '操作成功') {
           relatedOrdersTable.value[2].actions = [{ name: '查看', method: viewPackagingList }]
-          ElMessage.success(res.msg)
+          messageBox('success', null, '分包创建成功')
           DialogVisible.value = false
         } else {
-          ElMessage.error('操作失败')
+          messageBox('error', null, null, res.msg)
           return
         }
       })
@@ -384,6 +365,7 @@ const addPackagingList = () => {
 const relatedOrdersTable = ref([
   {
     type: '采购表',
+<<<<<<< HEAD
     actions: [
       // { name: '创建', method: addPurchaseOrder },
       { name: '查看', method: viewPuchaseOrder },
@@ -402,9 +384,20 @@ const relatedOrdersTable = ref([
       // { name: '创建', method: addPackagingList },
       { name: '查看', method: viewPackagingList },
     ],
+=======
+    actions: [{ name: '查看', method: viewPuchaseOrder }],
+  },
+  {
+    type: '布产表',
+    actions: [{ name: '查看', method: viewProductsSchedule }],
+  },
+  {
+    type: '分包表',
+    actions: [{ name: '查看', method: viewPackagingList }],
+>>>>>>> 9809e7e489480ff9f0ae3c55f94b7f3a0f0d958d
   },
 ])
-getPackagingListByOrderId('xxxx').then((res) => {
+getPackagingListByOrderId(props.orderCode).then((res) => {
   if (res.rows.length == 0) {
     relatedOrdersTable.value[2].actions = [{ name: '创建', method: addPackagingList }]
   } else {
@@ -425,12 +418,8 @@ const onBoxSubmit = async () => {
     messageBox('success', null, '订单已成功提交')
     tabStore.freshTab('订单查询')
   } else {
-    console.error('提交订单失败')
-    console.log('提交订单失败:', res)
-
     messageBox('error', null, null, res.msg)
   }
-
   getOrdersList()
 }
 
@@ -491,5 +480,33 @@ const onBoxCancel = () => {
   :deep(.el-input__wrapper) {
     box-shadow: none !important;
   }
+}
+
+.related-orders-grid {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.related-orders-row {
+  display: flex;
+  width: 100%;
+}
+
+.related-orders-cell {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+}
+
+.type-cell {
+  font-weight: bold;
+  background: #fcfcfc;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.action-cell {
+  background: #fff;
 }
 </style>
