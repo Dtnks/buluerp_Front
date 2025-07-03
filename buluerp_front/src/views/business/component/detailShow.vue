@@ -418,7 +418,6 @@ const onBoxCancel = () => {
 .input-blank {
   width: 40px;
   border-bottom: 1px solid #000;
-  outline: none;
   margin-left: 5px;
   margin-right: 5px;
   padding: 0;
