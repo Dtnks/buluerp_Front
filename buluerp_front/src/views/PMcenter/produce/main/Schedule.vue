@@ -44,12 +44,12 @@ const formData = ref([
   ],
   [
     { type: 'input', label: '订单编号', key: 'orderCode' },
-    { type: 'input', label: '产品编码', key: 'productCode' },
+    { type: 'input', label: '产品编号', key: 'productId' },
 
     { type: 'input', label: '供应商', key: 'supplier' },
   ],
   [
-    { type: 'input', label: '模具编码', key: 'mouldCode' },
+    { type: 'input', label: '模具编码', key: 'mouldNumber' },
     { type: 'input', label: '模具厂家', key: 'mouldManufacturer' },
     { type: 'input', label: '客户', key: 'customer' },
   ],
@@ -79,7 +79,7 @@ const newFormData = ref([
     // { type: 'input', label: '产品编码', key: 'productCode', width: 8 },
   ],
   [
-    { type: 'input', label: '模具编码', key: 'mouldCode', width: 8 },
+    { type: 'input', label: '模具编码', key: 'mouldNumber', width: 8 },
     {
       type: 'select',
       label: '模具状态',
@@ -158,11 +158,25 @@ const newFormData = ref([
       label: '排产Id',
       key: 'arrangeId',
       width: 12,
-      rules: [requiredRule],
+      rules: [],
       options: [],
       loading: false,
       remoteFunc: searchFunc('system/production-arrange/list', 'id'),
     },
+  ],
+  [
+    {
+      type: 'mutilInputSelect',
+      label: '物料ID',
+      key: 'materialIds',
+      width: 12,
+      rules: [requiredRule],
+      options: [],
+      loading: false,
+      remoteFunc: searchFunc('system/material-info/list', 'id'),
+    },
+
+    { type: 'input', label: '料别', key: 'materialType', width: 12, rules: [requiredRule] },
   ],
   [
     { type: 'input', label: '单重', key: 'singleWeight', width: 8, rules: [positiveNumberRule] },
@@ -197,14 +211,11 @@ const newFormData = ref([
       type: 'number',
       label: '色粉数量',
       key: 'colorPowderNeeded',
-      width: 12,
+      width: 8,
       rules: [positiveNumberRule],
     },
-    { type: 'input', label: '料别', key: 'materialType', width: 12, rules: [requiredRule] },
-  ],
-  [
-    { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 12, rules: [requiredRule] },
-    { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 12, rules: [requiredRule] },
+    { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 8, rules: [requiredRule] },
+    { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 8, rules: [requiredRule] },
   ],
   [{ type: 'image', label: '样例图', key: 'picture', width: 24 }],
 ])
@@ -213,7 +224,7 @@ const newSubmit = ref({
   productId: '',
   productionTime: '',
   productCode: '',
-  mouldCode: '',
+  mouldNumber: '',
   mouldCondition: '',
   picture: '',
   colorCode: '',
@@ -240,7 +251,7 @@ const searchContent = ref({
   mouldCondition: '',
   orderCode: '',
   productCode: '',
-  mouldCode: '',
+  mouldNumber: '',
   supplier: '',
   mouldManufacturer: '',
   customer: '',
@@ -252,14 +263,20 @@ const tableData = ref([
     type: 'text',
   },
   {
-    value: 'productCode',
-    label: '产品编码',
+    value: 'productId',
+    label: '产品编号',
     type: 'text',
   },
   {
     value: 'arrangeId',
     label: '排产Id',
     type: 'text',
+  },
+
+  {
+    value: 'materialIds',
+    label: '物料ID',
+    type: 'tags',
   },
   { value: 'pictureUrl', label: '图片', type: 'picture' },
   {
@@ -268,7 +285,7 @@ const tableData = ref([
     type: 'text',
   },
   {
-    value: 'mouldCode',
+    value: 'mouldNumber',
     label: '模具编码',
     type: 'text',
   },
@@ -313,18 +330,8 @@ const tableData = ref([
     type: 'text',
   },
   {
-    value: 'productId',
-    label: '产品ID',
-    type: 'text',
-  },
-  {
     value: 'operator',
     label: '操作人',
-    type: 'text',
-  },
-  {
-    value: 'productCode',
-    label: '产品编码',
     type: 'text',
   },
   {
@@ -338,7 +345,7 @@ const tableData = ref([
     type: 'text',
   },
   { value: 'supplier', label: '供应商', type: 'text' },
-  { value: 'mouldManufacturer', label: '模具厂家', type: 'text' },
+  { value: 'mouldManufacturer', label: '模具厂家', type: 'tags' },
   {
     value: 'colorPowderNeeded',
     label: '色粉数量',
@@ -357,7 +364,7 @@ const tableData = ref([
   {
     value: 'customer',
     label: '客户',
-    type: 'text',
+    type: 'tags',
   },
 ])
 const operation = ref([
@@ -430,7 +437,7 @@ const resetSubmit = () => {
     productId: '',
     productionTime: '',
     productCode: '',
-    mouldCode: '',
+    mouldNumber: '',
     mouldCondition: '',
     picture: '',
     colorCode: '',

@@ -1,11 +1,13 @@
 <template>
   <div class="detail-box">
-    <div style="
+    <div
+      style="
         flex: 1;
         background-color: rgba(240, 242, 245, 1);
         padding: 20px 40px 0 40px;
         overflow-y: auto;
-      ">
+      "
+    >
       <div class="main">
         <!-- 业务订单基本信息 -->
         <informationCard title="业务订单基本信息">
@@ -17,9 +19,22 @@
                   {{ field.value }}
                 </div>
                 <div v-else class="field-value">
-                  <el-input v-if="field.label == '客户姓名'" v-model="updateFields.customerName" placeholder="请输入" />
-                  <el-input v-else-if="field.label == '备注'" v-model="updateFields.remark" placeholder="请输入" />
-                  <el-date-picker v-else v-model="updateFields.deliveryTime" style="width: 200px" placeholder="请选择" />
+                  <el-input
+                    v-if="field.label == '客户姓名'"
+                    v-model="updateFields.customerName"
+                    placeholder="请输入"
+                  />
+                  <el-input
+                    v-else-if="field.label == '备注'"
+                    v-model="updateFields.remark"
+                    placeholder="请输入"
+                  />
+                  <el-date-picker
+                    v-else
+                    v-model="updateFields.deliveryTime"
+                    style="width: 200px"
+                    placeholder="请选择"
+                  />
                 </div>
               </div>
             </el-col>
@@ -50,8 +65,14 @@
             <el-table-column prop="orderId" label="订单ID" />
             <el-table-column prop="action" label="操作" width="180">
               <template #default="scope">
-                <el-button v-for="action in scope.row.actions" :key="action.name" link type="primary" size="small"
-                  @click="handleAction(action.method, scope.row)">
+                <el-button
+                  v-for="action in scope.row.actions"
+                  :key="action.name"
+                  link
+                  type="primary"
+                  size="small"
+                  @click="handleAction(action.method, scope.row)"
+                >
                   {{ action.name }}
                 </el-button>
               </template>
@@ -70,11 +91,14 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button type="info" @click="
-            () => {
-              DialogVisible = false
-            }
-          ">
+          <el-button
+            type="info"
+            @click="
+              () => {
+                DialogVisible = false
+              }
+            "
+          >
             取消
           </el-button>
         </div>
@@ -207,7 +231,6 @@ const viewProductsSchedule = (row: any) => {
     props.control,
   )
 }
-
 
 // handleAction: 处理关联订单的操作
 const handleAction = (method: Function, row: any) => {
@@ -361,7 +384,6 @@ const addPackagingList = () => {
 const relatedOrdersTable = ref([
   {
     type: '采购表',
-    orderId: props.id,
     actions: [
       // { name: '创建', method: addPurchaseOrder },
       { name: '查看', method: viewPuchaseOrder },
@@ -369,7 +391,6 @@ const relatedOrdersTable = ref([
   },
   {
     type: '布产表',
-    orderId: props.id,
     actions: [
       // { name: '创建', method: addProductsSchedule },
       { name: '查看', method: viewProductsSchedule },
@@ -377,7 +398,6 @@ const relatedOrdersTable = ref([
   },
   {
     type: '分包表',
-    orderId: props.id,
     actions: [
       // { name: '创建', method: addPackagingList },
       { name: '查看', method: viewPackagingList },
