@@ -311,15 +311,13 @@ const handleSubmit = () => {
   createFormRef.value.validateForm((valid) => {
     if (valid) {
       newSubmit.value.releaseDate = parseTime(newSubmit.value.releaseDate, '{y}-{m}-{d}')
-
       newPackaging({ ...newSubmit.value, orderCode: props.orderCode }).then((res) => {
-        console.log(res)
         if (res.msg == '操作成功') {
           relatedOrdersTable.value[2].actions = [{ name: '查看', method: viewPackagingList }]
-          ElMessage.success(res.msg)
+          messageBox('success', null, '分包创建成功')
           DialogVisible.value = false
         } else {
-          ElMessage.error('操作失败')
+          messageBox('error', null, null, res.msg)
           return
         }
       })
@@ -366,12 +364,8 @@ const onBoxSubmit = async () => {
     messageBox('success', null, '订单已成功提交')
     tabStore.freshTab('订单查询')
   } else {
-    console.error('提交订单失败')
-    console.log('提交订单失败:', res)
-
     messageBox('error', null, null, res.msg)
   }
-
   getOrdersList()
 }
 
