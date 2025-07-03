@@ -48,40 +48,36 @@
             <el-table-column label="创建时间" prop="createTime" />
             <el-table-column label="更新时间" prop="updateTime" />
             <el-table-column label="产品状态" prop="designStatus" />
-
           </el-table>
         </informationCard>
         <!-- 关联订单 -->
         <informationCard title="关联订单">
-<<<<<<< HEAD
-          <el-table :data="relatedOrdersTable" style="width: 100%">
-            <el-table-column prop="type" label="订单类型" width="100" />
-            <el-table-column prop="orderId" label="订单ID" />
-            <el-table-column prop="action" label="操作" width="180">
-              <template #default="scope">
-                <el-button
-                  v-for="action in scope.row.actions"
-                  :key="action.name"
-                  link
-                  type="primary"
-                  size="small"
-                  @click="handleAction(action.method, scope.row)"
-                >
-=======
           <div class="related-orders-grid">
             <!-- 第一行：订单类型 -->
             <div class="related-orders-row">
-              <div v-for="item in relatedOrdersTable" :key="item.type" class="related-orders-cell type-cell">
+              <div
+                v-for="item in relatedOrdersTable"
+                :key="item.type"
+                class="related-orders-cell type-cell"
+              >
                 {{ item.type }}
               </div>
             </div>
             <!-- 第二行：操作按钮 -->
             <div class="related-orders-row">
-              <div v-for="(item, idx) in relatedOrdersTable" :key="item.type + '-action'"
-                class="related-orders-cell action-cell">
-                <el-button v-for="action in item.actions" :key="action.name" link type="primary" size="small"
-                  @click="handleAction(action.method, item)">
->>>>>>> 9809e7e489480ff9f0ae3c55f94b7f3a0f0d958d
+              <div
+                v-for="(item, idx) in relatedOrdersTable"
+                :key="item.type + '-action'"
+                class="related-orders-cell action-cell"
+              >
+                <el-button
+                  v-for="action in item.actions"
+                  :key="action.name"
+                  link
+                  type="primary"
+                  size="small"
+                  @click="handleAction(action.method, item)"
+                >
                   {{ action.name }}
                 </el-button>
               </div>
@@ -123,7 +119,18 @@ import { getStatusText } from '../utils/statusMap'
 import { getOrderDetail } from '../function/oders'
 import { getOrdersList, putOrder } from '@/apis/orders'
 import { parseTime } from '@/utils/ruoyi'
-import { ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElDialog, dayjs, } from 'element-plus'
+import {
+  ElButton,
+  ElInput,
+  ElDatePicker,
+  ElRow,
+  ElCol,
+  ElTable,
+  ElTableColumn,
+  ElFooter,
+  ElDialog,
+  dayjs,
+} from 'element-plus'
 import ProductionSchedule from './productionSchedule.vue'
 import { messageBox } from '@/components/message/messageBox'
 import PurchaseInfo from './purchasePlan.vue'
@@ -365,26 +372,6 @@ const addPackagingList = () => {
 const relatedOrdersTable = ref([
   {
     type: '采购表',
-<<<<<<< HEAD
-    actions: [
-      // { name: '创建', method: addPurchaseOrder },
-      { name: '查看', method: viewPuchaseOrder },
-    ],
-  },
-  {
-    type: '布产表',
-    actions: [
-      // { name: '创建', method: addProductsSchedule },
-      { name: '查看', method: viewProductsSchedule },
-    ],
-  },
-  {
-    type: '分包表',
-    actions: [
-      // { name: '创建', method: addPackagingList },
-      { name: '查看', method: viewPackagingList },
-    ],
-=======
     actions: [{ name: '查看', method: viewPuchaseOrder }],
   },
   {
@@ -394,7 +381,6 @@ const relatedOrdersTable = ref([
   {
     type: '分包表',
     actions: [{ name: '查看', method: viewPackagingList }],
->>>>>>> 9809e7e489480ff9f0ae3c55f94b7f3a0f0d958d
   },
 ])
 getPackagingListByOrderId(props.orderCode).then((res) => {
