@@ -62,6 +62,9 @@
             </span>
             <span v-else-if="item.type == 'text'">{{ row[item.value] }}</span>
             <span v-else-if="item.type == 'Maptext'">{{ item.map[row[item.value]] }}</span>
+            <span v-else-if="item.type == 'tags'">
+              <el-tag v-for="tag in getList(row[item.value])">{{ tag }}</el-tag>
+            </span>
           </template>
         </el-table-column>
         <el-table-column label="操作" fixed="right" v-if="operations">
@@ -100,7 +103,13 @@ defineProps([
   'exportCharts',
 ])
 const select = ref()
-
+const getList = (ele) => {
+  if (typeof ele === 'string') {
+    return ele.split(',')
+  } else if (Array.isArray(ele)) {
+    return ele
+  }
+}
 const donwLoadFile = async (Fileurl, miniType) => {
   const content = await axios.get(Fileurl, { responseType: 'blob' })
   const blob = new Blob([content.data], { type: miniType })
