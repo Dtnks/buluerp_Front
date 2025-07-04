@@ -10,6 +10,7 @@ import {
   deleteSchedule,
   importFile,
   downLoadModule,
+  selectTransToArrange,
 } from '@/apis/produceControl/produce/schedule'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
@@ -257,6 +258,11 @@ const searchContent = ref({
   customer: '',
 })
 const tableData = ref([
+  {
+    value: 'id',
+    label: 'ID',
+    type: 'text',
+  },
   {
     value: 'orderCode',
     label: '订单编号',
@@ -533,6 +539,10 @@ const exportFunc = (row) => {
 }
 
 const DeleteFunc = (row) => {
+  if (row.length === 0) {
+    ElMessage.warning('请先选择要删除的记录')
+    return
+  }
   const ids = row.map((ele) => {
     return ele.id
   })
@@ -557,7 +567,64 @@ const DeleteFunc = (row) => {
     `确认删除${ids.length}条记录`,
   )
 }
-
+const ids = ref([])
+const transDialogVisible = ref(false)
+const createTransFormRef = ref()
+const transFormData = ref([
+  [
+    { type: 'input', label: '出模数', key: 'mouldOutput', width: 12, rules: [positiveNumberRule] },
+    {
+      type: 'timer',
+      label: '安排时间',
+      key: 'scheduledTime',
+      width: 12,
+      timerType: 'date',
+      rules: [requiredRule],
+    },
+  ],
+  [{ type: 'textarea', label: '备注', key: 'remarks', width: 24 }],
+  [{ type: 'image', label: '样例图', key: 'pictureFile', width: 12 }],
+])
+const transSubmit = ref({
+  mouldOutput: '',
+  scheduledTime: '',
+  remarks: '',
+  pictureFile: '',
+})
+const handleSubmitTrans = () => {
+  console.log(ids.value)
+  transSubmit.value.scheduledTime = parseTime(transSubmit.value.scheduledTime, '{y}-{m}-{d}')
+  createTransFormRef.value.validateForm((valid) => {
+    if (valid) {
+      selectTransToArrange({ ...transSubmit.value, sheduleIds: ids.value }).then((res) => {
+        if (res.code == 200) {
+          ElMessage.success(res.msg)
+          transDialogVisible.value = false
+          listSchedule(page.value, pageSize.value).then((res) => {
+            listData.value = res.rows
+            total.value = res.total
+          })
+        } else {
+          ElMessage.error(res.msg)
+        }
+      })
+    }
+  })
+}
+const transToArrange = (row) => {
+  if (row.length === 0) {
+    ElMessage.warning('请先选择要导入排产的记录')
+    return
+  }
+  transSubmit.value = {
+    mouldOutput: '',
+    scheduledTime: '',
+    remarks: '',
+    pictureFile: '',
+  }
+  ids.value = row.map((item) => item.id)
+  transDialogVisible.value = true
+}
 //分页
 const page = ref(1)
 const pageSize = ref(10)
@@ -604,6 +671,7 @@ listSchedule(page.value, pageSize.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
+        :transToArrange="transToArrange"
         :control="control"
       >
         <slot>
@@ -641,6 +709,24 @@ listSchedule(page.value, pageSize.value).then((res) => {
             @click="
               () => {
                 editDialogVisible = false
+              }
+            "
+          >
+            取消
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+    <el-dialog v-model="transDialogVisible" :title="title" width="800px"
+      ><CreateForm :data="transFormData" :Formvalue="transSubmit" ref="createTransFormRef" />
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="handleSubmitTrans"> 确认 </el-button>
+          <el-button
+            type="info"
+            @click="
+              () => {
+                transDialogVisible = false
               }
             "
           >

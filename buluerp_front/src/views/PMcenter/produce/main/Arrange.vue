@@ -26,7 +26,6 @@ const createFormRef = ref()
 const formData = ref([
   [
     { type: 'timer', label: '安排日期', timerType: 'date', key: 'scheduledTime' },
-    { type: 'timer', label: '排产时间', timerType: 'date', key: 'productionTime' },
     { type: 'timer', label: '完成时间', timerType: 'date', key: 'completionTime' },
   ],
   [
@@ -37,10 +36,6 @@ const formData = ref([
       label: '料别',
       key: 'materialType',
     },
-  ],
-  [
-    { type: 'input', label: '订单编号', key: 'orderCode' },
-    { type: 'input', label: '产品编码', key: 'productCode' },
   ],
 ])
 const newFormData = ref([
@@ -78,28 +73,6 @@ const newFormData = ref([
   ],
   [
     {
-      type: 'inputSelect',
-      label: '产品ID',
-      key: 'productId',
-      width: 12,
-      rules: [requiredRule],
-      options: [],
-      loading: false,
-      remoteFunc: searchFunc('system/products/list', 'id'),
-    },
-    {
-      type: 'inputSelect',
-      label: '订单Id',
-      key: 'orderCode',
-      width: 12,
-      rules: [requiredRule],
-      remoteFunc: searchFunc('system/orders/list', 'innerId'),
-      options: [],
-      loading: false,
-    },
-  ],
-  [
-    {
       type: 'timer',
       label: '安排时间',
       key: 'scheduledTime',
@@ -110,14 +83,6 @@ const newFormData = ref([
     { type: 'input', label: '单重', key: 'singleWeight', width: 12, rules: [positiveNumberRule] },
   ],
   [
-    {
-      type: 'timer',
-      label: '排产时间',
-      key: 'productionTime',
-      width: 12,
-      timerType: 'date',
-      rules: [requiredRule],
-    },
     {
       type: 'timer',
       label: '完成时间',
@@ -133,14 +98,10 @@ const newFormData = ref([
 const newSubmit = ref({
   colorCode: '',
   completionTime: '',
-  productionTime: '',
+  creationTime: '',
   materialType: '',
   mouldNumber: '',
   mouldOutput: '',
-  orderCode: '',
-  productionId: '',
-  productCode: '',
-  productId: '',
   productionMouldCount: '',
   productionQuantity: '',
   scheduledTime: '',
@@ -150,31 +111,17 @@ const newSubmit = ref({
 const searchContent = ref({
   colorCode: '',
   completionTime: '',
-  productionTime: '',
   materialType: '',
   mouldNumber: '',
   mouldOutput: '',
-  orderCode: '',
-  productCode: '',
 })
 const tableData = ref([
-  {
-    value: 'orderCode',
-    label: '订单编号',
-    type: 'text',
-  },
-  {
-    value: 'productCode',
-    label: '产品编码',
-    type: 'text',
-  },
   {
     value: 'id',
     label: 'ID',
     type: 'text',
   },
   { value: 'pictureUrl', label: '图片', type: 'picture' },
-  { value: 'productionTime', label: '排产时间', type: 'text' },
   {
     value: 'mouldNumber',
     label: '模具编号',
@@ -226,8 +173,8 @@ const tableData = ref([
     type: 'text',
   },
   {
-    value: 'productId',
-    label: '产品编号',
+    value: 'operator',
+    label: '操作人',
     type: 'text',
   },
   {
@@ -286,7 +233,6 @@ const handleSubmit = () => {
     if (valid) {
       newSubmit.value.scheduledTime = parseTime(newSubmit.value.scheduledTime, '{y}-{m}-{d}')
       newSubmit.value.completionTime = parseTime(newSubmit.value.completionTime, '{y}-{m}-{d}')
-      newSubmit.value.productionTime = parseTime(newSubmit.value.productionTime, '{y}-{m}-{d}')
       if (title.value == '编辑') {
         changeArrange(newSubmit.value).then((res) => {
           console.log(res)
@@ -329,14 +275,9 @@ const resetSubmit = () => {
   newSubmit.value = {
     colorCode: '',
     completionTime: '',
-    productionTime: '',
     materialType: '',
     mouldNumber: '',
     mouldOutput: '',
-    orderCode: '',
-    productionId: '',
-    productCode: '',
-    productId: '',
     productionMouldCount: '',
     productionQuantity: '',
     scheduledTime: '',
@@ -357,7 +298,6 @@ const onSubmit = () => {
   page.value = 1
   newSubmit.value.scheduledTime = parseTime(newSubmit.value.scheduledTime, '{y}-{m}-{d}')
   newSubmit.value.completionTime = parseTime(newSubmit.value.completionTime, '{y}-{m}-{d}')
-  newSubmit.value.productionTime = parseTime(newSubmit.value.productionTime, '{y}-{m}-{d}')
 
   listArrange(page.value, pageSize.value, searchContent.value).then((res) => {
     listData.value = res.rows
@@ -422,6 +362,10 @@ const exportFunc = (row) => {
 }
 
 const DeleteFunc = (row) => {
+  if (row.length === 0) {
+    ElMessage.warning('请先选择要删除的记录')
+    return
+  }
   const ids = row.map((ele) => {
     return ele.id
   })

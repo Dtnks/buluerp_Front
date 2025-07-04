@@ -7,7 +7,6 @@ export function getProdunctionSchedeuleByOrderCode(orderCode) {
     method: 'get',
     headers: headers,
   })
-  
 }
 export function newSchedule(data) {
   return httpInstance({
@@ -78,6 +77,19 @@ export function importFile(formData) {
     url: 'system/products-schedule/import',
     method: 'post',
     data: formData,
+    headers: {
+      ...headers,
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+}
+
+export function selectTransToArrange(data) {
+  console.log(data)
+  return httpInstance({
+    url: `system/production-arrange/from-schedule`,
+    method: 'post',
+    data,
     headers: {
       ...headers,
       'Content-Type': 'multipart/form-data',
