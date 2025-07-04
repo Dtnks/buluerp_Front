@@ -27,6 +27,7 @@ const ComponentsGroup = {
   Admin: () => import('@/views/admin/Admin.vue'),
   Audit: () => import('@/views/admin/Audit.vue'),
   Role: () => import('@/views/admin/Role.vue'),
+  Log: () => import('@/views/admin/Log.vue'),
   AuditPage: () => import('@/views/Audit/Audit.vue'),
   PMInventoryList: () => import('@/views/PMcenter/inventory/main/List.vue'),
   PMInventoryQuery: () => import('@/views/PMcenter/inventory/main/Query.vue'),
