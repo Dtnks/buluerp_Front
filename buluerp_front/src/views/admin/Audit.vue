@@ -5,17 +5,17 @@
       <el-card class="box-card">
         <el-table :data="tableData" style="width: 100%">
           <el-table-column prop="id" label="节点" width="180" />
-          <<el-table-column prop="id" label="节点" width="180">
+          <el-table-column prop="id" label="节点" width="180">
             <template #default="scope">
               <span>{{ auditTypeMap[scope.row.auditType] }}</span>
             </template>
-            </el-table-column>
-            <el-table-column label="是否需要确认" prop="status" width="180">
-              <template #default="scope">
-                <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0"
-                  @change="handleSwitchChange(scope.row)" />
-              </template>
-            </el-table-column>
+          </el-table-column>
+          <el-table-column label="是否需要确认" prop="status" width="180">
+            <template #default="scope">
+              <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0"
+                @change="handleSwitchChange(scope.row)" />
+            </template>
+          </el-table-column>
         </el-table>
       </el-card>
     </div>
@@ -26,6 +26,7 @@
 import { getAuditSwitchEnabled, getAuditSwitchList, updateAuditSwitch } from '@/apis/audit'
 import BordShow from '@/components/board/SecBoard.vue'
 import { messageBox } from '@/components/message/messageBox'
+import useTabStore from '@/stores/modules/tabs'
 import { ElCard, ElTable, ElTableColumn } from 'element-plus'
 import { onMounted, ref } from 'vue'
 
@@ -38,6 +39,8 @@ onMounted(() => {
   getAuditEnabled(1)
 
 })
+
+const tabStore = useTabStore()
 
 const auditTypeMap = {
   1: '订单审核',
@@ -59,11 +62,11 @@ const handleSwitchChange = async (row: any) => {
   const res = await updateAuditSwitch(row.auditType, row.status)
   if (res.code === 200) {
     console.log('更新成功', res)
+    tabStore.freshTab('审核')
     messageBox('success', null, res.msg)
   } else {
     messageBox('error', null, null, res.msg)
     row.status = row.status === 1 ? 0 : 1
-
   }
 
 }

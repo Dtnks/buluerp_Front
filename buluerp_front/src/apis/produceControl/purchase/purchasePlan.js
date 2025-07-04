@@ -84,3 +84,11 @@ export function importFile(formData) {
     },
   })
 }
+
+export function getPurchasePlanDetail(id) {
+  return httpInstance({
+    url: `system/purchase-collection/list?id=${id}`,
+    method: 'get',
+    headers: headers,
+  })
+}
