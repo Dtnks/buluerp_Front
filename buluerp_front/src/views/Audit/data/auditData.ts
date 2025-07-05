@@ -145,7 +145,6 @@ export const formData = ref({
     { value: 'outerId', label: '外部ID' },
     { value: 'productId', label: '产品ID' },
     { value: 'productionId', label: '生产ID' },
-    { value: 'products', label: '产品列表' },
     { value: 'purchaseId', label: '采购ID' },
     { value: 'quantity', label: '数量' },
     { value: 'remark', label: '备注' },
