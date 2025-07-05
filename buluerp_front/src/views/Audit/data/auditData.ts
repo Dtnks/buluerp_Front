@@ -229,6 +229,6 @@ export const formData = ref({
     { value: 'operator', label: '操作人' },
     { value: 'isManual', label: '说明书' },
     { value: 'isMinifigure', label: '人偶' },
-    { value: 'isTool', label: '起见器' },
+    { value: 'isTool', label: '起件器' },
   ],
 } as const)
