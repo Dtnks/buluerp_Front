@@ -4,24 +4,36 @@
       <div class="card-header">
         <span>展示</span>
         <div>
-          <el-button type="primary" @click="exportFunc(select!.getSelectionRows())" v-if="exportFunc">导出</el-button>
-          <el-button type="danger" v-if="DeleteFunc" @click="
-            () => {
-              DeleteFunc(select!.getSelectionRows())
-              select.clearSelection()
-            }
-          " :disabled="control[2].disabled">删除</el-button>
-          <el-button type="primary" v-if="exportCharts" @click="exportCharts(select!.getSelectionRows())">图表</el-button>
-          <el-button type="primary" @click="exportFunc(select!.getSelectionRows())" v-if="exportFunc">导出</el-button>
-          <el-button type="primary" v-if="exportCharts" @click="exportCharts(select!.getSelectionRows())">图表</el-button>
-          <el-button type="primary" v-if="transToArrange"
-            @click="transToArrange(select!.getSelectionRows())">导入排产</el-button>
-          <el-button type="danger" v-if="DeleteFunc" @click="
-            () => {
-              DeleteFunc(select!.getSelectionRows())
-              select.clearSelection()
-            }
-          " :disabled="control[2].disabled">删除</el-button>
+          <el-button
+            type="primary"
+            @click="exportFunc(select!.getSelectionRows())"
+            v-if="exportFunc"
+            >导出</el-button
+          >
+          <el-button
+            type="danger"
+            v-if="DeleteFunc"
+            @click="
+              () => {
+                DeleteFunc(select!.getSelectionRows())
+                select.clearSelection()
+              }
+            "
+            :disabled="control[2].disabled"
+            >删除</el-button
+          >
+          <el-button
+            type="primary"
+            v-if="exportCharts"
+            @click="exportCharts(select!.getSelectionRows())"
+            >图表</el-button
+          >
+          <el-button
+            type="primary"
+            v-if="transToArrange"
+            @click="transToArrange(select!.getSelectionRows())"
+            >导入排产</el-button
+          >
         </div>
       </div>
     </template>
@@ -29,16 +41,29 @@
       <el-table :data="listData" border style="width: 100%" ref="select" :row-key="(row) => row.id">
         <el-table-column type="selection" width="55" reserve-selection="true" />
 
-        <el-table-column :prop="item.value" :label="item.label" v-for="item in tableData" :key="item.value">
+        <el-table-column
+          :prop="item.value"
+          :label="item.label"
+          v-for="item in tableData"
+          :key="item.value"
+        >
           <template #default="{ row }">
             <span v-if="item.type === 'picture'">
-              <el-image v-if="row[item.value]" :src="getFullImageUrl(row[item.value])"
-                style="width: 50px; height: 50px" />
+              <el-image
+                v-if="row[item.value]"
+                :src="getFullImageUrl(row[item.value])"
+                style="width: 50px; height: 50px"
+                @click="donwLoadFile(getFullImageUrl(row[item.value]))"
+              />
             </span>
             <span v-if="item.type === 'fileList'">
               <!-- <a v-for="(subItem) in row[item.value]" :href="getFullImageUrl(subItem[item.key])" :download="subItem[item.key].split('/').pop()" target="_blank">{{ subItem[item.key].split('/').pop()}}</a> -->
-              <el-button type="primary" text v-for="subItem in row[item.value]"
-                @click="donwLoadFile(getFullImageUrl(subItem[item.key]), item.miniType)">
+              <el-button
+                type="primary"
+                text
+                v-for="subItem in row[item.value]"
+                @click="donwLoadFile(getFullImageUrl(subItem[item.key]), item.miniType)"
+              >
                 {{ subItem[item.key].split('/').pop() }}
               </el-button>
             </span>
@@ -51,8 +76,15 @@
         </el-table-column>
         <el-table-column label="操作" fixed="right" v-if="operations">
           <template #default="{ row }">
-            <el-button size="small" type="primary" text :disabled="operation.disabled" @click="operation.func(row)"
-              v-for="operation in operations">{{ operation.value }}</el-button>
+            <el-button
+              size="small"
+              type="primary"
+              text
+              :disabled="operation.disabled"
+              @click="operation.func(row)"
+              v-for="operation in operations"
+              >{{ operation.value }}</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -87,7 +119,7 @@ const getList = (ele) => {
     return ele
   }
 }
-const donwLoadFile = async (Fileurl, miniType) => {
+const donwLoadFile = async (Fileurl, miniType = 'application/octet-stream') => {
   const content = await axios.get(Fileurl, { responseType: 'blob' })
   const blob = new Blob([content.data], { type: miniType })
   const url = URL.createObjectURL(blob)
