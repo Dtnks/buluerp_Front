@@ -67,7 +67,7 @@ export const getAuditPurchasePending = (pageNum, pageSize) => {
 // getAuditSubcontractPending: 获取待审核分包列表
 export const getAuditSubcontractPending = (pageNum, pageSize) => {
   return httpInstance({
-    url: `system/audit/subcontract/pending`,
+    url: `/system/audit/packaging/pending`,
     method: 'get',
     headers: headers,
     params: { pageNum, pageSize },
@@ -107,7 +107,7 @@ export const postAuditPurchase = (auditId, commitData) => {
 // postAuditSubcontract: 提交分包审核
 export const postAuditSubcontract = (auditId, commitData) => {
   return httpInstance({
-    url: `/system/audit/subcontract/audit/${auditId}`,
+    url: `/system/audit/packaging/audit/${auditId}`,
     method: 'post',
     headers: headers,
     data: { ...commitData },
