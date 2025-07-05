@@ -3,10 +3,12 @@
     <el-config-provider :locale="zhCn">
       <BordShow content="业务订单查询列表" path="业务中心/查询" />
       <div class="greyBack">
-        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd" :control="control" @customerSuggestions="customerSuggestions" @checkCustomerName="checkCustomerName"></QueryForm>
+        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd" :control="control"
+          @customerSuggestions="customerSuggestions" @checkCustomerName="checkCustomerName"></QueryForm>
         <QueryTable :addTab="props.addTab" :pagination="pagination" :tableData="tableData" :control="control"
           @onPageChange="handlePageChange" @onPageSizeChange="handleSizeChange" @fetchData="fetchTableData"
-          @onUpdated="handleUpdate" @customerSuggestions="customerSuggestions" @checkCustomerName="checkCustomerName"> </QueryTable>
+          @onUpdated="handleUpdate" @customerSuggestions="customerSuggestions" @checkCustomerName="checkCustomerName">
+        </QueryTable>
       </div>
     </el-config-provider>
   </div>
@@ -23,12 +25,13 @@ import { addOrder, } from '../function/oders'
 import type { TableDataType } from '@/types/orderResponse'
 import { messageBox } from '@/components/message/messageBox'
 import { listCustomerAll } from '@/apis/custom'
+import useTabStore from '@/stores/modules/tabs'
 
 const props = defineProps<{
   addTab: (targetName: string, component: any, data?: any, control?: Array<object>) => void
   control: Array<object>
 }>()
-
+const tabStore = useTabStore()
 // pagination: 分页数据
 const pagination = reactive({
   page: 1,
@@ -75,13 +78,11 @@ const handleQuery = (params: any) => {
 
 // handleAdd: 处理新增
 const handleAdd = async (newData: TableDataType) => {
-  console.log('1111新增数据(handleAdd):', newData)
   const res = await addOrder(newData)
-  console.log('33333', res);
-
   if (res.code === 200) {
     messageBox('success', null, '订单已成功添加')
     fetchTableData()
+    tabStore.freshTab('审核')
   }
   else {
     messageBox('error', null, null, res.msg)
@@ -95,10 +96,8 @@ const handleUpdate = async (updatedData: TableDataType) => {
     console.log('更新结果(handelUpdate):', res)
     messageBox('success', null, '订单已成功更新')
     fetchTableData()
+    tabStore.freshTab('审核')
   }
-  //  else {
-  //   messageBox('error', null, null, '更新订单失败，请检查输入数据是否正确')
-  // }
 }
 
 // handlePageChange: 处理分页

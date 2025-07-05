@@ -150,6 +150,7 @@ const editDialogVisible = ref(false)
 const editForm = reactive({
   id: 0,
   innerId: '',
+  outerId: '',
   customerName: '',
   statusText: '',
   remark: '',
@@ -160,7 +161,8 @@ const editForm = reactive({
 // 点击“编辑”按钮时触发
 const onEdit = (row: TableDataType) => {
   // 将选中的行数据复制到编辑表单中
-  // editForm.innerId = row.innerId
+  editForm.innerId = row.innerId ? row.innerId : ''
+  editForm.outerId = row.outerId ? row.outerId : ''
   editForm.customerName = row.customerName ? row.customerName : ''
   editForm.statusText = getStatusText(row.status)
   editForm.remark = row.remark ? row.remark : ''

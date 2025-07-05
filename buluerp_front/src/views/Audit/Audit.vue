@@ -6,7 +6,7 @@
         <template #header>
           <div class="card-header">
             <span style="font-weight: bold;">审核列表</span>
-            <el-select v-if="TypeOptions.length > 0" v-model="type" placeholder="请选择" style="width: 120px;" size="small"
+            <el-select v-if="isLoadingCompleted" v-model="type" placeholder="请选择" style="width: 120px;" size="small"
               @change="fetchAuditData(true)">
               <el-option v-for="item in TypeOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
@@ -102,15 +102,15 @@ import { getProductionScheduleById } from '@/apis/produceControl/produce/schedul
 import { getFullImageUrl } from '@/utils/image/getUrl'
 const props = defineProps(['control'])
 const type = ref('order')
-
+const isLoadingCompleted = ref(false)
 onMounted(async () => {
   // 初始化时获取审核类型
   TypeOptions.value = await getTypeOptions()
-  isLoading.value = false
+  isLoadingCompleted.value = true
   fetchAuditData(true)
 })
 const tableData = ref([])
-const isLoading = ref(true)
+
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)

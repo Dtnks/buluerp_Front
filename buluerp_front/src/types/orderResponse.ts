@@ -1,8 +1,9 @@
-import { Status, getStatusText } from "@/views/business/utils/statusMap"
+import { Status, getStatusText } from '@/views/business/utils/statusMap'
 export interface TableDataType {
   createTime?: string
   id: number | null
   innerId?: string
+  outerId?: string
   status: Status
   customerName?: string
   remark?: string

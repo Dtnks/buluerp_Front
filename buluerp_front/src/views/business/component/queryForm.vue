@@ -28,7 +28,7 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button @click="onAddCancel">取消</el-button>
         <el-button type="primary" @click="onAddConfirm"> 确定 </el-button>
       </div>
     </template>
@@ -46,17 +46,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { ElInput, ElMessageBox, ElButton, ElDialog, ElUpload, ElMessage, ElAutocomplete, ElFormItem } from 'element-plus'
 import Form from '@/components/form/Form.vue'
-import { importOrderFile, getProductTemplate, getOrdersList } from '@/apis/orders'
+import { importOrderFile, getProductTemplate } from '@/apis/orders'
 import { getStatusText, Status } from '../utils/statusMap'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import { messageBox } from '@/components/message/messageBox'
 import { format } from 'date-fns'
 import type { SubmitFormType } from '../types'
-import { listCustomerAll } from '@/apis/custom'
 
 const dialogFormVisible = ref(false)
 
@@ -104,29 +103,12 @@ const data = reactive([
         { label: getStatusText(Status.Producing), value: Status.Producing },
       ],
     },
-    {
-      label: '创建时间',
-      type: 'timer',
-      key: 'createTime',
-      timerType: 'datetimerange',
-    },
+    { label: '创建时间', type: 'timer', key: 'createTime', timerType: 'datetimerange', },
   ],
   [
-    {
-      label: '客户姓名',
-      type: 'input',
-      key: 'customerName',
-    },
-    {
-      label: '创建人姓名',
-      type: 'input',
-      key: 'operator',
-    },
-    {
-      label: '备注',
-      type: 'input',
-      key: 'remark',
-    },
+    { label: '客户姓名', type: 'input', key: 'customerName', },
+    { label: '创建人姓名', type: 'input', key: 'operator', },
+    { label: '备注', type: 'input', key: 'remark', },
   ],
 ])
 
@@ -188,43 +170,6 @@ const onCreate = () => {
   dialogFormVisible.value = true
 }
 
-// 获取客户列表
-const customers = ref([])
-const suggestionResult = ref([])
-
-onMounted(async () => {
-  // const res = await listCustomerAll()
-  // customers.value = res.rows || []
-})
-
-// // customerSuggestions: 客户姓名建议
-// const customerSuggestions = async (queryString: string, cb) => {
-//   const res = await listCustomerAll(queryString)
-//   const customerNames = ref(res.rows.map(customer => customer.name))
-//   // 如果没有查询字符串，返回客户表第一页客户名称
-//   if (!queryString) {
-//     cb(customerNames.value.map(name => ({ value: name })))
-//     return
-//   }
-
-//   const results = queryString ? customerNames.value.filter(customer => customer.includes(queryString)) : customerNames.value
-//   suggestionResult.value = queryString ? customerNames.value.filter(customer => customer.includes(queryString)) : customerNames.value
-//   cb(results.map(name => ({ value: name })))
-// }
-
-// // checkCustomerName: 校验客户姓名
-// const checkCustomerName = () => {
-//   console.log('校验客户姓名:', dialogForm.customerName)
-//   if (suggestionResult.value.length === 0) {
-//     messageBox('error', null, null, '没有找到匹配的客户姓名, 请先添加客户')
-//   }
-// }
-
-// watch(dialogForm, (newValue, oldValue) => {
-//   if (newValue.customerName !== oldValue.customerName) {
-//     checkCustomerName()
-//   }
-// })
 
 const customerSuggestions = (queryString: string, cb) => {
   emit('customerSuggestions', queryString, cb)
@@ -232,16 +177,24 @@ const customerSuggestions = (queryString: string, cb) => {
 const checkCustomerName = () => {
   emit('checkCustomerName')
 }
+// onAddCancel: 取消新增订单
+const onAddCancel = () => {
+  dialogFormVisible.value = false
+  dialogForm.customerName = ''
+  dialogForm.innerId = ''
+  dialogForm.outerId = ''
+  dialogForm.remark = ''
+}
 
 // onAddConfirm: 确认新增订单
 const onAddConfirm = () => {
   emit('onAdd', { ...dialogForm })
   console.log('新增订单数据：', { ...dialogForm })
   dialogFormVisible.value = false
+
 }
 
 const importDialogVisible = ref(false)
-
 const onImport = () => {
   importDialogVisible.value = true
 }
