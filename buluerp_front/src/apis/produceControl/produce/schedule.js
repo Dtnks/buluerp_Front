@@ -8,6 +8,15 @@ export function getProdunctionSchedeuleByOrderCode(orderCode) {
     headers: headers,
   })
 }
+
+export function getProductionScheduleById(id) {
+  return httpInstance({
+    url: `system/products-schedule/list?id=${id}`,
+    method: 'get',
+    headers: headers,
+  })
+}
+
 export function newSchedule(data) {
   return httpInstance({
     url: `system/products-schedule`,

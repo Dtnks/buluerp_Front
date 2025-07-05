@@ -1,13 +1,11 @@
 <template>
   <div class="detail-box">
-    <div
-      style="
+    <div style="
         flex: 1;
         background-color: rgba(240, 242, 245, 1);
         padding: 20px 40px 0 40px;
         overflow-y: auto;
-      "
-    >
+      ">
       <div class="main">
         <!-- 业务订单基本信息 -->
         <informationCard title="业务订单基本信息">
@@ -19,22 +17,9 @@
                   {{ field.value }}
                 </div>
                 <div v-else class="field-value">
-                  <el-input
-                    v-if="field.label == '客户姓名'"
-                    v-model="updateFields.customerName"
-                    placeholder="请输入"
-                  />
-                  <el-input
-                    v-else-if="field.label == '备注'"
-                    v-model="updateFields.remark"
-                    placeholder="请输入"
-                  />
-                  <el-date-picker
-                    v-else
-                    v-model="updateFields.deliveryTime"
-                    style="width: 200px"
-                    placeholder="请选择"
-                  />
+                  <el-input v-if="field.label == '客户姓名'" v-model="updateFields.customerName" placeholder="请输入" />
+                  <el-input v-else-if="field.label == '备注'" v-model="updateFields.remark" placeholder="请输入" />
+                  <el-date-picker v-else v-model="updateFields.deliveryTime" style="width: 200px" placeholder="请选择" />
                 </div>
               </div>
             </el-col>
@@ -55,29 +40,16 @@
           <div class="related-orders-grid">
             <!-- 第一行：订单类型 -->
             <div class="related-orders-row">
-              <div
-                v-for="item in relatedOrdersTable"
-                :key="item.type"
-                class="related-orders-cell type-cell"
-              >
+              <div v-for="item in relatedOrdersTable" :key="item.type" class="related-orders-cell type-cell">
                 {{ item.type }}
               </div>
             </div>
             <!-- 第二行：操作按钮 -->
             <div class="related-orders-row">
-              <div
-                v-for="(item, idx) in relatedOrdersTable"
-                :key="item.type + '-action'"
-                class="related-orders-cell action-cell"
-              >
-                <el-button
-                  v-for="action in item.actions"
-                  :key="action.name"
-                  link
-                  type="primary"
-                  size="small"
-                  @click="handleAction(action.method, item)"
-                >
+              <div v-for="(item, idx) in relatedOrdersTable" :key="item.type + '-action'"
+                class="related-orders-cell action-cell">
+                <el-button v-for="action in item.actions" :key="action.name" link type="primary" size="small"
+                  @click="handleAction(action.method, item)">
                   {{ action.name }}
                 </el-button>
               </div>
@@ -96,14 +68,11 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button
-            type="info"
-            @click="
-              () => {
-                DialogVisible = false
-              }
-            "
-          >
+          <el-button type="info" @click="
+            () => {
+              DialogVisible = false
+            }
+          ">
             取消
           </el-button>
         </div>
@@ -356,6 +325,7 @@ const handleSubmit = () => {
           relatedOrdersTable.value[2].actions = [{ name: '查看', method: viewPackagingList }]
           messageBox('success', null, '分包创建成功')
           DialogVisible.value = false
+          tabStore.freshTab('审核')
         } else {
           messageBox('error', null, null, res.msg)
           return

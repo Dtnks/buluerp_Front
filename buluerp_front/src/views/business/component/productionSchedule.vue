@@ -53,8 +53,10 @@ import informationCard from './informationCard.vue';
 import { changeSchedule, deleteSchedule, getProdunctionSchedeuleByOrderCode, newSchedule } from '@/apis/produceControl/produce/schedule';
 import { messageBox } from '@/components/message/messageBox';
 import { getFullImageUrl } from '@/utils/image/getUrl';
+import useTabStore from '@/stores/modules/tabs';
 // import useProductionSchedule from '../function/productionSchedule';
 
+const tabStore = useTabStore();
 const isLoading = ref(true);
 const updatedFields = ref({})
 const props = defineProps<{
@@ -68,7 +70,8 @@ const scheduleData = ref<{ [value: string]: any }>({});
 const newFormData = ref([
   [
     { type: 'inputSelect', label: '订单Id', key: 'orderCode', width: 12, rules: [requiredRule], remoteFunc: searchFunc('system/orders/list', 'innerId'), options: [], loading: false, },
-    { type: 'inputSelect', label: '产品ID', key: 'productId', width: 12, rules: [requiredRule], remoteFunc: searchFunc('system/products/list', 'id'), options: [], loading: false, },
+    { type: 'inputSelect', label: '产品ID', key: 'productId', width: 12, rules: [requiredRule], options: [], loading: false, remoteFunc: searchFunc('system/products/list', 'id'), },
+    // { type: 'input', label: '产品编码', key: 'productCode', width: 8 },
   ],
   [
     { type: 'input', label: '模具编码', key: 'mouldNumber', width: 8 },
@@ -90,12 +93,18 @@ const newFormData = ref([
       type: 'inputSelect', label: '颜色编号', key: 'colorCode', width: 12,
       remoteFunc: (ele) => {
         ele.loading = true
-        ele.options = [{ label: '1', value: '1' }, { label: '2', value: '2' }, { label: '3', value: '3' },]
+        ele.options = [
+          { label: '1', value: '1' },
+          { label: '2', value: '2' },
+          { label: '3', value: '3' },
+        ]
         ele.loading = false
-      },
-      loading: false, options: [],
+      }, loading: false, options: [],
     },
-    { type: 'inputSelect', label: '排产Id', key: 'arrangeId', width: 12, rules: [requiredRule], options: [], loading: false, remoteFunc: searchFunc('system/production-arrange/list', 'id'), },
+    { type: 'inputSelect', label: '排产Id', key: 'arrangeId', width: 12, rules: [], options: [], loading: false, remoteFunc: searchFunc('system/production-arrange/list', 'id'), },
+  ],
+  [{ type: 'mutilInputSelect', label: '物料ID', key: 'materialIds', width: 12, rules: [requiredRule], options: [], loading: false, remoteFunc: searchFunc('system/material-info/list', 'id'), },
+  { type: 'input', label: '料别', key: 'materialType', width: 12, rules: [requiredRule] },
   ],
   [
     { type: 'input', label: '单重', key: 'singleWeight', width: 8, rules: [positiveNumberRule] },
@@ -108,12 +117,9 @@ const newFormData = ref([
     { type: 'input', label: '布产数量PCS', key: 'productionQuantity', width: 8, rules: [requiredRule], },
   ],
   [
-    { type: 'number', label: '色粉数量', key: 'colorPowderNeeded', width: 12, rules: [positiveNumberRule], },
-    { type: 'input', label: '料别', key: 'materialType', width: 12, rules: [requiredRule] },
-  ],
-  [
-    { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 12, rules: [requiredRule] },
-    { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 12, rules: [requiredRule] },
+    { type: 'number', label: '色粉数量', key: 'colorPowderNeeded', width: 8, rules: [positiveNumberRule], },
+    { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 8, rules: [requiredRule] },
+    { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 8, rules: [requiredRule] },
   ],
   [{ type: 'image', label: '样例图', key: 'picture', width: 24 }],
 ]);
@@ -180,6 +186,7 @@ const onCancel = () => {
       messageBox('error', null, null, '解绑失败');
     }
   }, '解绑成功', '解绑失败', '确定要解绑当前订单吗？');
+  tabStore.freshTab('审核')
 }
 
 const onAdd = () => {
@@ -195,6 +202,8 @@ const onAddSubmit = async () => {
     messageBox('error', null, null, res.msg);
   }
   newDialogVisible.value = false;
+  tabStore.freshTab('布产表');
+  tabStore.freshTab('审核')
 }
 
 const onUpdate = () => {
@@ -205,6 +214,7 @@ const onUpdateSubmit = async () => {
   const res = await changeSchedule(updatedFields.value);
   if (res.code == 200) {
     messageBox('success', null, '修改布产表成功');
+    tabStore.freshTab('审核')
   } else {
     messageBox('error', null, null, res.msg);
   }

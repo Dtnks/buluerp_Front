@@ -6,7 +6,7 @@
         <template #header>
           <div class="card-header">
             <span style="font-weight: bold;">审核列表</span>
-            <el-select v-model="type" placeholder="请选择" style="width: 120px;" size="small"
+            <el-select v-if="TypeOptions.length > 0" v-model="type" placeholder="请选择" style="width: 120px;" size="small"
               @change="fetchAuditData(true)">
               <el-option v-for="item in TypeOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
@@ -72,7 +72,10 @@
     <el-form class="flex-form">
 
       <el-form-item v-for="item in formData[type]" :key="item.value" :label="item.label" class="form-item">
-        <span class="form-value" v-if="detailData[item.value]">{{ detailData[item.value] }}</span>
+        <span class="form-value" v-if="detailData[item.value] && item.value != 'pictureUrl'">{{
+          detailData[item.value] }}</span>
+        <el-image v-else-if="detailData[item.value] && item.value == 'pictureUrl'"
+          :src="getFullImageUrl(detailData[item.value])"></el-image>
         <span class="form-value" v-else>暂无数据</span>
       </el-form-item>
 
@@ -88,24 +91,26 @@ import FormSearch from '@/components/form/Form.vue'
 import TableList from '@/components/table/TableList.vue'
 import { TypeOptions, columns, getTypeOptions, formData } from './data/auditData'
 import { computed, onMounted, ref } from 'vue'
-import { ElOption, ElSelect, ElPagination, ElTable, ElTableColumn, ElButton, ElPopover, ElInput, ElDialog, ElForm, ElFormItem } from 'element-plus'
+import { ElOption, ElSelect, ElPagination, ElTable, ElTableColumn, ElButton, ElPopover, ElInput, ElDialog, ElForm, ElFormItem, ElCard, ElImage } from 'element-plus'
 import { getAuditList, getAuditOrderPending, getAuditProductionPending, getAuditPurchasePending, getAuditSubcontractPending, postAuditOder, postAuditProduction, postAuditPurchase, postAuditSubcontract } from '@/apis/audit'
 import { Status, getStatusText } from '../business/utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
 import { getOrderDetailById } from '@/apis/orders'
-import { getProductDetail } from '@/apis/products'
 import { getPurchasePlanDetail } from '@/apis/produceControl/purchase/purchasePlan'
 import { getPackagingDetail } from '@/apis/produceControl/produce/packaging'
+import { getProductionScheduleById } from '@/apis/produceControl/produce/schedule'
+import { getFullImageUrl } from '@/utils/image/getUrl'
 const props = defineProps(['control'])
 const type = ref('order')
 
 onMounted(async () => {
   // 初始化时获取审核类型
   TypeOptions.value = await getTypeOptions()
+  isLoading.value = false
   fetchAuditData(true)
 })
 const tableData = ref([])
-
+const isLoading = ref(true)
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
@@ -126,7 +131,7 @@ const auditPostApiMap = {
 
 const viewApiMap = {
   order: getOrderDetailById,
-  production: getProductDetail,
+  production: getProductionScheduleById,
   purchase: getPurchasePlanDetail,
   subcontract: getPackagingDetail,
 }
@@ -217,7 +222,7 @@ const onView = async (auditType: number, auditId: number) => {
     console.log(res, '查看审核数据返回结果');
     if (res.code === 200) {
       dialogVisible.value = true
-      detailData.value = res.data
+      detailData.value = res.data || res.rows[0]
       // 处理查看数据
     } else {
       messageBox('error', null, null, res.msg || '查看失败，请稍后再试')

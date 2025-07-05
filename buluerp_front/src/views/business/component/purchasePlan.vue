@@ -66,12 +66,9 @@ const updatedFields = ref({})
 
 const newFormData = ref([
   [
-    { type: 'inputSelect', label: '订单Id', key: 'orderCode', width: 12, rules: [requiredRule], remoteFunc: searchFunc('system/orders/list', 'innerId'), disabled: true },
-    { type: 'inputSelect', label: '产品ID', key: 'productId', width: 12, rules: [requiredRule], remoteFunc: searchFunc('system/products/list', 'id'), options: [], loading: false, },
-  ],
-  [{ type: 'input', label: '采购重量', key: 'purchaseWeight', width: 8, rules: [positiveNumberRule], },
-  { type: 'number', label: '采购数量', key: 'purchaseQuantity', width: 8, rules: [positiveNumberRule], },
-  { type: 'input', label: '单重', key: 'singleWeight', width: 8, rules: [positiveNumberRule] },
+    { type: 'input', label: '采购重量', key: 'purchaseWeight', width: 8, rules: [positiveNumberRule], },
+    { type: 'number', label: '采购数量', key: 'purchaseQuantity', width: 8, rules: [positiveNumberRule], },
+    { type: 'input', label: '单重', key: 'singleWeight', width: 8, rules: [positiveNumberRule] },
   ],
   [
     { type: 'input', label: '颜色编号', key: 'colorCode', width: 12, rules: [requiredRule] },
@@ -89,7 +86,10 @@ const newFormData = ref([
     { type: 'input', label: '模具编号', key: 'mouldNumber', width: 12, rules: [requiredRule] },
     { type: 'input', label: '规格', key: 'specification', width: 12, rules: [requiredRule] },
   ],
-
+  [
+    { type: 'inputSelect', label: '订单Id', key: 'orderCode', width: 12, rules: [requiredRule], remoteFunc: searchFunc('system/orders/list', 'innerId'), options: [], loading: false, },
+    { type: 'inputSelect', label: '产品ID', key: 'productId', width: 12, rules: [requiredRule], remoteFunc: searchFunc('system/products/list', 'id'), options: [], loading: false, },
+  ],
   [
     { type: 'textarea', label: '客户备注', key: 'remarks', width: 24, rules: [] }, // 备注字段不做必填校验
   ],
@@ -161,6 +161,7 @@ const onAddSubmit = async () => {
   if (res.code == 200) {
     messageBox('success', null, '新增采购表成功');
     getPurchaseData(); // 刷新采购表数据
+    tabStore.freshTab('审核')
   } else {
     messageBox('error', null, null, '新增采购表失败');
   }
@@ -176,6 +177,7 @@ const onUpdateSubmit = async () => {
   if (res.code == 200) {
     purchaseData.value = { ...purchaseData.value, ...updatedFields.value }; // 更新本地数据
     messageBox('success', null, '修改采购表成功');
+    tabStore.freshTab('审核')
   } else {
     messageBox('error', null, null, res.msg);
   }
