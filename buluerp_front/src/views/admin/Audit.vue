@@ -33,10 +33,8 @@ import { onMounted, ref } from 'vue'
 const tableData = ref([])
 onMounted(() => {
   // 模拟获取数据
-  console.log('组件已挂载，数据已加载')
   auditSwitchList()
-  console.log(tableData.value, 'tableData.value');
-  getAuditEnabled(1)
+  // getAuditEnabled(1)
 
 })
 

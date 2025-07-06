@@ -2,6 +2,7 @@ import { getAuditSwitchList } from '@/apis/audit'
 import { ref } from 'vue'
 
 const auditTypeValueMap = {
+  0: 'all',
   1: 'order',
   2: 'purchase',
   3: 'production',
@@ -9,6 +10,7 @@ const auditTypeValueMap = {
 }
 
 const auditTypeLabelMap = {
+  all: '全部审核记录',
   order: '订单审核',
   purchase: '采购审核',
   production: '布产审核',
@@ -32,6 +34,12 @@ export async function getTypeOptions(): Promise<{ label: string; value: string }
               label: auditTypeLabelMap[value], // 使用 auditTypeLabelMap 获取中文标签
               value: value,
             })
+          }
+        }
+        if (item.status === 0) {
+          const value = auditTypeValueMap[item.auditType]
+          if (value && TypeOptions.value.some((option) => option.value === value)) {
+            TypeOptions.value = TypeOptions.value.filter((option) => option.value != value)
           }
         }
       }

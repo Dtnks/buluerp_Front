@@ -101,7 +101,7 @@ import { getPackagingDetail } from '@/apis/produceControl/produce/packaging'
 import { getProductionScheduleById } from '@/apis/produceControl/produce/schedule'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 const props = defineProps(['control'])
-const type = ref('order')
+const type = ref('all')
 const isLoadingCompleted = ref(false)
 onMounted(async () => {
   // 初始化时获取审核类型
@@ -156,7 +156,6 @@ const auditStatusMap = {
 
 const fetchAuditData = async (resetPage: boolean) => {
   const api = auditTypeApiMap[type.value as keyof typeof auditTypeApiMap]
-  console.log(api, '获取审核数据api');
   if (api) {
     if (resetPage) {
       page.value = 1
@@ -164,7 +163,6 @@ const fetchAuditData = async (resetPage: boolean) => {
     const res = await api(page.value, pageSize.value,)
     tableData.value = res.rows
     total.value = res.total
-    console.log(tableData.value, '获取审核数据222');
   }
 }
 
@@ -192,8 +190,6 @@ const onAudit = async (id: number, commitData: any) => {
       ...commitData,
       accept: 1, // 默认接受审核
     }
-    console.log(commitData, '提交审核数据22222222');
-
     const res = await api(id, commitData)
     if (res.code === 200) {
       messageBox('success', null, res.msg || '审核成功')
@@ -202,7 +198,6 @@ const onAudit = async (id: number, commitData: any) => {
     } else {
       messageBox('error', null, null, res.msg || '审核失败，请稍后再试')
     }
-
   }
 }
 
@@ -215,11 +210,9 @@ const detailData = ref<Record<string, any>>({})
 
 const dialogVisible = ref(false)
 const onView = async (auditType: number, auditId: number) => {
-  console.log(auditType, auditId, '查看审核数据');
   const api = viewApiMap[type.value as keyof typeof viewApiMap]
   if (api) {
     const res = await api(auditId)
-    console.log(res, '查看审核数据返回结果');
     if (res.code === 200) {
       dialogVisible.value = true
       detailData.value = res.data || res.rows[0]
