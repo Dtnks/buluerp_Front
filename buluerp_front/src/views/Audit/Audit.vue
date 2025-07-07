@@ -2,32 +2,59 @@
   <div class="col">
     <BordShow content="审核" path="用户中心/审核" />
     <div class="greyBack">
-      <el-card style="margin: 0 20px;">
+      <el-card style="margin: 0 20px">
         <template #header>
           <div class="card-header">
-            <span style="font-weight: bold;">审核列表</span>
-            <el-select v-if="isLoadingCompleted" v-model="type" placeholder="请选择" style="width: 120px;" size="small"
-              @change="fetchAuditData(true)">
-              <el-option v-for="item in TypeOptions" :key="item.value" :label="item.label" :value="item.value" />
+            <span style="font-weight: bold">审核列表</span>
+            <el-select
+              v-if="isLoadingCompleted"
+              v-model="type"
+              placeholder="请选择"
+              style="width: 120px"
+              size="small"
+              @change="fetchAuditData(true)"
+            >
+              <el-option
+                v-for="item in TypeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
             </el-select>
           </div>
         </template>
-        <el-table :data="tableData" border style="width: 100%; margin-top: 10px;">
+        <el-table :data="tableData" border style="width: 100%; margin-top: 10px">
           <!-- <el-table-column type="selection" width="55" /> -->
-          <el-table-column v-for="column in columns[type as keyof typeof columns]" :key="column.value"
-            :prop="column.value" :label="column.label">
+          <el-table-column
+            v-for="column in columns[type as keyof typeof columns]"
+            :key="column.value"
+            :prop="column.value"
+            :label="column.label"
+          >
             <template #default="scope">
               <template v-if="column.value === 'auditType'">
-                {{ auditTypeMap[scope.row.auditType as keyof typeof auditTypeMap] || scope.row.auditType }}
+                {{
+                  auditTypeMap[scope.row.auditType as keyof typeof auditTypeMap] ||
+                  scope.row.auditType
+                }}
               </template>
               <template v-else-if="column.value === 'confirm'">
-                {{ auditConfirmMap[scope.row.confirm as keyof typeof auditConfirmMap] || scope.row.confirm }}
+                {{
+                  auditConfirmMap[scope.row.confirm as keyof typeof auditConfirmMap] ||
+                  scope.row.confirm
+                }}
               </template>
               <template v-else-if="column.value === 'preStatus' && type !== 'order'">
-                {{ auditStatusMap[scope.row.preStatus as keyof typeof auditStatusMap] || scope.row.preStatus }}
+                {{
+                  auditStatusMap[scope.row.preStatus as keyof typeof auditStatusMap] ||
+                  scope.row.preStatus
+                }}
               </template>
               <template v-else-if="column.value === 'toStatus' && type !== 'order'">
-                {{ auditStatusMap[scope.row.toStatus as keyof typeof auditStatusMap] || scope.row.toStatus }}
+                {{
+                  auditStatusMap[scope.row.toStatus as keyof typeof auditStatusMap] ||
+                  scope.row.toStatus
+                }}
               </template>
               <template v-else-if="column.value === 'preStatus' && type === 'order'">
                 {{ getStatusText(scope.row.preStatus) || scope.row.preStatus }}
@@ -45,62 +72,107 @@
             <template #default="scope">
               <el-popover @hide="onCancel">
                 <div class="popover-content">
-                  <el-input v-model="commitData.auditComment" placeholder="请输入审核意见"></el-input>
-                  <el-button size="small" type="primary" @click="onAudit(scope.row.id, commitData)"
-                    class="popover-button">确认</el-button>
+                  <el-input
+                    v-model="commitData.auditComment"
+                    placeholder="请输入审核意见"
+                  ></el-input>
+                  <el-button
+                    size="small"
+                    type="primary"
+                    @click="onAudit(scope.row.id, commitData)"
+                    class="popover-button"
+                    >确认</el-button
+                  >
                   <el-button size="small" @click="onCancel" class="popover-button">重置</el-button>
                 </div>
                 <template #reference>
                   <el-button size="small">审核</el-button>
                 </template>
               </el-popover>
-              <el-button size="small" style="margin-left: 1px;"
-                @click="onView(scope.row.auditType, scope.row.auditId)">查看</el-button>
-
+              <el-button
+                size="small"
+                style="margin-left: 1px"
+                @click="onView(scope.row.auditType, scope.row.auditId)"
+                >查看</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
-        <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
-          <el-pagination background layout="prev, pager, next, jumper, ->, total, sizes" :total="total"
-            :current-page="page" :page-size="pageSize" :page-sizes="[5, 10, 20]" @current-change="handlePageChange"
-            @size-change="handleSizeChange" />
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end">
+          <el-pagination
+            background
+            layout="prev, pager, next, jumper, ->, total, sizes"
+            :total="total"
+            :current-page="page"
+            :page-size="pageSize"
+            :page-sizes="[5, 10, 20]"
+            @current-change="handlePageChange"
+            @size-change="handleSizeChange"
+          />
         </div>
       </el-card>
     </div>
   </div>
   <el-dialog v-model="dialogVisible" width="50%" title="查看审核详情" class="audit-dialog">
     <el-form class="flex-form">
-
-      <el-form-item v-for="item in formData[type]" :key="item.value" :label="item.label" class="form-item">
+      <el-form-item
+        v-for="item in formData[type]"
+        :key="item.value"
+        :label="item.label"
+        class="form-item"
+      >
         <span class="form-value" v-if="detailData[item.value] && item.value != 'pictureUrl'">{{
-          detailData[item.value] }}</span>
-        <el-image v-else-if="detailData[item.value] && item.value == 'pictureUrl'"
-          :src="getFullImageUrl(detailData[item.value])"></el-image>
+          detailData[item.value]
+        }}</span>
+        <el-image
+          v-else-if="detailData[item.value] && item.value == 'pictureUrl'"
+          :src="getFullImageUrl(detailData[item.value])"
+        ></el-image>
         <span class="form-value" v-else>暂无数据</span>
       </el-form-item>
-
     </el-form>
   </el-dialog>
-
 </template>
-
 
 <script setup lang="ts">
 import BordShow from '@/components/board/SecBoard.vue'
-import FormSearch from '@/components/form/Form.vue'
-import TableList from '@/components/table/TableList.vue'
+
 import { TypeOptions, columns, getTypeOptions, formData } from './data/auditData'
-import { computed, onMounted, ref } from 'vue'
-import { ElOption, ElSelect, ElPagination, ElTable, ElTableColumn, ElButton, ElPopover, ElInput, ElDialog, ElForm, ElFormItem, ElCard, ElImage } from 'element-plus'
-import { getAuditList, getAuditOrderPending, getAuditProductionPending, getAuditPurchasePending, getAuditSubcontractPending, postAuditOder, postAuditProduction, postAuditPurchase, postAuditSubcontract } from '@/apis/audit'
-import { Status, getStatusText } from '../business/utils/statusMap'
+import { onMounted, ref } from 'vue'
+import {
+  ElOption,
+  ElSelect,
+  ElPagination,
+  ElTable,
+  ElTableColumn,
+  ElButton,
+  ElPopover,
+  ElInput,
+  ElDialog,
+  ElForm,
+  ElFormItem,
+  ElCard,
+  ElImage,
+} from 'element-plus'
+import {
+  getAuditList,
+  getAuditOrderPending,
+  getAuditProductionPending,
+  getAuditPurchasePending,
+  getAuditSubcontractPending,
+  postAuditOder,
+  postAuditProduction,
+  postAuditPurchase,
+  postAuditSubcontract,
+} from '@/apis/audit'
+import { getStatusText } from '../business/utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
 import { getOrderDetailById } from '@/apis/orders'
 import { getPurchasePlanDetail } from '@/apis/produceControl/purchase/purchasePlan'
 import { getPackagingDetail } from '@/apis/produceControl/produce/packaging'
 import { getProductionScheduleById } from '@/apis/produceControl/produce/schedule'
 import { getFullImageUrl } from '@/utils/image/getUrl'
-const props = defineProps(['control'])
+defineProps(['control'])
 const type = ref('all')
 const isLoadingCompleted = ref(false)
 onMounted(async () => {
@@ -119,14 +191,14 @@ const auditTypeApiMap = {
   order: getAuditOrderPending,
   production: getAuditProductionPending,
   purchase: getAuditPurchasePending,
-  subcontract: getAuditSubcontractPending
+  subcontract: getAuditSubcontractPending,
 }
 
 const auditPostApiMap = {
   order: postAuditOder,
   production: postAuditProduction,
   purchase: postAuditPurchase,
-  subcontract: postAuditSubcontract
+  subcontract: postAuditSubcontract,
 }
 
 const viewApiMap = {
@@ -153,19 +225,17 @@ const auditStatusMap = {
   1: '审核通过',
 }
 
-
 const fetchAuditData = async (resetPage: boolean) => {
   const api = auditTypeApiMap[type.value as keyof typeof auditTypeApiMap]
   if (api) {
     if (resetPage) {
       page.value = 1
     }
-    const res = await api(page.value, pageSize.value,)
+    const res = await api(page.value, pageSize.value)
     tableData.value = res.rows
     total.value = res.total
   }
 }
-
 
 const handlePageChange = (newPage: number) => {
   page.value = newPage
@@ -206,7 +276,6 @@ const onCancel = () => {
 }
 
 const detailData = ref<Record<string, any>>({})
-
 
 const dialogVisible = ref(false)
 const onView = async (auditType: number, auditId: number) => {

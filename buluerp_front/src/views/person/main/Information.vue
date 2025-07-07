@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { GetMessage } from '@/apis/layout'
-import BordShow from '@/components/board/SecBoard.vue'
 import { ref } from 'vue'
 const messages = ref()
 GetMessage().then((res) => {
