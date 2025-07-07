@@ -19,10 +19,13 @@ GetMessage().then((res) => {
     total.value = res.total
   }
 })
-setInterval(() => {
+const timer = setInterval(() => {
   GetMessage().then((res) => {
-    if (res.total !== undefined) {
+    console.log(res, 'cleared')
+    if (res) {
       total.value = res.total
+    } else {
+      clearInterval(timer)
     }
   })
 }, 2000)

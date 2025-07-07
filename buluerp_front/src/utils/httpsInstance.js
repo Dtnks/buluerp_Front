@@ -27,15 +27,10 @@ httpInstance.interceptors.request.use(
 // 响应拦截器：统一处理错误、鉴权失败等
 httpInstance.interceptors.response.use(
   (res) => {
-    if (res.data.code === 200 || res.status === 200) {
+    if (res.data.code === 200) {
       return res.data
-    } else {
-      ElMessage.error(res.data.message || '请求失败')
-      return Promise.reject(res.data)
-    }
-  },
-  (err) => {
-    if (err.response?.status === 401) {
+    } else if (res.data.code == 401) {
+      let warningText = '登录信息已过效,请重新登录'
       ElMessageBox.confirm(warningText, '操作确认提示', {
         confirmButtonText: '继续',
         cancelButtonText: '取消',
@@ -45,8 +40,12 @@ httpInstance.interceptors.response.use(
         localStorage.removeItem('Authorization')
       })
     } else {
-      ElMessage.error(err.response?.data?.message || '服务异常')
+      ElMessage.error(res.data.message || '请求失败')
+      return Promise.reject(res.data)
     }
+  },
+  (err) => {
+    ElMessage.error(err.response?.data?.message || '服务异常')
     return Promise.reject(err)
   },
 )

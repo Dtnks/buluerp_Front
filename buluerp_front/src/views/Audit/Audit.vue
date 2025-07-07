@@ -2,7 +2,7 @@
   <div class="col">
     <BordShow content="审核" path="用户中心/审核" />
     <div class="greyBack">
-      <el-card style="margin: 0 20px;">
+      <el-card style="margin: 0 20px">
         <template #header>
           <div class="card-header">
             <span style="font-weight: bold;">审核列表</span>
@@ -12,22 +12,34 @@
             </el-select>
           </div>
         </template>
-        <el-table :data="tableData" border style="width: 100%; margin-top: 10px;">
+        <el-table :data="tableData" border style="width: 100%; margin-top: 10px">
           <!-- <el-table-column type="selection" width="55" /> -->
           <el-table-column v-for="column in columns[type as keyof typeof columns]" :key="column.value"
             :prop="column.value" :label="column.label">
             <template #default="scope">
               <template v-if="column.value === 'auditType'">
-                {{ auditTypeMap[scope.row.auditType as keyof typeof auditTypeMap] || scope.row.auditType }}
+                {{
+                  auditTypeMap[scope.row.auditType as keyof typeof auditTypeMap] ||
+                  scope.row.auditType
+                }}
               </template>
               <template v-else-if="column.value === 'confirm'">
-                {{ auditConfirmMap[scope.row.confirm as keyof typeof auditConfirmMap] || scope.row.confirm }}
+                {{
+                  auditConfirmMap[scope.row.confirm as keyof typeof auditConfirmMap] ||
+                  scope.row.confirm
+                }}
               </template>
               <template v-else-if="column.value === 'preStatus' && type !== 'order'">
-                {{ auditStatusMap[scope.row.preStatus as keyof typeof auditStatusMap] || scope.row.preStatus }}
+                {{
+                  auditStatusMap[scope.row.preStatus as keyof typeof auditStatusMap] ||
+                  scope.row.preStatus
+                }}
               </template>
               <template v-else-if="column.value === 'toStatus' && type !== 'order'">
-                {{ auditStatusMap[scope.row.toStatus as keyof typeof auditStatusMap] || scope.row.toStatus }}
+                {{
+                  auditStatusMap[scope.row.toStatus as keyof typeof auditStatusMap] ||
+                  scope.row.toStatus
+                }}
               </template>
               <template v-else-if="column.value === 'preStatus' && type === 'order'">
                 {{ getStatusText(scope.row.preStatus) || scope.row.preStatus }}
@@ -82,22 +94,42 @@
           :src="getFullImageUrl(detailData[item.value])"></el-image>
         <span class="form-value" v-else>暂无数据</span>
       </el-form-item>
-
     </el-form>
   </el-dialog>
-
 </template>
-
 
 <script setup lang="ts">
 import BordShow from '@/components/board/SecBoard.vue'
-import FormSearch from '@/components/form/Form.vue'
-import TableList from '@/components/table/TableList.vue'
+
 import { TypeOptions, columns, getTypeOptions, formData } from './data/auditData'
-import { computed, onMounted, ref } from 'vue'
-import { ElOption, ElSelect, ElPagination, ElTable, ElTableColumn, ElButton, ElPopover, ElInput, ElDialog, ElForm, ElFormItem, ElCard, ElImage } from 'element-plus'
-import { getAuditList, getAuditOrderPending, getAuditProductionPending, getAuditPurchasePending, getAuditSubcontractPending, postAuditOder, postAuditProduction, postAuditPurchase, postAuditSubcontract } from '@/apis/audit'
-import { Status, getStatusText } from '../business/utils/statusMap'
+import { onMounted, ref } from 'vue'
+import {
+  ElOption,
+  ElSelect,
+  ElPagination,
+  ElTable,
+  ElTableColumn,
+  ElButton,
+  ElPopover,
+  ElInput,
+  ElDialog,
+  ElForm,
+  ElFormItem,
+  ElCard,
+  ElImage,
+} from 'element-plus'
+import {
+  getAuditList,
+  getAuditOrderPending,
+  getAuditProductionPending,
+  getAuditPurchasePending,
+  getAuditSubcontractPending,
+  postAuditOder,
+  postAuditProduction,
+  postAuditPurchase,
+  postAuditSubcontract,
+} from '@/apis/audit'
+import { getStatusText } from '../business/utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
 import { getOrderDetailById } from '@/apis/orders'
 import { getPurchasePlanDetail } from '@/apis/produceControl/purchase/purchasePlan'
@@ -125,14 +157,14 @@ const auditTypeApiMap = {
   order: getAuditOrderPending,
   production: getAuditProductionPending,
   purchase: getAuditPurchasePending,
-  subcontract: getAuditSubcontractPending
+  subcontract: getAuditSubcontractPending,
 }
 
 const auditPostApiMap = {
   order: postAuditOder,
   production: postAuditProduction,
   purchase: postAuditPurchase,
-  subcontract: postAuditSubcontract
+  subcontract: postAuditSubcontract,
 }
 
 const viewApiMap = {
@@ -171,14 +203,13 @@ const fetchAuditData = async (resetPage: boolean) => {
     if (resetPage) {
       page.value = 1
     }
-    const res = await api(page.value, pageSize.value,)
+    const res = await api(page.value, pageSize.value)
     tableData.value = res.rows
     total.value = res.total
     console.log('获取审核数据', res);
 
   }
 }
-
 
 const handlePageChange = (newPage: number) => {
   page.value = newPage
@@ -220,7 +251,6 @@ const onCancel = () => {
 }
 
 const detailData = ref<Record<string, any>>({})
-
 
 const dialogVisible = ref(false)
 const onView = async (auditType: number, auditId: number) => {
