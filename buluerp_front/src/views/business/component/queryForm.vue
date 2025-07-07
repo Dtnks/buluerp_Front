@@ -62,7 +62,7 @@ const dialogFormVisible = ref(false)
 const emit = defineEmits(['onSubmit', 'onAdd', 'checkCustomerName', 'customerSuggestions'])
 defineProps(['control'])
 const dialogForm = reactive({
-  status: Status.PendingDesign, // 确保 status 有默认值
+  status: Status.Initial, // 确保 status 有默认值
   createTime: '',
   operator: '',
   otherInfo: '',
@@ -191,7 +191,10 @@ const onAddConfirm = () => {
   emit('onAdd', { ...dialogForm })
   console.log('新增订单数据：', { ...dialogForm })
   dialogFormVisible.value = false
-
+  dialogForm.customerName = ''
+  dialogForm.innerId = ''
+  dialogForm.outerId = ''
+  dialogForm.remark = ''
 }
 
 const importDialogVisible = ref(false)

@@ -1,11 +1,11 @@
 export enum Status {
-  Initial = 0,
+  Initial = 0, // 创建(未审核)
   ApprovedFalse = -1, // 审核未通过
   PendingDesign = 1, // 待设计
-  Designing = 2,
-  Completed = 3,
-  Canceled = 4,
-  Producing = 5,
+  Designing = 2, // 设计中
+  Completed = 3, // 已完成
+  Canceled = 4, // 作废
+  Producing = 5, // 布产中
 }
 
 /**
@@ -29,7 +29,6 @@ export const getStatusText = (status: Status): string => {
       return '作废'
     case Status.Producing:
       return '布产中'
-
     default:
       return '未知状态'
   }

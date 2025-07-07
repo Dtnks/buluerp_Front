@@ -43,9 +43,13 @@
 
           <el-table-column v-if="type != 'all'" label="操作" width="130">
             <template #default="scope">
-              <el-popover @hide="onCancel">
+              <el-popover @hide="onCancel" width="200px">
                 <div class="popover-content">
-                  <el-input v-model="commitData.auditComment" placeholder="请输入审核意见"></el-input>
+                  <el-select v-model="commitData.accept" placeholder="是否通过审核" :teleported="false"
+                    class="popover-content">
+                    <el-option v-for="(label, value) in auditAcceptMap" :key="value" :label="label" :value="value" />
+                  </el-select>
+                  <el-input v-model="commitData.auditComment" placeholder="请输入审核意见" class="popover-content"></el-input>
                   <el-button size="small" type="primary" @click="onAudit(scope.row.id, commitData)"
                     class="popover-button">确认</el-button>
                   <el-button size="small" @click="onCancel" class="popover-button">重置</el-button>
@@ -101,6 +105,8 @@ import { getPackagingDetail } from '@/apis/produceControl/produce/packaging'
 import { getProductionScheduleById } from '@/apis/produceControl/produce/schedule'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 const props = defineProps(['control'])
+const popoverRef = ref()
+const popoverVisible = ref(false)
 const type = ref('all')
 const isLoadingCompleted = ref(false)
 onMounted(async () => {
@@ -154,6 +160,11 @@ const auditStatusMap = {
 }
 
 
+const auditAcceptMap = {
+  '-1': '拒绝',
+  1: '接受'
+}
+
 const fetchAuditData = async (resetPage: boolean) => {
   const api = auditTypeApiMap[type.value as keyof typeof auditTypeApiMap]
   if (api) {
@@ -163,6 +174,8 @@ const fetchAuditData = async (resetPage: boolean) => {
     const res = await api(page.value, pageSize.value,)
     tableData.value = res.rows
     total.value = res.total
+    console.log('获取审核数据', res);
+
   }
 }
 
@@ -179,7 +192,7 @@ const handleSizeChange = (newSize: number) => {
 }
 
 const commitData = ref({
-  accept: 0,
+  accept: null as number | null,
   auditComment: '',
 })
 
@@ -188,7 +201,6 @@ const onAudit = async (id: number, commitData: any) => {
   if (api) {
     commitData = {
       ...commitData,
-      accept: 1, // 默认接受审核
     }
     const res = await api(id, commitData)
     if (res.code === 200) {
@@ -199,10 +211,12 @@ const onAudit = async (id: number, commitData: any) => {
       messageBox('error', null, null, res.msg || '审核失败，请稍后再试')
     }
   }
+  // popoverRef.value?.hide() // 关闭弹出框
 }
 
 const onCancel = () => {
   commitData.value.auditComment = ''
+  commitData.value.accept = null
 }
 
 const detailData = ref<Record<string, any>>({})
@@ -233,6 +247,12 @@ const onView = async (auditType: number, auditId: number) => {
 
 .popover-button {
   margin: 6px 1px 0 0;
+}
+
+
+.popover-content {
+  margin-top: 4px;
+  margin-bottom: 4px;
 }
 
 .audit-dialog {

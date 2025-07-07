@@ -63,10 +63,10 @@ export const columns = {
     { value: 'auditType', label: '审核类型' },
     { value: 'auditor', label: '审核人' },
     { value: 'checkTime', label: '检查时间' },
-    { value: 'confirm', label: '是否确认' },
+    { value: 'confirm', label: '是否确认审核' },
     { value: 'createTime', label: '创建时间' },
     { value: 'preStatus', label: '之前状态' },
-    { value: 'toStatus', label: '当前状态' },
+    { value: 'toStatus', label: '目标状态' },
     { value: 'auditComment', label: '审核意见' },
   ],
   order: [

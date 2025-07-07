@@ -81,6 +81,7 @@ import BusinessDetail from '@/views/business/main/Detail.vue'
 import { exportToExcel } from '@/utils/file/exportExcel'
 import { getStatusText } from '../utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
+import useTabStore from '@/stores/modules/tabs'
 
 // 加载数据
 onMounted(() => {
@@ -110,7 +111,6 @@ const columns = [
     label: '订单状态',
     slot: 'statusSlot', // 自定义渲染的插槽名称
   },
-
   { prop: 'innerId', label: '内部编号' },
   { prop: 'outerId', label: '外部编号' },
   { prop: 'operator', label: '创建人' },
@@ -213,10 +213,11 @@ const onDelete = async () => {
     const ids = selectedRows.value.map((item) => item.id)
     try {
       await deleteOrders(ids)
+      useTabStore().freshTab('订单列表')
       messageBox('success', null, '已成功删除选中的产品')
       // 重新获取表格数据
       emit('fetchData')
-      selectedRows.value = []
+      selectedRows.value = [] // 清空选中行
     } catch (error) {
       console.error('删除失败:', error)
       messageBox('error', null, null, '删除失败,请稍后重试')
