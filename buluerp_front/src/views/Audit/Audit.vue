@@ -29,23 +29,23 @@
                   scope.row.confirm
                 }}
               </template>
-              <template v-else-if="column.value === 'preStatus' && type !== 'order'">
+              <template v-else-if="column.value === 'preStatus' && scope.row.auditType !== 1">
                 {{
                   auditStatusMap[scope.row.preStatus as keyof typeof auditStatusMap] ||
                   scope.row.preStatus
                 }}
               </template>
-              <template v-else-if="column.value === 'toStatus' && type !== 'order'">
+              <template v-else-if="column.value === 'toStatus' && scope.row.auditType !== 1">
                 {{
                   auditStatusMap[scope.row.toStatus as keyof typeof auditStatusMap] ||
                   scope.row.toStatus
                 }}
               </template>
-              <template v-else-if="column.value === 'preStatus' && type === 'order'">
-                {{ getStatusText(scope.row.preStatus) || scope.row.preStatus }}
+              <template v-else-if="column.value === 'preStatus' && scope.row.auditType === 1">
+                {{ newStatusMap[scope.row.preStatus] }}
               </template>
-              <template v-else-if="column.value === 'toStatus' && type === 'order'">
-                {{ getStatusText(scope.row.toStatus) || scope.row.toStatus }}
+              <template v-else-if="column.value === 'toStatus' && scope.row.auditType === 1">
+                {{ newStatusMap[scope.row.toStatus] }}
               </template>
               <template v-else>
                 {{ scope.row[column.value] }}
@@ -103,33 +103,9 @@ import BordShow from '@/components/board/SecBoard.vue'
 
 import { TypeOptions, columns, getTypeOptions, formData } from './data/auditData'
 import { onMounted, ref } from 'vue'
-import {
-  ElOption,
-  ElSelect,
-  ElPagination,
-  ElTable,
-  ElTableColumn,
-  ElButton,
-  ElPopover,
-  ElInput,
-  ElDialog,
-  ElForm,
-  ElFormItem,
-  ElCard,
-  ElImage,
-} from 'element-plus'
-import {
-  getAuditList,
-  getAuditOrderPending,
-  getAuditProductionPending,
-  getAuditPurchasePending,
-  getAuditSubcontractPending,
-  postAuditOder,
-  postAuditProduction,
-  postAuditPurchase,
-  postAuditSubcontract,
-} from '@/apis/audit'
-import { getStatusText } from '../business/utils/statusMap'
+import { ElOption, ElSelect, ElPagination, ElTable, ElTableColumn, ElButton, ElPopover, ElInput, ElDialog, ElForm, ElFormItem, ElCard, ElImage, } from 'element-plus'
+import { getAuditList, getAuditOrderPending, getAuditProductionPending, getAuditPurchasePending, getAuditSubcontractPending, postAuditOder, postAuditProduction, postAuditPurchase, postAuditSubcontract, } from '@/apis/audit'
+import { getStatusText, newStatusMap } from '../business/utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
 import { getOrderDetailById } from '@/apis/orders'
 import { getPurchasePlanDetail } from '@/apis/produceControl/purchase/purchasePlan'
@@ -146,6 +122,8 @@ onMounted(async () => {
   TypeOptions.value = await getTypeOptions()
   isLoadingCompleted.value = true
   fetchAuditData(true)
+  console.log(newStatusMap.value, 'newStatusMap111111111');
+
 })
 const tableData = ref([])
 

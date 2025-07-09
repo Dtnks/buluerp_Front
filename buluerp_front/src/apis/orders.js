@@ -92,3 +92,11 @@ export const getOrderProducts = (id) => {
     headers: headers,
   })
 }
+
+// 状态映射
+export const getOrderStatusMap = () => {
+  return httpInstance({
+    url: `system/orders/status/map`,
+    method: 'get',
+  })
+}
