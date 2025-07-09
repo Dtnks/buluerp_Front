@@ -59,7 +59,6 @@ const tableData = ref([
   },
   { value: 'createTime', label: '创建时间', type: 'text' },
 ])
-console.log(props.control)
 const operation = ref([
   // {
   //   func: (id) => {
@@ -97,37 +96,41 @@ const rules = ref<FormRules>({
 // 表单引用
 const formRef = ref<FormInstance>()
 const handleSubmit = () => {
-  if (title.value == '编辑') {
-    changeManufacturers(newSubmit.value).then((res) => {
-      if (res.code == 200) {
-        page.value = 1
-        listManufacturers(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
+  formRef.value.validate((valid) => {
+    if (valid) {
+      if (title.value == '编辑') {
+        changeManufacturers(newSubmit.value).then((res) => {
+          if (res.code == 200) {
+            page.value = 1
+            listManufacturers(page.value, pageSize.value).then((res) => {
+              listData.value = res.rows
+              total.value = res.total
+            })
+            ElMessage.success(res.msg)
+            editDialogVisible.value = false
+          } else {
+            ElMessage.error(res.msg)
+            return
+          }
         })
-        ElMessage.success(res.msg)
-        editDialogVisible.value = false
       } else {
-        ElMessage.error(res.msg)
-        return
-      }
-    })
-  } else {
-    newManufacturers(newSubmit.value).then((res) => {
-      if (res.msg == '操作成功') {
-        page.value = 1
-        listManufacturers(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
+        newManufacturers(newSubmit.value).then((res) => {
+          if (res.msg == '操作成功') {
+            page.value = 1
+            listManufacturers(page.value, pageSize.value).then((res) => {
+              listData.value = res.rows
+              total.value = res.total
+            })
+            ElMessage.success(res.msg)
+            editDialogVisible.value = false
+          } else {
+            ElMessage.error(res.msg)
+            return
+          }
         })
-        ElMessage.success(res.msg)
-        editDialogVisible.value = false
-      } else {
-        ElMessage.error(res.msg)
-        return
       }
-    })
-  }
+    }
+  })
 }
 const title = ref('编辑')
 //传给form组件的参数

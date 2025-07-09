@@ -89,15 +89,6 @@
               >删除</el-button
             >
           </el-col>
-          <el-col :span="1.5">
-            <el-button
-              type="warning"
-              plain
-              @click="handleExport"
-              v-hasPermi="['system:role:export']"
-              >导出</el-button
-            >
-          </el-col>
           <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
         </el-row>
 
@@ -142,7 +133,7 @@
                   type="primary"
                   icon="Edit"
                   @click="handleUpdate(scope.row)"
-                   :disabled="control[1].disabled"
+                  :disabled="control[1].disabled"
                   v-hasPermi="['system:role:edit']"
                   >修改</el-button
                 >
@@ -242,7 +233,6 @@ import {
   getRole,
   listRole,
   updateRole,
-  deptTreeSelect,
 } from '@/apis/system/role'
 import { roleMenuTreeselect, treeselect as menuTreeselect } from '@/apis/system/menu'
 import { ref, reactive, getCurrentInstance, toRefs, nextTick } from 'vue'
@@ -322,16 +312,7 @@ function handleDelete(row) {
     })
     .catch(() => {})
 }
-/** 导出按钮操作 */
-function handleExport() {
-  proxy.download(
-    'system/role/export',
-    {
-      ...queryParams.value,
-    },
-    `role_${new Date().getTime()}.xlsx`,
-  )
-}
+
 /** 多选框选中数据 */
 function handleSelectionChange(selection) {
   ids.value = selection.map((item) => item.roleId)
@@ -492,5 +473,4 @@ function cancel() {
 
 getList()
 </script>
-<style scoped>
-</style>
+<style scoped></style>

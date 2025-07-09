@@ -403,19 +403,13 @@ const handleSubmit = () => {
       newSubmit.value.shipmentTime = parseTime(newSubmit.value.shipmentTime, '{y}-{m}-{d}')
       if (title.value == '编辑') {
         changeSchedule(newSubmit.value).then((res) => {
-          console.log(res)
-          if (res.code == 200) {
-            page.value = 1
-            listSchedule(page.value, pageSize.value).then((res) => {
-              listData.value = res.rows
-              total.value = res.total
-            })
-            ElMessage.success(res.msg)
-            editDialogVisible.value = false
-          } else {
-            ElMessage.error(res.msg)
-            return
-          }
+          page.value = 1
+          listSchedule(page.value, pageSize.value).then((res) => {
+            listData.value = res.rows
+            total.value = res.total
+          })
+          ElMessage.success(res.msg)
+          editDialogVisible.value = false
         })
       } else {
         newSchedule(newSubmit.value).then((res) => {
@@ -596,17 +590,13 @@ const handleSubmitTrans = () => {
   transSubmit.value.scheduledTime = parseTime(transSubmit.value.scheduledTime, '{y}-{m}-{d}')
   createTransFormRef.value.validateForm((valid) => {
     if (valid) {
-      selectTransToArrange({ ...transSubmit.value, sheduleIds: ids.value }).then((res) => {
-        if (res.code == 200) {
-          ElMessage.success(res.msg)
-          transDialogVisible.value = false
-          listSchedule(page.value, pageSize.value).then((res) => {
-            listData.value = res.rows
-            total.value = res.total
-          })
-        } else {
-          ElMessage.error(res.msg)
-        }
+      selectTransToArrange({ ...transSubmit.value, scheduleIds: ids.value }).then((res) => {
+        ElMessage.success(res.msg)
+        transDialogVisible.value = false
+        listSchedule(page.value, pageSize.value).then((res) => {
+          listData.value = res.rows
+          total.value = res.total
+        })
       })
     }
   })
@@ -717,7 +707,7 @@ listSchedule(page.value, pageSize.value).then((res) => {
         </div>
       </template>
     </el-dialog>
-    <el-dialog v-model="transDialogVisible" :title="title" width="800px"
+    <el-dialog v-model="transDialogVisible" title="导入排产" width="800px"
       ><CreateForm :data="transFormData" :Formvalue="transSubmit" ref="createTransFormRef" />
       <template #footer>
         <div class="dialog-footer">

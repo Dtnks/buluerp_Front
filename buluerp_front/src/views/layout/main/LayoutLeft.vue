@@ -6,6 +6,7 @@ const props = defineProps({
 import useMenuState from '@/stores/modules/menu.js'
 import { ref, onMounted } from 'vue'
 import { Grid, Memo, CircleCheck, User, Menu } from '@element-plus/icons-vue'
+import LoadingComponent from '@/components/Loading.vue'
 const menuStore = useMenuState()
 const menuOptions = ref([])
 onMounted(async () => {
@@ -44,7 +45,12 @@ const LazyComponentsGroup = new Proxy(
     get(target, prop) {
       if (!target[prop] && ComponentsGroup[prop]) {
         // 首次访问时解析动态导入
-        target[prop] = defineAsyncComponent(ComponentsGroup[prop])
+        target[prop] = defineAsyncComponent({
+          // 加载函数
+          loader: ComponentsGroup[prop],
+          // 加载异步组件时使用的组件
+          loadingComponent: LoadingComponent,
+        })
       }
       return target[prop]
     },
