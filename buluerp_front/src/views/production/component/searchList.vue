@@ -72,10 +72,11 @@
 
 <script lang="ts" setup>
 import { ref, watch, onMounted , reactive ,nextTick} from 'vue'
-import { getList_pro, deleteProduct } from '@/apis/products.js'
+import { getList_pro, deleteProduct , exportProduct} from '@/apis/products.js'
 import { exportToExcel } from '@/utils/file/exportExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { getFullImageUrl } from '@/utils/image/getUrl'
+import { downloadBinaryFile } from '@/utils/file/base64'
 import useTabStore from '@/stores/modules/tabs'
 
 import Detail from '../main/Detail.vue'
@@ -197,7 +198,7 @@ const onDelete = async () => {
   )
 }
 
-const onExport = () => {
+const onExport = async () => {
   if (selectedRows.value.length === 0) {
     messageBox(
       'error',
@@ -209,22 +210,20 @@ const onExport = () => {
     return
   }
 
+  const ids = selectedRows.value.map(item => item.id).join(',')
+
   const today = new Date()
   const dateStr = today.toISOString().split('T')[0].replace(/-/g, '')
+  const filename = `产品数据_${dateStr}.xlsx`
 
-  const exportData = selectedRows.value.map(item => ({
-    产品ID: item.id,
-    产品名称: item.name,
-    创建时间: item.createTime,
-    更新时间: item.updateTime,
-    创建人: item.createUsername || '未知',
-    设计确认状态: item.designStatus === 1 ? '已完成' : '设计中',
-    图片URL: item.pictureUrl ? getFullImageUrl(item.pictureUrl) : '暂无',
-  }))
-
-  exportToExcel(exportData, `产品数据_${dateStr}`)
+  try {
+    const res = await exportProduct(ids)
+    const blob = new Blob([res], { type: 'application/vnd.ms-excel' })
+    downloadBinaryFile(blob, filename)
+  } catch (err) {
+    messageBox('error', null, '', '导出失败', '')
+  }
 }
-
 
 const onView = (row: any) => {
   props.addTab(`产品详情页-${row.name}`, Detail, row, props.control)

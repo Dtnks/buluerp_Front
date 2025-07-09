@@ -76,3 +76,12 @@ export function getProductTemplate() {
     responseType: 'blob'
   })
 }
+
+export function exportProduct(ids) {
+  return httpInstance({
+    url: `system/products/export/${ids}`,
+    method: 'post',
+    responseType: 'blob'
+  })
+}
+
