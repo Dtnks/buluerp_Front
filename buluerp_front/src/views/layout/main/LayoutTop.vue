@@ -21,7 +21,6 @@ GetMessage().then((res) => {
 })
 const timer = setInterval(() => {
   GetMessage().then((res) => {
-    // console.log(res, 'cleared')
     if (res) {
       total.value = res.total
     } else {
@@ -61,24 +60,34 @@ const timer = setInterval(() => {
         <div class="notification-icon-wrapper" :class="{ 'has-notification': total > 0 }"
           :data-count="total.toString()">
           <svg class="icon notification-icon" style="
+      <div
+        class=" center" style="flex: 1" @click="
+          props.addTab(
+            '我的信息',
+            defineAsyncComponent(() => import('@/views/person/main/Information.vue')),
+          )
+          ">
+            <div class="notification-icon-wrapper" :class="{ 'has-notification': total > 0 }"
+              :data-count="total.toString()">
+              <svg class="icon notification-icon" style="
               width: 25px;
               height: 25px;
               vertical-align: middle;
               fill: currentColor;
               overflow: hidden;
             " viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="11341">
-            <path
-              d="M512 235.52c118.57408 0 215.04 96.46592 215.04 215.04v263.86432l19.38944 20.67968 40.43776 43.136H237.1328l40.43776-43.136L296.96 714.42432V450.56c0-118.57408 96.46592-215.04 215.04-215.04m0-71.68c-158.35136 0-286.72 128.36864-286.72 286.72v235.52l-56.60672 60.38016C131.88608 785.69984 159.70816 849.92 213.49888 849.92h597.00736c53.7856 0 81.60768-64.22016 44.82048-103.45984L798.72 686.08V450.56c0-158.35136-128.36864-286.72-286.72-286.72zM583.68 890.88H440.32a35.84 35.84 0 1 0 0 71.68h143.36a35.84 35.84 0 1 0 0-71.68zM537.6 61.44H486.4a35.84 35.84 0 1 0 0 71.68h51.2a35.84 35.84 0 1 0 0-71.68z"
-              :fill="total > 0 ? 'red' : 'grey'" p-id="11342"></path>
-          </svg>
+                <path
+                  d="M512 235.52c118.57408 0 215.04 96.46592 215.04 215.04v263.86432l19.38944 20.67968 40.43776 43.136H237.1328l40.43776-43.136L296.96 714.42432V450.56c0-118.57408 96.46592-215.04 215.04-215.04m0-71.68c-158.35136 0-286.72 128.36864-286.72 286.72v235.52l-56.60672 60.38016C131.88608 785.69984 159.70816 849.92 213.49888 849.92h597.00736c53.7856 0 81.60768-64.22016 44.82048-103.45984L798.72 686.08V450.56c0-158.35136-128.36864-286.72-286.72-286.72zM583.68 890.88H440.32a35.84 35.84 0 1 0 0 71.68h143.36a35.84 35.84 0 1 0 0-71.68zM537.6 61.44H486.4a35.84 35.84 0 1 0 0 71.68h51.2a35.84 35.84 0 1 0 0-71.68z"
+                  :fill="total > 0 ? 'red' : 'grey'" p-id="11342"></path>
+              </svg>
+            </div>
+        </div>
+        <div class="center row" style="flex: 3; align-items: center">
+          <img id="head" :src="getFullImageUrl(message.avatar)" v-if="message.avatar" /><el-text style="flex: 1">{{
+            message.nickName }}</el-text>
         </div>
       </div>
-      <div class="center row" style="flex: 3; align-items: center">
-        <img id="head" :src="getFullImageUrl(message.avatar)" v-if="message.avatar" /><el-text style="flex: 1">{{
-          message.nickName }}</el-text>
-      </div>
     </div>
-  </div>
 </template>
 <style scoped>
 #menu {
@@ -140,5 +149,10 @@ const timer = setInterval(() => {
   padding: 0 3px;
   display: block;
   z-index: 1000;
+}
+
+.center {
+  display: flex;
+  align-items: center;
 }
 </style>
