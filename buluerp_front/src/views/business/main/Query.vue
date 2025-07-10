@@ -97,6 +97,9 @@ const handleUpdate = async (updatedData: TableDataType) => {
     messageBox('success', null, '订单已成功更新')
     fetchTableData()
     tabStore.freshTab('审核')
+    console.log('更新成功(handelUpdate):', res);
+  } else {
+    messageBox('error', null, null, res.msg)
   }
 }
 

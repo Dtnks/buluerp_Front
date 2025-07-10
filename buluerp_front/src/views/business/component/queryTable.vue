@@ -59,8 +59,8 @@
             @blur="checkCustomerName" />
         </el-form-item>
         <el-form-item label="订单状态">
-          <el-select v-model="editForm.statusText">
-            <el-option v-for="(label, value) in newStatusMap" :key="value" :label="label" :value="value" />
+          <el-select v-model="editForm.status" filterable>
+            <el-option v-for="(label, value) in newStatusMap" :key="value" :label="label" :value="Number(value)" />
           </el-select>
         </el-form-item>
         <el-form-item label="其他信息">
@@ -77,7 +77,7 @@
 
 <script setup lang="ts">
 import { reactive, onMounted, ref } from 'vue'
-import { ElButton, ElTable, ElTableColumn, ElPagination, ElDialog, ElForm, ElFormItem, ElInput, ElMessageBox, ElAutocomplete } from 'element-plus'
+import { ElButton, ElTable, ElTableColumn, ElPagination, ElDialog, ElForm, ElFormItem, ElInput, ElMessageBox, ElAutocomplete, ElSelect, ElOption } from 'element-plus'
 import { deleteOrders } from '@/apis/orders'
 import type { TableDataType } from '@/types/orderResponse'
 import BusinessDetail from '@/views/business/main/Detail.vue'
@@ -153,7 +153,7 @@ const editForm = reactive({
   innerId: '',
   outerId: '',
   customerName: '',
-  statusText: '',
+  status: 0,
   remark: '',
   createTime: '',
   // id: 0,
@@ -165,7 +165,8 @@ const onEdit = (row: TableDataType) => {
   editForm.innerId = row.innerId ? row.innerId : ''
   editForm.outerId = row.outerId ? row.outerId : ''
   editForm.customerName = row.customerName ? row.customerName : ''
-  editForm.statusText = getStatusText(row.status)
+  // editForm.status = row.status ? row.status : 0
+  editForm.status = row.status ?? 0
   editForm.remark = row.remark ? row.remark : ''
   editForm.createTime = row.createTime ? row.createTime : ''
   editForm.id = row.id ? row.id : 0

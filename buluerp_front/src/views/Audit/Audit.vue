@@ -18,28 +18,16 @@
             :prop="column.value" :label="column.label">
             <template #default="scope">
               <template v-if="column.value === 'auditType'">
-                {{
-                  auditTypeMap[scope.row.auditType as keyof typeof auditTypeMap] ||
-                  scope.row.auditType
-                }}
+                {{ auditTypeMap[scope.row.auditType as keyof typeof auditTypeMap] || scope.row.auditType }}
               </template>
               <template v-else-if="column.value === 'confirm'">
-                {{
-                  auditConfirmMap[scope.row.confirm as keyof typeof auditConfirmMap] ||
-                  scope.row.confirm
-                }}
+                {{ auditConfirmMap[scope.row.confirm as keyof typeof auditConfirmMap] || scope.row.confirm }}
               </template>
               <template v-else-if="column.value === 'preStatus' && scope.row.auditType !== 1">
-                {{
-                  auditStatusMap[scope.row.preStatus as keyof typeof auditStatusMap] ||
-                  scope.row.preStatus
-                }}
+                {{ auditStatusMap[scope.row.preStatus as keyof typeof auditStatusMap] || scope.row.preStatus }}
               </template>
               <template v-else-if="column.value === 'toStatus' && scope.row.auditType !== 1">
-                {{
-                  auditStatusMap[scope.row.toStatus as keyof typeof auditStatusMap] ||
-                  scope.row.toStatus
-                }}
+                {{ auditStatusMap[scope.row.toStatus as keyof typeof auditStatusMap] || scope.row.toStatus }}
               </template>
               <template v-else-if="column.value === 'preStatus' && scope.row.auditType === 1">
                 {{ newStatusMap[scope.row.preStatus] }}
@@ -102,28 +90,55 @@
 import BordShow from '@/components/board/SecBoard.vue'
 
 import { TypeOptions, columns, getTypeOptions, formData } from './data/auditData'
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { ElOption, ElSelect, ElPagination, ElTable, ElTableColumn, ElButton, ElPopover, ElInput, ElDialog, ElForm, ElFormItem, ElCard, ElImage, } from 'element-plus'
 import { getAuditList, getAuditOrderPending, getAuditProductionPending, getAuditPurchasePending, getAuditSubcontractPending, postAuditOder, postAuditProduction, postAuditPurchase, postAuditSubcontract, } from '@/apis/audit'
-import { getStatusText, newStatusMap } from '../business/utils/statusMap'
+import { fetchOrderStatusMap, newStatusMap } from '../business/utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
 import { getOrderDetailById } from '@/apis/orders'
 import { getPurchasePlanDetail } from '@/apis/produceControl/purchase/purchasePlan'
 import { getPackagingDetail } from '@/apis/produceControl/produce/packaging'
 import { getProductionScheduleById } from '@/apis/produceControl/produce/schedule'
 import { getFullImageUrl } from '@/utils/image/getUrl'
+
 const props = defineProps(['control'])
 const popoverRef = ref()
 const popoverVisible = ref(false)
 const type = ref('all')
 const isLoadingCompleted = ref(false)
+let ws: WebSocket | null = null
+
 onMounted(async () => {
   // 初始化时获取审核类型
   TypeOptions.value = await getTypeOptions()
+  await fetchOrderStatusMap()
   isLoadingCompleted.value = true
   fetchAuditData(true)
   console.log(newStatusMap.value, 'newStatusMap111111111');
 
+  const token = localStorage.getItem('Authorization') // 或从cookie等获取
+  ws = new WebSocket(`ws://localhost:8080/websocket/${token}`)
+
+  ws.onopen = () => {
+    console.log('WebSocket 连接已建立')
+  }
+  ws.onmessage = (event) => {
+    // 收到消息后刷新审核数据
+    fetchAuditData(true)
+  }
+  ws.onerror = (err) => {
+    console.error('WebSocket 错误', err)
+  }
+  ws.onclose = () => {
+    console.log('WebSocket 连接已关闭')
+  }
+})
+
+onUnmounted(() => {
+  if (ws) {
+    ws.close()
+    ws = null
+  }
 })
 const tableData = ref([])
 
