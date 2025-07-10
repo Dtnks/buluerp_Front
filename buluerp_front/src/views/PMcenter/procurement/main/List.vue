@@ -213,37 +213,26 @@ const handleSubmit = () => {
         delete newSubmit.value.invoice
         console.log(newSubmit.value)
         changePurchaseList(newSubmit.value).then((res) => {
-          console.log(res)
-          if (res.code == 200) {
-            page.value = 1
-            listPurchaseList(page.value, pageSize.value).then((res) => {
-              listData.value = res.rows
-              total.value = res.total
-            })
-            editDialogVisible.value = false
-            ElMessage.success(res.msg)
-          } else {
-            ElMessage.error(res.msg)
-            return
-          }
+          page.value = 1
+          listPurchaseList(page.value, pageSize.value).then((res) => {
+            listData.value = res.rows
+            total.value = res.total
+          })
+          editDialogVisible.value = false
+          ElMessage.success(res.msg)
         })
       } else {
         if (newSubmit.value.invoice && newSubmit.value.invoice.length === 0) {
           delete newSubmit.value.invoice
         }
         newPurchaseList(newSubmit.value).then((res) => {
-          if (res.msg == '操作成功') {
-            page.value = 1
-            listPurchaseList(page.value, pageSize.value).then((res) => {
-              listData.value = res.rows
-              total.value = res.total
-            })
-            ElMessage.success(res.msg)
-            editDialogVisible.value = false
-          } else {
-            ElMessage.error('操作失败')
-            return
-          }
+          page.value = 1
+          listPurchaseList(page.value, pageSize.value).then((res) => {
+            listData.value = res.rows
+            total.value = res.total
+          })
+          ElMessage.success(res.msg)
+          editDialogVisible.value = false
         })
       }
     }
@@ -278,57 +267,6 @@ const onSubmit = () => {
   })
 }
 
-// const onImport = () => {
-//   importDialogVisible.value = true
-// }
-
-// const handleUpload = async (option: any) => {
-//   const formData = new FormData()
-//   formData.append('file', option.file)
-
-//   importFile(formData).then((res) => {
-//     if (res.code == 200) {
-//       ElMessage.success(res.msg)
-//       listPurchaseList(page.value, pageSize.value).then((res) => {
-//         listData.value = res.rows
-//         total.value = res.total
-//       })
-//     } else {
-//       ElMessage.error(res.msg)
-//       const error_text = res.data
-//         .map((ele) => {
-//           return '第' + ele.rowNum + '行：' + ele.errorMsg
-//         })
-//         .join('<br>')
-//       ElMessageBox.alert(error_text, '数据格式出现问题', {
-//         confirmButtonText: '继续',
-//         type: 'error',
-//         dangerouslyUseHTMLString: true,
-//       })
-//     }
-//   })
-
-//   importDialogVisible.value = false
-// }
-//传给table组件
-// const exportFunc = (row) => {
-//   if (row.length === 0) {
-//     ElMessage.warning('请先选择要导出的产品')
-//     return
-//   }
-//   const formData = new URLSearchParams()
-//   const ids = row.map((ele) => {
-//     return ele.id
-//   })
-//   // const idsString = Array.isArray(ids) ? ids.join(',') : ids
-//   formData.append('ids', ids)
-//   exportSelectTable(formData).then((res) => {
-//     const now = new Date()
-//     downloadBinaryFile(res, '客户信息_' + now.toLocaleDateString() + '_' + count + '.xlsx')
-//     count += 1
-//   })
-// }
-
 const DeleteFunc = (row) => {
   if (row.length === 0) {
     ElMessage.warning('请先选择要删除的记录')
@@ -339,14 +277,10 @@ const DeleteFunc = (row) => {
   })
   const func = () => {
     return deletePurchaseList(ids).then((res) => {
-      if (res.code == 500) {
-        throw new Error('权限不足')
-      } else {
-        listPurchaseList(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
-        })
-      }
+      listPurchaseList(page.value, pageSize.value).then((res) => {
+        listData.value = res.rows
+        total.value = res.total
+      })
     })
   }
 
@@ -384,40 +318,18 @@ const handleChangeInvoice = async () => {
   } else if (promiseList.length === 1) {
     promiseList[0].then((res) => {
       console.log(res, 1)
-      if (res.code == 200) {
-        ElMessage.success(res.msg)
-        close()
-      } else {
-        ElMessage.error(res.msg)
-      }
+
+      ElMessage.success(res.msg)
+      close()
     })
   } else {
     await promiseList[0].then((res) => {
-      if (res.code == 200) {
-        promiseList[1].then((res) => {
-          console.log(res, 2)
-          if (res.code == 200) {
-            ElMessage.success(res.msg)
-            close()
-          } else {
-            ElMessage.error(res.msg)
-          }
-        })
-      }
+      promiseList[1].then((res) => {
+        ElMessage.success(res.msg)
+        close()
+      })
     })
   }
-  // deletePurchaseInvoice(FileSubmit.value.invoiceList).then((res) => {
-  //   if (res.code == 200) {
-  //     ElMessage.success(res.msg)
-  //     fileChangeVisible.value = false
-  //     listPurchaseList(page.value, pageSize.value).then((res) => {
-  //       listData.value = res.rows
-  //       total.value = res.total
-  //     })
-  //   } else {
-  //     ElMessage.error(res.msg)
-  //   }
-  // })
 }
 
 //分页

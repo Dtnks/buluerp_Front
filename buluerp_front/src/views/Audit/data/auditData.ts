@@ -25,30 +25,26 @@ export async function getTypeOptions(): Promise<{ label: string; value: string }
   try {
     const response = await getAuditSwitchList()
     // const TypeOptions = [{ label: '全部审核记录', value: '' }]
-    if (response.code === 200) {
-      for (const item of response.rows) {
-        if (item.status === 1) {
-          const value = auditTypeValueMap[item.auditType] // 使用 auditTypeValueMap 获取英文单词
-          if (value && !TypeOptions.value.some((option) => option.value === value)) {
-            TypeOptions.value.push({
-              label: auditTypeLabelMap[value], // 使用 auditTypeLabelMap 获取中文标签
-              value: value,
-            })
-          }
-        }
-        if (item.status === 0) {
-          const value = auditTypeValueMap[item.auditType]
-          if (value && TypeOptions.value.some((option) => option.value === value)) {
-            TypeOptions.value = TypeOptions.value.filter((option) => option.value != value)
-          }
+
+    for (const item of response.rows) {
+      if (item.status === 1) {
+        const value = auditTypeValueMap[item.auditType] // 使用 auditTypeValueMap 获取英文单词
+        if (value && !TypeOptions.value.some((option) => option.value === value)) {
+          TypeOptions.value.push({
+            label: auditTypeLabelMap[value], // 使用 auditTypeLabelMap 获取中文标签
+            value: value,
+          })
         }
       }
-      console.log('获取审核类型成功:', TypeOptions.value)
-      return TypeOptions.value
-    } else {
-      console.error('获取审核类型失败:', response.message)
-      return TypeOptions.value
+      if (item.status === 0) {
+        const value = auditTypeValueMap[item.auditType]
+        if (value && TypeOptions.value.some((option) => option.value === value)) {
+          TypeOptions.value = TypeOptions.value.filter((option) => option.value != value)
+        }
+      }
     }
+    console.log('获取审核类型成功:', TypeOptions.value)
+    return TypeOptions.value
   } catch (error) {
     console.error('获取审核类型时发生错误:', error)
     return TypeOptions.value

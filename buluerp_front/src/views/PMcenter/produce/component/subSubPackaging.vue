@@ -21,11 +21,8 @@
             () => {
               const func = () => {
                 return Sub.deletePackaging(detail.id).then((res) => {
-                  if (res.code == 200) {
-                    refresh()
-                  } else {
-                    throw new Error('删除失败')
-                  }
+                  ElMessage.success('删除成功')
+                  refresh()
                 })
               }
 
@@ -238,18 +235,15 @@ const handleSubSubSubmit = () => {
   const submitValue = { ...newSubSubSubmit.value, packagingBagId: props.id }
   if (title.value === '新增') {
     Sub.newPackaging(submitValue).then((res) => {
-      if (res.code == 200) {
-        subSubDialogVisible.value = false
-        refresh()
-      }
+      ElMessage.success('新增成功')
+      subSubDialogVisible.value = false
+      refresh()
     })
   } else {
     Sub.changePackaging(submitValue).then((res) => {
-      console.log(res)
-      if (res.code == 200) {
-        subSubDialogVisible.value = false
-        refresh()
-      }
+      ElMessage.success('修改成功')
+      subSubDialogVisible.value = false
+      refresh()
     })
   }
 }

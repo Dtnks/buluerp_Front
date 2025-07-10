@@ -3,7 +3,6 @@ import { GetMessage } from '@/apis/layout'
 import { ref } from 'vue'
 const messages = ref()
 GetMessage().then((res) => {
-  console.log(res.rows)
   messages.value = res.rows
 })
 </script>

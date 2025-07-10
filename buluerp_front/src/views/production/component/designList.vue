@@ -1,7 +1,10 @@
 <template>
-  <el-card style=" margin: 0 20px;">
+  <el-card style="margin: 0 20px">
     <template #header>
-      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <div
+        class="card-header"
+        style="display: flex; justify-content: space-between; align-items: center"
+      >
         <span>展示</span>
         <div class="card-actions">
           <!-- <el-button type="danger" @click="onDelete">删除</el-button> -->
@@ -10,7 +13,14 @@
       </div>
     </template>
     <div>
-      <el-table :data="data" border style="width: 100%" ref="tableRef" :row-key="getRowKey" @selection-change="handleSelectionChange">
+      <el-table
+        :data="data"
+        border
+        style="width: 100%"
+        ref="tableRef"
+        :row-key="getRowKey"
+        @selection-change="handleSelectionChange"
+      >
         <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" />
         <el-table-column prop="productId" label="产品ID" />
@@ -25,16 +35,17 @@
             </template>
         </el-table-column> -->
         <el-table-column label="操作" fixed="right" width="75">
-            <template #default="{ row }">
+          <template #default="{ row }">
             <el-button size="small" type="primary" text @click="onEdit(row)">编辑</el-button>
             <!-- <el-button size="small" type="primary" text @click="onView(row)">查看</el-button> -->
-            </template>
+          </template>
         </el-table-column>
       </el-table>
 
-
       <!-- 分页器 -->
-      <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+      <div
+        style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center"
+      >
         <div>共 {{ total }} 条</div>
         <el-pagination
           background
@@ -50,27 +61,20 @@
     </div>
   </el-card>
   <DesignDialog
-  v-model="showDialog"
-  :isEdit="isEdit"
-  :currentData="currentRow"
-  @submit="handleSubmit"
-/>
-
+    v-model="showDialog"
+    :isEdit="isEdit"
+    :currentData="currentRow"
+    @submit="handleSubmit"
+  />
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted ,nextTick } from 'vue'
-import {
-  deleteDesign,
-  exportDesignFile,
-  getDesignList,
-  updateDesign,
-} from '@/apis/designs.js'
+import { ref, watch, onMounted, nextTick } from 'vue'
+import { deleteDesign, exportDesignFile, getDesignList, updateDesign } from '@/apis/designs.js'
 import { exportToExcel } from '@/utils/file/exportExcel'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import { messageBox } from '@/components/message/messageBox'
 import Style from '@/views/production/main/StyleTable.vue'
-
 
 import DesignDialog from '@/views/production/component/designDialog.vue'
 
@@ -119,11 +123,8 @@ const handleSubmit = async (formData: any) => {
       formData.id = currentRow.value.id
 
       const res = await updateDesign(formData)
-      if (res.code === 200) {
-        messageBox('success', Promise.resolve, '更新成功', '', '')
-      } else {
-        throw new Error('更新失败')
-      }
+
+      messageBox('success', Promise.resolve, '更新成功', '', '')
     }
     fetchData()
   } catch (err) {
@@ -132,7 +133,6 @@ const handleSubmit = async (formData: any) => {
     showDialog.value = false
   }
 }
-
 
 onMounted(() => {
   fetchData()
@@ -144,7 +144,7 @@ watch(
     page.value = 1
     fetchData()
   },
-  { deep: true }
+  { deep: true },
 )
 
 watch([page, pageSize], fetchData)
@@ -162,27 +162,26 @@ const selectedRows = ref<any[]>([])
 const tableRef = ref()
 
 const handleSelectionChange = (selection: any[]) => {
-  const currentIds = data.value.map(item => item.id)
+  const currentIds = data.value.map((item) => item.id)
 
   // 删除当前页取消选中的
-  selectedRows.value = selectedRows.value.filter(item => !currentIds.includes(item.id))
+  selectedRows.value = selectedRows.value.filter((item) => !currentIds.includes(item.id))
 
   // 添加当前页选中的（去重）
-  selectedRows.value.push(...selection.filter(item =>
-    !selectedRows.value.some(existing => existing.id === item.id)
-  ))
+  selectedRows.value.push(
+    ...selection.filter((item) => !selectedRows.value.some((existing) => existing.id === item.id)),
+  )
 }
 const restoreSelection = () => {
   nextTick(() => {
-    data.value.forEach(row => {
-      const found = selectedRows.value.find(item => item.id === row.id)
+    data.value.forEach((row) => {
+      const found = selectedRows.value.find((item) => item.id === row.id)
       if (found) {
         tableRef.value?.toggleRowSelection(row, true)
       }
     })
   })
 }
-
 
 const onDelete = async () => {
   if (selectedRows.value.length === 0) {
@@ -195,16 +194,14 @@ const onDelete = async () => {
     async () => {
       const ids = selectedRows.value.map((item) => item.id)
       const res = await deleteDesign(ids)
-      if (res.code === 200) {
-        fetchData()
-        selectedRows.value = []
-        return Promise.resolve()
-      }
-      return Promise.reject()
+
+      fetchData()
+      selectedRows.value = []
+      return Promise.resolve()
     },
     '删除成功',
     '删除失败',
-    '确认要删除选中的造型表吗？'
+    '确认要删除选中的造型表吗？',
   )
 }
 
@@ -230,10 +227,9 @@ const onExport = async () => {
 const onView = (row: any) => {
   props.addTab(`造型表 - ID: ${row.id}`, Style, { productId: row.productId })
 }
-
 </script>
 <style>
-.card-actions{
+.card-actions {
   margin-right: 20px;
 }
 </style>

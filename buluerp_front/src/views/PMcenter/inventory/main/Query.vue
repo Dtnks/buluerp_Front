@@ -158,18 +158,12 @@ const ChangeNumberVisible = ref(false)
 const changeNumber = ref(0)
 const handleSubmit = () => {
   changeSafeNumber(changeId.value, changeNumber.value, type.value).then((res) => {
-    if (res.code == 200) {
-      ElMessage({
-        type: 'success',
-        message: '修改成功',
-      })
-      refreshList()
-    } else {
-      ElMessage({
-        type: 'error',
-        message: '修改失败',
-      })
-    }
+    ElMessage({
+      type: 'success',
+      message: '修改成功',
+    })
+    refreshList()
+
     ChangeNumberVisible.value = false
   })
 }

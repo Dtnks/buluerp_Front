@@ -4,6 +4,7 @@
 <script setup>
 import { ElLoading } from 'element-plus'
 import { ref } from 'vue'
+console.log('loading')
 //定义div的ref
 const ragRef = ref()
 const ragRefInstance = ref()

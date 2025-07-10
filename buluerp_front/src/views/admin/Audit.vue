@@ -12,8 +12,12 @@
           </el-table-column>
           <el-table-column label="是否需要确认" prop="status" width="180">
             <template #default="scope">
-              <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0"
-                @change="handleSwitchChange(scope.row)" />
+              <el-switch
+                v-model="scope.row.status"
+                :active-value="1"
+                :inactive-value="0"
+                @change="handleSwitchChange(scope.row)"
+              />
             </template>
           </el-table-column>
         </el-table>
@@ -35,7 +39,6 @@ onMounted(() => {
   // 模拟获取数据
   auditSwitchList()
   // getAuditEnabled(1)
-
 })
 
 const tabStore = useTabStore()
@@ -54,28 +57,20 @@ const auditSwitchList = async () => {
 }
 
 const handleSwitchChange = async (row: any) => {
-  console.log(row, 'row');
+  console.log(row, 'row')
   // 这里可以添加逻辑来处理开关状态变化
   // 例如，调用API更新状态
   const res = await updateAuditSwitch(row.auditType, row.status)
-  if (res.code === 200) {
-    console.log('更新成功', res)
-    tabStore.freshTab('审核')
-    messageBox('success', null, res.msg)
-  } else {
-    messageBox('error', null, null, res.msg)
-    row.status = row.status === 1 ? 0 : 1
-  }
 
+  console.log('更新成功', res)
+  tabStore.freshTab('审核')
+  messageBox('success', null, res.msg)
 }
 
 const getAuditEnabled = async (auditType: number) => {
   const res = await getAuditSwitchEnabled(auditType)
   console.log(res, '获取审核开关状态')
 }
-
-
-
 </script>
 
 <style scoped lang="less"></style>

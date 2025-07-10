@@ -1,23 +1,35 @@
 <template>
-  <el-card style=" margin: 0 20px;">
+  <el-card style="margin: 0 20px">
     <template #header>
-      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <div
+        class="card-header"
+        style="display: flex; justify-content: space-between; align-items: center"
+      >
         <span>展示</span>
         <div class="card-actions">
-          <el-button type="danger" @click="onDelete" :disabled="control[2].disabled">删除</el-button>
+          <el-button type="danger" @click="onDelete" :disabled="control[2].disabled"
+            >删除</el-button
+          >
           <el-button type="primary" @click="onExport">导出</el-button>
         </div>
       </div>
     </template>
     <div>
-      <el-table :data="data" border style="width: 100%" ref="tableRef" :row-key="getRowKey" @selection-change="handleSelectionChange">
+      <el-table
+        :data="data"
+        border
+        style="width: 100%"
+        ref="tableRef"
+        :row-key="getRowKey"
+        @selection-change="handleSelectionChange"
+      >
         <el-table-column type="selection" width="55" />
         <el-table-column prop="createTime" label="创建时间" />
         <el-table-column prop="id" label="产品编码" />
         <el-table-column prop="name" label="产品名称" />
         <el-table-column prop="designStatus" label="产品状态">
           <template #default="{ row }">
-            <span style="display: flex; align-items: center;">
+            <span style="display: flex; align-items: center">
               <span
                 :style="{
                   display: 'inline-block',
@@ -38,7 +50,7 @@
               v-if="row.pictureUrl && !loadErrorMap[row.id]"
               :src="getFullImageUrl(row.pictureUrl)"
               alt="产品图片"
-              style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;"
+              style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px"
               @error="handleImageError(row.id)"
             />
             <span v-else>暂无图片</span>
@@ -53,7 +65,9 @@
       </el-table>
 
       <!-- 分页器 -->
-      <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+      <div
+        style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center"
+      >
         <div>共 {{ total }} 条</div>
         <el-pagination
           background
@@ -71,8 +85,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted , reactive ,nextTick} from 'vue'
-import { getList_pro, deleteProduct , exportProduct} from '@/apis/products.js'
+import { ref, watch, onMounted, reactive, nextTick } from 'vue'
+import { getList_pro, deleteProduct, exportProduct } from '@/apis/products.js'
 import { exportToExcel } from '@/utils/file/exportExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { getFullImageUrl } from '@/utils/image/getUrl'
@@ -84,7 +98,7 @@ import Detail from '../main/Detail.vue'
 const props = defineProps<{
   queryParams: Record<string, any>
   addTab: (targetName: string, component: any, data?: any) => void
-   control: Array<object>
+  control: Array<object>
 }>()
 
 const getRowKey = (row: any) => row.id
@@ -127,7 +141,7 @@ watch(
     page.value = 1
     fetchData()
   },
-  { deep: true }
+  { deep: true },
 )
 
 watch([page, pageSize], fetchData)
@@ -145,20 +159,20 @@ const selectedRows = ref<any[]>([])
 const tableRef = ref()
 
 const handleSelectionChange = (selection: any[]) => {
-  const currentIds = data.value.map(item => item.id)
+  const currentIds = data.value.map((item) => item.id)
 
   // 删除当前页中取消选择的项
-  selectedRows.value = selectedRows.value.filter(item => !currentIds.includes(item.id))
+  selectedRows.value = selectedRows.value.filter((item) => !currentIds.includes(item.id))
 
   // 添加当前页中选中的项（去重）
-  selectedRows.value.push(...selection.filter(item =>
-    !selectedRows.value.some(existing => existing.id === item.id)
-  ))
+  selectedRows.value.push(
+    ...selection.filter((item) => !selectedRows.value.some((existing) => existing.id === item.id)),
+  )
 }
 const restoreSelection = () => {
   nextTick(() => {
-    data.value.forEach(row => {
-      const found = selectedRows.value.find(item => item.id === row.id)
+    data.value.forEach((row) => {
+      const found = selectedRows.value.find((item) => item.id === row.id)
       if (found) {
         tableRef.value?.toggleRowSelection(row, true)
       }
@@ -168,13 +182,7 @@ const restoreSelection = () => {
 
 const onDelete = async () => {
   if (selectedRows.value.length === 0) {
-    messageBox(
-      'error',
-      () => Promise.reject(),
-      '',
-      '请先选择要删除的产品',
-      '',
-    )
+    messageBox('error', () => Promise.reject(), '', '请先选择要删除的产品', '')
     return
   }
 
@@ -184,33 +192,23 @@ const onDelete = async () => {
     'warning',
     () =>
       deleteProduct(ids).then((res) => {
-        if (res.code === 200) {
-          fetchData()
-          selectedRows.value = []
-          return Promise.resolve()
-        } else {
-          return Promise.reject()
-        }
+        fetchData()
+        selectedRows.value = []
+        return Promise.resolve()
       }),
     '删除成功',
     '删除失败',
-    '确认要删除选中的产品吗？'
+    '确认要删除选中的产品吗？',
   )
 }
 
 const onExport = async () => {
   if (selectedRows.value.length === 0) {
-    messageBox(
-      'error',
-      () => Promise.reject(),
-      '',
-      '请先选择要导出的产品',
-      ''
-    )
+    messageBox('error', () => Promise.reject(), '', '请先选择要导出的产品', '')
     return
   }
 
-  const ids = selectedRows.value.map(item => item.id).join(',')
+  const ids = selectedRows.value.map((item) => item.id).join(',')
 
   const today = new Date()
   const dateStr = today.toISOString().split('T')[0].replace(/-/g, '')
@@ -228,10 +226,9 @@ const onExport = async () => {
 const onView = (row: any) => {
   props.addTab(`产品详情页-${row.name}`, Detail, row, props.control)
 }
-
 </script>
 <style>
-.card-actions{
+.card-actions {
   margin-right: 20px;
 }
 </style>

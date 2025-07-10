@@ -34,7 +34,7 @@ const formData = ref([
 const tableData = ref([
   {
     value: 'id',
-    label: '用户ID',
+    label: 'ID',
     type: 'text',
   },
   {
@@ -100,33 +100,23 @@ const handleSubmit = () => {
     if (valid) {
       if (title.value == '编辑') {
         changeManufacturers(newSubmit.value).then((res) => {
-          if (res.code == 200) {
-            page.value = 1
-            listManufacturers(page.value, pageSize.value).then((res) => {
-              listData.value = res.rows
-              total.value = res.total
-            })
-            ElMessage.success(res.msg)
-            editDialogVisible.value = false
-          } else {
-            ElMessage.error(res.msg)
-            return
-          }
+          page.value = 1
+          listManufacturers(page.value, pageSize.value).then((res) => {
+            listData.value = res.rows
+            total.value = res.total
+          })
+          ElMessage.success(res.msg)
+          editDialogVisible.value = false
         })
       } else {
         newManufacturers(newSubmit.value).then((res) => {
-          if (res.msg == '操作成功') {
-            page.value = 1
-            listManufacturers(page.value, pageSize.value).then((res) => {
-              listData.value = res.rows
-              total.value = res.total
-            })
-            ElMessage.success(res.msg)
-            editDialogVisible.value = false
-          } else {
-            ElMessage.error(res.msg)
-            return
-          }
+          page.value = 1
+          listManufacturers(page.value, pageSize.value).then((res) => {
+            listData.value = res.rows
+            total.value = res.total
+          })
+          ElMessage.success(res.msg)
+          editDialogVisible.value = false
         })
       }
     }
@@ -165,27 +155,12 @@ const handleUpload = async (option: any) => {
   formData.append('file', option.file)
 
   importmanufacturersFile(formData).then((res) => {
-    console.log(res)
-    if (res.code == 200) {
-      ElMessage.success(res.msg)
-      listManufacturers(page.value, pageSize.value).then((res) => {
-        listData.value = res.rows
-        total.value = res.total
-      })
-      importDialogVisible.value = false
-    } else {
-      ElMessage.error(res.msg)
-      const error_text = res.data
-        .map((ele) => {
-          return '第' + ele.row + '行：' + ele.error
-        })
-        .join('<br>')
-      ElMessageBox.alert(error_text, '数据格式出现问题', {
-        confirmButtonText: '继续',
-        type: 'error',
-        dangerouslyUseHTMLString: true,
-      })
-    }
+    ElMessage.success(res.msg)
+    listManufacturers(page.value, pageSize.value).then((res) => {
+      listData.value = res.rows
+      total.value = res.total
+    })
+    importDialogVisible.value = false
   })
 }
 let count = 1
@@ -218,16 +193,10 @@ const DeleteFunc = (row) => {
   })
   const func = () => {
     return deleteManufacturers(ids).then((res) => {
-      console.log(res, '删除')
-      if (res.code == 500) {
-        console.log(res)
-        throw new Error('权限不足')
-      } else {
-        listManufacturers(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
-        })
-      }
+      listManufacturers(page.value, pageSize.value).then((res) => {
+        listData.value = res.rows
+        total.value = res.total
+      })
     })
   }
 

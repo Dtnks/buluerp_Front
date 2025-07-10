@@ -413,18 +413,13 @@ const handleSubmit = () => {
         })
       } else {
         newSchedule(newSubmit.value).then((res) => {
-          if (res.msg == '操作成功') {
-            page.value = 1
-            listSchedule(page.value, pageSize.value).then((res) => {
-              listData.value = res.rows
-              total.value = res.total
-            })
-            ElMessage.success(res.msg)
-            editDialogVisible.value = false
-          } else {
-            ElMessage.error('操作失败')
-            return
-          }
+          page.value = 1
+          listSchedule(page.value, pageSize.value).then((res) => {
+            listData.value = res.rows
+            total.value = res.total
+          })
+          ElMessage.success(res.msg)
+          editDialogVisible.value = false
         })
       }
     }
@@ -489,25 +484,11 @@ const handleUpload = async (option: any) => {
   formData.append('file', option.file)
 
   importFile(formData).then((res) => {
-    if (res.code == 200) {
-      ElMessage.success(res.msg)
-      listSchedule(page.value, pageSize.value).then((res) => {
-        listData.value = res.rows
-        total.value = res.total
-      })
-    } else {
-      ElMessage.error(res.msg)
-      const error_text = res.data
-        .map((ele) => {
-          return '第' + ele.rowNum + '行：' + ele.errorMsg
-        })
-        .join('<br>')
-      ElMessageBox.alert(error_text, '数据格式出现问题', {
-        confirmButtonText: '继续',
-        type: 'error',
-        dangerouslyUseHTMLString: true,
-      })
-    }
+    ElMessage.success(res.msg)
+    listSchedule(page.value, pageSize.value).then((res) => {
+      listData.value = res.rows
+      total.value = res.total
+    })
   })
 
   importDialogVisible.value = false
@@ -542,14 +523,10 @@ const DeleteFunc = (row) => {
   })
   const func = () => {
     return deleteSchedule(ids).then((res) => {
-      if (res.code == 500) {
-        throw new Error('权限不足')
-      } else {
-        listSchedule(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
-        })
-      }
+      listSchedule(page.value, pageSize.value).then((res) => {
+        listData.value = res.rows
+        total.value = res.total
+      })
     })
   }
 

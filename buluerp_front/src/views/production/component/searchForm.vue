@@ -61,7 +61,9 @@
         </el-col>
         <el-col :span="6" style="text-align: right">
           <el-space>
-            <el-button type="primary" @click="onCreate" :disabled="control[0].disabled">新建</el-button>
+            <el-button type="primary" @click="onCreate" :disabled="control[0].disabled"
+              >新建</el-button
+            >
             <el-button @click="onImport">导入</el-button>
           </el-space>
         </el-col>
@@ -203,17 +205,14 @@ const handleCreateSubmit = async () => {
     'warning',
     () =>
       createProduct(formData).then((res) => {
-        if (res.code === 200) {
-          createDialogVisible.value = false
-          resetCreateForm()
-          emit('created')
-          return Promise.resolve()
-        }
-        return Promise.reject()
+        createDialogVisible.value = false
+        resetCreateForm()
+        emit('created')
+        return Promise.resolve()
       }),
     '产品创建成功',
     '创建失败',
-    '是否确认创建该产品？'
+    '是否确认创建该产品？',
   )
 }
 
@@ -295,22 +294,23 @@ const handleUpload = async (option: any) => {
     'warning',
     () =>
       importProductFile(formData).then((res) => {
-        if (res.code === 200) {
-          importDialogVisible.value = false
-          return Promise.resolve()
-        }
-        return Promise.reject()
+        importDialogVisible.value = false
+        return Promise.resolve()
       }),
     '导入成功',
     '导入失败',
-    '确定要导入选中的 Excel 文件吗？'
+    '确定要导入选中的 Excel 文件吗？',
   )
 }
 
 const onDownloadTemplate = async () => {
   try {
     const res = await getProductTemplate()
-    downloadBinaryFile(res, '产品模板.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    downloadBinaryFile(
+      res,
+      '产品模板.xlsx',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
   } catch (e) {
     messageBox('error', () => Promise.reject(), '', '下载失败', '')
   }
@@ -339,7 +339,6 @@ const beforeImageUpload = (file: File) => {
 
   return false
 }
-
 </script>
 
 <style scoped>

@@ -51,6 +51,20 @@ httpInstance.interceptors.response.use(
     } else if (res.data.code === 404) {
       ElMessage.error(res.data.msg || '请求资源不存在')
       return Promise.reject(res.data)
+    } else if (res.data.code === 409) {
+      ElMessage.error(res.msg)
+      const error_text = res.data.data
+        .map((ele) => {
+          return '第' + ele.rowNum + '行：' + ele.errorMsg
+        })
+        .join('<br>')
+      ElMessageBox.alert(error_text, '数据格式出现问题', {
+        confirmButtonText: '继续',
+        type: 'error',
+        dangerouslyUseHTMLString: true,
+      })
+      console.log(error_text)
+      return Promise.reject(res.data)
     } else if (res.data instanceof Blob) {
       return res.data
     }
