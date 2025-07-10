@@ -39,9 +39,20 @@ httpInstance.interceptors.response.use(
         router.push('/login')
         localStorage.removeItem('Authorization')
       })
-    } else {
-      ElMessage.error(res.data.message || res.data.msg || '请求失败')
+    } else if (res.data.code === 500) {
+      ElMessage.error(res.data.msg || '请求失败')
       return Promise.reject(res.data)
+    } else if (res.data.code === 403) {
+      ElMessage.error(res.data.msg || '权限不足')
+      return Promise.reject(res.data)
+    } else if (res.data.code === 400) {
+      ElMessage.error(res.data.msg || '请求参数错误')
+      return Promise.reject(res.data)
+    } else if (res.data.code === 404) {
+      ElMessage.error(res.data.msg || '请求资源不存在')
+      return Promise.reject(res.data)
+    } else if (res.data instanceof Blob) {
+      return res.data
     }
   },
   (err) => {

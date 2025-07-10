@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import numberCard from '../component/numberCard.vue'
-import boxShow from '../component/boxShow.vue'
 import { getOrdersData } from '@/apis/orderShow'
 import { ref } from 'vue'
 const deliveredCount = ref(0)
 const UndeliveredCount = ref(0)
 const punctualPercent = ref(0)
 const orderStateCount = ref({})
+const orderStateCountList = ref([])
 getOrdersData().then((res) => {
   console.log(res)
   deliveredCount.value = res.data.deliveredCount
   UndeliveredCount.value = res.data.totalCount - res.data.deliveredCount
   punctualPercent.value = (res.data.punctualCount / res.data.deliveredCount) * 100
-  orderStateCount.value = res.data.statusCount
+  orderStateCountList.value = [res.data.punctualRateWeekOnWeek, res.data.punctualRateDayOnDay]
 })
 const value = ref('')
 // const defaultTime = new Date(2025, 7, 1, 12, 0, 0)
@@ -27,6 +27,7 @@ const value = ref('')
         :data-top="[punctualPercent]"
         text-top="订单准时交付率"
         :number="punctualPercent + '%'"
+        :data-bottom="orderStateCountList"
       ></numberCard>
     </div>
     <div id="boxShow" class="col">
@@ -43,53 +44,88 @@ const value = ref('')
           />
         </div>
       </div>
-      <div style="flex: 1; position: relative">
+      <div style="flex: 1; position: relative; overflow: scroll">
         <div class="box col" style="top: 8vh; left: 4vw">
-          <div>初始状态</div>
+          <div>待设计</div>
           <div>{{ orderStateCount['创建(未审核)'] }}笔</div>
         </div>
         <div class="toright" style="top: 13vh; left: 12vw"></div>
-        <div class="arrow-right" style="top: 12vh; left: 17.5vw"></div>
+        <div class="arrow-right" style="top: 12vh; left: 17vw"></div>
 
         <div class="box col" style="top: 8vh; left: 18vw">
           <div>设计中</div>
           <div>{{ orderStateCount['待设计'] }}笔</div>
         </div>
         <div class="toright" style="top: 13vh; left: 26vw"></div>
-        <div class="arrow-right" style="top: 12vh; left: 31.5vw"></div>
+        <div class="arrow-right" style="top: 12vh; left: 31vw"></div>
 
         <div class="box col" style="top: 8vh; left: 32vw">
-          <div>生产计划设计中</div>
+          <div>待外购布产</div>
           <div>{{ 5 }}笔</div>
         </div>
         <div class="toright" style="top: 13vh; left: 40vw"></div>
-        <div class="arrow-right" style="top: 12vh; left: 45.5vw"></div>
+        <div class="arrow-right" style="top: 12vh; left: 45vw"></div>
 
         <div class="box col" style="top: 8vh; left: 46vw">
-          <div>生产中</div>
+          <div>外购布产中</div>
           <div>{{ 3 }}笔</div>
         </div>
         <div class="toright" style="top: 13vh; left: 54vw"></div>
-        <div class="arrow-right" style="top: 12vh; left: 59.5vw"></div>
+        <div class="arrow-right" style="top: 12vh; left: 59vw"></div>
 
         <div class="box col" style="top: 8vh; left: 60vw">
-          <div>拉线中</div>
+          <div>齐料入库</div>
           <div>{{ 3 }}笔</div>
         </div>
         <div class="toright" style="top: 13vh; left: 68vw"></div>
-        <div class="arrow-right" style="top: 12vh; left: 73.5vw"></div>
+        <div class="arrow-right" style="top: 12vh; left: 73vw"></div>
 
         <div class="box col" style="top: 8vh; left: 74vw">
-          <div>已收货</div>
+          <div>套料中</div>
           <div>{{ 12 }}笔</div>
         </div>
+        <div class="tobottom" style="top: 18vh; left: 78vw"></div>
+        <div class="arrow-bottom" style="top: 24vh; left: 77.5vw"></div>
 
-        <div class="box col" style="top: 26vh; left: 32vw">
-          <div>采购中</div>
+        <div class="box col" style="top: 26vh; left: 74vw">
+          <div>待拉线</div>
           <div>{{ 3 }}笔</div>
         </div>
-        <div class="tobottom" style="top: 18vh; left: 36vw"></div>
-        <div class="arrow-bottom" style="top: 25.2vh; left: 35.5vw"></div>
+        <div class="toright" style="top: 31vh; left: 68vw"></div>
+        <div class="arrow-left" style="top: 30vh; left: 68vw"></div>
+
+        <div class="box col" style="top: 26vh; left: 60vw">
+          <div>拉线组包中</div>
+          <div>{{ 3 }}笔</div>
+        </div>
+        <div class="toright" style="top: 31vh; left: 54vw"></div>
+        <div class="arrow-left" style="top: 30vh; left: 54vw"></div>
+
+        <div class="box col" style="top: 26vh; left: 46vw">
+          <div>分包已入库</div>
+          <div>{{ 3 }}笔</div>
+        </div>
+        <div class="toright" style="top: 31vh; left: 40vw"></div>
+        <div class="arrow-left" style="top: 30vh; left: 40vw"></div>
+
+        <div class="box col" style="top: 26vh; left: 32vw">
+          <div>包装中</div>
+          <div>{{ 3 }}笔</div>
+        </div>
+        <div class="toright" style="top: 31vh; left: 26vw"></div>
+        <div class="arrow-left" style="top: 30vh; left: 26vw"></div>
+
+        <div class="box col" style="top: 26vh; left: 18vw">
+          <div>已发货</div>
+          <div>{{ 3 }}笔</div>
+        </div>
+        <div class="toright" style="top: 31vh; left: 12vw"></div>
+        <div class="arrow-left" style="top: 30vh; left: 12vw"></div>
+
+        <div class="box col" style="top: 26vh; left: 4vw">
+          <div>已完成</div>
+          <div>{{ 3 }}笔</div>
+        </div>
       </div>
     </div>
   </div>
@@ -127,7 +163,7 @@ const value = ref('')
   height: 0;
   border-top: 1vh solid transparent;
   border-bottom: 1vh solid transparent;
-  border-left: 1vh solid gray;
+  border-left: 1vw solid gray;
   position: absolute;
 }
 .toright {
@@ -141,7 +177,15 @@ const value = ref('')
   height: 0;
   border-left: 1vh solid transparent;
   border-right: 1vh solid transparent;
-  border-top: 1vh solid gray;
+  border-top: 1vw solid gray;
+  position: absolute;
+}
+.arrow-left {
+  width: 0;
+  height: 0;
+  border-right: 1vw solid gray;
+  border-top: 1vh solid transparent;
+  border-bottom: 1vh solid transparent;
   position: absolute;
 }
 .tobottom {
