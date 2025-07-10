@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import {
   ElInput,
@@ -79,7 +79,7 @@ import {
 } from 'element-plus'
 import Form from '@/components/form/Form.vue'
 import { importOrderFile, getProductTemplate } from '@/apis/orders'
-import { getStatusText, Status } from '../utils/statusMap'
+import { fetchOrderStatusMap, newStatusMap, Status } from '../utils/statusMap'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import { messageBox } from '@/components/message/messageBox'
 import { format } from 'date-fns'
@@ -106,7 +106,20 @@ const dialogForm = reactive({
   operater: '',
 })
 
+onMounted(async () => {
+  await fetchOrderStatusMap()
+  console.log(newStatusMap.value, 'newStatusMap444')
+})
+
 const title = '查询表单'
+const statusOptions = computed(() =>
+  Object.entries(newStatusMap.value).map(([key, value]) => ({
+    label: value,
+    value: key,
+    key: key,
+  })),
+)
+console.log('statusOptions:4444', statusOptions.value)
 
 // data: 表单数据
 const data = reactive([
@@ -120,15 +133,14 @@ const data = reactive([
       label: '订单状态',
       type: 'select',
       key: 'status',
-      options: [
-        { label: getStatusText(Status.ApprovedFalse), value: Status.ApprovedFalse },
-        { label: getStatusText(Status.Initial), value: Status.Initial },
-        { label: getStatusText(Status.PendingDesign), value: Status.PendingDesign },
-        { label: getStatusText(Status.Designing), value: Status.Designing },
-        { label: getStatusText(Status.Completed), value: Status.Completed },
-        { label: getStatusText(Status.Canceled), value: Status.Canceled },
-        { label: getStatusText(Status.Producing), value: Status.Producing },
-      ],
+      options: statusOptions,
+      // options: [
+      //   { label: '初始状态', value: Status.Initial },
+      //   { label: '设计中', value: Status.Designing },
+      //   { label: '已完成', value: Status.Completed },
+      //   { label: '作废', value: Status.Canceled },
+      //   { label: '布产中', value: Status.Producing },
+      // ],
     },
     { label: '创建时间', type: 'timer', key: 'createTime', timerType: 'datetimerange' },
   ],

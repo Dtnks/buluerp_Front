@@ -15,7 +15,7 @@
       <el-table-column v-for="column in columns" :key="column.prop" :prop="column.prop" :label="column.label">
         <template v-if="column.slot" #default="{ row }">
           <span style="display: flex; align-items: center">
-            <span :style="{
+            <!-- <span :style="{
               backgroundColor: getStatusColor(row[column.prop]),
               display: 'inline-block',
               width: '8px',
@@ -23,9 +23,10 @@
               borderRadius: '50%',
               margin: '0 5px 0 0',
               border: '1px solid #ccc',
-            }"></span>
-            <!-- {{ row[column.prop] }} -->
-            {{ getStatusText(row[column.prop]) }}
+            }"></span> -->
+            <!-- {{ getStatusText(row[column.prop]) }} -->
+            {{ newStatusMap[row[column.prop]] }}
+
           </span>
         </template>
       </el-table-column>
@@ -58,7 +59,9 @@
             @blur="checkCustomerName" />
         </el-form-item>
         <el-form-item label="订单状态">
-          <el-input v-model="editForm.statusText" disabled />
+          <el-select v-model="editForm.statusText">
+            <el-option v-for="(label, value) in newStatusMap" :key="value" :label="label" :value="value" />
+          </el-select>
         </el-form-item>
         <el-form-item label="其他信息">
           <el-input v-model="editForm.remark" />
@@ -79,15 +82,13 @@ import { deleteOrders } from '@/apis/orders'
 import type { TableDataType } from '@/types/orderResponse'
 import BusinessDetail from '@/views/business/main/Detail.vue'
 import { exportToExcel } from '@/utils/file/exportExcel'
-import { getStatusText } from '../utils/statusMap'
+import { fetchOrderStatusMap, getStatusText, newStatusMap } from '../utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
 import useTabStore from '@/stores/modules/tabs'
 
-// 加载数据
-onMounted(() => {
-  // getOrders()
+onMounted(async () => {
+  await fetchOrderStatusMap()
 })
-
 const props = defineProps<{
   // queryParams: Record<string, any>
   addTab: (targetName: string, component: any, data?: any, control: Array<object>) => void
