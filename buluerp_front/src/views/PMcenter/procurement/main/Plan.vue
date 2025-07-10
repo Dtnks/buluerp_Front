@@ -10,6 +10,7 @@ import {
   deletePurchasePlan,
   importFile,
   downLoadModule,
+  newPlanFromDesign,
 } from '@/apis/produceControl/purchase/purchasePlan'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
@@ -117,6 +118,56 @@ const newFormData = ref([
   ],
   [{ type: 'image', label: '样例图', key: 'picture', width: 12 }],
 ])
+const designFormData = ref([
+  [
+    { type: 'input', label: '颜色编号', key: 'colorCode', width: 12, rules: [requiredRule] },
+    {
+      type: 'timer',
+      label: '交货时间',
+      key: 'deliveryTime',
+      timerType: 'date',
+      width: 12,
+      rules: [requiredRule],
+    },
+  ],
+  [
+    {
+      type: 'inputSelect',
+      label: '设计总表ID',
+      key: 'designPatternId',
+      width: 12,
+      rules: [requiredRule],
+      remoteFunc: searchFunc('system/patterns/list', 'id'),
+      options: [],
+      loading: false,
+    },
+    {
+      type: 'inputSelect',
+      label: '外购资料ID',
+      key: 'purchaseInfoId',
+      width: 12,
+      rules: [requiredRule],
+      remoteFunc: searchFunc('system/purchase-info/list', 'id'),
+      options: [],
+      loading: false,
+    },
+  ],
+  [
+    {
+      type: 'number',
+      label: '采购数量',
+      key: 'purchaseQuantity',
+      width: 12,
+      rules: [positiveNumberRule],
+    },
+    {
+      type: 'textarea',
+      label: '备注',
+      key: 'remarks',
+      width: 12,
+    },
+  ],
+])
 const newSubmit = ref({
   creationTime: '',
   remarks: '',
@@ -144,6 +195,25 @@ const searchContent = ref({
   supplier: '',
   materialType: '',
 })
+const designSubmit = ref({
+  colorCode: '',
+  deliveryTime: '',
+  designPatternId: '',
+  purchaseInfoId: '',
+  purchaseQuantity: '',
+  remarks: '',
+})
+
+const resetDesignSubmit = () => {
+  designSubmit.value = {
+    colorCode: '',
+    deliveryTime: '',
+    designPatternId: '',
+    purchaseInfoId: '',
+    purchaseQuantity: '',
+    remarks: '',
+  }
+}
 const tableData = ref([
   {
     value: 'id',
@@ -254,25 +324,21 @@ const operation = ref([
 const importDialogVisible = ref(false)
 const editDialogVisible = ref(false)
 const createFormRef = ref(null)
+const designDialogVisible = ref(false)
+const designFormRef = ref(null)
 
 const handleSubmit = () => {
   createFormRef.value.validateForm((valid) => {
     if (valid) {
       if (title.value === '编辑') {
-        console.log(newSubmit.value)
         changePurchasePlan(newSubmit.value).then((res) => {
-          if (res.code === 200) {
-            page.value = 1
-            listPurchasePlan(page.value, pageSize.value).then((res) => {
-              listData.value = res.rows
-              total.value = res.total
-            })
-            ElMessage.success(res.msg)
-            editDialogVisible.value = false
-          } else {
-            ElMessage.error(res.msg)
-            return
-          }
+          page.value = 1
+          listPurchasePlan(page.value, pageSize.value).then((res) => {
+            listData.value = res.rows
+            total.value = res.total
+          })
+          ElMessage.success(res.msg)
+          editDialogVisible.value = false
         })
       } else {
         newSubmit.value.creationTime = parseTime(newSubmit.value.creationTime, '{y}-{m}-{d}')
@@ -280,21 +346,40 @@ const handleSubmit = () => {
         newSubmit.value.deliveryTime = parseTime(newSubmit.value.deliveryTime, '{y}-{m}-{d}')
         newSubmit.value.orderTime = parseTime(newSubmit.value.orderTime, '{y}-{m}-{d}')
         newPurchasePlan(newSubmit.value).then((res) => {
-          if (res.msg === '操作成功') {
-            page.value = 1
-            listPurchasePlan(page.value, pageSize.value).then((res) => {
-              listData.value = res.rows
-              total.value = res.total
-            })
-            ElMessage.success(res.msg)
-            editDialogVisible.value = false
-          } else {
-            ElMessage.error('操作失败')
-            return
-          }
+          page.value = 1
+          listPurchasePlan(page.value, pageSize.value).then((res) => {
+            listData.value = res.rows
+            total.value = res.total
+          })
+          ElMessage.success(res.msg)
+          editDialogVisible.value = false
         })
       }
     }
+  })
+}
+//从设计总表新建
+const handleDesignSubmit = () => {
+  designFormRef.value.validateForm((valid) => {
+    if (!valid) return
+    const payload = {
+      ...designSubmit.value,
+      deliveryTime: parseTime(designSubmit.value.deliveryTime, '{y}-{m}-{d}'),
+    }
+    console.log(payload)
+    newPlanFromDesign(payload).then((res) => {
+      if (res.code === 200) {
+        ElMessage.success(res.msg)
+        designDialogVisible.value = false
+        page.value = 1
+        listPurchasePlan(page.value, pageSize.value).then((res) => {
+          listData.value = res.rows
+          total.value = res.total
+        })
+      } else {
+        ElMessage.error(res.msg)
+      }
+    })
   })
 }
 const title = ref('编辑')
@@ -321,11 +406,23 @@ const resetSubmit = () => {
   }
 }
 const onCreate = () => {
-  resetSubmit()
-  title.value = '新增'
-  editDialogVisible.value = true
+  createTypeDialogVisible.value = true
+}
+const createTypeDialogVisible = ref(false)
 
-  createFormRef.value.clearValidate()
+const handleCreateType = (type: 'direct' | 'design') => {
+  createTypeDialogVisible.value = false
+  if (type === 'direct') {
+    resetSubmit()
+    title.value = '新增'
+    editDialogVisible.value = true
+    nextTick(() => {
+      createFormRef.value?.clearValidate()
+    })
+  } else if (type === 'design') {
+    resetDesignSubmit()
+    designDialogVisible.value = true
+  }
 }
 
 const onSubmit = () => {
@@ -351,25 +448,11 @@ const handleUpload = async (option: any) => {
   formData.append('file', option.file)
 
   importFile(formData).then((res) => {
-    if (res.code == 200) {
-      ElMessage.success(res.msg)
-      listPurchasePlan(page.value, pageSize.value).then((res) => {
-        listData.value = res.rows
-        total.value = res.total
-      })
-    } else {
-      ElMessage.error(res.msg)
-      const error_text = res.data
-        .map((ele) => {
-          return '第' + ele.rowNum + '行：' + ele.errorMsg
-        })
-        .join('<br>')
-      ElMessageBox.alert(error_text, '数据格式出现问题', {
-        confirmButtonText: '继续',
-        type: 'error',
-        dangerouslyUseHTMLString: true,
-      })
-    }
+    ElMessage.success(res.msg)
+    listPurchasePlan(page.value, pageSize.value).then((res) => {
+      listData.value = res.rows
+      total.value = res.total
+    })
   })
 
   importDialogVisible.value = false
@@ -404,14 +487,10 @@ const DeleteFunc = (row) => {
   })
   const func = () => {
     return deletePurchasePlan(ids).then((res) => {
-      if (res.code == 500) {
-        throw new Error('权限不足')
-      } else {
-        listPurchasePlan(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
-        })
-      }
+      listPurchasePlan(page.value, pageSize.value).then((res) => {
+        listData.value = res.rows
+        total.value = res.total
+      })
     })
   }
 
@@ -453,21 +532,44 @@ listPurchasePlan(page.value, pageSize.value).then((res) => {
   <div class="col">
     <BordShow content="采购计划" path="生产管理/采购/采购计划" />
     <div class="greyBack">
-      <FormSearch title="查询" :data="formData" :onCreate="onCreate" :onSubmit="onSubmit" :onImport="onImport"
-        :onDownloadTemplate="onDownloadTemplate" :searchForm="searchContent" :control="control" />
-      <TableList :tableData="tableData" :operations="operation" :listData="listData" :DeleteFunc="DeleteFunc"
-        :exportFunc="exportFunc" :control="control">
+      <FormSearch
+        title="查询"
+        :data="formData"
+        :onCreate="onCreate"
+        :onSubmit="onSubmit"
+        :onImport="onImport"
+        :onDownloadTemplate="onDownloadTemplate"
+        :searchForm="searchContent"
+        :control="control"
+      />
+      <TableList
+        :tableData="tableData"
+        :operations="operation"
+        :listData="listData"
+        :DeleteFunc="DeleteFunc"
+        :exportFunc="exportFunc"
+        :control="control"
+      >
         <slot>
-          <div style="
+          <div
+            style="
               margin-top: 20px;
               display: flex;
               justify-content: space-between;
               align-items: center;
-            ">
+            "
+          >
             <div>共 {{ total }} 条</div>
-            <el-pagination background layout="prev, pager, next, jumper, ->, total, sizes" :current-page="page"
-              :page-size="pageSize" :page-sizes="[5, 10, 20, 50]" :total="total" @current-change="handlePageChange"
-              @size-change="handleSizeChange" />
+            <el-pagination
+              background
+              layout="prev, pager, next, jumper, ->, total, sizes"
+              :current-page="page"
+              :page-size="pageSize"
+              :page-sizes="[5, 10, 20, 50]"
+              :total="total"
+              @current-change="handlePageChange"
+              @size-change="handleSizeChange"
+            />
           </div>
         </slot>
       </TableList>
@@ -478,25 +580,49 @@ listPurchasePlan(page.value, pageSize.value).then((res) => {
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button type="info" @click="
-            () => {
-              editDialogVisible = false
-            }
-          ">
+          <el-button
+            type="info"
+            @click="
+              () => {
+                editDialogVisible = false
+              }
+            "
+          >
             取消
           </el-button>
         </div>
       </template>
     </el-dialog>
     <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
-      <el-upload class="upload-demo" drag :show-file-list="false" :before-upload="beforeUpload"
-        :http-request="handleUpload" accept=".xlsx,.xls">
+      <el-upload
+        class="upload-demo"
+        drag
+        :show-file-list="false"
+        :before-upload="beforeUpload"
+        :http-request="handleUpload"
+        accept=".xlsx,.xls"
+      >
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
         <template v-slot:tip>
           <div class="el-upload__tip">只能上传 xls/xlsx 文件，大小不超过 5MB</div>
         </template>
       </el-upload>
+    </el-dialog>
+        <el-dialog v-model="createTypeDialogVisible" title="请选择新建方式" width="400px">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <el-button type="primary" @click="handleCreateType('direct')">直接新建</el-button>
+        <el-button type="success" @click="handleCreateType('design')">从外购资料/设计总表新建</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog v-model="designDialogVisible" title="从设计/外购新增采购计划" width="800px">
+      <CreateForm :data="designFormData" :Formvalue="designSubmit" ref="designFormRef" />
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="handleDesignSubmit"> 确认 </el-button>
+          <el-button @click="designDialogVisible = false">取消</el-button>
+        </div>
+      </template>
     </el-dialog>
   </div>
 </template>

@@ -59,13 +59,10 @@ const handleSubmit = () => {
     if (valid) {
       newUser(newSubmit.value).then((res) => {
         newDialogVisible.value = false
-        if (res.code === 500) {
-          ElMessage({ type: 'error', message: '用户已存在' })
-        } else {
-          ElMessage({ type: 'success', message: '新增用户成功' })
-          currentPage.value = 1
-          setPage(1)
-        }
+
+        ElMessage({ type: 'success', message: '新增用户成功' })
+        currentPage.value = 1
+        setPage(1)
       })
     } else {
       ElMessage({ type: 'error', message: '请填写完整信息' })

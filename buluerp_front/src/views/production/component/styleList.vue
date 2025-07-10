@@ -1,6 +1,6 @@
 <template>
   <div class="bg">
-    <el-card class="greyBack" style="margin:30px,30px; padding:0;">
+    <el-card class="greyBack" style="margin: 30px, 30px; padding: 0">
       <template #header>
         <div class="card-header card-header-flex">
           <span>产品ID: {{ detail.id }} 对应的造型表列表</span>
@@ -24,10 +24,16 @@
         </div>
       </template>
 
-      <div v-for="[groupId, groupItems] in groupedData" :key="groupId" style="margin-bottom: 40px;">
-        <div style="font-weight: bold; margin: 10px 0;">分组：{{ groupId }}</div>
+      <div v-for="[groupId, groupItems] in groupedData" :key="groupId" style="margin-bottom: 40px">
+        <div style="font-weight: bold; margin: 10px 0">分组：{{ groupId }}</div>
 
-        <el-table :data="groupItems" border style="width: 100%" :row-key="getRowKey" @selection-change="handleSelectionChange">
+        <el-table
+          :data="groupItems"
+          border
+          style="width: 100%"
+          :row-key="getRowKey"
+          @selection-change="handleSelectionChange"
+        >
           <!-- 表头保持不变 -->
           <el-table-column type="selection" width="55" />
           <el-table-column prop="id" label="ID" />
@@ -37,7 +43,7 @@
                 v-if="row.pictureUrl"
                 :src="getFullImageUrl(row.pictureUrl)"
                 alt="产品图片"
-                style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;"
+                style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px"
               />
               <span v-else>暂无图片</span>
             </template>
@@ -67,22 +73,20 @@
         <!-- 每组下方新增按钮 -->
         <el-button
           type="success"
-          style="margin-top: 10px; width: 100%;"
+          style="margin-top: 10px; width: 100%"
           @click="onCreateWithGroup(groupId)"
         >
           + 新增造型表（分组 {{ groupId }}）
         </el-button>
       </div>
 
-      <el-button
-        type="primary"
-        style="margin-top: 30px; width: 100%;"
-        @click="onAddGroup"
-      >
+      <el-button type="primary" style="margin-top: 30px; width: 100%" @click="onAddGroup">
         + 新增分组
       </el-button>
 
-      <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+      <div
+        style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center"
+      >
         <div>共 {{ total }} 条</div>
         <el-pagination
           background
@@ -94,10 +98,10 @@
           @current-change="handlePageChange"
           @size-change="handleSizeChange"
         />
-          <div style="margin-top: 20px; text-align: right;">
+        <div style="margin-top: 20px; text-align: right">
           <el-button type="success" @click="handleConfirm">PMC确认</el-button>
           <el-button type="warning" @click="handleCancelConfirm">取消确认</el-button>
-          </div>
+        </div>
       </div>
 
       <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
@@ -138,9 +142,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted ,nextTick ,computed } from 'vue'
-import { getStyleList, deleteStyle, exportStyleFile, updateStyle , addStyle,importStyleFile,getStyleTemplate} from '@/apis/styles'
-import { pmcConfirm , pmcCancel , exportDesignFile} from '@/apis/designs'
+import { ref, watch, onMounted, nextTick, computed } from 'vue'
+import {
+  getStyleList,
+  deleteStyle,
+  exportStyleFile,
+  updateStyle,
+  addStyle,
+  importStyleFile,
+  getStyleTemplate,
+} from '@/apis/styles'
+import { pmcConfirm, pmcCancel, exportDesignFile } from '@/apis/designs'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessageBox } from 'element-plus'
 import { downloadBinaryFile } from '@/utils/file/base64'
@@ -169,7 +181,7 @@ const currentRow = ref({})
 
 const groupedData = computed(() => {
   const groups = new Map()
-  data.value.forEach(item => {
+  data.value.forEach((item) => {
     const group = item.groupId ?? 0
     if (!groups.has(group)) groups.set(group, [])
     groups.get(group).push(item)
@@ -203,18 +215,18 @@ const handleSizeChange = (val: number) => {
 const tableRef = ref()
 
 const handleSelectionChange = (selection: any[]) => {
-  const currentIds = data.value.map(item => item.id)
+  const currentIds = data.value.map((item) => item.id)
   // 删除当前页取消选中的
-  selectedRows.value = selectedRows.value.filter(item => !currentIds.includes(item.id))
+  selectedRows.value = selectedRows.value.filter((item) => !currentIds.includes(item.id))
   // 添加当前页选中的（去重）
-  selectedRows.value.push(...selection.filter(item =>
-    !selectedRows.value.some(existing => existing.id === item.id)
-  ))
+  selectedRows.value.push(
+    ...selection.filter((item) => !selectedRows.value.some((existing) => existing.id === item.id)),
+  )
 }
 const restoreSelection = () => {
   nextTick(() => {
-    data.value.forEach(row => {
-      const found = selectedRows.value.find(item => item.id === row.id)
+    data.value.forEach((row) => {
+      const found = selectedRows.value.find((item) => item.id === row.id)
       if (found) {
         tableRef.value?.toggleRowSelection(row, true)
       }
@@ -235,7 +247,7 @@ const onCreateWithGroup = (groupId: number) => {
 }
 
 const onAddGroup = () => {
-  const allGroupIds = data.value.map(i => i.groupId ?? 0)
+  const allGroupIds = data.value.map((i) => i.groupId ?? 0)
   const nextGroupId = Math.max(...allGroupIds, 0) + 1
   onCreateWithGroup(nextGroupId)
 }
@@ -249,18 +261,16 @@ const onDelete = async () => {
   messageBox(
     'warning',
     async () => {
-      const ids = selectedRows.value.map(i => i.id)
+      const ids = selectedRows.value.map((i) => i.id)
       const res = await deleteStyle(ids)
-      if (res.code === 200) {
-        fetchData()
-        selectedRows.value = []
-        return Promise.resolve()
-      }
-      return Promise.reject()
+
+      fetchData()
+      selectedRows.value = []
+      return Promise.resolve()
     },
     '删除成功',
     '删除失败',
-    '确认删除选中的造型表数据吗？'
+    '确认删除选中的造型表数据吗？',
   )
 }
 
@@ -288,21 +298,9 @@ const handleUpload = async (option: any) => {
   try {
     const res = await importStyleFile(formData)
 
-    if (res.code === 200) {
-      messageBox('success', null, '导入成功', '', '')
-      importDialogVisible.value = false
-      fetchData()
-    } else {
-      const error_text = res.data
-        .map((ele) => '第' + ele.rowNum + '行：' + ele.errorMsg)
-        .join('<br>')
-
-      ElMessageBox.alert(error_text, '数据格式出现问题', {
-        confirmButtonText: '继续',
-        type: 'error',
-        dangerouslyUseHTMLString: true,
-      })
-    }
+    messageBox('success', null, '导入成功', '', '')
+    importDialogVisible.value = false
+    fetchData()
   } catch (e) {
     messageBox('error', null, '', '导入失败', '')
   }
@@ -314,7 +312,7 @@ const handleDownloadTemplate = async () => {
     downloadBinaryFile(
       res,
       '造型表模板.xlsx',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     )
   } catch (e) {
     messageBox('error', null, '', '下载失败', '')
@@ -328,7 +326,6 @@ const groupExportDialogVisible = ref(false)
 const groupOptions = ref<string[]>([])
 
 const onExportAll = async () => {
-
   try {
     const res = await exportDesignFile(props.detail.id)
     const blob = new Blob([res], { type: 'application/vnd.ms-excel' })
@@ -344,7 +341,7 @@ const onExportSelected = async () => {
     return
   }
 
-  const ids = selectedRows.value.map(i => i.id).join(',')
+  const ids = selectedRows.value.map((i) => i.id).join(',')
 
   try {
     const res = await exportStyleFile(ids)
@@ -354,8 +351,6 @@ const onExportSelected = async () => {
     messageBox('error', null, '', '导出失败', '')
   }
 }
-
-
 
 const onEdit = (row: any) => {
   isEdit.value = true
@@ -377,7 +372,7 @@ const handleSubmit = async (rawForm: Record<string, any>) => {
 
     if (Array.isArray(value) && value[0] instanceof File) {
       // 文件数组
-      value.forEach(file => formData.append(key, file))
+      value.forEach((file) => formData.append(key, file))
     } else if (value instanceof File) {
       // 单个文件
       formData.append(key, value)
@@ -401,13 +396,9 @@ const handleSubmit = async (rawForm: Record<string, any>) => {
       res = await addStyle(formData)
     }
 
-    if (res.code === 200) {
-      messageBox('success', Promise.resolve, isEdit.value ? '更新成功' : '新增成功', '', '')
-      fetchData()
-      emit('refresh')
-    } else {
-      throw new Error('操作失败')
-    }
+    messageBox('success', Promise.resolve, isEdit.value ? '更新成功' : '新增成功', '', '')
+    fetchData()
+    emit('refresh')
   } catch (err) {
     messageBox('error', () => Promise.reject(), '', '提交失败', '')
   } finally {
@@ -418,12 +409,9 @@ const handleSubmit = async (rawForm: Record<string, any>) => {
 const handleConfirm = async () => {
   try {
     const res = await pmcConfirm(props.detail.id)
-    if (res.code === 200) {
-      messageBox('success', null, '确认成功', '', '')
-      tabStore.freshTab('产品查询')
-    } else {
-      messageBox('error', null, '', '确认失败', '')
-    }
+
+    messageBox('success', null, '确认成功', '', '')
+    tabStore.freshTab('产品查询')
   } catch (err) {
     messageBox('error', null, '', '确认失败', '')
   }
@@ -432,17 +420,13 @@ const handleConfirm = async () => {
 const handleCancelConfirm = async () => {
   try {
     const res = await pmcCancel(props.detail.id)
-    if (res.code === 200) {
-      messageBox('success', null, '取消确认成功', '', '')
-      tabStore.freshTab('产品查询')
-    } else {
-      messageBox('error', null, '', '取消确认失败', '')
-    }
+
+    messageBox('success', null, '取消确认成功', '', '')
+    tabStore.freshTab('产品查询')
   } catch (err) {
     messageBox('error', null, '', '取消确认失败', '')
   }
 }
-
 
 onMounted(fetchData)
 watch([page, pageSize], fetchData)
@@ -452,7 +436,6 @@ watch(showDialog, (val) => {
     isEdit.value = false
   }
 })
-
 </script>
 <style>
 .card-header {
@@ -466,6 +449,6 @@ watch(showDialog, (val) => {
 }
 .bg {
   padding: 0 40px 0 40px;
-  background-color: rgb(240,242,245);
+  background-color: rgb(240, 242, 245);
 }
 </style>

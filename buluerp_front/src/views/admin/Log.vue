@@ -107,14 +107,10 @@ const DeleteFunc = (row) => {
   })
   const func = () => {
     return deleteLog(ids).then((res) => {
-      if (res.code == 500) {
-        throw new Error('权限不足')
-      } else {
-        listLog(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
-        })
-      }
+      listLog(page.value, pageSize.value).then((res) => {
+        listData.value = res.rows
+        total.value = res.total
+      })
     })
   }
 

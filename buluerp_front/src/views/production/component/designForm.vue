@@ -7,7 +7,7 @@
     </template>
 
     <el-row>
-      <el-form :model="formState" label-width="120px" class="search-form" style="flex: 1;">
+      <el-form :model="formState" label-width="120px" class="search-form" style="flex: 1">
         <el-row :gutter="20" align="middle">
           <el-col :span="12">
             <el-form-item label="PMC确认状态">
@@ -87,7 +87,6 @@
       @submit="handleCreateSubmit"
     />
 
-
     <el-dialog v-model="orderDialogVisible" title="待设计订单" width="800px">
       <el-table :data="orderList" style="width: 100%">
         <el-table-column prop="innerId" label="订单编号" />
@@ -108,21 +107,19 @@
         <el-button @click="orderDialogVisible = false">关闭</el-button>
       </template>
     </el-dialog>
-
-
   </el-card>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { messageBox } from '@/components/message/messageBox'
-import { ElMessageBox , ElLoading } from 'element-plus'
+import { ElMessageBox, ElLoading } from 'element-plus'
 import { importDesignFile, getDesignTemplate, addDesign } from '@/apis/designs'
 import { downloadBinaryFile } from '@/utils/file/base64'
-import { getOrdersList , putOrder} from '@/apis/orders'
+import { getOrdersList, putOrder } from '@/apis/orders'
 import DesignDialog from '@/views/production/component/designDialog.vue'
 
-const emit = defineEmits(['search','created'])
+const emit = defineEmits(['search', 'created'])
 
 const formState = reactive({
   confirm: '',
@@ -136,7 +133,7 @@ const dialogVisible = ref(false)
 
 const orderDialogVisible = ref(false)
 const orderList = ref([])
-const orderIdList = orderList.value.map(row => row.id)
+const orderIdList = orderList.value.map((row) => row.id)
 const currentOrderData = ref<Record<string, any> | null>(null)
 
 const handleSearch = () => {
@@ -158,23 +155,19 @@ const handleCreate = () => {
 const handleCreateSubmit = async (formData: any) => {
   try {
     const res = await addDesign(formData)
-    if (res.code === 200) {
-      messageBox('success', null, '新建成功', '', '')
-      dialogVisible.value = false
-      emit('search', { ...formState }) 
-      if (formData.orderId) {
-        await putOrder({ id: formData.orderId, status: 2 })
-      }
 
-      fetchPendingOrders() 
-    } else {
-      messageBox('error', null, '', res.msg || '新建失败', '')
+    messageBox('success', null, '新建成功', '', '')
+    dialogVisible.value = false
+    emit('search', { ...formState })
+    if (formData.orderId) {
+      await putOrder({ id: formData.orderId, status: 2 })
     }
+
+    fetchPendingOrders()
   } catch (error) {
     messageBox('error', null, '', '新建失败', '')
   }
 }
-
 
 const handleImport = () => {
   importDialogVisible.value = true
@@ -200,21 +193,9 @@ const handleUpload = async (option: any) => {
   try {
     const res = await importDesignFile(formData)
 
-    if (res.code === 200) {
-      messageBox('success', null, '导入成功', '', '')
-      importDialogVisible.value = false
-      emit('created')
-    } else {
-      const error_text = res.data
-        .map((ele) => '第' + ele.rowNum + '行：' + ele.errorMsg)
-        .join('<br>')
-
-      ElMessageBox.alert(error_text, '数据格式出现问题', {
-        confirmButtonText: '继续',
-        type: 'error',
-        dangerouslyUseHTMLString: true,
-      })
-    }
+    messageBox('success', null, '导入成功', '', '')
+    importDialogVisible.value = false
+    emit('created')
   } catch (e) {
     messageBox('error', null, '', '导入失败', '')
   }
@@ -226,7 +207,7 @@ const handleDownloadTemplate = async () => {
     downloadBinaryFile(
       res,
       '设计总表模板.xlsx',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     )
   } catch (e) {
     messageBox('error', null, '', '下载失败', '')
@@ -236,11 +217,8 @@ const handleDownloadTemplate = async () => {
 const fetchPendingOrders = async () => {
   try {
     const res = await getOrdersList({ status: 1 })
-    if (res.code === 200) {
-      orderList.value = res.rows || []
-    } else {
-      messageBox('error', null, '', '获取待设计订单失败', '')
-    }
+
+    orderList.value = res.rows || []
   } catch (e) {
     messageBox('error', null, '', '获取订单异常', '')
   }
@@ -275,11 +253,8 @@ const handleBatchCreate = async () => {
     for (const order of orderList.value) {
       try {
         const res = await await addDesign({ orderId: order.id })
-        if (res.code === 200) {
-          successCount++
-        } else {
-          failCount++
-        }
+
+        successCount++
       } catch (e) {
         failCount++
       }
@@ -290,7 +265,7 @@ const handleBatchCreate = async () => {
       null,
       `批量创建完成：成功 ${successCount} 个，失败 ${failCount} 个`,
       '',
-      ''
+      '',
     )
   } finally {
     loadingInstance.close()
@@ -298,7 +273,6 @@ const handleBatchCreate = async () => {
     emit('search', { ...formState })
   }
 }
-
 </script>
 
 <style scoped>

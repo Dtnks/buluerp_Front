@@ -1,6 +1,14 @@
 <template>
-  <Form :data="data" :title="title" :onSubmit="onSubmit" :onCreate="onCreate" :onImport="onImport"
-    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm" :control="control"></Form>
+  <Form
+    :data="data"
+    :title="title"
+    :onSubmit="onSubmit"
+    :onCreate="onCreate"
+    :onImport="onImport"
+    :onDownloadTemplate="onDownloadTemplate"
+    :searchForm="searchForm"
+    :control="control"
+  ></Form>
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
       <!-- <el-form-item label="订单状态">
@@ -13,8 +21,13 @@
         </el-select>
       </el-form-item> -->
       <el-form-item label="客户姓名">
-        <el-autocomplete v-model="dialogForm.customerName" :fetch-suggestions="customerSuggestions" :value-key="'value'"
-          @blur="checkCustomerName" placeholder="请输入" />
+        <el-autocomplete
+          v-model="dialogForm.customerName"
+          :fetch-suggestions="customerSuggestions"
+          :value-key="'value'"
+          @blur="checkCustomerName"
+          placeholder="请输入"
+        />
       </el-form-item>
       <el-form-item label="外部编号" required>
         <el-input v-model="dialogForm.outerId" placeholder="请输入" />
@@ -34,8 +47,14 @@
     </template>
   </el-dialog>
   <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
-    <el-upload class="upload-demo" drag :show-file-list="false" :before-upload="beforeUpload"
-      :http-request="handleUpload" accept=".xlsx,.xls">
+    <el-upload
+      class="upload-demo"
+      drag
+      :show-file-list="false"
+      :before-upload="beforeUpload"
+      :http-request="handleUpload"
+      accept=".xlsx,.xls"
+    >
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
       <template v-slot:tip>
@@ -48,7 +67,16 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
-import { ElInput, ElMessageBox, ElButton, ElDialog, ElUpload, ElMessage, ElAutocomplete, ElFormItem } from 'element-plus'
+import {
+  ElInput,
+  ElMessageBox,
+  ElButton,
+  ElDialog,
+  ElUpload,
+  ElMessage,
+  ElAutocomplete,
+  ElFormItem,
+} from 'element-plus'
 import Form from '@/components/form/Form.vue'
 import { importOrderFile, getProductTemplate } from '@/apis/orders'
 import { fetchOrderStatusMap, newStatusMap, Status } from '../utils/statusMap'
@@ -80,7 +108,7 @@ const dialogForm = reactive({
 
 onMounted(async () => {
   await fetchOrderStatusMap()
-  console.log(newStatusMap.value, 'newStatusMap444');
+  console.log(newStatusMap.value, 'newStatusMap444')
 })
 
 const title = '查询表单'
@@ -89,10 +117,9 @@ const statusOptions = computed(() =>
     label: value,
     value: key,
     key: key,
-  }))
+  })),
 )
-console.log('statusOptions:4444', statusOptions.value);
-
+console.log('statusOptions:4444', statusOptions.value)
 
 // data: 表单数据
 const data = reactive([
@@ -115,12 +142,12 @@ const data = reactive([
       //   { label: '布产中', value: Status.Producing },
       // ],
     },
-    { label: '创建时间', type: 'timer', key: 'createTime', timerType: 'datetimerange', },
+    { label: '创建时间', type: 'timer', key: 'createTime', timerType: 'datetimerange' },
   ],
   [
-    { label: '客户姓名', type: 'input', key: 'customerName', },
-    { label: '创建人姓名', type: 'input', key: 'operator', },
-    { label: '备注', type: 'input', key: 'remark', },
+    { label: '客户姓名', type: 'input', key: 'customerName' },
+    { label: '创建人姓名', type: 'input', key: 'operator' },
+    { label: '备注', type: 'input', key: 'remark' },
   ],
 ])
 
@@ -155,18 +182,17 @@ const searchForm = ref({
 })
 defineExpose({ formState, formRef, searchForm })
 
-
-
-
 // onSubmit: 提交查询条件
 const onSubmit = () => {
-  const createTimeFrom = searchForm.value.createTime && searchForm.value.createTime.length > 0
-    ? format(new Date(searchForm.value.createTime[0]), 'yyyy-MM-dd HH:mm:ss')
-    : null;
+  const createTimeFrom =
+    searchForm.value.createTime && searchForm.value.createTime.length > 0
+      ? format(new Date(searchForm.value.createTime[0]), 'yyyy-MM-dd HH:mm:ss')
+      : null
 
-  const createTimeTo = searchForm.value.createTime && searchForm.value.createTime.length > 1
-    ? format(new Date(searchForm.value.createTime[1]), 'yyyy-MM-dd HH:mm:ss')
-    : null;
+  const createTimeTo =
+    searchForm.value.createTime && searchForm.value.createTime.length > 1
+      ? format(new Date(searchForm.value.createTime[1]), 'yyyy-MM-dd HH:mm:ss')
+      : null
   const submitForm: SubmitFormType = {
     ...searchForm.value,
     createTimeFrom,
@@ -174,14 +200,12 @@ const onSubmit = () => {
   }
   delete submitForm.createTime // 删除 createTime 属性，避免重复提交
   emit('onSubmit', submitForm)
-
 }
 
 // onCreate: 点击新建按钮
 const onCreate = () => {
   dialogFormVisible.value = true
 }
-
 
 const customerSuggestions = (queryString: string, cb) => {
   emit('customerSuggestions', queryString, cb)
@@ -216,19 +240,19 @@ const onImport = () => {
 
 // 文件校验（限制大小）
 const beforeUpload = (file: File) => {
-  console.log('beforeUpload file:mmmmmmm');
+  console.log('beforeUpload file:mmmmmmm')
 
   const isExcel =
     file.type === 'application/vnd.ms-excel' ||
     file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   const isLt5M = file.size / 1024 / 1024 < 5
   if (!isExcel) {
-    console.log('beforeUpload file: !isExcel');
+    console.log('beforeUpload file: !isExcel')
     messageBox('error', null, null, '只能上传 xls/xlsx 文件')
     return false
   }
   if (!isLt5M) {
-    console.log('beforeUpload file: !isLt5M');
+    console.log('beforeUpload file: !isLt5M')
     messageBox('error', null, null, '文件大小不能超过 5MB')
     return false
   }
@@ -239,27 +263,10 @@ const handleUpload = async (option: any) => {
   const formData = new FormData()
   formData.append('file', option.file)
   const res = await importOrderFile(formData)
-  if (res.code == 200) {
-    messageBox('success', null, res.msg || '导入成功')
-  } else {
-    ElMessage.error(res.msg || '导入失败')
-    console.log('导入失败2222:', res);
-    if (res.data && Array.isArray(res.data)) {
-      const error_text = res.data
-        .map((ele: any) => {
-          return '第' + ele.rowNum + '行：' + ele.errorMsg
-        })
-        .join('<br>')
-      ElMessageBox.alert(error_text, {
-        confirmButtonText: '继续',
-        type: 'error',
-        dangerouslyUseHTMLString: true,
-      })
-    }
-  }
+
+  messageBox('success', null, res.msg || '导入成功')
 
   importDialogVisible.value = false
-
 }
 
 const onDownloadTemplate = () => {
@@ -267,8 +274,6 @@ const onDownloadTemplate = () => {
     downloadBinaryFile(res, '订单信息模板.xlsx')
   })
 }
-
-
 </script>
 
 <style scoped></style>

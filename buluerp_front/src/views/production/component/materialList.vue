@@ -1,7 +1,10 @@
 <template>
-  <el-card style=" margin: 0 20px;">
+  <el-card style="margin: 0 20px">
     <template #header>
-      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <div
+        class="card-header"
+        style="display: flex; justify-content: space-between; align-items: center"
+      >
         <span>展示</span>
         <div class="card-actions">
           <el-button type="danger" @click="onDelete">删除</el-button>
@@ -10,7 +13,14 @@
       </div>
     </template>
     <div>
-      <el-table :data="data" border style="width: 100%" ref="tableRef" :row-key="getRowKey" @selection-change="handleSelectionChange">
+      <el-table
+        :data="data"
+        border
+        style="width: 100%"
+        ref="tableRef"
+        :row-key="getRowKey"
+        @selection-change="handleSelectionChange"
+      >
         <el-table-column type="selection" width="55" />
         <el-table-column label="胶件图片">
           <template #default="{ row }">
@@ -18,7 +28,7 @@
               v-if="row.drawingReference"
               :src="getFullImageUrl(row.drawingReference)"
               alt="产品图片"
-              style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;"
+              style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px"
             />
             <span v-else>暂无图片</span>
           </template>
@@ -56,7 +66,9 @@
       </el-table>
 
       <!-- 分页器 -->
-      <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+      <div
+        style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center"
+      >
         <div>共 {{ total }} 条</div>
         <el-pagination
           background
@@ -70,11 +82,7 @@
         />
       </div>
     </div>
-    <el-dialog
-      v-model="purchaseDialogVisible"
-      title="外购信息"
-      width="600px"
-    >
+    <el-dialog v-model="purchaseDialogVisible" title="外购信息" width="600px">
       <el-table :data="currentPurchaseInfos" border>
         <el-table-column label="图片" width="80">
           <template #default="{ row }">
@@ -82,7 +90,7 @@
               v-if="row.pictureUrl"
               :src="getFullImageUrl(row.pictureUrl)"
               alt="外购图片"
-              style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
+              style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px"
             />
             <span v-else>暂无图片</span>
           </template>
@@ -94,16 +102,15 @@
     </el-dialog>
   </el-card>
   <MaterialDialog
-  v-model="showDialog"
-  :isEdit="isEdit"
-  :currentData="currentRow"
-  @submit="handleSubmit"
-/>
-
+    v-model="showDialog"
+    :isEdit="isEdit"
+    :currentData="currentRow"
+    @submit="handleSubmit"
+  />
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted , nextTick} from 'vue'
+import { ref, watch, onMounted, nextTick } from 'vue'
 import {
   deleteMaterial,
   exportMaterialFile,
@@ -166,11 +173,8 @@ const handleSubmit = async (formData: any) => {
   try {
     if (isEdit.value) {
       const res = await updateMaterial(formData)
-      if (res.code === 200) {
-        messageBox('success', Promise.resolve, '更新成功', '', '')
-      } else {
-        throw new Error('更新失败')
-      }
+
+      messageBox('success', Promise.resolve, '更新成功', '', '')
     }
     fetchData()
   } catch (err) {
@@ -190,7 +194,7 @@ watch(
     page.value = 1
     fetchData()
   },
-  { deep: true }
+  { deep: true },
 )
 
 watch([page, pageSize], fetchData)
@@ -208,20 +212,20 @@ const selectedRows = ref<any[]>([])
 const tableRef = ref()
 
 const handleSelectionChange = (selection: any[]) => {
-  const currentIds = data.value.map(item => item.id)
+  const currentIds = data.value.map((item) => item.id)
 
   // 删除当前页取消选中的
-  selectedRows.value = selectedRows.value.filter(item => !currentIds.includes(item.id))
+  selectedRows.value = selectedRows.value.filter((item) => !currentIds.includes(item.id))
 
   // 添加当前页选中的（去重）
-  selectedRows.value.push(...selection.filter(item =>
-    !selectedRows.value.some(existing => existing.id === item.id)
-  ))
+  selectedRows.value.push(
+    ...selection.filter((item) => !selectedRows.value.some((existing) => existing.id === item.id)),
+  )
 }
 const restoreSelection = () => {
   nextTick(() => {
-    data.value.forEach(row => {
-      const found = selectedRows.value.find(item => item.id === row.id)
+    data.value.forEach((row) => {
+      const found = selectedRows.value.find((item) => item.id === row.id)
       if (found) {
         tableRef.value?.toggleRowSelection(row, true)
       }
@@ -240,16 +244,14 @@ const onDelete = async () => {
     async () => {
       const ids = selectedRows.value.map((item) => item.id)
       const res = await deleteMaterial(ids)
-      if (res.code === 200) {
-        fetchData()
-        selectedRows.value = []
-        return Promise.resolve()
-      }
-      return Promise.reject()
+
+      fetchData()
+      selectedRows.value = []
+      return Promise.resolve()
     },
     '删除成功',
     '删除失败',
-    '确认要删除选中的产品吗？'
+    '确认要删除选中的产品吗？',
   )
 }
 
@@ -272,10 +274,9 @@ const onExport = async () => {
     console.error('导出错误:', err)
   }
 }
-
 </script>
 <style>
-.card-actions{
+.card-actions {
   margin-right: 20px;
 }
 </style>

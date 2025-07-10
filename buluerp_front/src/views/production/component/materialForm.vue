@@ -7,7 +7,7 @@
     </template>
 
     <el-row>
-      <el-form :model="formState" label-width="100px" class="search-form" style="flex: 1;">
+      <el-form :model="formState" label-width="100px" class="search-form" style="flex: 1">
         <el-row :gutter="20" align="middle">
           <el-col :span="8">
             <el-form-item label="模具编号">
@@ -77,11 +77,7 @@
     </el-dialog>
 
     <!-- 新建模具弹窗 -->
-    <MaterialDialog
-      v-model="dialogVisible"
-      :isEdit="false"
-      @submit="handleCreateSubmit"
-    />
+    <MaterialDialog v-model="dialogVisible" :isEdit="false" @submit="handleCreateSubmit" />
   </el-card>
 </template>
 
@@ -114,14 +110,16 @@ const fetchMaterialOptions = async () => {
     const res = await getMaterialList({})
     const rows = res.rows || []
 
-    mouldNumberOptions.value = [...new Set(rows.map(item => item.mouldNumber))].map(val => ({
+    mouldNumberOptions.value = [...new Set(rows.map((item) => item.mouldNumber))].map((val) => ({
       label: String(val),
       value: String(val),
     }))
-    mouldManufacturerOptions.value = [...new Set(rows.map(item => item.mouldManufacturer))].map(val => ({
-      label: String(val),
-      value: String(val),
-    }))
+    mouldManufacturerOptions.value = [...new Set(rows.map((item) => item.mouldManufacturer))].map(
+      (val) => ({
+        label: String(val),
+        value: String(val),
+      }),
+    )
   } catch (error) {
     messageBox('error', null, '', '获取物料失败', '')
   }
@@ -183,20 +181,8 @@ const handleUpload = async (option: any) => {
   try {
     const res = await importMaterialFile(formData)
 
-    if (res.code === 200) {
-      messageBox('success', null, '导入成功', '', '')
-      importDialogVisible.value = false
-    } else {
-      const error_text = res.data
-        .map((ele) => '第' + ele.rowNum + '行：' + ele.errorMsg)
-        .join('<br>')
-
-      ElMessageBox.alert(error_text, '数据格式出现问题', {
-        confirmButtonText: '继续',
-        type: 'error',
-        dangerouslyUseHTMLString: true,
-      })
-    }
+    messageBox('success', null, '导入成功', '', '')
+    importDialogVisible.value = false
   } catch (e) {
     messageBox('error', null, '', '导入失败', '')
   }
@@ -208,13 +194,12 @@ const handleDownloadTemplate = async () => {
     downloadBinaryFile(
       res,
       '模具模板.xlsx',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     )
   } catch (e) {
     messageBox('error', null, '', '下载失败', '')
   }
 }
-
 </script>
 
 <style scoped>

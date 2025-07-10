@@ -18,12 +18,9 @@ const handleRole = (row) => {
 const submitRole = () => {
   changeRoles({ userId: editPerson.value.userId, roleIds: editPerson.value.roleIds }).then(
     (res) => {
-      console.log({ userId: editPerson.value.userId, roleIds: editPerson.value.roleIds }, res)
-      if (res.code === 200) {
-        DialogVisible.value = false
-        ElMessage({ type: 'success', message: '授权成功' })
-        props.setPage(1)
-      }
+      DialogVisible.value = false
+      ElMessage({ type: 'success', message: '授权成功' })
+      props.setPage(1)
     },
   )
 }
@@ -32,11 +29,7 @@ const handleStatus = (row, status) => {
   const func = () => {
     submitChange.status = status
     return changeStatus(submitChange).then((res) => {
-      if (res.code == 500) {
-        throw new Error('权限不足')
-      } else {
-        row.status = status ? '离职' : '生效'
-      }
+      row.status = status ? '离职' : '生效'
     })
   }
 
@@ -52,9 +45,7 @@ const handleStatus = (row, status) => {
 const handelResetPassword = (row) => {
   const func = () => {
     return resetPassword({ userId: row.userId, password: '123456' }).then((res) => {
-      if (res.code == 500) {
-        throw new Error('权限不足')
-      }
+      ElMessage.success('用户成功修改密码')
     })
   }
   messageBox('warning', func, '用户成功修改密码', '用户权限不足', '确认重置该用户密码为123456吗?')

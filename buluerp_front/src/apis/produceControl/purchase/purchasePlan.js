@@ -92,3 +92,11 @@ export function getPurchasePlanDetail(id) {
     headers: headers,
   })
 }
+export function newPlanFromDesign(data) {
+  return httpInstance({
+    url: `system/purchase-collection/from-info`,
+    method: 'post',
+    data,
+  })
+}
+

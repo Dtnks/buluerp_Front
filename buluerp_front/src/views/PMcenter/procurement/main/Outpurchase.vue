@@ -141,20 +141,14 @@ const handleSubmit = () => {
   createFormRef.value.validateForm((valid) => {
     if (valid) {
       if (title.value === '编辑') {
-        console.log(newSubmit.value)
         changePurchaseInfo(newSubmit.value).then((res) => {
-          if (res.code === 200) {
-            page.value = 1
-            listPurchaseInfo(page.value, pageSize.value).then((res) => {
-              listData.value = res.rows
-              total.value = res.total
-            })
-            ElMessage.success(res.msg)
-            editDialogVisible.value = false
-          } else {
-            ElMessage.error(res.msg)
-            return
-          }
+          page.value = 1
+          listPurchaseInfo(page.value, pageSize.value).then((res) => {
+            listData.value = res.rows
+            total.value = res.total
+          })
+          ElMessage.success(res.msg)
+          editDialogVisible.value = false
         })
       } else {
         newSubmit.value.creationTime = parseTime(newSubmit.value.creationTime, '{y}-{m}-{d}')
@@ -162,19 +156,13 @@ const handleSubmit = () => {
         newSubmit.value.deliveryTime = parseTime(newSubmit.value.deliveryTime, '{y}-{m}-{d}')
         newSubmit.value.orderTime = parseTime(newSubmit.value.orderTime, '{y}-{m}-{d}')
         newPurchaseInfo(newSubmit.value).then((res) => {
-          console.log(res)
-          if (res.msg === '操作成功') {
-            page.value = 1
-            listPurchaseInfo(page.value, pageSize.value).then((res) => {
-              listData.value = res.rows
-              total.value = res.total
-            })
-            ElMessage.success(res.msg)
-            editDialogVisible.value = false
-          } else {
-            ElMessage.error('操作失败')
-            return
-          }
+          page.value = 1
+          listPurchaseInfo(page.value, pageSize.value).then((res) => {
+            listData.value = res.rows
+            total.value = res.total
+          })
+          ElMessage.success(res.msg)
+          editDialogVisible.value = false
         })
       }
     }
@@ -222,25 +210,11 @@ const handleUpload = async (option: any) => {
   formData.append('file', option.file)
 
   importFile(formData).then((res) => {
-    if (res.code == 200) {
-      ElMessage.success(res.msg)
-      listPurchaseInfo(page.value, pageSize.value).then((res) => {
-        listData.value = res.rows
-        total.value = res.total
-      })
-    } else {
-      ElMessage.error(res.msg)
-      const error_text = res.data
-        .map((ele) => {
-          return '第' + ele.rowNum + '行：' + ele.errorMsg
-        })
-        .join('<br>')
-      ElMessageBox.alert(error_text, '数据格式出现问题', {
-        confirmButtonText: '继续',
-        type: 'error',
-        dangerouslyUseHTMLString: true,
-      })
-    }
+    ElMessage.success(res.msg)
+    listPurchaseInfo(page.value, pageSize.value).then((res) => {
+      listData.value = res.rows
+      total.value = res.total
+    })
   })
 
   importDialogVisible.value = false
@@ -275,14 +249,10 @@ const DeleteFunc = (row) => {
   })
   const func = () => {
     return deletePurchaseInfo(ids).then((res) => {
-      if (res.code == 500) {
-        throw new Error('权限不足')
-      } else {
-        listPurchaseInfo(page.value, pageSize.value).then((res) => {
-          listData.value = res.rows
-          total.value = res.total
-        })
-      }
+      listPurchaseInfo(page.value, pageSize.value).then((res) => {
+        listData.value = res.rows
+        total.value = res.total
+      })
     })
   }
 
