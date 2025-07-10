@@ -10,6 +10,7 @@ import {
   deletePurchasePlan,
   importFile,
   downLoadModule,
+  newPlanFromDesign,
 } from '@/apis/produceControl/purchase/purchasePlan'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
@@ -117,6 +118,56 @@ const newFormData = ref([
   ],
   [{ type: 'image', label: '样例图', key: 'picture', width: 12 }],
 ])
+const designFormData = ref([
+  [
+    { type: 'input', label: '颜色编号', key: 'colorCode', width: 12, rules: [requiredRule] },
+    {
+      type: 'timer',
+      label: '交货时间',
+      key: 'deliveryTime',
+      timerType: 'date',
+      width: 12,
+      rules: [requiredRule],
+    },
+  ],
+  [
+    {
+      type: 'inputSelect',
+      label: '设计总表ID',
+      key: 'designPatternId',
+      width: 12,
+      rules: [requiredRule],
+      remoteFunc: searchFunc('system/patterns/list', 'id'),
+      options: [],
+      loading: false,
+    },
+    {
+      type: 'inputSelect',
+      label: '外购资料ID',
+      key: 'purchaseInfoId',
+      width: 12,
+      rules: [requiredRule],
+      remoteFunc: searchFunc('system/purchase-info/list', 'id'),
+      options: [],
+      loading: false,
+    },
+  ],
+  [
+    {
+      type: 'number',
+      label: '采购数量',
+      key: 'purchaseQuantity',
+      width: 12,
+      rules: [positiveNumberRule],
+    },
+    {
+      type: 'textarea',
+      label: '备注',
+      key: 'remarks',
+      width: 12,
+    },
+  ],
+])
 const newSubmit = ref({
   creationTime: '',
   remarks: '',
@@ -144,6 +195,25 @@ const searchContent = ref({
   supplier: '',
   materialType: '',
 })
+const designSubmit = ref({
+  colorCode: '',
+  deliveryTime: '',
+  designPatternId: '',
+  purchaseInfoId: '',
+  purchaseQuantity: '',
+  remarks: '',
+})
+
+const resetDesignSubmit = () => {
+  designSubmit.value = {
+    colorCode: '',
+    deliveryTime: '',
+    designPatternId: '',
+    purchaseInfoId: '',
+    purchaseQuantity: '',
+    remarks: '',
+  }
+}
 const tableData = ref([
   {
     value: 'id',
@@ -254,6 +324,8 @@ const operation = ref([
 const importDialogVisible = ref(false)
 const editDialogVisible = ref(false)
 const createFormRef = ref(null)
+const designDialogVisible = ref(false)
+const designFormRef = ref(null)
 
 const handleSubmit = () => {
   createFormRef.value.validateForm((valid) => {
@@ -286,6 +358,30 @@ const handleSubmit = () => {
     }
   })
 }
+//从设计总表新建
+const handleDesignSubmit = () => {
+  designFormRef.value.validateForm((valid) => {
+    if (!valid) return
+    const payload = {
+      ...designSubmit.value,
+      deliveryTime: parseTime(designSubmit.value.deliveryTime, '{y}-{m}-{d}'),
+    }
+    console.log(payload)
+    newPlanFromDesign(payload).then((res) => {
+      if (res.code === 200) {
+        ElMessage.success(res.msg)
+        designDialogVisible.value = false
+        page.value = 1
+        listPurchasePlan(page.value, pageSize.value).then((res) => {
+          listData.value = res.rows
+          total.value = res.total
+        })
+      } else {
+        ElMessage.error(res.msg)
+      }
+    })
+  })
+}
 const title = ref('编辑')
 //传给form组件的参数
 const resetSubmit = () => {
@@ -310,11 +406,23 @@ const resetSubmit = () => {
   }
 }
 const onCreate = () => {
-  resetSubmit()
-  title.value = '新增'
-  editDialogVisible.value = true
+  createTypeDialogVisible.value = true
+}
+const createTypeDialogVisible = ref(false)
 
-  createFormRef.value.clearValidate()
+const handleCreateType = (type: 'direct' | 'design') => {
+  createTypeDialogVisible.value = false
+  if (type === 'direct') {
+    resetSubmit()
+    title.value = '新增'
+    editDialogVisible.value = true
+    nextTick(() => {
+      createFormRef.value?.clearValidate()
+    })
+  } else if (type === 'design') {
+    resetDesignSubmit()
+    designDialogVisible.value = true
+  }
 }
 
 const onSubmit = () => {
@@ -500,6 +608,21 @@ listPurchasePlan(page.value, pageSize.value).then((res) => {
           <div class="el-upload__tip">只能上传 xls/xlsx 文件，大小不超过 5MB</div>
         </template>
       </el-upload>
+    </el-dialog>
+        <el-dialog v-model="createTypeDialogVisible" title="请选择新建方式" width="400px">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <el-button type="primary" @click="handleCreateType('direct')">直接新建</el-button>
+        <el-button type="success" @click="handleCreateType('design')">从外购资料/设计总表新建</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog v-model="designDialogVisible" title="从设计/外购新增采购计划" width="800px">
+      <CreateForm :data="designFormData" :Formvalue="designSubmit" ref="designFormRef" />
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="handleDesignSubmit"> 确认 </el-button>
+          <el-button @click="designDialogVisible = false">取消</el-button>
+        </div>
+      </template>
     </el-dialog>
   </div>
 </template>
