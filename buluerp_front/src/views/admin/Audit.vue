@@ -29,14 +29,13 @@ import { messageBox } from '@/components/message/messageBox'
 import useTabStore from '@/stores/modules/tabs'
 import { ElCard, ElTable, ElTableColumn } from 'element-plus'
 import { onMounted, ref } from 'vue'
+import { debounce } from 'lodash-es'
 
 const tableData = ref([])
 onMounted(() => {
   // 模拟获取数据
   auditSwitchList()
   // getAuditEnabled(1)
-
-
 })
 
 const tabStore = useTabStore()
@@ -54,7 +53,7 @@ const auditSwitchList = async () => {
   tableData.value = res.rows
 }
 
-const handleSwitchChange = async (row: any) => {
+const handleSwitchChange = debounce(async (row: any) => {
   console.log(row, 'row')
   // 这里可以添加逻辑来处理开关状态变化
   // 例如，调用API更新状态
@@ -63,7 +62,7 @@ const handleSwitchChange = async (row: any) => {
   console.log('更新成功', res)
   tabStore.freshTab('审核')
   messageBox('success', null, res.msg)
-}
+}, 500) // 500ms防抖
 
 const getAuditEnabled = async (auditType: number) => {
   const res = await getAuditSwitchEnabled(auditType)

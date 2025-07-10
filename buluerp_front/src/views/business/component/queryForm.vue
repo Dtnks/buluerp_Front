@@ -1,14 +1,6 @@
 <template>
-  <Form
-    :data="data"
-    :title="title"
-    :onSubmit="onSubmit"
-    :onCreate="onCreate"
-    :onImport="onImport"
-    :onDownloadTemplate="onDownloadTemplate"
-    :searchForm="searchForm"
-    :control="control"
-  ></Form>
+  <Form :data="data" :title="title" :onSubmit="onSubmit" :onCreate="onCreate" :onImport="onImport"
+    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm" :control="control"></Form>
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
       <!-- <el-form-item label="订单状态">
@@ -21,13 +13,8 @@
         </el-select>
       </el-form-item> -->
       <el-form-item label="客户姓名">
-        <el-autocomplete
-          v-model="dialogForm.customerName"
-          :fetch-suggestions="customerSuggestions"
-          :value-key="'value'"
-          @blur="checkCustomerName"
-          placeholder="请输入"
-        />
+        <el-autocomplete v-model="dialogForm.customerName" :fetch-suggestions="customerSuggestions" :value-key="'value'"
+          @blur="checkCustomerName" placeholder="请输入" />
       </el-form-item>
       <el-form-item label="外部编号" required>
         <el-input v-model="dialogForm.outerId" placeholder="请输入" />
@@ -47,14 +34,8 @@
     </template>
   </el-dialog>
   <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
-    <el-upload
-      class="upload-demo"
-      drag
-      :show-file-list="false"
-      :before-upload="beforeUpload"
-      :http-request="handleUpload"
-      accept=".xlsx,.xls"
-    >
+    <el-upload class="upload-demo" drag :show-file-list="false" :before-upload="beforeUpload"
+      :http-request="handleUpload" accept=".xlsx,.xls">
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
       <template v-slot:tip>
