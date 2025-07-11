@@ -61,7 +61,6 @@ const newSubmit = ref({
   purchaseCode: '',
   unitPrice: '',
   supplier: '',
-  picture: '',
 })
 const searchContent = ref({
   creationTime: '',
@@ -176,7 +175,6 @@ const resetSubmit = () => {
     purchaseCode: '',
     unitPrice: '',
     supplier: '',
-    picture: '',
   }
 }
 const onCreate = () => {

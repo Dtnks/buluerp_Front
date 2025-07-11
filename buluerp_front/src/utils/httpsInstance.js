@@ -36,8 +36,8 @@ httpInstance.interceptors.response.use(
         cancelButtonText: '取消',
         type: 'warning',
       }).then(() => {
-        router.push('/login')
         localStorage.removeItem('Authorization')
+        router.push('/login')
       })
     } else if (res.data.code === 500) {
       ElMessage.error(res.data.msg || '请求失败')
@@ -65,6 +65,8 @@ httpInstance.interceptors.response.use(
       })
       console.log(error_text)
       return Promise.reject(res.data)
+    } else if (res.data.code === 506) {
+      return res.data
     } else if (res.data instanceof Blob) {
       return res.data
     }

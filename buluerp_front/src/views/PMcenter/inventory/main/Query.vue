@@ -198,7 +198,11 @@ onMounted(() => {
   console.log(chartDom)
 })
 const ChartVisible = ref(false)
-const mapKey = { 'packaging-material': 'packingNumber', part: 'mouldNumber', product: '成品' }
+const mapKey = {
+  'packaging-material': 'packingNumber',
+  part: 'mouldNumber',
+  product: 'productPartNumber',
+}
 const option = {
   title: { text: mapList[type.value] + '库存' },
   tooltip: {

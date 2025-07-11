@@ -8,6 +8,8 @@ import { GetUserInfo, GetMessage } from '@/apis/layout'
 import { defineAsyncComponent } from 'vue'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 import { ref } from 'vue'
+import useTabStore from '@/stores/modules/tabs'
+import router from '@/router'
 const message = ref({ avatar: '' })
 GetUserInfo().then((res) => {
   message.value = res.user
@@ -15,19 +17,27 @@ GetUserInfo().then((res) => {
 
 const total = ref(0)
 GetMessage().then((res) => {
-  if (res.total !== undefined) {
-    total.value = res.total
+  console.log()
+  if (res.data.total !== undefined) {
+    total.value = res.data.total
   }
 })
 const timer = setInterval(() => {
   GetMessage().then((res) => {
     if (res) {
-      total.value = res.total
+      total.value = res.data.total
     } else {
       clearInterval(timer)
     }
   })
-}, 2000)
+}, 6000)
+const logout = () => {
+  localStorage.removeItem('Authorization')
+  clearInterval(timer)
+  const store = useTabStore()
+  store.deleteTab()
+  router.push({ path: '/login' })
+}
 </script>
 <template>
   <div id="menu" class="row">
@@ -106,6 +116,7 @@ const timer = setInterval(() => {
           style="flex: 1"
           >{{ message.nickName }}</el-text
         >
+        <el-text @click="logout">登出</el-text>
       </div>
     </div>
   </div>

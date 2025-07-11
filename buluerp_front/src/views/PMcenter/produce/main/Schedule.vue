@@ -227,7 +227,7 @@ const newSubmit = ref({
   productCode: '',
   mouldNumber: '',
   mouldCondition: '',
-  picture: '',
+
   colorCode: '',
   usage: '',
   supplier: '',
@@ -434,7 +434,7 @@ const resetSubmit = () => {
     productCode: '',
     mouldNumber: '',
     mouldCondition: '',
-    picture: '',
+
     colorCode: '',
     usage: '',
     supplier: '',
