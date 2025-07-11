@@ -48,16 +48,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
-import {
-  ElInput,
-  ElMessageBox,
-  ElButton,
-  ElDialog,
-  ElUpload,
-  ElMessage,
-  ElAutocomplete,
-  ElFormItem,
-} from 'element-plus'
+import { ElInput, ElButton, ElDialog, ElUpload, ElAutocomplete, ElFormItem } from 'element-plus'
 import Form from '@/components/form/Form.vue'
 import { importOrderFile, getProductTemplate } from '@/apis/orders'
 import { fetchOrderStatusMap, newStatusMap, Status } from '../utils/statusMap'
@@ -81,7 +72,6 @@ const dialogForm = reactive({
   remark: '',
   operatorId: '0',
   quantity: 1,
-  productId: 0,
   productName: '',
   customerName: '',
   operater: '',
