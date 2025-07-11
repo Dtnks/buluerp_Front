@@ -49,6 +49,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="productName" label="产品名称" />
+          <el-table-column prop="materialId" label="物料ID" />
           <el-table-column prop="lddNumber" label="LDD编号" />
           <el-table-column prop="mouldNumber" label="模具编号" />
           <el-table-column prop="mouldCategory" label="模具类别" />

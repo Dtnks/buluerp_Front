@@ -20,8 +20,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, defineProps, defineEmits, watch } from 'vue'
+import { ref, defineProps, defineEmits, watch, onMounted } from 'vue'
 import CustomForm from '@/components/form/CreateForm.vue'
+import { getList_pro } from '@/apis/products'
 
 const props = defineProps<{
   modelValue: boolean
@@ -42,26 +43,63 @@ const form = ref<Record<string, any>>({
   productId: '',
 })
 
-const formConfig = [
-  [
-    {
-      label: '订单ID',
-      key: 'orderId',
-      type: 'input',
-      width: 12,
-      required: true,
-      placeholder: '请输入订单ID',
-    },
-    {
-      label: '产品编码',
-      key: 'productId',
-      type: 'input',
-      width: 12,
-      required: true,
-      placeholder: '请输入产品编码',
-    },
-  ],
-]
+// 非响应式变量
+let productOptions: any[] = []
+let productLoading = false
+
+const formConfig = ref<any[]>([])
+
+const updateFormConfig = () => {
+  formConfig.value = [
+    [
+      {
+        label: '订单ID',
+        key: 'orderId',
+        type: 'input',
+        width: 12,
+        required: true,
+        placeholder: '请输入订单ID',
+      },
+      {
+        label: '产品编码',
+        key: 'productId',
+        type: 'inputSelect',
+        width: 12,
+        required: true,
+        placeholder: '请输入产品编码',
+        remoteFunc: handleSearchProduct,
+        options: productOptions,
+        loading: productLoading,
+      },
+    ],
+  ]
+}
+
+// 初始化一次
+onMounted(() => {
+  updateFormConfig()
+})
+
+const handleSearchProduct = async (_item, query: string) => {
+  if (!query) {
+    productOptions = []
+    updateFormConfig()
+    return
+  }
+  productLoading = true
+  updateFormConfig()
+
+  try {
+    const res = await getList_pro({ id: query })
+    productOptions = (res.rows || []).map((item: any) => ({
+      value: item.id,
+      label: `${item.id} - ${item.name || ''}`,
+    }))
+  } finally {
+    productLoading = false
+    updateFormConfig()
+  }
+}
 
 watch(
   () => props.currentData,
@@ -91,7 +129,6 @@ const handleClose = () => {
 const handleSubmit = async () => {
   try {
     emit('submit', { ...form.value })
-    // handleClose()
   } catch (err) {
     console.error('校验失败', err)
   }

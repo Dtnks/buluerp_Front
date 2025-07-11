@@ -182,35 +182,25 @@ interface MaterialItem {
       <template #header><div class="card-header">业务订单基础信息</div></template>
 
       <el-row :gutter="20">
-        <el-col :span="8">
+        <el-col :span="12">
           <el-form-item label="产品编码">
             <el-text line-clamp="2">{{ props.detail?.id || '-' }}</el-text>
           </el-form-item>
         </el-col>
-        <el-col :span="8">
+        <el-col :span="12">
           <el-form-item label="创建日期">
             <el-text line-clamp="2">{{ props.detail?.createTime || '-' }}</el-text>
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
-          <el-form-item label="产品定价" prop="productPrice">
-            <el-input v-model="mainFormState.productPrice" placeholder="请输入" />
           </el-form-item>
         </el-col>
       </el-row>
 
       <el-row :gutter="20">
-        <el-col :span="8">
+        <el-col :span="12">
           <el-form-item label="产品名称" prop="productName">
             <el-input v-model="mainFormState.productName" placeholder="请输入" />
           </el-form-item>
         </el-col>
-        <el-col :span="8">
-          <el-form-item label="订单ID" prop="orderId">
-            <el-input v-model="mainFormState.orderId" placeholder="请输入" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="8">
+        <el-col :span="12">
           <el-form-item label="产品设计状态" prop="otherInfo">
             <el-select v-model="mainFormState.designStatus" placeholder="请选择">
               <el-option label="设计中" :value="0" />

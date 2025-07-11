@@ -55,9 +55,9 @@
           </el-form-item>
         </el-col>
         <el-col :span="6">
-          <el-form-item label="其他搜索" prop="otherSearch">
+          <!-- <el-form-item label="其他搜索" prop="otherSearch">
             <el-input v-model="formState.otherSearch" placeholder="请输入其他搜索条件" />
-          </el-form-item>
+          </el-form-item> -->
         </el-col>
         <el-col :span="6" style="text-align: right">
           <el-space>
@@ -125,10 +125,18 @@
           v-model="createForm.materialIds"
           multiple
           filterable
-          allow-create
-          default-first-option
-          placeholder="请输入物料ID，按回车确认"
+          remote
+          reserve-keyword
+          placeholder="请输入物料ID"
+          :remote-method="handleRemoteSearch"
+          :loading="materialLoading"
         >
+          <el-option
+            v-for="item in materialOptions"
+            :key="item.id"
+            :label="`${item.id} - ${item.specificationName || '未命名'}`"
+            :value="item.id"
+          />
         </el-select>
       </el-form-item>
     </el-form>
@@ -147,6 +155,7 @@ import type { FormInstance } from 'element-plus'
 import { createProduct, importProductFile, getProductTemplate } from '@/apis/products.js'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import { messageBox } from '@/components/message/messageBox' // ✅ 使用自定义封装
+import { getMaterialList } from '@/apis/materials'
 
 const emit = defineEmits(['search', 'created'])
 defineProps(['control'])
@@ -166,7 +175,7 @@ const createFormRules = {
   name: [{ required: true, message: '请输入产品名称', trigger: 'blur' }],
   innerId: [{ required: true, message: '请输入内部编号', trigger: 'blur' }],
   outerId: [{ required: true, message: '请输入外部编号', trigger: 'blur' }],
-  orderId: [{ required: true, message: '请输入订单ID', trigger: 'blur' }],
+  orderId: [{ required: true, message: '请输入订单ID', trigger: 'blur' },{ number: true, message:'请输入数字', trigger:'blur'}],
   image: [{ required: true, message: '请上传产品图片', trigger: 'change' }],
   materialIds: [
     {
@@ -266,6 +275,31 @@ const onCreateCancel = () => {
 
 const onImport = () => {
   importDialogVisible.value = true
+}
+
+const materialOptions = ref<any[]>([])        // 查询结果选项
+const materialLoading = ref(false)            // loading 状态
+
+const handleRemoteSearch = async (query: string) => {
+  if (!query) {
+    materialOptions.value = []
+    return
+  }
+
+  materialLoading.value = true
+  try {
+    const res = await getMaterialList({
+      id: query,
+      pageNum: 1,
+      pageSize: 20,
+    })
+    materialOptions.value = res.rows || []
+  } catch (error) {
+    console.error('获取物料失败', error)
+    materialOptions.value = []
+  } finally {
+    materialLoading.value = false
+  }
 }
 
 // 文件校验

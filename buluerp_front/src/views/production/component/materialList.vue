@@ -33,6 +33,7 @@
             <span v-else>暂无图片</span>
           </template>
         </el-table-column>
+        <el-table-column prop="id" label="物料ID" />
         <el-table-column prop="mouldNumber" label="模具编号" />
         <el-table-column prop="specificationName" label="规格名称" />
         <el-table-column prop="materialType" label="料别" />
