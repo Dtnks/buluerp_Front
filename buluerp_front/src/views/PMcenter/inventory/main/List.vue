@@ -104,7 +104,7 @@ const newFormData = ref({
         label: '进出数量',
         key: 'inOutQuantity',
         width: 12,
-        rules: [positiveNumberRule],
+        rules: [positiveNumberRule,requiredRule],
       },
       {
         type: 'input',
@@ -162,7 +162,7 @@ const newFormData = ref({
         label: '进出数量',
         key: 'inOutQuantity',
         width: 12,
-        rules: [positiveNumberRule],
+        rules: [positiveNumberRule,requiredRule],
       },
       {
         type: 'timer',
@@ -196,7 +196,7 @@ const newFormData = ref({
         label: '进出数量',
         key: 'inOutQuantity',
         width: 12,
-        rules: [positiveNumberRule],
+        rules: [positiveNumberRule,requiredRule],
       },
       {
         type: 'timer',

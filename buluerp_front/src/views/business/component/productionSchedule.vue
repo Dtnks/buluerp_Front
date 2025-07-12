@@ -132,7 +132,7 @@ const newFormData = ref([
       rules: [requiredRule],
     },
 
-    { type: 'input', label: '用量', key: 'usage', width: 8, rules: [positiveNumberRule] },
+    { type: 'input', label: '用量', key: 'usage', width: 8, rules: [positiveNumberRule,requiredRule] },
   ],
   [
     {
@@ -218,13 +218,13 @@ const newFormData = ref([
     { type: 'input', label: '料别', key: 'materialType', width: 12, rules: [requiredRule] },
   ],
   [
-    { type: 'input', label: '单重', key: 'singleWeight', width: 8, rules: [positiveNumberRule] },
+    { type: 'input', label: '单重', key: 'singleWeight', width: 8, rules: [positiveNumberRule,requiredRule] },
     {
       type: 'input',
       label: '布产重量',
       key: 'productionWeight',
       width: 8,
-      rules: [positiveNumberRule],
+      rules: [positiveNumberRule,requiredRule],
     },
     { type: 'input', label: '供应商', key: 'supplier', width: 8, rules: [requiredRule] },
   ],
@@ -251,7 +251,7 @@ const newFormData = ref([
       label: '色粉数量',
       key: 'colorPowderNeeded',
       width: 8,
-      rules: [positiveNumberRule],
+      rules: [positiveNumberRule,requiredRule],
     },
     { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 8, rules: [requiredRule] },
     { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 8, rules: [requiredRule] },

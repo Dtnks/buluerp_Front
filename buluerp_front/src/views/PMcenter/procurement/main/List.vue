@@ -40,6 +40,8 @@ const newFormData = ref([
       key: 'purchaseId',
       width: 12,
       rules: [requiredRule],
+      showKey:[{key:'id',label:"采购计划"},{key:'purchaseQuantity',label:"采购数量"}
+              ,{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
       remoteFunc: searchFunc('system/purchase-collection/list', 'id'),
       loading: false,
       options: [],
@@ -49,30 +51,7 @@ const newFormData = ref([
       label: '订单金额',
       key: 'amount',
       width: 12,
-      rules: [positiveNumberRule],
-    },
-  ],
-  [
-    {
-      type: 'input',
-      label: '单重',
-      key: 'singleWeight',
-      width: 8,
-      rules: [positiveNumberRule],
-    },
-    {
-      type: 'input',
-      label: '采购重量',
-      key: 'purchaseWeight',
-      width: 8,
-      rules: [positiveNumberRule],
-    },
-    {
-      type: 'number',
-      label: '采购数量',
-      key: 'purchaseQuantity',
-      width: 8,
-      rules: [positiveNumberRule],
+      rules: [positiveNumberRule,requiredRule],
     },
   ],
   [

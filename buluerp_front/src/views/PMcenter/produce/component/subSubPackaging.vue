@@ -113,6 +113,7 @@ import * as Sub from '@/apis/produceControl/produce/subsubPackage.js'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 import { ref } from 'vue'
 import { getFullImageUrl } from '@/utils/image/getUrl'
+import { searchFunc } from '@/utils/search/search'
 
 import { messageBox } from '@/components/message/messageBox'
 const props = defineProps(['id'])
@@ -134,13 +135,13 @@ const newSubSubFormData = ref([
       width: 8,
       rules: [requiredRule],
     },
-    { type: 'input', label: '本包数量', key: 'bagQuantity', width: 8, rules: [positiveNumberRule] },
+    { type: 'input', label: '本包数量', key: 'bagQuantity', width: 8, rules: [positiveNumberRule,requiredRule] },
     {
       type: 'input',
       label: '用量',
       key: 'usage',
       width: 8,
-      rules: [positiveNumberRule],
+      rules: [positiveNumberRule,requiredRule],
     },
   ],
   [
@@ -149,7 +150,7 @@ const newSubSubFormData = ref([
       label: '套料数量',
       key: 'setQuantity',
       width: 8,
-      rules: [positiveNumberRule],
+      rules: [positiveNumberRule,requiredRule],
     },
     {
       type: 'input',
@@ -157,30 +158,27 @@ const newSubSubFormData = ref([
 
       key: 'singleWeight',
       width: 8,
-      rules: [positiveNumberRule],
+      rules: [positiveNumberRule,requiredRule],
     },
     {
       type: 'input',
       label: '规格名称',
       key: 'specificationName',
       width: 8,
-      rules: [positiveNumberRule],
+      rules: [positiveNumberRule,requiredRule],
     },
   ],
   [
     {
-      type: 'input',
-      label: '料别',
-      key: 'materialType',
+      type: 'inputSelect',
+      label: '物料',
+      key: 'materialId',
       width: 12,
       rules: [requiredRule],
-    },
-    {
-      type: 'input',
-      label: '模具编号',
-      key: 'mouldNumber',
-      width: 12,
-      rules: [requiredRule],
+      showKey:[{key:'id',label:"物料ID"},{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
+      remoteFunc: searchFunc('system/material-info/list', 'id'),
+      options: [],
+      loading: false,
     },
   ],
   [
@@ -189,7 +187,7 @@ const newSubSubFormData = ref([
       label: '备注',
       key: 'remarks',
       width: 24,
-      rules: [positiveNumberRule],
+      rules: [],
     },
   ],
   [

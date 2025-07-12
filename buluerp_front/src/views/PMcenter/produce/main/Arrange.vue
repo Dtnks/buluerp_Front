@@ -53,23 +53,21 @@ const newFormData = ref([
       label: '排产数量',
       key: 'productionQuantity',
       width: 8,
-      rules: [positiveNumberRule],
+      rules: [positiveNumberRule,requiredRule],
     },
     {
       type: 'input',
       label: '排产重量',
       key: 'productionWeight',
       width: 8,
-      rules: [positiveNumberRule],
+      rules: [positiveNumberRule,requiredRule],
     },
   ],
   [
-    { type: 'input', label: '颜色编号', key: 'colorCode', width: 12, rules: [requiredRule] },
-    { type: 'input', label: '料别', key: 'materialType', width: 12, rules: [requiredRule] },
-  ],
-  [
-    { type: 'input', label: '出模数', key: 'mouldOutput', width: 12, rules: [positiveNumberRule] },
-    { type: 'input', label: '模具编号', key: 'mouldNumber', width: 12, rules: [requiredRule] },
+    { type: 'input', label: '颜色编号', key: 'colorCode', width: 8, rules: [requiredRule] },
+    { type: 'input', label: '出模数', key: 'mouldOutput', width: 8, rules: [positiveNumberRule,requiredRule] },
+    { type: 'input', label: '单重', key: 'singleWeight', width: 8, rules: [positiveNumberRule,requiredRule] },
+
   ],
   [
     {
@@ -80,9 +78,7 @@ const newFormData = ref([
       timerType: 'date',
       rules: [requiredRule],
     },
-    { type: 'input', label: '单重', key: 'singleWeight', width: 12, rules: [positiveNumberRule] },
-  ],
-  [
+
     {
       type: 'timer',
       label: '完成时间',

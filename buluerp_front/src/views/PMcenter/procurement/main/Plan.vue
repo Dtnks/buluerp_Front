@@ -43,21 +43,43 @@ const newFormData = ref([
       label: '采购重量',
       key: 'purchaseWeight',
       width: 8,
-      rules: [positiveNumberRule],
+      rules: [positiveNumberRule,requiredRule],
     },
     {
       type: 'number',
       label: '采购数量',
       key: 'purchaseQuantity',
       width: 8,
-      rules: [positiveNumberRule],
+      rules: [positiveNumberRule,requiredRule],
     },
-    { type: 'input', label: '单重', key: 'singleWeight', width: 8, rules: [positiveNumberRule] },
+    { type: 'input', label: '单重', key: 'singleWeight', width: 8, rules: [positiveNumberRule,requiredRule] },
+  ],
+    [
+ { type: 'input', label: '颜色编号', key: 'colorCode', width: 8, rules: [requiredRule] },
+        
+    { type: 'input', label: '供应商', key: 'supplier', width: 8, rules: [requiredRule] },
+    { type: 'input', label: '规格', key: 'specification', width: 8, rules: [requiredRule] },
   ],
   [
-    { type: 'input', label: '颜色编号', key: 'colorCode', width: 12, rules: [requiredRule] },
-    { type: 'input', label: '料别', key: 'materialType', width: 12, rules: [requiredRule] },
-  ],
+   {
+      type: 'timer',
+      label: '下单时间',
+      key: 'orderTime',
+      width: 12,
+      timerType: 'date',
+      rules: [requiredRule],
+    },  
+    {
+      type: 'inputSelect',
+      label: '物料',
+      key: 'materialIds',
+      width: 12,
+      rules: [requiredRule],
+      showKey:[{key:'id',label:"物料ID"},{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
+      remoteFunc: searchFunc('system/material-info/list', 'id'),
+      options: [],
+      loading: false,
+    },  ],
   [
     {
       type: 'timer',
@@ -76,41 +98,29 @@ const newFormData = ref([
       rules: [requiredRule],
     },
   ],
-  [
-    {
-      type: 'timer',
-      label: '下单时间',
-      key: 'orderTime',
-      width: 12,
-      timerType: 'date',
-      rules: [requiredRule],
-    },
-    { type: 'input', label: '供应商', key: 'supplier', width: 12, rules: [requiredRule] },
-  ],
-  [
-    { type: 'input', label: '模具编号', key: 'mouldNumber', width: 12, rules: [requiredRule] },
-    { type: 'input', label: '规格', key: 'specification', width: 12, rules: [requiredRule] },
-  ],
+
   [
     {
       type: 'inputSelect',
-      label: '订单Id',
+      label: '订单',
       key: 'orderCode',
       width: 12,
       rules: [requiredRule],
+      showKey:[{key:'innerId',label:"内部编号"},{key:'outerId',label:"外部编号"}],
       remoteFunc: searchFunc('system/orders/list', 'innerId'),
       options: [],
       loading: false,
     },
     {
       type: 'inputSelect',
-      label: '产品ID',
+      label: '产品',
       key: 'productId',
       width: 12,
+      showKey:[{key:'id',label:"产品ID"},{key:'name',label:"产品名称"}],
       rules: [requiredRule],
-      remoteFunc: searchFunc('system/products/list', 'id'),
       options: [],
       loading: false,
+      remoteFunc: searchFunc('system/products/list', 'id'),
     },
   ],
   [
@@ -158,7 +168,7 @@ const designFormData = ref([
       label: '采购数量',
       key: 'purchaseQuantity',
       width: 12,
-      rules: [positiveNumberRule],
+      rules: [positiveNumberRule,requiredRule],
     },
     {
       type: 'textarea',
@@ -180,8 +190,7 @@ const newSubmit = ref({
   singleWeight: '',
   purchaseWeight: '',
   supplier: '',
-  materialType: '',
-  mouldNumber: '',
+
   specification: '',
   orderCode: '',
   productId: '',
@@ -215,16 +224,16 @@ const resetDesignSubmit = () => {
 }
 const tableData = ref([
   {
-    value: 'id',
+    value: 'purchaseCode',
     label: 'ID',
     type: 'text',
   },
-  { value: 'creationTime', label: '创建时间', type: 'text' },
   {
-    value: 'operator',
-    label: '操作人',
+    value: 'orderCode',
+    label: '订单ID',
     type: 'text',
   },
+  
   {
     value: 'materialType',
     label: '料别',
@@ -280,7 +289,12 @@ const tableData = ref([
     label: '供应商',
     type: 'text',
   },
-
+  { value: 'creationTime', label: '创建时间', type: 'text' },
+  {
+    value: 'operator',
+    label: '操作人',
+    type: 'text',
+  },
   {
     value: 'remarks',
     label: '备注',
@@ -330,6 +344,11 @@ const designFormRef = ref(null)
 const handleSubmit = () => {
   createFormRef.value.validateForm((valid) => {
     if (valid) {
+      newSubmit.value.creationTime = parseTime(newSubmit.value.creationTime, '{y}-{m}-{d}')
+        newSubmit.value.deliveryDate = parseTime(newSubmit.value.deliveryDate, '{y}-{m}-{d}')
+        newSubmit.value.deliveryTime = parseTime(newSubmit.value.deliveryTime, '{y}-{m}-{d}')
+        newSubmit.value.orderTime = parseTime(newSubmit.value.orderTime, '{y}-{m}-{d}')
+        
       if (title.value === '编辑') {
         changePurchasePlan(newSubmit.value).then((res) => {
           page.value = 1
@@ -341,10 +360,6 @@ const handleSubmit = () => {
           editDialogVisible.value = false
         })
       } else {
-        newSubmit.value.creationTime = parseTime(newSubmit.value.creationTime, '{y}-{m}-{d}')
-        newSubmit.value.deliveryDate = parseTime(newSubmit.value.deliveryDate, '{y}-{m}-{d}')
-        newSubmit.value.deliveryTime = parseTime(newSubmit.value.deliveryTime, '{y}-{m}-{d}')
-        newSubmit.value.orderTime = parseTime(newSubmit.value.orderTime, '{y}-{m}-{d}')
         newPurchasePlan(newSubmit.value).then((res) => {
           page.value = 1
           listPurchasePlan(page.value, pageSize.value).then((res) => {
@@ -397,8 +412,6 @@ const resetSubmit = () => {
     singleWeight: '',
     purchaseWeight: '',
     supplier: '',
-    materialType: '',
-    mouldNumber: '',
     specification: '',
     orderCode: '',
     productId: '',
@@ -523,6 +536,7 @@ const handleSizeChange = async (val: number) => {
 
 //初次渲染
 listPurchasePlan(page.value, pageSize.value).then((res) => {
+  console.log(res)
   total.value = res.total
   listData.value = res.rows
 })
