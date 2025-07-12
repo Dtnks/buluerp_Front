@@ -6,31 +6,16 @@
         <template #header>
           <div class="card-header">
             <span style="font-weight: bold">审核列表</span>
-            <el-select
-              v-if="isLoadingCompleted"
-              v-model="type"
-              placeholder="请选择"
-              style="width: 120px"
-              size="small"
-              @change="fetchAuditData(true)"
-            >
-              <el-option
-                v-for="item in TypeOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
+            <el-select v-if="isLoadingCompleted" v-model="type" placeholder="请选择" style="width: 120px" size="small"
+              @change="fetchAuditData(true)">
+              <el-option v-for="item in TypeOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
           </div>
         </template>
         <el-table :data="tableData" border style="width: 100%; margin-top: 10px">
           <!-- <el-table-column type="selection" width="55" /> -->
-          <el-table-column
-            v-for="column in columns[type as keyof typeof columns]"
-            :key="column.value"
-            :prop="column.value"
-            :label="column.label"
-          >
+          <el-table-column v-for="column in columns[type as keyof typeof columns]" :key="column.value"
+            :prop="column.value" :label="column.label">
             <template #default="scope">
               <template v-if="column.value === 'auditType'">
                 {{ auditTypeMap[scope.row.auditType as keyof typeof auditTypeMap] || scope.row.auditType }}
@@ -60,76 +45,40 @@
             <template #default="scope">
               <el-popover @hide="onCancel" width="200px">
                 <div class="popover-content">
-                  <el-select
-                    v-model="commitData.accept"
-                    placeholder="是否通过审核"
-                    :teleported="false"
-                    class="popover-content"
-                  >
-                    <el-option
-                      v-for="(label, value) in auditAcceptMap"
-                      :key="value"
-                      :label="label"
-                      :value="value"
-                    />
+                  <el-select v-model="commitData.accept" placeholder="是否通过审核" :teleported="false"
+                    class="popover-content">
+                    <el-option v-for="(label, value) in auditAcceptMap" :key="value" :label="label" :value="value" />
                   </el-select>
-                  <el-input
-                    v-model="commitData.auditComment"
-                    placeholder="请输入审核意见"
-                    class="popover-content"
-                  ></el-input>
-                  <el-button
-                    size="small"
-                    type="primary"
-                    @click="onAudit(scope.row.id, commitData)"
-                    class="popover-button"
-                    >确认</el-button
-                  >
+                  <el-input v-model="commitData.auditComment" placeholder="请输入审核意见" class="popover-content"></el-input>
+                  <el-button size="small" type="primary" @click="onAudit(scope.row.id, commitData)"
+                    class="popover-button">确认</el-button>
                   <el-button size="small" @click="onCancel" class="popover-button">重置</el-button>
                 </div>
                 <template #reference>
                   <el-button size="small">审核</el-button>
                 </template>
               </el-popover>
-              <el-button
-                size="small"
-                style="margin-left: 1px"
-                @click="onView(scope.row.auditType, scope.row.auditId)"
-                >查看</el-button
-              >
+              <el-button size="small" style="margin-left: 1px"
+                @click="onView(scope.row.auditType, scope.row.auditId)">查看</el-button>
             </template>
           </el-table-column>
         </el-table>
         <div style="margin-top: 20px; display: flex; justify-content: flex-end">
-          <el-pagination
-            background
-            layout="prev, pager, next, jumper, ->, total, sizes"
-            :total="total"
-            :current-page="page"
-            :page-size="pageSize"
-            :page-sizes="[5, 10, 20]"
-            @current-change="handlePageChange"
-            @size-change="handleSizeChange"
-          />
+          <el-pagination background layout="prev, pager, next, jumper, ->, total, sizes" :total="total"
+            :current-page="page" :page-size="pageSize" :page-sizes="[5, 10, 20]" @current-change="handlePageChange"
+            @size-change="handleSizeChange" />
         </div>
       </el-card>
     </div>
   </div>
   <el-dialog v-model="dialogVisible" width="50%" title="查看审核详情" class="audit-dialog">
     <el-form class="flex-form">
-      <el-form-item
-        v-for="item in formData[type]"
-        :key="item.value"
-        :label="item.label"
-        class="form-item"
-      >
+      <el-form-item v-for="item in formData[type]" :key="item.value" :label="item.label" class="form-item">
         <span class="form-value" v-if="detailData[item.value] && item.value != 'pictureUrl'">{{
           detailData[item.value]
-        }}</span>
-        <el-image
-          v-else-if="detailData[item.value] && item.value == 'pictureUrl'"
-          :src="getFullImageUrl(detailData[item.value])"
-        ></el-image>
+          }}</span>
+        <el-image v-else-if="detailData[item.value] && item.value == 'pictureUrl'"
+          :src="getFullImageUrl(detailData[item.value])"></el-image>
         <span class="form-value" v-else>暂无数据</span>
       </el-form-item>
     </el-form>
@@ -166,8 +115,12 @@ onMounted(async () => {
   fetchAuditData(true)
   console.log(newStatusMap.value, 'newStatusMap111111111');
 
-  const token = localStorage.getItem('Authorization') // 或从cookie等获取
-  ws = new WebSocket(`ws://localhost:8080/websocket/${token}`)
+  const token = localStorage.getItem('Authorization');
+  if (!token) {
+    console.error('Token 不存在');
+    return;
+  }
+  ws = new WebSocket(`ws://154.201.77.135:8080/websocket/${token}`)
 
   ws.onopen = () => {
     console.log('WebSocket 连接已建立')
