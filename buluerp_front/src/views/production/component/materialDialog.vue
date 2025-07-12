@@ -18,7 +18,7 @@
         circle
       ><el-icon><Delete /></el-icon></el-button>
     </div>
-    
+
     <CustomForm
       :data="formConfig"
       :formState="formState"
@@ -37,7 +37,9 @@
 import { ref, defineProps, defineEmits, watch } from 'vue'
 import CustomForm from '@/components/form/CreateForm.vue' // 替换为你封装组件的路径
 import ImageUpload from '@/components/upload/editUpload.vue'
+import { getFullImageUrl } from '@/utils/image/getUrl'
 import { Delete } from '@element-plus/icons-vue'
+import { number } from 'echarts'
 
 const props = defineProps<{
   modelValue: boolean
@@ -93,7 +95,9 @@ const formConfig = [
       label: '模具编号',
       key: 'mouldNumber',
       type: 'input',
-      width: 8
+      width: 8,
+      required: true,
+      rules: [{ required: true, message: '请输入模具编号', trigger: 'blur' }]
     },{
       label: '规格名称',
       key: 'specificationName',
@@ -111,7 +115,9 @@ const formConfig = [
       label: '材料类型',
       key: 'materialType',
       type: 'input',
-      width: 12
+      width: 12,
+      required: true,
+      rules: [{ required: true, message: '请输入模具编号', trigger: 'blur' }]
     },{
       label: '单重',
       key: 'singleWeight',
@@ -130,6 +136,12 @@ const formConfig = [
       key: 'sampleLocation',
       type: 'input',
       width: 8
+    },{
+      label: '常规编码',
+      key: 'standardCode',
+      type: 'input',
+      width: 8,
+      rules: [{number: true, message: '请输入数字',trigger:'blur'}]
     }
   ],
   [
@@ -196,10 +208,10 @@ watch(
   { immediate: true }
 )
 
-const getFullImageUrl = (path: string) => {
-  const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
-  return BASE_IMAGE_URL + path.replace('//', '/')
-}
+// const getFullImageUrl = (path: string) => {
+//   const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
+//   return BASE_IMAGE_URL + path.replace('//', '/')
+// }
 
 watch(
   () => form.value.drawingReferenceFile,
@@ -219,38 +231,43 @@ const removeImage = () => {
 
 const handleSubmit = async () => {
   try {
-    const formData = new FormData()
+    if (!formRef.value) return
 
-    for (const key in form.value) {
-      if (key === 'drawingReferenceFile') {
-        if (drawingFile.value) {
-          // 新上传的图片
-          formData.append('drawingReferenceFile', drawingFile.value)
-        } else if (
-          typeof form.value.drawingReferenceFile === 'string' &&
-          form.value.drawingReferenceFile !== ''
-        ) {
-          // 旧图片路径，保持不变
-          formData.append('drawingReference', form.value.drawingReferenceFile)
+    formRef.value.validateForm(async (valid: boolean) => {
+      if (!valid) return
+
+      const formData = new FormData()
+
+      for (const key in form.value) {
+        if (key === 'drawingReferenceFile') {
+          if (drawingFile.value) {
+            formData.append('drawingReferenceFile', drawingFile.value)
+          } else if (
+            typeof form.value.drawingReferenceFile === 'string' &&
+            form.value.drawingReferenceFile !== ''
+          ) {
+            formData.append('drawingReference', form.value.drawingReferenceFile)
+          }
+          continue
         }
-        continue
-      }
-      if (form.value.deleteDrawingReference) {
-        formData.append('deleteDrawingReference', 'true')  // 转为字符串发送
+        if (form.value.deleteDrawingReference) {
+          formData.append('deleteDrawingReference', 'true')
+        }
+
+        const value = form.value[key]
+        if (Array.isArray(value)) {
+          value.forEach(v => formData.append(key, v))
+        } else if (value !== null && value !== undefined) {
+          formData.append(key, value)
+        }
       }
 
-      const value = form.value[key]
-      if (Array.isArray(value)) {
-        value.forEach(v => formData.append(key, v))
-      } else if (value !== null && value !== undefined) {
-        formData.append(key, value)
-      }
-    }
-
-    emit('submit', formData)
-    handleClose()
+      emit('submit', formData)
+      handleClose()
+    })
   } catch (err) {
     console.error('表单提交失败:', err)
   }
 }
+
 </script>

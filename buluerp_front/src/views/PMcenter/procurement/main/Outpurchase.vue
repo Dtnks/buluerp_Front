@@ -24,7 +24,7 @@ const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
   [
-    { type: 'input', label: '料别', key: 'materialType' },
+    { type: 'input', label: '物料ID', key: 'materialId' },
     { type: 'input', label: '外购ID', key: 'purchaseCode', width: 8 },
     { type: 'input', label: '供应商', key: 'supplier' },
   ],
@@ -34,13 +34,13 @@ const newFormData = ref([
   [
     {
       type: 'inputSelect',
-      label: '料别',
-      key: 'materialType',
+      label: '物料ID',
+      key: 'materialId',
       width: 12,
       rules: [requiredRule],
       options: [],
       loading: false,
-      remoteFunc: searchFunc('system/material-info/list', 'materialType'),
+      remoteFunc: searchFunc('system/material-info/list', 'id'),
     },
     {
       type: 'input',
@@ -57,7 +57,7 @@ const newFormData = ref([
   [{ type: 'image', label: '样例图', key: 'picture', width: 12 }],
 ])
 const newSubmit = ref({
-  materialType: '',
+  materialId: '',
   purchaseCode: '',
   unitPrice: '',
   supplier: '',
@@ -68,7 +68,7 @@ const searchContent = ref({
   operator: '',
   colorCode: '',
   supplier: '',
-  materialType: '',
+  materialId: '',
 })
 const tableData = ref([
   {
@@ -81,7 +81,7 @@ const tableData = ref([
     label: '产品图片',
     type: 'picture',
   },
-  { value: 'materialType', label: '料别', type: 'text' },
+  { value: 'materialId', label: '物料ID', type: 'text' },
 
   {
     value: 'purchaseCode',
@@ -171,7 +171,7 @@ const title = ref('编辑')
 //传给form组件的参数
 const resetSubmit = () => {
   newSubmit.value = {
-    materialType: '',
+    materialId: '',
     purchaseCode: '',
     unitPrice: '',
     supplier: '',

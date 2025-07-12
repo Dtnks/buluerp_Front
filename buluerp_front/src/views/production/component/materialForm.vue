@@ -34,9 +34,9 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="搜索关键字">
+            <!-- <el-form-item label="搜索关键字">
               <el-input v-model="formState.keyword" placeholder="请输入关键字" />
-            </el-form-item>
+            </el-form-item> -->
           </el-col>
         </el-row>
       </el-form>
@@ -147,14 +147,15 @@ const handleCreate = () => {
 }
 
 const handleCreateSubmit = async (formData: any) => {
-  try {
-    await addMaterial(formData)
-    messageBox('success', null, '新建成功', '', '')
-    dialogVisible.value = false
-    emit('search')
-  } catch (error) {
-    messageBox('error', null, '', '新建失败', '')
-  }
+    const res = await addMaterial(formData)
+
+    if (res.code === 200) {
+      messageBox('success', null, '新建成功', '', '')
+      dialogVisible.value = false
+      handleSearch()
+    } else {
+      messageBox('error', null, '', res.msg || '新建失败', '')
+    }
 }
 
 const handleImport = () => {
