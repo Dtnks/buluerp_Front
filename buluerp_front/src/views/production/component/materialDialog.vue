@@ -19,12 +19,12 @@
       ><el-icon><Delete /></el-icon></el-button>
     </div>
 
-    <CustomForm
-      :data="formConfig"
-      :formState="formState"
-      :formRef="formRef"
-      :Formvalue="form"
-    />
+      <CustomForm
+        ref="formRef"
+        :data="formConfig"
+        :formState="formState"
+        :Formvalue="form"
+      />
 
     <template #footer>
       <el-button @click="handleClose">取消</el-button>
@@ -53,7 +53,7 @@ const visible = ref(props.modelValue)
 watch(() => props.modelValue, (val) => (visible.value = val))
 watch(() => visible.value, (val) => emit('update:modelValue', val))
 
-const formRef = ref()
+const formRef = ref<any>(null)
 const formState = ref({})
 const form = ref<Record<string, any>>({
   mouldNumber: '',
@@ -229,45 +229,44 @@ const removeImage = () => {
   setDrawingFile(null)
 }
 
-const handleSubmit = async () => {
-  try {
-    if (!formRef.value) return
+const handleSubmit = () => {
+  if (!formRef.value) return
 
-    formRef.value.validateForm(async (valid: boolean) => {
-      if (!valid) return
+  // 使用回调方式
+  formRef.value.validateForm((valid: boolean) => {
+    if (!valid) return
 
-      const formData = new FormData()
+    const formData = new FormData()
 
-      for (const key in form.value) {
-        if (key === 'drawingReferenceFile') {
-          if (drawingFile.value) {
-            formData.append('drawingReferenceFile', drawingFile.value)
-          } else if (
-            typeof form.value.drawingReferenceFile === 'string' &&
-            form.value.drawingReferenceFile !== ''
-          ) {
-            formData.append('drawingReference', form.value.drawingReferenceFile)
-          }
-          continue
+    for (const key in form.value) {
+      if (key === 'drawingReferenceFile') {
+        if (drawingFile.value) {
+          formData.append('drawingReferenceFile', drawingFile.value)
+        } else if (
+          typeof form.value.drawingReferenceFile === 'string' &&
+          form.value.drawingReferenceFile !== ''
+        ) {
+          formData.append('drawingReference', form.value.drawingReferenceFile)
         }
-        if (form.value.deleteDrawingReference) {
-          formData.append('deleteDrawingReference', 'true')
-        }
-
-        const value = form.value[key]
-        if (Array.isArray(value)) {
-          value.forEach(v => formData.append(key, v))
-        } else if (value !== null && value !== undefined) {
-          formData.append(key, value)
-        }
+        continue
       }
 
-      emit('submit', formData)
-      handleClose()
-    })
-  } catch (err) {
-    console.error('表单提交失败:', err)
-  }
+      if (form.value.deleteDrawingReference) {
+        formData.append('deleteDrawingReference', 'true')
+      }
+
+      const value = form.value[key]
+      if (Array.isArray(value)) {
+        value.forEach(v => formData.append(key, v))
+      } else if (value !== null && value !== undefined) {
+        formData.append(key, value)
+      }
+    }
+
+    emit('submit', formData)
+    handleClose()
+  })
 }
+
 
 </script>
