@@ -40,6 +40,8 @@ const mainFormState = reactive({
   orderId: '',
   productName: '',
   productIntro: '',
+  innerId: '',
+  outerId: '',
   designStatus: 0,
 })
 
@@ -58,6 +60,8 @@ const refreshData = async () => {
     originalProductName.value = val.name || ''
     mainFormState.orderId = val.orderId || ''
     mainFormState.designStatus = Number(val.designStatus ?? 0)
+    mainFormState.innerId = val.innerId || ''
+    mainFormState.outerId = val.outerId || ''
 
     if (val.pictureUrl) {
       pictureUrl.value = getFullImageUrl(val.pictureUrl)
@@ -140,6 +144,8 @@ const submitMainForm = async () => {
       orderId: mainFormState.orderId,
       designStatus: Number(mainFormState.designStatus),
       picture: pictureFile.value ?? null,
+      innerId: mainFormState.innerId,
+      outerId: mainFormState.outerId,
     })
     tabStore.freshTab('产品查询')
 
@@ -182,30 +188,40 @@ interface MaterialItem {
       <template #header><div class="card-header">业务订单基础信息</div></template>
 
       <el-row :gutter="20">
-        <el-col :span="12">
+        <el-col :span="8">
           <el-form-item label="产品编码">
             <el-text line-clamp="2">{{ props.detail?.id || '-' }}</el-text>
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="8">
           <el-form-item label="创建日期">
             <el-text line-clamp="2">{{ props.detail?.createTime || '-' }}</el-text>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="内部编号" prop="innerId">
+            <el-input v-model="mainFormState.innerId" placeholder="请输入" />
           </el-form-item>
         </el-col>
       </el-row>
 
       <el-row :gutter="20">
-        <el-col :span="12">
+        <el-col :span="8">
           <el-form-item label="产品名称" prop="productName">
             <el-input v-model="mainFormState.productName" placeholder="请输入" />
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="8">
           <el-form-item label="产品设计状态" prop="otherInfo">
             <el-select v-model="mainFormState.designStatus" placeholder="请选择">
               <el-option label="设计中" :value="0" />
               <el-option label="已完成" :value="1" />
             </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="外部编号" prop="outerId">
+            <el-input v-model="mainFormState.outerId" placeholder="请输入" />
           </el-form-item>
         </el-col>
       </el-row>
