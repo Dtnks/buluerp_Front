@@ -56,6 +56,9 @@ const useTabStore = defineStore('tabs', {
         }
       })
     },
+    deleteTab() {
+      this.$state.editableTabs = []
+    },
   },
 })
 

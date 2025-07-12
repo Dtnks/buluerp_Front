@@ -181,7 +181,6 @@ const newSubmit = ref({
   purchaseWeight: '',
   supplier: '',
   materialType: '',
-  picture: '',
   mouldNumber: '',
   specification: '',
   orderCode: '',
@@ -303,6 +302,7 @@ const operation = ref([
       const id = row.id
       title.value = '编辑'
       editDialogVisible.value = true
+
       newSubmit.value = { ...row }
       nextTick(() => {
         createFormRef.value.clearValidate()
@@ -398,7 +398,6 @@ const resetSubmit = () => {
     purchaseWeight: '',
     supplier: '',
     materialType: '',
-    picture: '',
     mouldNumber: '',
     specification: '',
     orderCode: '',
@@ -609,10 +608,12 @@ listPurchasePlan(page.value, pageSize.value).then((res) => {
         </template>
       </el-upload>
     </el-dialog>
-        <el-dialog v-model="createTypeDialogVisible" title="请选择新建方式" width="400px">
-      <div style="display: flex; flex-direction: column; gap: 12px;">
+    <el-dialog v-model="createTypeDialogVisible" title="请选择新建方式" width="400px">
+      <div style="display: flex; flex-direction: column; gap: 12px">
         <el-button type="primary" @click="handleCreateType('direct')">直接新建</el-button>
-        <el-button type="success" @click="handleCreateType('design')">从外购资料/设计总表新建</el-button>
+        <el-button type="success" @click="handleCreateType('design')"
+          >从外购资料/设计总表新建</el-button
+        >
       </div>
     </el-dialog>
     <el-dialog v-model="designDialogVisible" title="从设计/外购新增采购计划" width="800px">

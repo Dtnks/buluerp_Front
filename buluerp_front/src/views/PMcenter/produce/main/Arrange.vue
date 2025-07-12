@@ -106,7 +106,6 @@ const newSubmit = ref({
   productionQuantity: '',
   scheduledTime: '',
   singleWeight: '',
-  picture: null,
 })
 const searchContent = ref({
   colorCode: '',
@@ -270,7 +269,7 @@ const resetSubmit = () => {
     productionQuantity: '',
     scheduledTime: '',
     singleWeight: '',
-    picture: '',
+
     pictureUrl: null,
   }
 }
