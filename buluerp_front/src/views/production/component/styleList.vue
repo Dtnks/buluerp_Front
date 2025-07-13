@@ -56,13 +56,6 @@
           <el-table-column prop="material" label="模具用料" />
           <el-table-column prop="color" label="颜色" />
           <el-table-column prop="quantity" label="数量" />
-          <el-table-column prop="confirm" label="是否确认">
-            <template #default="{ row }">
-              <el-tag :type="row.confirm ? 'success' : 'info'">
-                {{ row.confirm ? '已确认' : '未确认' }}
-              </el-tag>
-            </template>
-          </el-table-column>
           <el-table-column label="操作" fixed="right" width="120">
             <template #default="{ row }">
               <el-button size="small" type="primary" text @click="onEdit(row)">编辑</el-button>
@@ -160,6 +153,7 @@ import { downloadBinaryFile } from '@/utils/file/base64'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 import StyleDialog from '../component/styleDialog.vue'
 import useTabStore from '@/stores/modules/tabs'
+import { updateProduct } from '@/apis/products'
 
 const props = defineProps<{
   detail: any
@@ -408,14 +402,20 @@ const handleSubmit = async (rawForm: Record<string, any>) => {
 }
 //Dialog 中只负责传值，FormData 永远由父组件构造和发送。!!!!!!!!!
 const handleConfirm = async () => {
-  try {
+  // console.log(props.detail)
+  //   const res2 = await updateProduct({
+  //     id: Number(props.detail.id),
+  //     designStatus: Number(1),
+  //     name: props.detail.name,
+  //     picture: getFullImageUrl(props.detail.pictureUrl,)
+  //   })
     const res = await pmcConfirm(props.detail.id)
-
-    messageBox('success', null, '确认成功', '', '')
-    tabStore.freshTab('产品查询')
-  } catch (err) {
-    messageBox('error', null, '', '确认失败', '')
-  }
+    if (res.code==200) {
+      messageBox('success', null, '确认成功', '', '')
+      tabStore.freshTab('产品查询')
+    } else {
+      messageBox('error',null,'确认失败',res.data.msg,'')
+    }
 }
 
 const handleCancelConfirm = async () => {

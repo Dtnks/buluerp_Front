@@ -101,9 +101,6 @@
       <el-form-item label="外部编号" prop="outerId">
         <el-input v-model="createForm.outerId" placeholder="请输入外部编号" />
       </el-form-item>
-      <el-form-item label="订单ID" prop="orderId">
-        <el-input v-model="createForm.orderId" placeholder="请输入订单ID" />
-      </el-form-item>
       <el-form-item label="产品图片" prop="image">
         <el-upload
           class="avatar-uploader"
@@ -119,25 +116,6 @@
             </div>
           </div>
         </el-upload>
-      </el-form-item>
-      <el-form-item label="物料ID" prop="materialIds">
-        <el-select
-          v-model="createForm.materialIds"
-          multiple
-          filterable
-          remote
-          reserve-keyword
-          placeholder="请输入物料ID"
-          :remote-method="handleRemoteSearch"
-          :loading="materialLoading"
-        >
-          <el-option
-            v-for="item in materialOptions"
-            :key="item.id"
-            :label="`${item.id} - ${item.specificationName || '未命名'}`"
-            :value="item.id"
-          />
-        </el-select>
       </el-form-item>
     </el-form>
 
@@ -165,9 +143,7 @@ const createForm = reactive({
   name: '',
   innerId: '',
   outerId: '',
-  orderId: '',
   image: '',
-  materialIds: [] as number[],
 })
 
 const createFormRef = ref<FormInstance>()
@@ -175,17 +151,7 @@ const createFormRules = {
   name: [{ required: true, message: '请输入产品名称', trigger: 'blur' }],
   innerId: [{ required: true, message: '请输入内部编号', trigger: 'blur' }],
   outerId: [{ required: true, message: '请输入外部编号', trigger: 'blur' }],
-  orderId: [{ required: true, message: '请输入订单ID', trigger: 'blur' },{ number: true, message:'请输入数字', trigger:'blur'}],
   image: [{ required: true, message: '请上传产品图片', trigger: 'change' }],
-  materialIds: [
-    {
-      required: true,
-      type: 'array',
-      min: 1,
-      message: '请至少输入一个物料 ID',
-      trigger: 'change',
-    },
-  ],
 }
 
 const imageFile = ref<File | null>(null)
@@ -204,11 +170,6 @@ const handleCreateSubmit = async () => {
   formData.append('picture', imageFile.value)
   formData.append('innerId', createForm.innerId)
   formData.append('outerId', createForm.outerId)
-  formData.append('orderId', createForm.orderId)
-
-  createForm.materialIds.forEach((id) => {
-    formData.append('materialIds', id)
-  })
 
   messageBox(
     'warning',
@@ -230,8 +191,6 @@ const resetCreateForm = () => {
   createForm.image = ''
   createForm.outerId = ''
   createForm.innerId = ''
-  createForm.orderId = ''
-  createForm.materialIds = []
   imageFile.value = null
   createFormRef.value?.clearValidate?.()
 }

@@ -46,18 +46,18 @@ export function importProductFile(formData) {
 
 export function updateProduct(data) {
   const formData = new FormData();
+
   formData.append('id', String(data.id));
   formData.append('name', data.name);
   formData.append('designStatus', String(data.designStatus));
-  if (Array.isArray(data.materialIds)) {
-    data.materialIds.forEach((id) => {
-      formData.append('materialIds', String(id));
-    });
-  }
-  if (data.picture) {
-    console.log('上传图片文件：', data.picture);
+
+  // 默认 deletePicture = 0，除非明确要求删除
+  formData.append('deletePicture', String(data.deletePicture === 1 ? 1 : 0));
+
+  if (data.picture instanceof File) {
     formData.append('picture', data.picture);
   }
+
   return httpInstance({
     url: 'system/products',
     method: 'put',
@@ -67,6 +67,8 @@ export function updateProduct(data) {
     },
   });
 }
+
+
 
 
 export function getProductTemplate() {

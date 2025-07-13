@@ -86,7 +86,7 @@ function flattenDesignDetail(data: any): DesignMaterialItem[] {
     data.mouldNumber?.length || 0,
     data.lddNumber?.length || 0,
     data.mouldCategory?.length || 0,
-    data.mouldId?.length || 0,
+    data.materialId?.length || 0,
     data.pictureUrl?.length || 0,
     data.color?.length || 0,
     data.productName?.length || 0,
@@ -100,7 +100,7 @@ function flattenDesignDetail(data: any): DesignMaterialItem[] {
       mouldNumber: data.mouldNumber?.[i] || '',
       lddNumber: data.lddNumber?.[i] || '',
       mouldCategory: data.mouldCategory?.[i] || '',
-      mouldId: data.mouldId?.[i] || '',
+      materialId: data.materialId?.[i] || '',
       pictureUrl: data.pictureUrl?.[i] || '',
       color: data.color?.[i] || '',
       productName: data.productName?.[i] || '',
@@ -130,32 +130,46 @@ watch(
 const removeImage = (index: number) => {
   fileList.value.splice(index, 1)
 }
+const deleteImage = () => {
+  pictureUrl.value = ''
+  pictureFile.value = null
+}
+
 
 const submitMainForm = async () => {
   if (!mainFormRef.value) return
+
   try {
     await mainFormRef.value.validate()
 
-    // const rawFile = fileList.value[0]?.raw ?? null
+    const payload: any = {
+    id: Number(props.detail?.id),
+    name: mainFormState.productName,
+    orderId: mainFormState.orderId,
+    designStatus: Number(mainFormState.designStatus),
+    innerId: mainFormState.innerId,
+    outerId: mainFormState.outerId,
+    deletePicture: 0, // 默认保留图片
+  }
 
-    await updateProduct({
-      id: Number(props.detail?.id),
-      name: mainFormState.productName,
-      orderId: mainFormState.orderId,
-      designStatus: Number(mainFormState.designStatus),
-      picture: pictureFile.value ?? null,
-      innerId: mainFormState.innerId,
-      outerId: mainFormState.outerId,
-    })
+  if (pictureFile.value) {
+    payload.picture = pictureFile.value // 用户上传新图
+  } else if (!pictureUrl.value) {
+    payload.deletePicture = 1 // 用户主动删除图片
+  }
+
+
+    await updateProduct(payload)
+
     tabStore.freshTab('产品查询')
 
     if (mainFormState.productName !== originalProductName.value) {
       const oldTabName = `详情页-${originalProductName.value}`
       const newTabName = `详情页-${mainFormState.productName}`
       tabStore.changeTabName(oldTabName, newTabName)
-
       originalProductName.value = mainFormState.productName
     }
+
     messageBox('success', null, '提交成功', '', '')
   } catch (err) {
     console.error('提交失败', err)
@@ -211,14 +225,13 @@ interface MaterialItem {
             <el-input v-model="mainFormState.productName" placeholder="请输入" />
           </el-form-item>
         </el-col>
-        <el-col :span="8">
-          <el-form-item label="产品设计状态" prop="otherInfo">
-            <el-select v-model="mainFormState.designStatus" placeholder="请选择">
-              <el-option label="设计中" :value="0" />
-              <el-option label="已完成" :value="1" />
-            </el-select>
-          </el-form-item>
-        </el-col>
+      <el-col :span="8">
+        <el-form-item label="产品设计状态">
+          <el-text>
+            {{ mainFormState.designStatus === 1 ? '已确认' : '未确认' }}
+          </el-text>
+        </el-form-item>
+      </el-col>
         <el-col :span="8">
           <el-form-item label="外部编号" prop="outerId">
             <el-input v-model="mainFormState.outerId" placeholder="请输入" />
@@ -230,16 +243,21 @@ interface MaterialItem {
         <el-col :span="8">
           <el-form-item label="上传图片" prop="uploadImage">
             <uploadPicture :setFile="setFile" :initialUrl="pictureUrl" />
+            <div v-if="pictureUrl" class="deletebutton">
+              <el-button type="danger" size="small" @click="deleteImage">删除图片</el-button>
+            </div>
           </el-form-item>
         </el-col>
         <el-col :span="16">
           <div class="preview-container">
+            <!-- 显示新上传的预览图 -->
             <div v-for="(item, index) in fileList" :key="index" class="preview-item">
               <img :src="item.url" alt="预览" class="preview-image" />
               <el-button type="danger" size="small" @click="removeImage(index)">删除</el-button>
             </div>
           </div>
         </el-col>
+
       </el-row>
       <div style="text-align: right; margin-top: 20px">
         <el-space>
@@ -261,19 +279,19 @@ interface MaterialItem {
       </el-steps>
 
       <el-table :data="tableData" style="width: 100%" max-height="400">
-        <el-table-column prop="mouldNumber" label="模具编号" width="120" />
-        <el-table-column prop="lddNumber" label="LDD编号" width="120" />
-        <el-table-column prop="mouldCategory" label="模具分类" width="120" />
-        <el-table-column prop="mouldId" label="模具ID" width="120" />
-        <el-table-column prop="pictureUrl" label="图片">
+        <el-table-column prop="mouldNumber" label="模具编号"  />
+        <el-table-column prop="lddNumber" label="LDD编号"  />
+        <el-table-column prop="mouldCategory" label="模具分类"  />
+        <el-table-column prop="materialId" label="物料ID"  />
+        <el-table-column prop="pictureUrl" label="图片" >
           <template #default="scope">
             <el-image :src="getFullImageUrl(scope.row.pictureUrl)" style="width: 80px; height: 80px;" />
           </template>
         </el-table-column>
-        <el-table-column prop="color" label="颜色" width="100" />
-        <el-table-column prop="productName" label="产品名称" width="120" />
-        <el-table-column prop="quantity" label="数量" width="80" />
-        <el-table-column prop="material" label="原材料" width="120" />
+        <el-table-column prop="color" label="颜色"  />
+        <el-table-column prop="productName" label="产品名称"  />
+        <el-table-column prop="quantity" label="数量"  />
+        <el-table-column prop="material" label="原材料"  />
 
       </el-table>
     </el-card>
@@ -289,7 +307,6 @@ interface MaterialItem {
 .preview-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
   margin-top: 10px;
 }
 .preview-item {
@@ -305,5 +322,8 @@ interface MaterialItem {
 }
 .mt-4 {
   margin-top: 16px;
+}
+.deletebutton{
+  margin-bottom: 20px;
 }
 </style>

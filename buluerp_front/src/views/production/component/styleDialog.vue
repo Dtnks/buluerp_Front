@@ -47,7 +47,7 @@
               />
             </el-select>
             <div class="el-form-item__extra" style="color: #409EFF; font-size: 13px;">
-              提示：填写物料ID后会自动填写模具编号与模具类型
+              提示：填写物料ID后会自动填写模具编号，模具类型与图片
             </div>
           </el-form-item>
         </el-col>
