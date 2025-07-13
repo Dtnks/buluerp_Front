@@ -109,10 +109,32 @@ const newFormData = ref([
     },
     { type: 'input', label: '单重', key: 'singleWeight', width: 8, rules: [positiveNumberRule,requiredRule] },
   ],
-  [
-    { type: 'input', label: '颜色编号', key: 'colorCode', width: 12, rules: [requiredRule] },
-    { type: 'input', label: '料别', key: 'materialType', width: 12, rules: [requiredRule] },
+    [
+ { type: 'input', label: '颜色编号', key: 'colorCode', width: 8, rules: [requiredRule] },
+        
+    { type: 'input', label: '供应商', key: 'supplier', width: 8, rules: [requiredRule] },
+    { type: 'input', label: '规格', key: 'specification', width: 8, rules: [requiredRule] },
   ],
+  [
+   {
+      type: 'timer',
+      label: '下单时间',
+      key: 'orderTime',
+      width: 12,
+      timerType: 'date',
+      rules: [requiredRule],
+    },  
+    {
+      type: 'inputSelect',
+      label: '物料',
+      key: 'materialIds',
+      width: 12,
+      rules: [requiredRule],
+      showKey:[{key:'id',label:"物料ID"},{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
+      remoteFunc: searchFunc('system/material-info/list', 'id'),
+      options: [],
+      loading: false,
+    },  ],
   [
     {
       type: 'timer',
@@ -131,41 +153,29 @@ const newFormData = ref([
       rules: [requiredRule],
     },
   ],
-  [
-    {
-      type: 'timer',
-      label: '下单时间',
-      key: 'orderTime',
-      width: 12,
-      timerType: 'date',
-      rules: [requiredRule],
-    },
-    { type: 'input', label: '供应商', key: 'supplier', width: 12, rules: [requiredRule] },
-  ],
-  [
-    { type: 'input', label: '模具编号', key: 'mouldNumber', width: 12, rules: [requiredRule] },
-    { type: 'input', label: '规格', key: 'specification', width: 12, rules: [requiredRule] },
-  ],
+
   [
     {
       type: 'inputSelect',
-      label: '订单Id',
+      label: '订单',
       key: 'orderCode',
       width: 12,
       rules: [requiredRule],
+      showKey:[{key:'innerId',label:"内部编号"},{key:'outerId',label:"外部编号"}],
       remoteFunc: searchFunc('system/orders/list', 'innerId'),
       options: [],
       loading: false,
     },
     {
       type: 'inputSelect',
-      label: '产品ID',
+      label: '产品',
       key: 'productId',
       width: 12,
+      showKey:[{key:'id',label:"产品ID"},{key:'name',label:"产品名称"}],
       rules: [requiredRule],
-      remoteFunc: searchFunc('system/products/list', 'id'),
       options: [],
       loading: false,
+      remoteFunc: searchFunc('system/products/list', 'id'),
     },
   ],
   [

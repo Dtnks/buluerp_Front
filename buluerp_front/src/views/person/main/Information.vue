@@ -3,7 +3,7 @@ import { GetMessage } from '@/apis/layout'
 import { ref } from 'vue'
 const messages = ref()
 GetMessage().then((res) => {
-  messages.value = res.rows
+  messages.value = res.data.rows
 })
 </script>
 <template>

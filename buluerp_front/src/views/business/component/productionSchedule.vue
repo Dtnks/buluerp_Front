@@ -98,19 +98,21 @@ const newFormData = ref([
   [
     {
       type: 'inputSelect',
-      label: '订单Id',
+      label: '订单',
       key: 'orderCode',
       width: 12,
       rules: [requiredRule],
+      showKey:[{key:'innerId',label:"内部编号"},{key:'outerId',label:"外部编号"}],
       remoteFunc: searchFunc('system/orders/list', 'innerId'),
       options: [],
       loading: false,
     },
     {
       type: 'inputSelect',
-      label: '产品ID',
+      label: '产品',
       key: 'productId',
       width: 12,
+      showKey:[{key:'id',label:"产品ID"},{key:'name',label:"产品名称"}],
       rules: [requiredRule],
       options: [],
       loading: false,
@@ -119,8 +121,7 @@ const newFormData = ref([
     // { type: 'input', label: '产品编码', key: 'productCode', width: 8 },
   ],
   [
-    { type: 'input', label: '模具编码', key: 'mouldNumber', width: 8 },
-    {
+      {
       type: 'select',
       label: '模具状态',
       key: 'mouldCondition',
@@ -131,7 +132,12 @@ const newFormData = ref([
       ],
       rules: [requiredRule],
     },
-
+    {
+      type: 'input',
+      label: '颜色编号',
+      key: 'colorCode',
+      width: 8,
+    },
     { type: 'input', label: '用量', key: 'usage', width: 8, rules: [positiveNumberRule,requiredRule] },
   ],
   [
@@ -176,23 +182,7 @@ const newFormData = ref([
     },
   ],
   [
-    {
-      type: 'inputSelect',
-      label: '颜色编号',
-      key: 'colorCode',
-      width: 12,
-      remoteFunc: (ele) => {
-        ele.loading = true
-        ele.options = [
-          { label: '1', value: '1' },
-          { label: '2', value: '2' },
-          { label: '3', value: '3' },
-        ]
-        ele.loading = false
-      },
-      loading: false,
-      options: [],
-    },
+    
     {
       type: 'inputSelect',
       label: '排产Id',
@@ -203,20 +193,20 @@ const newFormData = ref([
       loading: false,
       remoteFunc: searchFunc('system/production-arrange/list', 'id'),
     },
-  ],
-  [
+
     {
-      type: 'mutilInputSelect',
-      label: '物料ID',
+      type: 'inputSelect',
+      label: '物料',
       key: 'materialIds',
       width: 12,
       rules: [requiredRule],
+      showKey:[{key:'id',label:"物料ID"},{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
+      remoteFunc: searchFunc('system/material-info/list', 'id'),
       options: [],
       loading: false,
-      remoteFunc: searchFunc('system/material-info/list', 'id'),
     },
-    { type: 'input', label: '料别', key: 'materialType', width: 12, rules: [requiredRule] },
-  ],
+
+     ],
   [
     { type: 'input', label: '单重', key: 'singleWeight', width: 8, rules: [positiveNumberRule,requiredRule] },
     {
