@@ -189,7 +189,7 @@ const customerSuggestions = (queryString: string, cb) => {
   emit('customerSuggestions', queryString, cb)
 }
 const checkCustomerName = () => {
-  emit('checkCustomerName')
+  emit('checkCustomerName', editForm.customerName)
 }
 
 // 表格操作--end

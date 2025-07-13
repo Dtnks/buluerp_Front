@@ -1,6 +1,6 @@
 <template>
   <Form :data="data" :title="title" :onSubmit="onSubmit" :onCreate="onCreate" :onImport="onImport"
-    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm" :control="control"></Form>
+    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm" :control="control" :formState="formState"></Form>
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
       <!-- <el-form-item label="订单状态">
@@ -182,7 +182,7 @@ const customerSuggestions = (queryString: string, cb) => {
   emit('customerSuggestions', queryString, cb)
 }
 const checkCustomerName = () => {
-  emit('checkCustomerName')
+  emit('checkCustomerName', dialogForm.customerName)
 }
 // onAddCancel: 取消新增订单
 const onAddCancel = () => {
