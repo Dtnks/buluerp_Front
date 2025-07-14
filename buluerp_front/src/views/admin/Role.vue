@@ -153,13 +153,7 @@
           </el-table-column>
         </el-table>
 
-        <pagination
-          v-show="total > 0"
-          :total="total"
-          v-model:page="queryParams.pageNum"
-          v-model:limit="queryParams.pageSize"
-          @pagination="getList"
-      /></el-card>
+        </el-card>
     </div>
 
     <!-- 添加或修改角色配置对话框 -->
@@ -264,7 +258,7 @@ const data = reactive({
   form: {},
   queryParams: {
     pageNum: 1,
-    pageSize: 10,
+    pageSize: 100,
     roleName: undefined,
     roleKey: undefined,
     status: undefined,

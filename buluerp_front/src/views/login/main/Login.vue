@@ -14,21 +14,16 @@ const fullscreenLoading = ref(false)
 const handleLogin = () => {
   fullscreenLoading.value = true
   Login({ username: account.value, password: password.value }).then(async (res) => {
-    console.log('login-response', res)
 
-    if (res.msg != '操作成功') {
-      ElMessage({ type: 'error', message: '账号或密码错误' })
-      fullscreenLoading.value = false
-    } else {
       localStorage.setItem('Authorization', res.token)
       await store.refreshMenu()
       router.push({
         path: '/main',
       })
-      fullscreenLoading.value = false
       ElMessage({ type: 'success', message: '登录成功' })
-    }
-  })
+    
+  }).catch((err) => {
+      fullscreenLoading.value = false  })
 }
 </script>
 <template>

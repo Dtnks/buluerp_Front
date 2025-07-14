@@ -19,7 +19,7 @@ let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
 
 export function getOptionselect() {
   return httpInstance({
-    url: `system/role/list`,
+    url: `system/role/list?pageNum=1&pageSize=100`,
     method: 'get',
     headers: headers,
   })
