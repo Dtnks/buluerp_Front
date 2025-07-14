@@ -106,6 +106,7 @@ const handleSizeChange = (pageSize: number) => {
 }
 
 const suggestionResult = ref([])
+
 // customerSuggestions: 客户姓名建议
 const customerSuggestions = async (queryString: string, cb) => {
   const res = await listCustomerAll(queryString)
@@ -123,14 +124,19 @@ const customerSuggestions = async (queryString: string, cb) => {
     ? customerNames.value.filter((customer) => customer.includes(queryString))
     : customerNames.value
   cb(results.map((name) => ({ value: name })))
+
 }
 
 // checkCustomerName: 校验客户姓名
-const checkCustomerName = () => {
-  // console.log('校验客户姓名:', dialogForm.customerName)
-  if (suggestionResult.value.length === 0) {
-    messageBox('error', null, null, '没有找到匹配的客户姓名, 请先添加客户')
-  }
+const checkCustomerName = async (customerName: string) => {
+  await customerSuggestions(customerName, (suggestions) => {
+    suggestionResult.value = suggestions
+    console.log('校验客户姓名:', suggestionResult.value)
+    if (suggestionResult.value.length === 0) {
+      messageBox('error', null, null, '没有找到匹配的客户姓名, 请先添加客户')
+    }
+  })
+
 }
 
 // 初始化数据
