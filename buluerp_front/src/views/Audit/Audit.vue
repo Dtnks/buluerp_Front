@@ -99,6 +99,7 @@ import { getPurchasePlanDetail } from '@/apis/produceControl/purchase/purchasePl
 import { getPackagingDetail } from '@/apis/produceControl/produce/packaging'
 import { getProductionScheduleById } from '@/apis/produceControl/produce/schedule'
 import { getFullImageUrl } from '@/utils/image/getUrl'
+import useTabStore from '@/stores/modules/tabs'
 
 const props = defineProps(['control'])
 const popoverRef = ref()
@@ -144,7 +145,7 @@ onUnmounted(() => {
   }
 })
 const tableData = ref([])
-
+const tabStore = useTabStore()
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
@@ -232,6 +233,7 @@ const onAudit = async (id: number, commitData: any) => {
     messageBox('success', null, res.msg || '审核成功')
     commitData.auditComment = '' // 清空输入框
     fetchAuditData(true) // 刷新数据
+    tabStore.freshTab('订单查询')
   }
   // popoverRef.value?.hide() // 关闭弹出框
 }
