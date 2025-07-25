@@ -35,7 +35,7 @@ const newFormData = ref([
     {
       type: 'inputSelect',
       label: '物料',
-      key: 'materialIds',
+      key: 'materialId',
       width: 12,
       rules: [requiredRule],
       showKey:[{key:'id',label:"物料ID"},{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],

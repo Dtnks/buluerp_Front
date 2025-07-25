@@ -80,7 +80,7 @@ export function downLoadModule() {
 
 export function getPackagingDetail(id) {
   return httpInstance({
-    url: `system/packaging-list/${id}`,
+    url: `system/packaging-list?ids=${id}`,
     method: 'get',
     headers: headers,
   })

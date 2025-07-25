@@ -36,7 +36,7 @@ const value = ref('')
     <div id="boxShow" class="col">
       <div class="row header">
         <div class="title">公司业务订单情况</div>
-        <div class="timeSelect">
+        <!-- <div class="timeSelect">
           <span>今日</span><span>本周</span><span>本月</span><span>全年</span
           ><el-date-picker
             v-model="value"
@@ -45,7 +45,7 @@ const value = ref('')
             end-placeholder="End date"
             style="width: 250px"
           />
-        </div>
+        </div> -->
       </div>
       <div style="flex: 1; position: relative; overflow: scroll">
         <div class="box col" style="top: 8vh; left: 4vw">
@@ -70,26 +70,26 @@ const value = ref('')
         <div class="arrow-right" style="top: 12vh; left: 39vw"></div>
 
         <div class="box col" style="top: 8vh; left: 40vw">
-          <div>待外购布产</div>
-          <div>{{ orderStateCount['待定制外购与布产计划']||0 }}笔</div>
+          <div>待布产</div>
+          <div>{{ orderStateCount['待制定布产计划']||0 }}笔</div>
         </div>
         <div class="toright" style="top: 13vh; left: 46vw"></div>
         <div class="arrow-right" style="top: 12vh; left: 51vw"></div>
 
         <div class="box col" style="top: 8vh; left: 52vw">
-          <div>外购布产中</div>
-          <div>{{ (orderStateCount['外购中']||0)+(orderStateCount['布产中']||0)+(orderStateCount['外购与布产中']||0) }}笔</div>
+          <div>待排产</div>
+          <div>{{ orderStateCount['待排产']||0}}笔</div>
         </div>
         <div class="toright" style="top: 13vh; left: 58vw"></div>
         <div class="arrow-right" style="top: 12vh; left: 63vw"></div>
 
         <div class="box col" style="top: 8vh; left: 64vw">
-          <div>齐料入库</div>
-          <div>{{ (orderStateCount['已齐料入库(待套料)']||0)+(orderStateCount['齐料完成']||0) }}笔</div>
+          <div>排产中</div>
+          <div>{{ orderStateCount['排产中']||0}}笔</div>
         </div>
         <div class="box col" style="top: 8vh; left: 76vw">
-          <div>套料中</div>
-          <div>{{ (orderStateCount['套料中']||0)+(orderStateCount['套料完成(待拉线)']||0) }}笔</div>
+          <div>待采购</div>
+          <div>{{ orderStateCount['生产完成(待采购完成)']||0}}笔</div>
         </div>
         <div class="toright" style="top: 13vh; left: 70vw"></div>
         <div class="arrow-right" style="top: 12vh; left: 75vw"></div>
@@ -97,56 +97,71 @@ const value = ref('')
         <div class="tobottom" style="top: 18vh; left: 79vw"></div>
         <div class="arrow-bottom" style="top: 24vh; left: 78.5vw"></div>
         <div class="box col" style="top: 26vh; left: 76vw">
-            <div>待拉线</div>
-            <div>{{ orderStateCount['套料完成(待拉线)']||0 }}笔</div>
+            <div>齐料入库</div>
+            <div>{{ orderStateCount['已齐料入库(待套料)']||0 }}笔</div>
           </div>
         <div class="toright" style="top: 31vh; left: 70vw"></div>
         <div class="arrow-left" style="top: 30vh; left: 70vw"></div>
 
         <div class="box col" style="top: 26vh; left: 64vw">
-          <div>拉线组包中</div>
-          <div>{{ orderStateCount['拉线组包中']||0 }}笔</div>
+          <div>套料中</div>
+          <div>{{ orderStateCount['套料中']||0 }}笔</div>
         </div>
         <div class="toright" style="top: 31vh; left: 58vw"></div>
         <div class="arrow-left" style="top: 30vh; left: 58vw"></div>
 
         <div class="box col" style="top: 26vh; left: 52vw">
-          <div>分包已入库</div>
-          <div>{{ orderStateCount['拉线完成(分包已入库)']||0 }}笔</div>
+          <div>待拉线</div>
+          <div>{{ orderStateCount['套料完成(待拉线)']||0 }}笔</div>
         </div>
         <div class="toright" style="top: 31vh; left: 46vw"></div>
         <div class="arrow-left" style="top: 30vh; left: 46vw"></div>
 
         <div class="box col" style="top: 26vh; left: 40vw">
-          <div>包装中</div>
-          <div>{{ orderStateCount['包装中']||0 }}笔</div>
+          <div>拉线组包中</div>
+          <div>{{ orderStateCount['拉线组包中']||0 }}笔</div>
         </div>
         <div class="toright" style="top: 31vh; left: 34vw"></div>
         <div class="arrow-left" style="top: 30vh; left: 34vw"></div>
 
         <div class="box col" style="top: 26vh; left: 28vw">
-          <div>已发货</div>
-          <div>{{ orderStateCount['已发货']||0 }}笔</div>
+          <div>分包已入库</div>
+          <div>{{ orderStateCount['拉线完成(分包已入库)']||0 }}笔</div>
         </div>
         <div class="toright" style="top: 31vh; left: 22vw"></div>
         <div class="arrow-left" style="top: 30vh; left: 22vw"></div>
 
         <div class="box col" style="top: 26vh; left: 16vw">
+          <div>包装中</div>
+          <div>{{ orderStateCount['包装中']||0 }}笔</div>
+        </div>
+        <div class="toright" style="top: 31vh; left: 10vw"></div>
+        <div class="arrow-left" style="top: 30vh; left: 10vw"></div>
+
+        <div class="box col" style="top: 26vh; left: 4vw">
+          <div>已发货</div>
+          <div>{{ orderStateCount['已发货']||0 }}笔</div>
+        </div>
+        <div class="tobottom" style="top: 36vh; left: 7vw"></div>
+        <div class="arrow-bottom" style="top: 42vh; left: 6.5vw"></div>
+
+        <div class="box col" style="top: 44vh; left: 4vw">
           <div>已完成</div>
           <div>{{ orderStateCount['已完成']||0 }}笔</div>
         </div>
 
-        <div class="box col" style="top: 26vh; left: 4vw">
+        <div class="box col" style="top: 44vh; left: 16vw">
           <div>审核不通过</div>
-          <div>{{ orderStateCount['审核不通过']||0 }}笔</div>
+          <div>{{ orderStateCount['审核不通过'] || 0 }}笔</div>
         </div>
+     
       </div>
     </div>
   </div>
 </template>
 <style scoped>
 #boxShow {
-  height: 50vh;
+  height: 60vh;
   background-color: white;
   margin: 30px;
   box-shadow: var(--el-box-shadow-light);

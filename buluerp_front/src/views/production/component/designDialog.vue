@@ -90,10 +90,10 @@ const handleSearchProduct = async (_item, query: string) => {
   updateFormConfig()
 
   try {
-    const res = await getList_pro({ id: query })
+    const res = await getList_pro({ innerId: query })
     productOptions = (res.rows || []).map((item: any) => ({
-      value: item.id,
-      label: `${item.id} - ${item.name || ''}`,
+      value: item.innerId,
+      label: `${item.innerId} - ${item.name || ''}`,
     }))
   } finally {
     productLoading = false
@@ -127,10 +127,6 @@ const handleClose = () => {
 }
 
 const handleSubmit = async () => {
-  try {
-    emit('submit', { ...form.value })
-  } catch (err) {
-    console.error('校验失败', err)
-  }
+  emit('submit', { ...form.value })
 }
 </script>

@@ -31,14 +31,6 @@ const formData = ref([
     { type: 'timer', label: '发布日期', key: 'releaseDate', timerType: 'date' },
   ],
   [
-    { type: 'input', label: '生产线', key: 'productionLine' },
-    { type: 'input', label: '操作人', key: 'operator' },
-  ],
-  [
-    { type: 'input', label: '订单编号', key: 'orderCode' },
-    { type: 'input', label: '本袋规格', key: 'bagSpecification' },
-  ],
-  [
     {
       type: 'select',
       label: '说明书',
@@ -67,6 +59,15 @@ const formData = ref([
       ],
     },
   ],
+  [
+    { type: 'select', label: '完成', key: 'done' ,options: [
+        { value: 1, label: '是' },
+        { value: 0, label: '否' },
+      ],},
+    { type: 'input', label: '操作人', key: 'operator' },
+    { type: 'input', label: '订单编号', key: 'orderCode' },
+  ],
+  
 ])
 const newFormData = ref([
   [
@@ -105,14 +106,19 @@ const newFormData = ref([
       rules: [requiredRule],
     },
   ],
-  [
-    { type: 'input', label: '本袋规格', key: 'bagSpecification', width: 8, rules: [requiredRule] },
-    { type: 'input', label: '本袋重量', key: 'bagWeight', width: 8, rules: [positiveNumberRule,requiredRule] },
+    [
     {
-      type: 'input',
-      label: '本袋数量',
-      key: 'packageQuantity',
-      width: 8,
+      type: 'number',
+      label: '配件种类',
+      key: 'accessoryType',
+      width: 12,
+      rules: [positiveNumberRule,requiredRule],
+    },
+    {
+      type: 'number',
+      label: '配件数量',
+      key: 'accessoryTotal',
+      width: 12,
       rules: [positiveNumberRule,requiredRule],
     },
   ],
@@ -151,29 +157,7 @@ const newFormData = ref([
       rules: [requiredRule],
     },
   ],
-  [
-    {
-      type: 'number',
-      label: '本袋配件',
-      key: 'packageAccessories',
-      width: 8,
-      rules: [positiveNumberRule,requiredRule],
-    },
-    {
-      type: 'number',
-      label: '配件种类',
-      key: 'accessoryType',
-      width: 8,
-      rules: [positiveNumberRule,requiredRule],
-    },
-    {
-      type: 'number',
-      label: '配件数量',
-      key: 'accessoryTotal',
-      width: 8,
-      rules: [positiveNumberRule,requiredRule],
-    },
-  ],
+
   [{ type: 'textarea', label: '备注', key: 'remark', width: 24 }],
 ])
 const newSubmit = ref({
@@ -205,6 +189,12 @@ const tableData = ref([
     value: 'id',
     label: 'ID',
     type: 'text',
+  },
+  {
+    value: 'done',
+    label: '完成情况',
+    type: 'Maptext',
+    map: { true: '否', false: '是' },
   },
   {
     value: 'orderCode',
@@ -260,7 +250,7 @@ const tableData = ref([
   },
   {
     value: 'isTool',
-    label: '起见器',
+    label: '起件器',
     type: 'Maptext',
     map: { true: '否', false: '是' },
   },
@@ -286,6 +276,22 @@ const operation = ref([
       })
     },
     value: '编辑',
+    disabled: props.control[1].disabled,
+  },
+  {
+    func: (row) => {
+      title.value = '编辑'
+      newSubmit.value.done=true
+      changePackaging(newSubmit.value).then((res) => {
+          page.value = 1
+          listPackaging(page.value, pageSize.value).then((res) => {
+            listData.value = res.rows
+            total.value = res.total
+          })
+          ElMessage.success(res.msg)
+        })
+    },
+    value: '分包完成',
     disabled: props.control[1].disabled,
   },
   {

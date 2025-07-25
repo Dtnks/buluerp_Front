@@ -11,7 +11,14 @@ export function getOrdersList(params = {}) {
     params,
   })
 }
-
+export const getDesignIdByOrderCode=(orderCode)=>{
+  return httpInstance({
+    url: 'system/orders/designId',
+    method: 'get',
+    params: { orderCode },
+    headers: headers,
+  })
+} 
 export const editOder = (data) => {
   return httpInstance({
     url: 'system/orders/edit',
@@ -33,7 +40,7 @@ export const getOrderDetailById = (id) => {
   // 使用httpInstance发送get请求，获取订单详情
   return httpInstance({
     // 请求的url
-    url: `system/orders/${id}`,
+    url: `system/orders?ids=${id}`,
     // 请求的方法
     method: 'get',
     // 请求的头部信息
@@ -88,7 +95,7 @@ export const getOrderProducts = (id) => {
   return httpInstance({
     url: `system/products/list`,
     method: 'get',
-    params: { orderId: id },
+    params: { innerId: id },
     headers: headers,
   })
 }

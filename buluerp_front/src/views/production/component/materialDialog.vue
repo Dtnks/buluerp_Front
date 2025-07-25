@@ -56,19 +56,19 @@ watch(() => visible.value, (val) => emit('update:modelValue', val))
 const formRef = ref<any>(null)
 const formState = ref({})
 const form = ref<Record<string, any>>({
-  mouldNumber: '',
-  specificationName: '',
   cavityCount: null,
+  cycleTime: null,
+  drawingReferenceFile: null,
   materialType: '',
-  standardCode: '',
-  singleWeight: null,
   mouldStatus: '',
   mouldManufacturer: '',
-  cycleTime: null,
+  mouldNumber: '',
   sampleLocation: '',
   remarks: '',
+  specificationName: '',
+  standardCode: '',
+  singleWeight: null,
   spareCode: '',
-  drawingReferenceFile: null,
   deleteDrawingReference: false
 })
 

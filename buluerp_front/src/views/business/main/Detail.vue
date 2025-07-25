@@ -18,12 +18,10 @@ const basicData = ref<any[]>([])
 
 onMounted(async () => {
   if (props.data.id) {
-    const detailRes = await getOrderDetail(props.data.id)
-    detail.value = detailRes
+    detail.value = (await getOrderDetail(props.data.id))[0]
     // const productsRes = await getOderProducts(props.data.id)
     // orderProduct.value = productsRes
-    console.log('1231323242424', props.data);
-
+    console.log('detail.value', detail.value)
   } else {
     console.log('找不到订单ID');
     messageBox('找不到订单ID', 'error')
@@ -35,7 +33,7 @@ onMounted(async () => {
 <template>
   <div class="col">
     <BordShow content="业务订单详情页" path="业务中心/详情" />
-    <DetailShow :id="props.data.id" v-if="detail" :detail="detail" :basicData="basicData" :orderCode="props.data.orderCode" :addTab="addTab"  :control="control"/>
+    <DetailShow v-if="detail" :id="props.data.id" :detail="detail" :basicData="basicData" :orderCode="props.data.orderCode" :addTab="addTab"  :control="control"/>
   </div>
 </template>
 

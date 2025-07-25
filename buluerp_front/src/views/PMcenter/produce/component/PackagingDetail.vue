@@ -4,7 +4,11 @@
     <div class="greyBack">
       <el-card class="detail-card">
         <template #header>
+          <div class="row" style="justify-content: space-between;">
           <div class="card-header">分包详情</div>
+          <el-button type="primary" @click="handleChange">分包完成</el-button>
+          </div>  
+          
         </template>
         <div class="detail-row" v-for="(row, index) in chunkedDisplayData" :key="index">
           <div v-for="(value, key) in row" :key="key" class="detail-item">
@@ -23,11 +27,18 @@
 <script setup lang="js">
 import BordShow from '@/components/board/SecBoard.vue'
 import { ElCard } from 'element-plus'
-import { getPackagingDetail } from '@/apis/produceControl/produce/packaging'
+import { getPackagingDetail,changePackaging } from '@/apis/produceControl/produce/packaging'
 import { ref } from 'vue'
 import subCardPackaging from '@/views/PMcenter/produce/component/subCardPackaging.vue'
 const props = defineProps(['data'])
-
+const handleChange = ()=>{
+  changePackaging({id:props.data,done:true}).then(res=>{
+    ElMessage({
+      message: '操作成功',
+      type: 'success',
+    })
+  })
+}
 // 定义字段映射，包含标签和类型信息
 const fieldMap = {
   id: { label: 'ID', type: 'text' },
@@ -44,7 +55,7 @@ const fieldMap = {
 let dataByid = {}
 const chunkedDisplayData = ref([])
 getPackagingDetail(props.data).then((res) => {
-  dataByid = res.data
+  dataByid = res.data[0]
   const displayData = {}
   for (const key in dataByid) {
     if (Object.keys(fieldMap).includes(key)) {

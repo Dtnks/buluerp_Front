@@ -1,13 +1,19 @@
+import { add } from 'date-fns'
 import { defineStore } from 'pinia'
 
 const useTabStore = defineStore('tabs', {
   state: () => ({
     editableTabs: [],
+    orderFreshFn:undefined
   }),
   actions: {
     // 获取字典
     addTab(targetName, component, data, control = null) {
       if (this.$state.editableTabs.filter((item) => item.title == targetName).length > 0) {
+        if(targetName=='订单查询' && this.$state.orderFreshFn){
+          console.log('fresh')
+          this.$state.orderFreshFn()
+        }
         return targetName
       }
       this.$state.editableTabs.push({
@@ -58,6 +64,9 @@ const useTabStore = defineStore('tabs', {
     },
     deleteTab() {
       this.$state.editableTabs = []
+    },
+    addOrderFresh(freshFn) {
+      this.$state.orderFreshFn = freshFn
     },
   },
 })

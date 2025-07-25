@@ -25,7 +25,7 @@
               border: '1px solid #ccc',
             }"></span> -->
             <!-- {{ getStatusText(row[column.prop]) }} -->
-            {{ newStatusMap[row[column.prop]] }}
+            {{ resMap[row[column.prop]] }}
 
           </span>
         </template>
@@ -33,6 +33,11 @@
       <el-table-column label="操作">
         <template #default="{ row }">
           <el-button link type="primary" @click="onEdit(row)" :disabled="control[1].disabled">编辑</el-button>
+          <el-button link type="primary" @click="()=>{
+                      emit('onUpdated', { ...row,status:row.status+1 })
+                      emit('fetchData')
+                      }" 
+            v-if="[7,8,11,12,13].includes(row.status)">{{ resMap[row.status+1] }}</el-button>
           <el-button link type="primary" @click="onCheck(row)">查看</el-button>
         </template>
       </el-table-column>
@@ -59,8 +64,8 @@
             @blur="checkCustomerName" />
         </el-form-item>
         <el-form-item label="订单状态">
-          <el-select v-model="editForm.status" filterable>
-            <el-option v-for="(label, value) in newStatusMap" :key="value" :label="label" :value="Number(value)" />
+          <el-select v-model="editForm.status" filterable disabled>
+            <el-option v-for="(label, value) in resMap" :key="value" :label="label" :value="Number(value)" />
           </el-select>
         </el-form-item>
         <el-form-item label="其他信息">
@@ -76,19 +81,17 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, onMounted, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { ElButton, ElTable, ElTableColumn, ElPagination, ElDialog, ElForm, ElFormItem, ElInput, ElMessageBox, ElAutocomplete, ElSelect, ElOption } from 'element-plus'
 import { deleteOrders } from '@/apis/orders'
 import type { TableDataType } from '@/types/orderResponse'
 import BusinessDetail from '@/views/business/main/Detail.vue'
 import { exportToExcel } from '@/utils/file/exportExcel'
-import { fetchOrderStatusMap, getStatusText, newStatusMap } from '../utils/statusMap'
+import {  resMap } from '../utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
 import useTabStore from '@/stores/modules/tabs'
 
-onMounted(async () => {
-  await fetchOrderStatusMap()
-})
+
 const props = defineProps<{
   // queryParams: Record<string, any>
   addTab: (targetName: string, component: any, data?: any, control: Array<object>) => void
@@ -118,23 +121,6 @@ const columns = [
   { prop: 'remark', label: '备注' },
 ]
 
-// 表格操作--start
-const getStatusColor = (status: number) => {
-  switch (status) {
-    case 0:
-      return 'grey'
-    case 1:
-      return 'blue'
-    case 2:
-      return 'green'
-    case 3:
-      return 'red'
-    case 4:
-      return 'orange'
-    default:
-      return 'grey'
-  }
-}
 
 const onCheck = (row: TableDataType) => {
   console.log('查看：', row)
@@ -161,26 +147,14 @@ const editForm = reactive({
 
 // 点击“编辑”按钮时触发
 const onEdit = (row: TableDataType) => {
-  // 将选中的行数据复制到编辑表单中
-  editForm.innerId = row.innerId ? row.innerId : ''
-  editForm.outerId = row.outerId ? row.outerId : ''
-  editForm.customerName = row.customerName ? row.customerName : ''
-  // editForm.status = row.status ? row.status : 0
-  editForm.status = row.status ?? 0
-  editForm.remark = row.remark ? row.remark : ''
-  editForm.createTime = row.createTime ? row.createTime : ''
-  editForm.id = row.id ? row.id : 0
 
   Object.assign(editForm, row)
-  console.log('编辑表单数据：', editForm)
-
   // 打开编辑弹窗
   editDialogVisible.value = true
 }
 
 // 保存编辑后的数据
 const onSaveEdit = () => {
-  console.log('保存了', { ...editForm })
   emit('onUpdated', { ...editForm })
   emit('fetchData')
   editDialogVisible.value = false

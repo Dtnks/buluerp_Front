@@ -65,7 +65,7 @@ const fetchTableData = async () => {
     messageBox('error', null, null, '获取订单数据失败', '请稍后重试')
   }
 }
-
+tabStore.addOrderFresh(fetchTableData)
 // handleQuery: 处理查询
 const handleQuery = (params: any) => {
   pagination.page = 1 // 查询时重置页码为 1
@@ -85,7 +85,7 @@ const handleAdd = async (newData: TableDataType) => {
 // handleUpdate: 处理编辑更新
 const handleUpdate = async (updatedData: TableDataType) => {
   const res = await putOrder(updatedData)
-
+  console.log(res)
   console.log('更新结果(handelUpdate):', res)
   messageBox('success', null, '订单已成功更新')
   fetchTableData()

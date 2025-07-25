@@ -37,6 +37,7 @@ const handleHiddenMenu = () => {
         <template #add-icon>
           <el-icon @click="store.removeTab('all')"><CircleClose /></el-icon>
         </template>
+        
         <el-tab-pane
           class="col"
           v-for="item in store.editableTabs"
@@ -44,7 +45,7 @@ const handleHiddenMenu = () => {
           :label="item.title"
           :name="item.name"
         >
-          <KeepAlive>
+          <keep-alive>
             <component
               :is="item.component"
               :addTab="addTab"
@@ -52,7 +53,8 @@ const handleHiddenMenu = () => {
               :control="item.control"
               :key="item.key"
             ></component>
-          </KeepAlive>
+          
+      </keep-alive>
         </el-tab-pane>
       </el-tabs>
     </div>

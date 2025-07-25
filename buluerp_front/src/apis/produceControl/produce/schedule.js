@@ -1,17 +1,42 @@
 import httpInstance from '@/utils/httpsInstance.js'
 let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
 
-export function getProdunctionSchedeuleByOrderCode(orderCode) {
+export function listScheduleByOrderCode(orderCode) {
+  let searchText=`system/products-schedule/list?orderCode=${orderCode}`
+  return function(pageNum, pageSize, searchContent = {}){
+    let concatText = Object.keys(searchContent)
+    .map((key) => {
+      return `&${key}=${searchContent[key]}`
+    })
+    .join('')
+    return httpInstance({
+    url: `${searchText}&pageNum=${pageNum}&pageSize=${pageSize}${concatText}`,
+    method: 'get',
+    headers: headers,
+  })
+  }
+  
+}
+
+
+export function getProductionScheduleById(id) {
   return httpInstance({
-    url: `system/products-schedule/list?orderCode=${orderCode}`,
+    url: `system/products-schedule/list?ids=${id}`,
     method: 'get',
     headers: headers,
   })
 }
-
-export function getProductionScheduleById(id) {
+export function finishSchedule(data) {
   return httpInstance({
-    url: `system/products-schedule/list?id=${id}`,
+    url: `system/products-schedule/mark-all-done`,
+    method: 'post',
+    headers: headers,
+    data: data,
+  })
+}
+export function getScheduleListByOrderId(orderId) {
+  return httpInstance({
+    url: `system/products-schedule/list?orderCode=${orderId}`,
     method: 'get',
     headers: headers,
   })
@@ -19,14 +44,10 @@ export function getProductionScheduleById(id) {
 
 export function newSchedule(data) {
   return httpInstance({
-    url: `system/products-schedule`,
+    url: `system/products-schedule/from-material`,
     method: 'post',
     headers: headers,
     data: data,
-    headers: {
-      ...headers,
-      'Content-Type': 'multipart/form-data',
-    },
   })
 }
 
@@ -66,7 +87,7 @@ export function listSchedule(pageNum, pageSize, searchContent = {}) {
     })
     .join('')
   return httpInstance({
-    url: `system/products-schedule/list?pageNum=${pageNum}&pageSize=${pageSize}${concatText}`,
+    url: `system/products-schedule/list?orderByColumn=orderCode&pageNum=${pageNum}&pageSize=${pageSize}${concatText}`,
     method: 'get',
     headers: headers,
   })

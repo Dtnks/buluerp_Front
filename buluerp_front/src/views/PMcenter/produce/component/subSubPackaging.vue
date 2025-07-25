@@ -84,6 +84,13 @@
             <div class="detail-value">{{ detail.packagingBagId || '无' }}</div>
           </div>
         </div>
+        <div class="row">
+          <div class="detail-item col">
+            <div class="detail-label">总重</div>
+            <div class="detail-value">{{ detail.totalWeight || '无' }}</div>
+          </div>
+
+        </div>
       </div>
     </div>
   </el-card>
@@ -114,7 +121,6 @@ import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 import { ref } from 'vue'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 import { searchFunc } from '@/utils/search/search'
-
 import { messageBox } from '@/components/message/messageBox'
 const props = defineProps(['id'])
 const title = ref('新增')
@@ -122,6 +128,7 @@ const subSubDialogVisible = ref(false)
 const details = ref()
 const refresh = () => {
   Sub.getBagList(props.id).then((res) => {
+    console.log(res)
     details.value = res.rows
   })
 }
@@ -180,6 +187,13 @@ const newSubSubFormData = ref([
       options: [],
       loading: false,
     },
+    {
+      type: 'input',
+      label: '总重量',
+      key: 'totalWeight',
+      width: 8,
+      rules: [positiveNumberRule,requiredRule],
+    }
   ],
   [
     {

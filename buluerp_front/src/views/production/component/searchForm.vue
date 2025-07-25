@@ -175,6 +175,7 @@ const handleCreateSubmit = async () => {
     'warning',
     () =>
       createProduct(formData).then((res) => {
+        console.log(res)
         createDialogVisible.value = false
         resetCreateForm()
         emit('created')

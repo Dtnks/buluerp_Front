@@ -14,7 +14,6 @@
 
 <script setup lang="ts">
 // import { reactive } from 'vue'
-import { ElCard, ElDivider } from 'element-plus'
 
 defineProps({
   title: { type: String, }

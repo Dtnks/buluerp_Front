@@ -32,11 +32,16 @@
         <informationCard title="订单详情">
           <el-table :data="orderProduct" style="width: 100%">
             <el-table-column label="产品编码" prop="id" />
+            
+            <el-table-column label="内部编码" prop="innerId" />
+            
+            <el-table-column label="外部编码" prop="outerId" />
+            
             <el-table-column label="产品名称" prop="name" />
             <el-table-column label="创建时间" prop="createTime" />
             <el-table-column label="更新时间" prop="updateTime" />
             <el-table-column label="产品状态" prop="designStatus" />
-          </el-table>
+          </el-table> 
         </informationCard>
         <!-- 关联订单 -->
         <informationCard title="关联订单">
@@ -87,8 +92,8 @@
 <script setup lang="ts">
 import informationCard from './informationCard.vue'
 import { computed, onMounted, ref } from 'vue'
-import { getStatusText } from '../utils/statusMap'
-import { getOrderDetail } from '../function/oders'
+import { resMap } from '../utils/statusMap'
+import { getProductsByOrderId } from '../function/oders'
 import { getOrdersList, putOrder } from '@/apis/orders'
 import { parseTime } from '@/utils/ruoyi'
 import { ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElDialog, dayjs } from 'element-plus'
@@ -111,17 +116,15 @@ const props = defineProps<{
 }>()
 const tabStore = useTabStore()
 const orderDetail = computed(() => props.detail)
-
+const fields=ref()
+const statusText=ref()
+const updateFields=ref()
 onMounted(() => {
-  console.log('订单详情组件加载', props.id)
-  fetchOrderProduct(props.id)
-})
-
-// 订单状态
-const statusText = ref(getStatusText(props.detail.status))
+  // 订单状态
+statusText.value = resMap[props.detail.status]
 
 // 业务订单基本信息的字段信息
-const fields = ref([
+  fields.value = [
   { label: '订单ID', value: props.detail.id },
   { label: '创建时间', value: props.detail.createTime },
   { label: '订单状态', value: statusText.value },
@@ -131,41 +134,38 @@ const fields = ref([
   { label: '交付日期', value: props.detail.deliveryTime },
   { label: '交付截止日期', value: props.detail.deliveryDeadline },
   { label: '备注', value: props.detail.remark },
-])
+]
 
 // 修改订单基本信息
-const updateFields = ref({
+ updateFields.value = {
   ...orderDetail.value,
   id: props.detail.id,
   deliveryTime: props.detail.deliveryTime || '',
   deliveryDeadline: props.detail.deliveryDeadline || '',
   remark: props.detail.remark || '',
   customerName: props.detail.customerName || '',
+}
+  fetchOrderProduct()
+
 })
+
 
 // 订单详情-产品数据
 const orderProduct = ref([])
 
+const promap={'0':'未生产','1':'已生产'}
 // 获取订单产品数据
-const fetchOrderProduct = async (orderId: number) => {
-  try {
-    const res = await getOrderDetail(orderId)
-    console.log('订单产品数据:22222222', res.product)
+const fetchOrderProduct = async () => {
+    const res = await getProductsByOrderId(props.detail.productId)
+    console.log(res,'res')
+    orderProduct.value = res.rows
+    orderProduct.value[0].designStatus = promap[orderProduct.value[0].designStatus]
 
-    if (res.product) {
-      orderProduct.value = Array.isArray(res.product) ? res.product : [res.product]
-      console.log('orderProduct.value', orderProduct.value)
-    }
-  } catch (error) {
-    console.error('获取订单产品数据失败:', error)
-    messageBox('error', null, null, '获取订单产品数据失败, 请稍后再试')
-  }
 }
 
 // // 关联订单数据和操作
 // viewPuchaseOrder: 查看采购表
 const viewPuchaseOrder = (row: any) => {
-  console.log('查看采购表', row)
   props.addTab(
     `订单${props.orderCode} 外购`,
     PurchaseInfo,
@@ -176,7 +176,6 @@ const viewPuchaseOrder = (row: any) => {
 
 // viewProductsSchedule: 查看布产表
 const viewProductsSchedule = (row: any) => {
-  console.log('查看布产表', row)
   props.addTab(
     `订单${props.orderCode} 布产`,
     ProductionSchedule,
@@ -200,9 +199,21 @@ const newFormData = ref([
   [
     {
       type: 'inputSelect',
-      label: '产品ID',
+      label: '订单',
+      key: 'orderCode',
+      width: 12,
+      rules: [requiredRule],
+      showKey:[{key:'innerId',label:"内部编号"},{key:'outerId',label:"外部编号"}],
+      remoteFunc: searchFunc('system/orders/list', 'innerId'),
+      options: [],
+      loading: false,
+    },
+    {
+      type: 'inputSelect',
+      label: '产品',
       key: 'productId',
-      width: 24,
+      width: 12,
+      showKey:[{key:'id',label:"产品ID"},{key:'name',label:"产品名称"}],
       rules: [requiredRule],
       options: [],
       loading: false,
@@ -221,14 +232,19 @@ const newFormData = ref([
       rules: [requiredRule],
     },
   ],
-  [
-    { type: 'input', label: '本袋规格', key: 'bagSpecification', width: 8, rules: [requiredRule] },
-    { type: 'input', label: '本袋重量', key: 'bagWeight', width: 8, rules: [positiveNumberRule,requiredRule] },
+    [
     {
-      type: 'input',
-      label: '本袋数量',
-      key: 'packageQuantity',
-      width: 8,
+      type: 'number',
+      label: '配件种类',
+      key: 'accessoryType',
+      width: 12,
+      rules: [positiveNumberRule,requiredRule],
+    },
+    {
+      type: 'number',
+      label: '配件数量',
+      key: 'accessoryTotal',
+      width: 12,
       rules: [positiveNumberRule,requiredRule],
     },
   ],
@@ -267,29 +283,7 @@ const newFormData = ref([
       rules: [requiredRule],
     },
   ],
-  [
-    {
-      type: 'number',
-      label: '本袋配件',
-      key: 'packageAccessories',
-      width: 8,
-      rules: [positiveNumberRule,requiredRule],
-    },
-    {
-      type: 'number',
-      label: '配件种类',
-      key: 'accessoryType',
-      width: 8,
-      rules: [positiveNumberRule,requiredRule],
-    },
-    {
-      type: 'number',
-      label: '配件数量',
-      key: 'accessoryTotal',
-      width: 8,
-      rules: [positiveNumberRule,requiredRule],
-    },
-  ],
+
   [{ type: 'textarea', label: '备注', key: 'remark', width: 24 }],
 ])
 
@@ -349,25 +343,23 @@ getPackagingListByOrderId(props.orderCode).then((res) => {
     relatedOrdersTable.value[2].actions = [{ name: '查看', method: viewPackagingList }]
   }
 })
+
 // //  页脚按钮
 // onBoxSubmit: 提交按钮
 const onBoxSubmit = async () => {
-  console.log('提交1111', updateFields.value)
   const submitData = { ...updateFields.value }
   if (submitData.deliveryTime instanceof Date) {
     submitData.deliveryTime = dayjs(submitData.deliveryTime).format('YYYY-MM-DD')
   }
   const res = await putOrder(submitData)
-  console.log('提交订单数据:555', res)
   messageBox('success', null, '订单已成功提交')
-  tabStore.freshTab('订单查询')
+
 
   getOrdersList()
 }
 
 // onBoxCancel: 取消按钮
 const onBoxCancel = () => {
-  console.log('取消')
   messageBox('success', null, '已取消提交')
 }
 </script>

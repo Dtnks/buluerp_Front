@@ -29,6 +29,7 @@ const handleSearch = (params: Record<string, any>) => {
 const handleCreated = () => {
   handleSearch(searchParams.value)
 }
+
 </script>
 
 <template>
@@ -36,7 +37,9 @@ const handleCreated = () => {
     <BordShow content="产品查询列表" path="产品管理/查询" />
     <div class="greyBack">
       <SearchForm @search="handleSearch" @created="handleCreated" :control="control"  />
-      <SearchList :queryParams="searchParams" :addTab="props.addTab" :control="control" />
+
+        <SearchList :queryParams="searchParams" :addTab="props.addTab" :control="control" />
+
     </div>
   </div>
 </template>

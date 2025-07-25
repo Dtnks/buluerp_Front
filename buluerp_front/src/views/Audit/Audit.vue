@@ -30,10 +30,10 @@
                 {{ auditStatusMap[scope.row.toStatus as keyof typeof auditStatusMap] || scope.row.toStatus }}
               </template>
               <template v-else-if="column.value === 'preStatus' && scope.row.auditType === 1">
-                {{ newStatusMap[scope.row.preStatus] }}
+                {{ resMap[scope.row.preStatus] }}
               </template>
               <template v-else-if="column.value === 'toStatus' && scope.row.auditType === 1">
-                {{ newStatusMap[scope.row.toStatus] }}
+                {{ resMap[scope.row.toStatus] }}
               </template>
               <template v-else>
                 {{ scope.row[column.value] }}
@@ -90,9 +90,8 @@ import BordShow from '@/components/board/SecBoard.vue'
 
 import { TypeOptions, columns, getTypeOptions, formData } from './data/auditData'
 import { onMounted, onUnmounted, ref } from 'vue'
-import { ElOption, ElSelect, ElPagination, ElTable, ElTableColumn, ElButton, ElPopover, ElInput, ElDialog, ElForm, ElFormItem, ElCard, ElImage, } from 'element-plus'
 import { getAuditList, getAuditOrderPending, getAuditProductionPending, getAuditPurchasePending, getAuditSubcontractPending, postAuditOder, postAuditProduction, postAuditPurchase, postAuditSubcontract, } from '@/apis/audit'
-import { fetchOrderStatusMap, newStatusMap } from '../business/utils/statusMap'
+import { resMap } from '../business/utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
 import { getOrderDetailById } from '@/apis/orders'
 import { getPurchasePlanDetail } from '@/apis/produceControl/purchase/purchasePlan'
@@ -101,9 +100,6 @@ import { getProductionScheduleById } from '@/apis/produceControl/produce/schedul
 import { getFullImageUrl } from '@/utils/image/getUrl'
 import useTabStore from '@/stores/modules/tabs'
 
-const props = defineProps(['control'])
-const popoverRef = ref()
-const popoverVisible = ref(false)
 const type = ref('all')
 const isLoadingCompleted = ref(false)
 let ws: WebSocket | null = null
@@ -111,10 +107,8 @@ let ws: WebSocket | null = null
 onMounted(async () => {
   // 初始化时获取审核类型
   TypeOptions.value = await getTypeOptions()
-  await fetchOrderStatusMap()
   isLoadingCompleted.value = true
   fetchAuditData(true)
-  console.log(newStatusMap.value, 'newStatusMap111111111');
 
   const token = localStorage.getItem('Authorization');
   if (!token) {
@@ -233,7 +227,7 @@ const onAudit = async (id: number, commitData: any) => {
     messageBox('success', null, res.msg || '审核成功')
     commitData.auditComment = '' // 清空输入框
     fetchAuditData(true) // 刷新数据
-    tabStore.freshTab('订单查询')
+
   }
   // popoverRef.value?.hide() // 关闭弹出框
 }

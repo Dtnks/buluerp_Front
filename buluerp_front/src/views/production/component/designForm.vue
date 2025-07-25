@@ -94,7 +94,7 @@
         <el-table-column prop="createTime" label="创建时间" />
         <el-table-column label="操作" width="150">
           <template #default="scope">
-            <el-button type="primary" size="small" @click="handleCreateDesign(scope.row.id)">
+            <el-button type="primary" size="small" @click="handleCreateDesign(scope.row.innerId)">
               创建设计总表
             </el-button>
           </template>
@@ -102,7 +102,7 @@
       </el-table>
 
       <template #footer>
-        <el-button type="primary" @click="handleBatchCreate">全部创建</el-button>
+        <!-- <el-button type="primary" @click="handleBatchCreate">全部创建</el-button> -->
         <el-button @click="fetchPendingOrders">刷新</el-button>
         <el-button @click="orderDialogVisible = false">关闭</el-button>
       </template>
@@ -133,7 +133,6 @@ const dialogVisible = ref(false)
 
 const orderDialogVisible = ref(false)
 const orderList = ref([])
-const orderIdList = orderList.value.map((row) => row.id)
 const currentOrderData = ref<Record<string, any> | null>(null)
 
 const handleSearch = () => {
@@ -153,20 +152,16 @@ const handleCreate = () => {
 }
 
 const handleCreateSubmit = async (formData: any) => {
-  try {
-    const res = await addDesign(formData)
-
+    await addDesign(formData)
     messageBox('success', null, '新建成功', '', '')
     dialogVisible.value = false
     emit('search', { ...formState })
-    if (formData.orderId) {
-      await putOrder({ id: formData.orderId, status: 2 })
-    }
+    // if (formData.orderId) {
+    //   await putOrder({ id: formData.orderId, status: 2 })
+    // }
 
     fetchPendingOrders()
-  } catch (error) {
-    messageBox('error', null, '', '新建失败', '')
-  }
+
 }
 
 const handleImport = () => {
@@ -215,13 +210,9 @@ const handleDownloadTemplate = async () => {
 }
 
 const fetchPendingOrders = async () => {
-  try {
     const res = await getOrdersList({ status: 1 })
-
     orderList.value = res.rows || []
-  } catch (e) {
-    messageBox('error', null, '', '获取订单异常', '')
-  }
+ 
 }
 
 const handleViewPendingOrders = () => {
@@ -239,7 +230,7 @@ const handleBatchCreate = async () => {
     messageBox('warning', null, '', '暂无可创建的订单', '')
     return
   }
-
+  
   const loadingInstance = ElLoading.service({
     lock: true,
     text: '正在批量创建设计总表...',
@@ -252,7 +243,7 @@ const handleBatchCreate = async () => {
   try {
     for (const order of orderList.value) {
       try {
-        const res = await await addDesign({ orderId: order.id })
+        const res = await await addDesign({ orderId: order.innerId })
 
         successCount++
       } catch (e) {

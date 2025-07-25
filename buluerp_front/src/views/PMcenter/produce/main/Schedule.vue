@@ -10,6 +10,7 @@ import {
   deleteSchedule,
   importFile,
   downLoadModule,
+  finishSchedule,
   selectTransToArrange,
 } from '@/apis/produceControl/produce/schedule'
 import { downloadBinaryFile } from '@/utils/file/base64'
@@ -18,12 +19,12 @@ import { ref, nextTick } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
-import { ElMessageBox } from 'element-plus'
 import { searchFunc } from '@/utils/search/search'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 const props = defineProps(['control', 'addTab'])
 //渲染页面
-const createFormRef = ref()
+const createNewFormRef = ref()
+const createEditFormRef = ref({})
 const formData = ref([
   [
     { type: 'timer', label: '出货日期', timerType: 'date', key: 'shipmentTime' },
@@ -58,130 +59,21 @@ const formData = ref([
 const newFormData = ref([
   [
     {
-      type: 'inputSelect',
-      label: '订单',
-      key: 'orderCode',
-      width: 12,
-      rules: [requiredRule],
-      showKey:[{key:'innerId',label:"内部编号"},{key:'outerId',label:"外部编号"}],
-      remoteFunc: searchFunc('system/orders/list', 'innerId'),
-      options: [],
-      loading: false,
-    },
-    {
-      type: 'inputSelect',
-      label: '产品',
-      key: 'productId',
-      width: 12,
-      showKey:[{key:'id',label:"产品ID"},{key:'name',label:"产品名称"}],
-      rules: [requiredRule],
-      options: [],
-      loading: false,
-      remoteFunc: searchFunc('system/products/list', 'id'),
-    },
-    // { type: 'input', label: '产品编码', key: 'productCode', width: 8 },
-  ],
-  [
-      {
-      type: 'select',
-      label: '模具状态',
-      key: 'mouldCondition',
-      width: 8,
-      options: [
-        { label: '未生产', value: '未生产' },
-        { label: '已生产', value: '已生产' },
-      ],
-      rules: [requiredRule],
-    },
-    {
       type: 'input',
       label: '颜色编号',
       key: 'colorCode',
       width: 8,
     },
-    { type: 'input', label: '用量', key: 'usage', width: 8, rules: [positiveNumberRule,requiredRule] },
-  ],
-  [
     {
-      type: 'mutilInputSelect',
-      label: '客户',
-      key: 'customer',
-      width: 12,
-      rules: [requiredRule],
-      options: [],
-      loading: false,
-      remoteFunc: searchFunc('system/customers/list', 'name'),
-    },
-
-    {
-      type: 'mutilInputSelect',
-      label: '模具厂家',
-      key: 'mouldManufacturer',
-      width: 12,
-      rules: [requiredRule],
-      options: [],
-      loading: false,
-      remoteFunc: searchFunc('system/manufacturer/list', 'name'),
-    },
-  ],
-  [
-    {
-      type: 'timer',
-      label: '布产时间',
-      key: 'productionTime',
-      timerType: 'date',
-      width: 12,
-      rules: [requiredRule],
-    },
-    {
-      type: 'timer',
-      label: '出货时间',
-      key: 'shipmentTime',
-      timerType: 'date',
-      width: 12,
-      rules: [requiredRule],
-    },
-  ],
-  [
-    
-    {
-      type: 'inputSelect',
-      label: '排产Id',
-      key: 'arrangeId',
-      width: 12,
-      rules: [],
-      options: [],
-      loading: false,
-      remoteFunc: searchFunc('system/production-arrange/list', 'id'),
-    },
-
-    {
-      type: 'inputSelect',
-      label: '物料',
-      key: 'materialIds',
-      width: 12,
-      rules: [requiredRule],
-      showKey:[{key:'id',label:"物料ID"},{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
-      remoteFunc: searchFunc('system/material-info/list', 'id'),
-      options: [],
-      loading: false,
-    },
-
-     ],
-  [
-    { type: 'input', label: '单重', key: 'singleWeight', width: 8, rules: [positiveNumberRule,requiredRule] },
-    {
-      type: 'input',
-      label: '布产重量',
-      key: 'productionWeight',
+      type: 'number',
+      label: '色粉数量',
+      key: 'colorPowderNeeded',
       width: 8,
       rules: [positiveNumberRule,requiredRule],
     },
-    { type: 'input', label: '供应商', key: 'supplier', width: 8, rules: [requiredRule] },
-  ],
-  [
-    { type: 'input', label: '腔数PCS', key: 'cavityCount', width: 8, rules: [requiredRule] },
-    {
+    { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 8, rules: [requiredRule] }],
+    [
+      {
       type: 'input',
       label: '布产模数PCS',
       key: 'productionMouldCount',
@@ -195,8 +87,83 @@ const newFormData = ref([
       width: 8,
       rules: [requiredRule],
     },
+    {
+      type: 'timer',
+      label: '布产时间',
+      key: 'productionTime',
+      timerType: 'date',
+      width: 8,
+      rules: [requiredRule],
+    }],
+  [
+    {
+      type: 'input',
+      label: '布产重量',
+      key: 'productionWeight',
+      width: 8,
+      rules: [positiveNumberRule,requiredRule],
+    },
+    {
+      type: 'timer',
+      label: '出货时间',
+      key: 'shipmentTime',
+      timerType: 'date',
+      width: 8,
+      rules: [requiredRule],
+    },
+    { type: 'input', label: '供应商', key: 'supplier', width: 8, rules: [requiredRule] },
   ],
   [
+    { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 8, rules: [requiredRule] },
+    {
+      type: 'inputSelect',
+      label: '模具厂家',
+      key: 'mouldManufacturer',
+      width: 8,
+      rules: [requiredRule],
+      options: [],
+      loading: false,
+      remoteFunc: searchFunc('system/manufacturer/list', 'name'),
+    },
+    { type: 'input', label: '用量', key: 'usage', width: 8, rules: [positiveNumberRule,requiredRule] },
+  ],
+  [
+    {
+      type: 'inputSelect',
+      label: '设计总表ID',
+      key: 'designPatternId',
+      width: 12,
+      rules: [requiredRule],
+      showKey:[{key:'id',label:"ID"},{key:'orderId',label:"订单ID"},{key:'productId',label:"产品ID"}],
+      remoteFunc: searchFunc('system/patterns/list', 'id'),
+      options: [],
+      loading: false,
+    },
+    {
+      type: 'inputSelect',
+      label: '物料',
+      key: 'materialId',
+      width: 12,
+      rules: [requiredRule],
+      showKey:[{key:'id',label:"物料ID"},{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
+      remoteFunc: searchFunc('system/material-info/list', 'id'),
+      options: [],
+      loading: false,
+    }],
+  
+  ])
+const newSubmit = ref({
+
+})
+
+const editFormData = ref([
+  [
+    {
+      type: 'input',
+      label: '颜色编号',
+      key: 'colorCode',
+      width: 8,
+    },
     {
       type: 'number',
       label: '色粉数量',
@@ -204,47 +171,84 @@ const newFormData = ref([
       width: 8,
       rules: [positiveNumberRule,requiredRule],
     },
-    { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 8, rules: [requiredRule] },
-    { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 8, rules: [requiredRule] },
+    { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 8, rules: [requiredRule] }],
+    [
+      {
+      type: 'input',
+      label: '布产模数PCS',
+      key: 'productionMouldCount',
+      width: 8,
+      rules: [requiredRule],
+    },
+    {
+      type: 'input',
+      label: '布产数量PCS',
+      key: 'productionQuantity',
+      width: 8,
+      rules: [requiredRule],
+    },
+    {
+      type: 'timer',
+      label: '布产时间',
+      key: 'productionTime',
+      timerType: 'date',
+      width: 8,
+      rules: [requiredRule],
+    }],
+  [
+    {
+      type: 'input',
+      label: '布产重量',
+      key: 'productionWeight',
+      width: 8,
+      rules: [positiveNumberRule,requiredRule],
+    },
+    {
+      type: 'timer',
+      label: '出货时间',
+      key: 'shipmentTime',
+      timerType: 'date',
+      width: 8,
+      rules: [requiredRule],
+    },
+    { type: 'input', label: '供应商', key: 'supplier', width: 8, rules: [requiredRule] },
   ],
-  [{ type: 'image', label: '样例图', key: 'picture', width: 24 }],
-])
-const newSubmit = ref({
-  orderCode: '',
-  productId: '',
-  productionTime: '',
-  productCode: '',
-  mouldNumber: '',
-  mouldCondition: '',
+  [
+    { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 8, rules: [requiredRule] },
+    {
+      type: 'inputSelect',
+      label: '模具厂家',
+      key: 'mouldManufacturer',
+      width: 8,
+      rules: [requiredRule],
+      options: [],
+      loading: false,
+      remoteFunc: searchFunc('system/manufacturer/list', 'name'),
+    },
+    { type: 'input', label: '用量', key: 'usage', width: 8, rules: [positiveNumberRule,requiredRule] },
+  ],
+  [
+    
 
-  colorCode: '',
-  usage: '',
-  supplier: '',
-  mouldManufacturer: '',
-  customer: '',
-  shipmentTime: '',
-  singleWeight: '',
-  productionWeight: '',
-  cavityCount: '',
-  productionMouldCount: '',
-  productionQuantity: '',
-  colorPowderNeeded: '',
-  materialType: '',
-  cycleTime: '',
-  timeHours: '',
+    {
+      type: 'inputSelect',
+      label: '物料',
+      key: 'materialId',
+      width: 12,
+      rules: [requiredRule],
+      showKey:[{key:'id',label:"物料ID"},{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
+      remoteFunc: searchFunc('system/material-info/list', 'id'),
+      options: [],
+      loading: false,
+    }],
+  
+  ])
+const editSubmit = ref({
+
 })
+
 const searchContent = ref({
-  shipmentTime: '',
-  productionTime: '',
-  operator: '',
-  colorCode: '',
-  mouldCondition: '',
-  orderCode: '',
-  productCode: '',
-  mouldNumber: '',
-  supplier: '',
-  mouldManufacturer: '',
-  customer: '',
+
 })
 const tableData = ref([
   {
@@ -252,6 +256,13 @@ const tableData = ref([
     label: 'ID',
     type: 'text',
   },
+  {
+    value: 'arrangeId',
+    label: '排产Id',
+    type: 'text',
+  },
+  { value: 'pictureUrl', label: '图片', type: 'picture' },
+  
   {
     value: 'orderCode',
     label: '订单编号',
@@ -262,18 +273,13 @@ const tableData = ref([
     label: '产品编号',
     type: 'text',
   },
-  {
-    value: 'arrangeId',
-    label: '排产Id',
-    type: 'text',
-  },
+  
 
   {
-    value: 'materialIds',
+    value: 'materialId',
     label: '物料ID',
     type: 'tags',
   },
-  { value: 'pictureUrl', label: '图片', type: 'picture' },
   {
     value: 'productionTime',
     label: '布产时间',
@@ -287,6 +293,11 @@ const tableData = ref([
   {
     value: 'colorCode',
     label: '颜色编号',
+    type: 'text',
+  },
+  {
+    value: 'colorPowderNeeded',
+    label: '色粉数量',
     type: 'text',
   },
   {
@@ -340,12 +351,12 @@ const tableData = ref([
     type: 'text',
   },
   { value: 'supplier', label: '供应商', type: 'text' },
-  { value: 'mouldManufacturer', label: '模具厂家', type: 'tags' },
-  {
-    value: 'colorPowderNeeded',
-    label: '色粉数量',
-    type: 'text',
+  { 
+    value: 'mouldManufacturer', 
+    label: '模具厂家', 
+    type: 'tags' 
   },
+  
   {
     value: 'cycleTime',
     label: '生产周期(s)',
@@ -357,24 +368,33 @@ const tableData = ref([
     type: 'text',
   },
   {
-    value: 'customer',
-    label: '客户',
+    value: 'customerId',
+    label: '客户ID',
     type: 'tags',
   },
 ])
 const operation = ref([
   {
     func: (row) => {
-      const id = row.id
       title.value = '编辑'
       editDialogVisible.value = true
 
       nextTick(() => {
-        createFormRef.value.clearValidate()
+        createEditFormRef.value.clearValidate()
       })
-      newSubmit.value = { ...row }
+      editSubmit.value = { ...row }
     },
     value: '编辑',
+    disabled: props.control[1].disabled,
+  },
+  {
+    func: (row) => {
+      finishSchedule({orderCode:row.orderCode}).then((res) => {
+        console.log({orderCode:row.orderCode})
+        ElMessage.success(res.msg)
+      })
+    },
+    value: '完成布产',
     disabled: props.control[1].disabled,
   },
 ])
@@ -382,16 +402,14 @@ const title = ref('新增')
 //新增与修改
 const importDialogVisible = ref(false)
 const editDialogVisible = ref(false)
+
+const newDialogVisible = ref(false)
 const handleSubmit = () => {
-  if (newSubmit.value.picture == '') {
-    delete newSubmit.value.picture
-  }
-  createFormRef.value.validateForm((valid) => {
+  if (title.value == '编辑') {
+  createEditFormRef.value.validateForm((valid) => {
     if (valid) {
-      newSubmit.value.productionTime = parseTime(newSubmit.value.productionTime, '{y}-{m}-{d}')
-      newSubmit.value.shipmentTime = parseTime(newSubmit.value.shipmentTime, '{y}-{m}-{d}')
-      if (title.value == '编辑') {
-        changeSchedule(newSubmit.value).then((res) => {
+      
+        changeSchedule(editSubmit.value).then((res) => {
           page.value = 1
           listSchedule(page.value, pageSize.value).then((res) => {
             listData.value = res.rows
@@ -400,53 +418,36 @@ const handleSubmit = () => {
           ElMessage.success(res.msg)
           editDialogVisible.value = false
         })
-      } else {
-        newSchedule(newSubmit.value).then((res) => {
-          page.value = 1
-          listSchedule(page.value, pageSize.value).then((res) => {
-            listData.value = res.rows
-            total.value = res.total
-          })
-          ElMessage.success(res.msg)
-          editDialogVisible.value = false
+      } })}else {
+        createNewFormRef.value.validateForm((valid) => {
+          if (valid) {
+             newSchedule(newSubmit.value).then((res) => {
+             page.value = 1
+             listSchedule(page.value, pageSize.value).then((res) => {
+                listData.value = res.rows
+                total.value = res.total
+              })
+              ElMessage.success(res.msg)
+              newDialogVisible.value = false
+            })
+          }
         })
       }
     }
-  })
-}
-//传给form组件的参数
-const resetSubmit = () => {
-  newSubmit.value = {
-    orderCode: '',
-    productId: '',
-    productionTime: '',
-    productCode: '',
-    mouldNumber: '',
-    mouldCondition: '',
 
-    colorCode: '',
-    usage: '',
-    supplier: '',
-    mouldManufacturer: '',
-    customer: '',
-    shipmentTime: '',
-    singleWeight: '',
-    productionWeight: '',
-    cavityCount: '',
-    productionMouldCount: '',
-    productionQuantity: '',
-    colorPowderNeeded: '',
-    materialType: '',
-    cycleTime: '',
-    timeHours: '',
+//传给form组件的参数
+const resetnewSubmit = () => {
+  newSubmit.value = {
+
   }
 }
 const onCreate = () => {
-  resetSubmit()
+  resetnewSubmit()
   title.value = '新增'
-  editDialogVisible.value = true
-
-  createFormRef.value.clearValidate()
+  newDialogVisible.value = true
+  nextTick(() => {
+        createNewFormRef.value.clearValidate()
+      })
 }
 
 const onSubmit = () => {
@@ -543,13 +544,10 @@ const transFormData = ref([
     },
   ],
   [{ type: 'textarea', label: '备注', key: 'remarks', width: 24 }],
-  [{ type: 'image', label: '样例图', key: 'pictureFile', width: 12 }],
+  [{ type: 'image', label: '样例图', key: 'pictureFile',rules: [requiredRule], width: 12 }],
 ])
 const transSubmit = ref({
-  mouldOutput: '',
-  scheduledTime: '',
-  remarks: '',
-  pictureFile: '',
+
 })
 const handleSubmitTrans = () => {
   console.log(ids.value)
@@ -573,10 +571,7 @@ const transToArrange = (row) => {
     return
   }
   transSubmit.value = {
-    mouldOutput: '',
-    scheduledTime: '',
-    remarks: '',
-    pictureFile: '',
+
   }
   ids.value = row.map((item) => item.id)
   transDialogVisible.value = true
@@ -655,8 +650,26 @@ listSchedule(page.value, pageSize.value).then((res) => {
       </TableList>
     </div>
 
+    <el-dialog v-model="newDialogVisible" :title="title" width="800px"
+      ><CreateForm :data="newFormData" :Formvalue="newSubmit" ref="createNewFormRef" />
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
+          <el-button
+            type="info"
+            @click="
+              () => {
+                newDialogVisible = false
+              }
+            "
+          >
+            取消
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
     <el-dialog v-model="editDialogVisible" :title="title" width="800px"
-      ><CreateForm :data="newFormData" :Formvalue="newSubmit" ref="createFormRef" />
+      ><CreateForm :data="editFormData" :Formvalue="editSubmit" ref="createEditFormRef" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>

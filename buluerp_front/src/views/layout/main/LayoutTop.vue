@@ -30,7 +30,7 @@ const timer = setInterval(() => {
       clearInterval(timer)
     }
   })
-}, 6000)
+}, 60000)
 const logout = () => {
   localStorage.removeItem('Authorization')
   clearInterval(timer)

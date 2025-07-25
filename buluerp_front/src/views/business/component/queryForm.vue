@@ -3,15 +3,7 @@
     :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm" :control="control" :formState="formState"></Form>
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
-      <!-- <el-form-item label="订单状态">
-        <el-select v-model="dialogForm.status" placeholder="请选择">
-          <el-option label="初始状态" :value="Status.Initial" />
-          <el-option label="设计中" :value="Status.Designing" />
-          <el-option label="已完成" :value="Status.Completed" />
-          <el-option label="作废" :value="Status.Canceled" />
-          <el-option label="布产中" :value="Status.Producing" />
-        </el-select>
-      </el-form-item> -->
+
       <el-form-item label="客户姓名">
         <el-autocomplete v-model="dialogForm.customerName" :fetch-suggestions="customerSuggestions" :value-key="'value'"
           @blur="checkCustomerName" placeholder="请输入" />
@@ -46,29 +38,29 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { ElInput, ElButton, ElDialog, ElUpload, ElAutocomplete, ElFormItem } from 'element-plus'
 import Form from '@/components/form/Form.vue'
 import { importOrderFile, getProductTemplate } from '@/apis/orders'
-import { fetchOrderStatusMap, newStatusMap, Status } from '../utils/statusMap'
+import { resMap } from '../utils/statusMap'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import { messageBox } from '@/components/message/messageBox'
 import { format } from 'date-fns'
 import type { SubmitFormType } from '../types'
 
 const dialogFormVisible = ref(false)
-
+console.log(resMap,'resMap')
 const emit = defineEmits(['onSubmit', 'onAdd', 'checkCustomerName', 'customerSuggestions'])
 defineProps(['control'])
 const dialogForm = reactive({
-  status: Status.Initial, // 确保 status 有默认值
+  status: 0, // 确保 status 有默认值
   createTime: '',
   operator: '',
   otherInfo: '',
   innerId: '',
   outerId: '',
-  id: 14,
+  id: '',
   remark: '',
   operatorId: '0',
   quantity: 1,
@@ -77,21 +69,15 @@ const dialogForm = reactive({
   operater: '',
 })
 
-onMounted(async () => {
-  await fetchOrderStatusMap()
-  console.log(newStatusMap.value, 'newStatusMap444')
-})
 
 const title = '查询表单'
 const statusOptions = computed(() =>
-  Object.entries(newStatusMap.value).map(([key, value]) => ({
+  Object.entries(resMap).map(([key, value]) => ({
     label: value,
     value: key,
     key: key,
   })),
 )
-console.log('statusOptions:4444', statusOptions.value)
-
 // data: 表单数据
 const data = reactive([
   [

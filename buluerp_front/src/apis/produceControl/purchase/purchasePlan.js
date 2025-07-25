@@ -2,15 +2,28 @@ import httpInstance from '@/utils/httpsInstance.js'
 let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
 export function newPurchasePlan(data) {
   return httpInstance({
-    url: `system/purchase-collection`,
+    url: `system/purchase-collection/from-info`,
+    method: 'post',
+    data,
+  })
+}
+
+export function getPurchaseListByOrderId(orderId) {
+  return httpInstance({
+    url: `system/purchase-collection/list?orderCode=${orderId}`,
+    method: 'get',
+    headers: headers,
+  })
+}
+
+export function finishPurchasePlan(data) {
+  return httpInstance({
+    url: `system/purchase-collection/mark-all-done`,
     method: 'post',
     headers: headers,
     data: data,
-    headers: {
-      ...headers,
-      'Content-Type': 'multipart/form-data',
-    },
   })
+
 }
 
 export function changePurchasePlan(data) {
@@ -72,7 +85,20 @@ export function exportSelectTable(data) {
     data: data,
   })
 }
-
+export function listPurchasePlanByOrderCode(orderCode){
+  let context= `system/purchase-collection/list?orderCodeExact=${orderCode}`
+  return function(pageNum, pageSize, searchContent = {}) {
+  let concatText = Object.keys(searchContent)
+    .map((key) => {
+      return `&${key}=${searchContent[key]}`
+    })
+    .join('')
+  return httpInstance({
+    url: `${context}&pageNum=${pageNum}&pageSize=${pageSize}${concatText}`,
+    method: 'get',
+    headers: headers,
+  })
+}}
 export function importFile(formData) {
   return httpInstance({
     url: 'system/purchase-collection/import',
@@ -92,11 +118,3 @@ export function getPurchasePlanDetail(id) {
     headers: headers,
   })
 }
-export function newPlanFromDesign(data) {
-  return httpInstance({
-    url: `system/purchase-collection/from-info`,
-    method: 'post',
-    data,
-  })
-}
-

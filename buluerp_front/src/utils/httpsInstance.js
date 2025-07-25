@@ -39,6 +39,7 @@ httpInstance.interceptors.response.use(
         localStorage.removeItem('Authorization')
         router.push('/login')
       })
+      return Promise.reject(res.data)
     } else if (res.data.code === 500) {
       ElMessage.error(res.data.msg || '请求失败')
       return Promise.reject(res.data)
@@ -69,6 +70,9 @@ httpInstance.interceptors.response.use(
       return res.data
     } else if (res.data instanceof Blob) {
       return res.data
+    }else{
+      ElMessage.error(res.data.msg || '请求失败')
+      return Promise.reject(res.data)
     }
   },
   (err) => {

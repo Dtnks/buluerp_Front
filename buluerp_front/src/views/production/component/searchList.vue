@@ -87,11 +87,9 @@
 <script lang="ts" setup>
 import { ref, watch, onMounted, reactive, nextTick } from 'vue'
 import { getList_pro, deleteProduct, exportProduct } from '@/apis/products.js'
-import { exportToExcel } from '@/utils/file/exportExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 import { downloadBinaryFile } from '@/utils/file/base64'
-import useTabStore from '@/stores/modules/tabs'
 
 import Detail from '../main/Detail.vue'
 
@@ -130,10 +128,11 @@ const fetchData = async () => {
 
   restoreSelection()
 }
-
 onMounted(() => {
   fetchData()
 })
+
+
 
 watch(
   () => props.queryParams,

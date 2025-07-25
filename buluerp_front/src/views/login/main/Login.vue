@@ -42,10 +42,10 @@ const handleLogin = () => {
           ><template #prefix>
             <el-icon class="el-input__icon"><Lock /></el-icon> </template
         ></el-input>
-        <div class="row" style="justify-content: space-between">
+        <!-- <div class="row" style="justify-content: space-between">
           <el-checkbox v-model="autoLogin" label="自动登录" size="large" />
           <el-text style="cursor: pointer">忘记密码</el-text>
-        </div>
+        </div> -->
         <el-button type="primary" @click="handleLogin" v-loading.fullscreen.lock="fullscreenLoading"
           >登录</el-button
         >
@@ -61,13 +61,13 @@ const handleLogin = () => {
   align-items: center;
 }
 .back img {
-  width: auto;
-  height: 65vh;
+  width: 40vw;
+  height: auto;
   object-fit: contain;
 }
 .form {
   width: 40vw;
-  height: 65vh;
+  height: auto;
   text-align: center;
 }
 .el-text {
