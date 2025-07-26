@@ -208,10 +208,7 @@ watch(
   { immediate: true }
 )
 
-// const getFullImageUrl = (path: string) => {
-//   const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
-//   return BASE_IMAGE_URL + path.replace('//', '/')
-// }
+
 
 watch(
   () => form.value.drawingReferenceFile,

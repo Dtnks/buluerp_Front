@@ -134,23 +134,7 @@ const refresh = () => {
 }
 refresh()
 const newSubSubFormData = ref([
-  [
-    {
-      type: 'input',
-      label: '颜色编号',
-      key: 'colorCode',
-      width: 8,
-      rules: [requiredRule],
-    },
-    { type: 'input', label: '本包数量', key: 'bagQuantity', width: 8, rules: [positiveNumberRule,requiredRule] },
-    {
-      type: 'input',
-      label: '用量',
-      key: 'usage',
-      width: 8,
-      rules: [positiveNumberRule,requiredRule],
-    },
-  ],
+
   [
     {
       type: 'number',
@@ -194,6 +178,17 @@ const newSubSubFormData = ref([
       width: 8,
       rules: [positiveNumberRule,requiredRule],
     }
+  ],
+    [
+
+    { type: 'input', label: '本包数量', key: 'bagQuantity', width: 12, rules: [positiveNumberRule,requiredRule] },
+    {
+      type: 'input',
+      label: '用量',
+      key: 'usage',
+      width: 12,
+      rules: [positiveNumberRule,requiredRule],
+    },
   ],
   [
     {

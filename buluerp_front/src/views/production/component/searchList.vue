@@ -105,11 +105,7 @@ const data = ref([])
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
-// const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
 
-// const getFullImageUrl = (path: string) => {
-//   return BASE_IMAGE_URL + path.replace('//', '/')
-// }
 
 const loadErrorMap = reactive<Record<string | number, boolean>>({})
 

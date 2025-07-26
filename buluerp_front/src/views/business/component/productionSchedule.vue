@@ -60,21 +60,6 @@ const formData = ref([
 ])
 const newFormData = ref([
   [
-    {
-      type: 'input',
-      label: '颜色编号',
-      key: 'colorCode',
-      width: 8,
-    },
-    {
-      type: 'number',
-      label: '色粉数量',
-      key: 'colorPowderNeeded',
-      width: 8,
-      rules: [positiveNumberRule,requiredRule],
-    },
-    { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 8, rules: [requiredRule] }],
-    [
       {
       type: 'input',
       label: '布产模数PCS',
@@ -96,7 +81,8 @@ const newFormData = ref([
       timerType: 'date',
       width: 8,
       rules: [requiredRule],
-    }],
+    }
+  ],
   [
     {
       type: 'input',
@@ -116,112 +102,35 @@ const newFormData = ref([
     { type: 'input', label: '供应商', key: 'supplier', width: 8, rules: [requiredRule] },
   ],
   [
-    { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 8, rules: [requiredRule] },
     {
       type: 'inputSelect',
       label: '模具厂家',
       key: 'mouldManufacturer',
-      width: 8,
+      width: 12,
       rules: [requiredRule],
       options: [],
       loading: false,
       remoteFunc: searchFunc('system/manufacturer/list', 'name'),
     },
-    { type: 'input', label: '用量', key: 'usage', width: 8, rules: [positiveNumberRule,requiredRule] },
+    { type: 'input', label: '用量', key: 'usage', width: 12, rules: [positiveNumberRule,requiredRule] },
   ],
-  [
-
-    {
-      type: 'inputSelect',
-      label: '物料',
-      key: 'materialId',
-      width: 24,
-      rules: [requiredRule],
-      showKey:[{key:'id',label:"物料ID"},{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
-      remoteFunc: searchFunc('system/material-info/list', 'id'),
-      options: [],
-      loading: false,
-    }],
-  
-  ])
-const newSubmit = ref({
-  orderCode:props.data.orderCode,
-})
-
-const editFormData = ref([
-  [
-    {
-      type: 'input',
-      label: '颜色编号',
-      key: 'colorCode',
-      width: 8,
-    },
-    {
-      type: 'number',
-      label: '色粉数量',
-      key: 'colorPowderNeeded',
-      width: 8,
-      rules: [positiveNumberRule,requiredRule],
-    },
-    { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 8, rules: [requiredRule] }],
     [
-      {
-      type: 'input',
-      label: '布产模数PCS',
-      key: 'productionMouldCount',
-      width: 8,
-      rules: [requiredRule],
-    },
-    {
-      type: 'input',
-      label: '布产数量PCS',
-      key: 'productionQuantity',
-      width: 8,
-      rules: [requiredRule],
-    },
-    {
-      type: 'timer',
-      label: '布产时间',
-      key: 'productionTime',
-      timerType: 'date',
-      width: 8,
-      rules: [requiredRule],
-    }],
-  [
-    {
-      type: 'input',
-      label: '布产重量',
-      key: 'productionWeight',
-      width: 8,
-      rules: [positiveNumberRule,requiredRule],
-    },
-    {
-      type: 'timer',
-      label: '出货时间',
-      key: 'shipmentTime',
-      timerType: 'date',
-      width: 8,
-      rules: [requiredRule],
-    },
-    { type: 'input', label: '供应商', key: 'supplier', width: 8, rules: [requiredRule] },
-  ],
-  [
-    { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 8, rules: [requiredRule] },
-    {
-      type: 'inputSelect',
-      label: '模具厂家',
-      key: 'mouldManufacturer',
-      width: 8,
-      rules: [requiredRule],
-      options: [],
-      loading: false,
-      remoteFunc: searchFunc('system/manufacturer/list', 'name'),
-    },
-    { type: 'input', label: '用量', key: 'usage', width: 8, rules: [positiveNumberRule,requiredRule] },
-  ],
-  [
+    { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 12, rules: [requiredRule] },
     
-
+    { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 12, rules: [requiredRule] }
+  ],
+  [
+    {
+      type: 'inputSelect',
+      label: '设计总表ID',
+      key: 'designPatternId',
+      width: 12,
+      rules: [requiredRule],
+      showKey:[{key:'id',label:"ID"},{key:'orderId',label:"订单ID"},{key:'productId',label:"产品ID"}],
+      remoteFunc: searchFunc('system/patterns/list', 'id'),
+      options: [],
+      loading: false,
+    },
     {
       type: 'inputSelect',
       label: '物料',
@@ -235,10 +144,85 @@ const editFormData = ref([
     }],
   
   ])
-const editSubmit = ref({
-  orderCode:props.data.orderCode,
+const newSubmit = ref({
+
 })
 
+const editFormData = ref([
+  [
+    { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 8, rules: [requiredRule] },
+    {
+      type: 'inputSelect',
+      label: '物料',
+      key: 'materialId',
+      width: 12,
+      rules: [requiredRule],
+      showKey:[{key:'id',label:"物料ID"},{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
+      remoteFunc: searchFunc('system/material-info/list', 'id'),
+      options: [],
+      loading: false,
+    }
+  ],
+    [
+      {
+      type: 'input',
+      label: '布产模数PCS',
+      key: 'productionMouldCount',
+      width: 8,
+      rules: [requiredRule],
+    },
+    {
+      type: 'input',
+      label: '布产数量PCS',
+      key: 'productionQuantity',
+      width: 8,
+      rules: [requiredRule],
+    },
+    {
+      type: 'timer',
+      label: '布产时间',
+      key: 'productionTime',
+      timerType: 'date',
+      width: 8,
+      rules: [requiredRule],
+    }],
+  [
+    {
+      type: 'input',
+      label: '布产重量',
+      key: 'productionWeight',
+      width: 8,
+      rules: [positiveNumberRule,requiredRule],
+    },
+    {
+      type: 'timer',
+      label: '出货时间',
+      key: 'shipmentTime',
+      timerType: 'date',
+      width: 8,
+      rules: [requiredRule],
+    },
+    { type: 'input', label: '供应商', key: 'supplier', width: 8, rules: [requiredRule] },
+  ],
+  [
+    { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 8, rules: [requiredRule] },
+    {
+      type: 'inputSelect',
+      label: '模具厂家',
+      key: 'mouldManufacturer',
+      width: 8,
+      rules: [requiredRule],
+      options: [],
+      loading: false,
+      remoteFunc: searchFunc('system/manufacturer/list', 'name'),
+    },
+    { type: 'input', label: '用量', key: 'usage', width: 8, rules: [positiveNumberRule,requiredRule] },
+  ]
+  
+  ])
+const editSubmit = ref({
+
+})
 const searchContent = ref({
 
 })

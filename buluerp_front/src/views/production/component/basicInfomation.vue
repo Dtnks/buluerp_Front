@@ -112,12 +112,8 @@ function flattenDesignDetail(data: any): DesignMaterialItem[] {
   return result
 }
 
-// const BASE_URL = 'http://154.201.77.135:8080'
 
-// function resolveImageUrl(path: string) {
-//   if (!path) return ''
-//   return `${BASE_URL}${path.replace('//', '/')}`
-// }
+
 
 watch(
   () => props.detail,

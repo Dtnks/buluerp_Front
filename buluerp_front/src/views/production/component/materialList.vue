@@ -146,11 +146,7 @@ const openPurchaseDialog = (infos: any[]) => {
   purchaseDialogVisible.value = true
 }
 
-// const BASE_IMAGE_URL = 'http://154.201.77.135:8080'
 
-// const getFullImageUrl = (path: string) => {
-//   return BASE_IMAGE_URL + path.replace('//', '/')
-// }
 
 const fetchData = async () => {
   const res = await getMaterialList({

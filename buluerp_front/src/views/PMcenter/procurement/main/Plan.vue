@@ -36,23 +36,12 @@ const formData = ref([
 ])
 
 const newFormData = ref([
-  [
-    { type: 'input', label: '颜色编号', key: 'colorCode', width: 12, rules: [requiredRule] },
-    {
-      type: 'timer',
-      label: '预交时间',
-      key: 'deliveryTime',
-      timerType: 'date',
-      width: 12,
-      rules: [requiredRule],
-    },
-  ],
-  [
+    [
     {
       type: 'inputSelect',
       label: '设计总表ID',
       key: 'designPatternId',
-      width: 12,
+      width: 8,
       rules: [requiredRule],
       showKey:[{key:'id',label:"ID"},{key:'orderId',label:"订单ID"},{key:'productId',label:"产品ID"}],
       remoteFunc: searchFunc('system/patterns/list', 'id'),
@@ -63,7 +52,7 @@ const newFormData = ref([
       type: 'inputSelect',
       label: '外购资料ID',
       key: 'purchaseInfoId',
-      width: 12,
+      width: 8,
       rules: [requiredRule],
       showKey:[{key:'id',label:"ID"},{key:'materialId',label:"物料"},{key:'unitPrice',label:"单价"}],
       
@@ -71,14 +60,22 @@ const newFormData = ref([
       options: [],
       loading: false,
     },
-  ],
-  [
+
     {
       type: 'number',
       label: '采购数量',
       key: 'purchaseQuantity',
-      width: 12,
+      width: 8,
       rules: [positiveNumberRule,requiredRule],
+    }],
+  [
+    {
+      type: 'timer',
+      label: '预交时间',
+      key: 'deliveryTime',
+      timerType: 'date',
+      width: 12,
+      rules: [requiredRule],
     },
     {
       type: 'timer',
@@ -88,8 +85,9 @@ const newFormData = ref([
       width: 12,
       rules: [requiredRule],
     },
-  ],[
-    
+  ],
+
+  [
     {
       type: 'textarea',
       label: '备注',
@@ -100,22 +98,20 @@ const newFormData = ref([
 ])
 const editFormData = ref([
   [
-    { type: 'input', label: '颜色编号', key: 'colorCode', width: 12, rules: [requiredRule] },
-    {
+        {
       type: 'timer',
       label: '交货时间',
       key: 'deliveryDate',
       timerType: 'date',
-      width: 12,
+      width: 8,
       rules: [requiredRule],
     },
-  ],
-  [
+
     {
       type: 'number',
       label: '采购数量',
       key: 'purchaseQuantity',
-      width: 12,
+      width: 8,
       rules: [positiveNumberRule,requiredRule],
     },
     {
@@ -123,7 +119,7 @@ const editFormData = ref([
       label: '下单时间',
       key: 'orderTime',
       timerType: 'date',
-      width: 12,
+      width: 8,
       rules: [requiredRule],
     },
   ],[
@@ -137,7 +133,6 @@ const editFormData = ref([
   ],
 ])
 const newSubmit = ref({
-  colorCode: '',
   deliveryTime: '',
   designPatternId: '',
   purchaseInfoId: '',

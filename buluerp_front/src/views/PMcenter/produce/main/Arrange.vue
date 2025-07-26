@@ -17,8 +17,6 @@ import { ref, nextTick } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
-import { ElMessageBox } from 'element-plus'
-import { searchFunc } from '@/utils/search/search'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 const props = defineProps(['control'])
 //渲染页面
@@ -66,21 +64,15 @@ const newFormData = ref([
   [
     { 
       type: 'input', 
-      label: '颜色编号', 
-      key: 'colorCode', 
-      width: 8, 
-      rules: [requiredRule] },
-    { 
-      type: 'input', 
       label: '出模数', 
       key: 'mouldOutput', 
-      width: 8, 
+      width: 12, 
       rules: [positiveNumberRule,requiredRule] },
     { 
       type: 'input', 
       label: '单重', 
       key: 'singleWeight', 
-      width: 8, 
+      width: 12, 
       rules: [positiveNumberRule,requiredRule] 
     },
 
@@ -101,7 +93,7 @@ const newFormData = ref([
       key: 'completionTime',
       width: 12,
       timerType: 'date',
-      rules: [requiredRule],
+      rules: [],
     },
   ],
   [{ type: 'textarea', label: '备注', key: 'remarks', width: 24 }],
@@ -272,26 +264,10 @@ const title = ref('编辑')
 //传给form组件的参数
 const resetSubmit = () => {
   newSubmit.value = {
-    colorCode: '',
-    completionTime: '',
-    materialType: '',
-    mouldNumber: '',
-    mouldOutput: '',
-    productionMouldCount: '',
-    productionQuantity: '',
-    scheduledTime: '',
-    singleWeight: '',
 
-    pictureUrl: null,
   }
 }
-const onCreate = () => {
-  resetSubmit()
-  title.value = '新增'
-  editDialogVisible.value = true
 
-  createFormRef.value.clearValidate()
-}
 
 const onSubmit = () => {
   page.value = 1
@@ -405,7 +381,6 @@ listArrange(page.value, pageSize.value).then((res) => {
       <FormSearch
         title="查询"
         :data="formData"
-        :onCreate="onCreate"
         :onSubmit="onSubmit"
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
