@@ -24,6 +24,7 @@ const ComponentsGroup = {
   BusinessQuery: () => import('@/views/business/main/Query.vue'),
   ProQuery: () => import('@/views/production/main/Query.vue'),
   ProMaterial: () => import('@/views/production/main/Material.vue'),
+  ProMaterialType: () => import('@/views/production/main/MaterialType.vue'),
   DesignTable: () => import('@/views/production/main/DesignTable.vue'),
   Admin: () => import('@/views/admin/Admin.vue'),
   Audit: () => import('@/views/admin/Audit.vue'),
@@ -38,6 +39,7 @@ const ComponentsGroup = {
   PMProduceArrange: () => import('@/views/PMcenter/produce/main/Arrange.vue'),
   PMProduceSchedule: () => import('@/views/PMcenter/produce/main/Schedule.vue'),
   PMProducePackaging: () => import('@/views/PMcenter/produce/main/Packaging.vue'),
+
 }
 const LazyComponentsGroup = new Proxy(
   {},

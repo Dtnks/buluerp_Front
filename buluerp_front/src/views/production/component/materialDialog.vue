@@ -39,7 +39,8 @@ import CustomForm from '@/components/form/CreateForm.vue' // 替换为你封装�
 import ImageUpload from '@/components/upload/editUpload.vue'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 import { Delete } from '@element-plus/icons-vue'
-import { number } from 'echarts'
+import { searchFunc } from '@/utils/search/search'
+import { requiredRule } from '@/utils/form/valid'
 
 const props = defineProps<{
   modelValue: boolean
@@ -112,13 +113,17 @@ const formConfig = [
   ],
   [
     {
+      type: 'inputSelect',
       label: '材料类型',
       key: 'materialType',
-      type: 'input',
       width: 12,
-      required: true,
-      rules: [{ required: true, message: '请输入模具编号', trigger: 'blur' }]
-    },{
+      rules: [requiredRule],
+      showKey:[{key:'name',label:"名称"},{key:'colorCode',label:"颜色编码"},{key:'colorWeight',label:"色粉重量"}],
+      remoteFunc: searchFunc('system/material-type/list', 'name'),
+      options: [],
+      loading: false,
+    },
+    {
       label: '单重',
       key: 'singleWeight',
       type: 'number',

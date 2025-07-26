@@ -25,7 +25,7 @@ const handleCreated = () => {
 </script>
 <template>
   <div>
-    <BordShow content="物料查询列表" path="物料管理/查询" />
+    <BordShow content="物料查询列表" path="物料管理/物料" />
     <div class="greyBack">
       <MaterialForm @search="handleSearch" @created="handleCreated"/>
       <MaterialList :queryParams="searchParams" :addTab="props.addTab"/>

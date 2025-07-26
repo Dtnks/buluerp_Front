@@ -3,123 +3,83 @@ import FormSearch from '@/components/form/Form.vue'
 import CreateForm from '@/components/form/CreateForm.vue'
 import BordShow from '@/components/board/SecBoard.vue'
 import {
-  listArrange,
-  changeArrange,
-  newArrange,
+  listMaterialInfo,
+  changeMaterialInfo,
+  newMaterialInfo,
   exportSelectTable,
-  deleteArrange,
+  deleteMaterialInfo,
   importFile,
   downLoadModule,
-} from '@/apis/produceControl/produce/arrange'
+} from '@/apis/materialType'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
 import { ref, nextTick } from 'vue'
-import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
-import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
+
+import { requiredRule } from '@/utils/form/valid'
 const props = defineProps(['control'])
 //渲染页面
-const createFormRef = ref()
 const formData = ref([
   [
-    { type: 'timer', label: '安排日期', timerType: 'date', key: 'scheduledTime' },
-    { type: 'timer', label: '完成时间', timerType: 'date', key: 'completionTime' },
-  ],
-  [
-    { type: 'input', label: '操作人', key: 'operator' },
     { type: 'input', label: '颜色编号', key: 'colorCode' },
-    {
-      type: 'input',
-      label: '料别',
-      key: 'materialType',
-    },
+    { type: 'input', label: '色粉重量', key: 'colorWeight' },
+    { type: 'input', label: '名称', key: 'name' },
   ],
 ])
+
 const newFormData = ref([
   [
-
     {
       type: 'input',
-      label: '排产数量',
-      key: 'productionQuantity',
+      label: '颜色编号',
+      key: 'colorCode',
       width: 8,
-      rules: [positiveNumberRule,requiredRule],
-    },
-    {
-      type: 'input',
-      label: '排产重量',
-      key: 'productionWeight',
-      width: 8,
-      rules: [positiveNumberRule,requiredRule],
-    },
-  ],
-  [
-    { 
-      type: 'input', 
-      label: '出模数', 
-      key: 'mouldOutput', 
-      width: 12, 
-      rules: [positiveNumberRule,requiredRule] },
-    { 
-      type: 'input', 
-      label: '单重', 
-      key: 'singleWeight', 
-      width: 12, 
-      rules: [positiveNumberRule,requiredRule] 
-    },
-
-  ],
-  [
-    {
-      type: 'timer',
-      label: '安排时间',
-      key: 'scheduledTime',
-      width: 12,
-      timerType: 'date',
       rules: [requiredRule],
     },
-
     {
-      type: 'timer',
-      label: '完成时间',
-      key: 'completionTime',
-      width: 12,
-      timerType: 'date',
-      rules: [],
+      type: 'input',
+      label: '色粉重量',
+      key: 'colorWeight',
+      width: 8,
+      rules: [requiredRule],
     },
-  ],
-  [{ type: 'textarea', label: '备注', key: 'remarks', width: 24 }],
-  [{ type: 'image', label: '样例图', key: 'picture', width: 12 }],
-])
+    { type: 'input', label: '名称', key: 'name', width: 8, rules: [requiredRule] }
+  ]])
+
+const editFormData = ref([
+  [
+    {
+      type: 'input',
+      label: '颜色编号',
+      key: 'colorCode',
+      width: 12,
+      rules: [requiredRule],
+    },
+    {
+      type: 'input',
+      label: '色粉重量',
+      key: 'colorWeight',
+      width: 12,
+      rules: [requiredRule],
+    }
+  ]])
 const newSubmit = ref({
-  colorCode: '',
-  completionTime: '',
-  creationTime: '',
-  materialType: '',
-  mouldNumber: '',
-  mouldOutput: '',
-  productionQuantity: '',
-  scheduledTime: '',
-  singleWeight: '',
+
+})
+const editFormRef=ref()
+const editSubmit = ref({
+
 })
 const searchContent = ref({
-  colorCode: '',
-  completionTime: '',
-  materialType: '',
-  mouldNumber: '',
-  mouldOutput: '',
+    colorCode: '',
+    colorWeight: '',
+    name: '',
 })
 const tableData = ref([
   {
     value: 'id',
     label: 'ID',
-    type: 'text',
-  },
-  { value: 'pictureUrl', label: '图片', type: 'picture' },
-  {
-    value: 'mouldNumber',
-    label: '模具编号',
     type: 'text',
   },
   {
@@ -128,55 +88,16 @@ const tableData = ref([
     type: 'text',
   },
   {
-    value: 'materialType',
-    label: '料别',
+    value: 'colorWeight',
+    label: '色粉重量',
     type: 'text',
   },
   {
-    value: 'mouldOutput',
-    label: '出模数',
+    value: 'name',
+    label: '名称',
     type: 'text',
   },
-  {
-    value: 'singleWeight',
-    label: '单重',
-    type: 'text',
-  },
-  {
-    value: 'productionQuantity',
-    label: '排产数量',
-    type: 'text',
-  },
-  {
-    value: 'productionMouldCount',
-    label: '排产模数',
-    type: 'text',
-  },
-  {
-    value: 'productionWeight',
-    label: '排产重量',
-    type: 'text',
-  },
-  {
-    value: 'scheduledTime',
-    label: '安排时间',
-    type: 'text',
-  },
-  {
-    value: 'completionTime',
-    label: '完成时间',
-    type: 'text',
-  },
-  {
-    value: 'operator',
-    label: '操作人',
-    type: 'text',
-  },
-  {
-    value: 'remarks',
-    label: '备注',
-    type: 'text',
-  },
+
 ])
 const operation = ref([
   // {
@@ -193,80 +114,74 @@ const operation = ref([
       const id = row.id
       title.value = '编辑'
       editDialogVisible.value = true
-      resetSubmit()
+      editSubmit.value = { ...row }
       nextTick(() => {
-        createFormRef.value.clearValidate()
+        editFormRef.value.clearValidate()
       })
-      newSubmit.value = { ...row }
-      if (row.pictureUrl) {
-        newSubmit.value.pictureUrl = row.pictureUrl
-      } else {
-        delete newSubmit.value.pictureUrl
-      }
-      console.log(newSubmit.value)
     },
     value: '编辑',
     disabled: props.control[1].disabled,
   },
-  // {
-  //   func: (row) => {
-  //     props.addTab('采购计划-' + row.id, PlanDetail, row, null)
-  //   },
-  //   value: '查看',
-  //   disabled: false,
-  // },
+
 ])
 
 //新增与修改
 const importDialogVisible = ref(false)
 const editDialogVisible = ref(false)
+const newDialogVisible = ref(false)
+const createFormRef = ref(null)
+
 const handleSubmit = () => {
-  if (newSubmit.value.picture == '') {
-    delete newSubmit.value.picture
-  }
-  createFormRef.value.validateForm((valid) => {
-    if (valid) {
-      newSubmit.value.scheduledTime = parseTime(newSubmit.value.scheduledTime, '{y}-{m}-{d}')
-      newSubmit.value.completionTime = parseTime(newSubmit.value.completionTime, '{y}-{m}-{d}')
-      if (title.value == '编辑') {
-        changeArrange(newSubmit.value).then((res) => {
-          page.value = 1
-          listArrange(page.value, pageSize.value).then((res) => {
-            listData.value = res.rows
-            total.value = res.total
+  
+      if (title.value === '编辑') {
+        editFormRef.value.validateForm((valid) => { 
+          if (valid) {
+            changeMaterialInfo(editSubmit.value).then((res) => {
+            page.value = 1
+            listMaterialInfo(page.value, pageSize.value).then((res) => {
+              listData.value = res.rows
+              total.value = res.total
           })
           ElMessage.success(res.msg)
           editDialogVisible.value = false
+          })}
         })
-      } else {
-        newArrange(newSubmit.value).then((res) => {
-          page.value = 1
-          listArrange(page.value, pageSize.value).then((res) => {
-            listData.value = res.rows
-            total.value = res.total
-          })
-          ElMessage.success(res.msg)
-          editDialogVisible.value = false
+      }
+       else {
+        createFormRef.value.validateForm((valid) => {
+          if (valid) {
+            newMaterialInfo(newSubmit.value).then((res) => {
+              page.value = 1
+              listMaterialInfo(page.value, pageSize.value).then((res) => {
+                listData.value = res.rows
+                total.value = res.total
+              })
+              ElMessage.success(res.msg)
+              newDialogVisible.value = false
+            })
+          }
         })
       }
     }
-  })
-}
+
 const title = ref('编辑')
 //传给form组件的参数
-const resetSubmit = () => {
+const resetNewSubmit = () => {
   newSubmit.value = {
 
   }
 }
+const onCreate = () => {
+  resetNewSubmit()
+  title.value = '新增'
+  newDialogVisible.value = true
 
+  createFormRef.value.clearValidate()
+}
 
 const onSubmit = () => {
   page.value = 1
-  newSubmit.value.scheduledTime = parseTime(newSubmit.value.scheduledTime, '{y}-{m}-{d}')
-  newSubmit.value.completionTime = parseTime(newSubmit.value.completionTime, '{y}-{m}-{d}')
-
-  listArrange(page.value, pageSize.value, searchContent.value).then((res) => {
+  listMaterialInfo(page.value, pageSize.value, searchContent.value).then((res) => {
     listData.value = res.rows
     total.value = res.total
   })
@@ -277,7 +192,7 @@ const onImport = () => {
 }
 const onDownloadTemplate = () => {
   downLoadModule().then((res) => {
-    downloadBinaryFile(res, '排产表导入模板.xlsx')
+    downloadBinaryFile(res, '料型模板.xlsx')
   })
 }
 const handleUpload = async (option: any) => {
@@ -286,7 +201,7 @@ const handleUpload = async (option: any) => {
 
   importFile(formData).then((res) => {
     ElMessage.success(res.msg)
-    listArrange(page.value, pageSize.value).then((res) => {
+    listMaterialInfo(page.value, pageSize.value).then((res) => {
       listData.value = res.rows
       total.value = res.total
     })
@@ -309,7 +224,7 @@ const exportFunc = (row) => {
   formData.append('ids', ids)
   exportSelectTable(formData).then((res) => {
     const now = new Date()
-    downloadBinaryFile(res, '排产表_' + now.toLocaleDateString() + '_' + count + '.xlsx')
+    downloadBinaryFile(res, '料型_' + now.toLocaleDateString() + '_' + count + '.xlsx')
     count += 1
   })
 }
@@ -323,8 +238,8 @@ const DeleteFunc = (row) => {
     return ele.id
   })
   const func = () => {
-    return deleteArrange(ids).then((res) => {
-      listArrange(page.value, pageSize.value).then((res) => {
+    return deleteMaterialInfo(ids).then((res) => {
+      listMaterialInfo(page.value, pageSize.value).then((res) => {
         listData.value = res.rows
         total.value = res.total
       })
@@ -347,32 +262,33 @@ const total = ref(0)
 const listData = ref([])
 const handlePageChange = async (val: number) => {
   page.value = val
-  listArrange(page.value, pageSize.value).then((res) => {
+  listMaterialInfo(page.value, pageSize.value).then((res) => {
     listData.value = res.rows
   })
 }
 const handleSizeChange = async (val: number) => {
   pageSize.value = val
   page.value = 1
-  listArrange(page.value, pageSize.value).then((res) => {
+  listMaterialInfo(page.value, pageSize.value).then((res) => {
     listData.value = res.rows
   })
 }
 
 //初次渲染
-listArrange(page.value, pageSize.value).then((res) => {
+listMaterialInfo(page.value, pageSize.value).then((res) => {
+  console.log(res)
   total.value = res.total
   listData.value = res.rows
-  console.log(res.rows)
 })
 </script>
 <template>
   <div class="col">
-    <BordShow content="排产表" path="生产管理/采购/排产表" />
+    <BordShow content="料型表" path="物料管理/料型" />
     <div class="greyBack">
       <FormSearch
         title="查询"
         :data="formData"
+        :onCreate="onCreate"
         :onSubmit="onSubmit"
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
@@ -412,9 +328,26 @@ listArrange(page.value, pageSize.value).then((res) => {
       </TableList>
     </div>
 
-    <el-dialog v-model="editDialogVisible" :title="title" width="800px"
+    <el-dialog v-model="newDialogVisible" :title="title" width="800px"
       ><CreateForm :data="newFormData" :Formvalue="newSubmit" ref="createFormRef" />
-
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
+          <el-button
+            type="info"
+            @click="
+              () => {
+                newDialogVisible = false
+              }
+            "
+          >
+            取消
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+    <el-dialog v-model="editDialogVisible" :title="title" width="800px"
+      ><CreateForm :data="editFormData" :Formvalue="editSubmit" ref="editFormRef" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
