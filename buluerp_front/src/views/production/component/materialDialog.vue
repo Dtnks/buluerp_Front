@@ -225,6 +225,22 @@ watch(
 )
 
 const handleClose = () => {
+  form.value ={
+    cavityCount: null,
+    cycleTime: null,
+    drawingReferenceFile: null,
+    materialType: '',
+    mouldStatus: '',
+    mouldManufacturer: '',
+    mouldNumber: '',
+    sampleLocation: '',
+    remarks: '',
+    specificationName: '',
+    standardCode: '',
+    singleWeight: null,
+    spareCode: '',
+    deleteDrawingReference: false
+  }
   visible.value = false
 }
 const removeImage = () => {
