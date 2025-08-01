@@ -32,16 +32,16 @@
         <informationCard title="订单详情">
           <el-table :data="orderProduct" style="width: 100%">
             <el-table-column label="产品编码" prop="id" />
-            
+
             <el-table-column label="内部编码" prop="innerId" />
-            
+
             <el-table-column label="外部编码" prop="outerId" />
-            
+
             <el-table-column label="产品名称" prop="name" />
             <el-table-column label="创建时间" prop="createTime" />
             <el-table-column label="更新时间" prop="updateTime" />
             <el-table-column label="产品状态" prop="designStatus" />
-          </el-table> 
+          </el-table>
         </informationCard>
         <!-- 关联订单 -->
         <informationCard title="关联订单">
@@ -151,17 +151,46 @@ statusText.value = resMap[props.detail.status]
 
 
 // 订单详情-产品数据
-const orderProduct = ref([])
+interface ProductInfo {
+  id: string
+  innerId: string
+  outerId: string
+  name: string
+  createTime: string
+  updateTime: string
+  designStatus: string
+}
+
+const orderProduct = ref<ProductInfo[]>([])
+
 
 const promap={'0':'未生产','1':'已生产'}
 // 获取订单产品数据
 const fetchOrderProduct = async () => {
-    const res = await getProductsByOrderId(props.detail.productId)
-    console.log(res,'res')
-    orderProduct.value = res.rows
-    orderProduct.value[0].designStatus = promap[orderProduct.value[0].designStatus]
+  const productId = props.detail.productId
+  if (!productId) {
+    // 如果未绑定产品，不发送请求
+    orderProduct.value = [{
+      id: '未绑定产品',
+      innerId: '-',
+      outerId: '-',
+      name: '-',
+      createTime: '-',
+      updateTime: '-',
+      designStatus: '-'
+    }]
+    return
+  }
 
+  const res = await getProductsByOrderId(productId)
+  orderProduct.value = res.rows
+
+  // 如果有数据，处理产品状态映射
+  if (orderProduct.value.length > 0) {
+    orderProduct.value[0].designStatus = promap[orderProduct.value[0].designStatus]
+  }
 }
+
 
 // // 关联订单数据和操作
 // viewPuchaseOrder: 查看采购表
