@@ -10,7 +10,7 @@ export function newPurchasePlan(data) {
 
 export function getPurchaseListByOrderId(orderId) {
   return httpInstance({
-    url: `system/purchase-collection/list?orderCode=${orderId}`,
+    url: `system/purchase-collection/list?orderCodeExact=${orderId}`,
     method: 'get',
     headers: headers,
   })
