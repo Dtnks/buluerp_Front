@@ -87,4 +87,10 @@ export function searchMaterial(params) {
   })
 }
 
-
+export function getPurchasedTemplate() {
+  return httpInstance({
+    url: 'system/material-info/import/purchased/template',
+    method: 'get',
+    responseType: 'blob'
+  })
+}

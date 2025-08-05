@@ -37,7 +37,7 @@
         <el-table-column prop="mouldNumber" label="模具编号" />
         <el-table-column prop="specificationName" label="规格名称" />
         <el-table-column prop="cavityCount" label="腔口数量" />
-        <el-table-column prop="materialType" label="料别" />
+        <el-table-column prop="materialType" label="料型" />
         <el-table-column prop="standardCode" label="常规编码" />
         <el-table-column prop="singleWeight" label="单重" />
         <el-table-column prop="mouldStatus" label="模具状态" />

@@ -114,7 +114,7 @@ const formConfig = [
   [
     {
       type: 'inputSelect',
-      label: '材料类型',
+      label: '料型',
       key: 'materialType',
       width: 12,
       rules: [requiredRule],
@@ -154,13 +154,18 @@ const formConfig = [
       label: '模具厂商',
       key: 'mouldManufacturer',
       type: 'input',
-      width: 12
+      width: 8
     },{
       label: '生产周期',
       key: 'cycleTime',
       type: 'number',
-      width: 12
-    }
+      width: 8
+    },{
+      label: '产品ID',
+      key: 'productCode',
+      type: 'input',
+      width: 8
+    },
   ],
   [
     {
