@@ -36,7 +36,8 @@
         <el-table-column prop="id" label="物料ID" />
         <el-table-column prop="mouldNumber" label="模具编号" />
         <el-table-column prop="specificationName" label="规格名称" />
-        <el-table-column prop="materialType" label="料别" />
+        <el-table-column prop="cavityCount" label="腔口数量" />
+        <el-table-column prop="materialType" label="料型" />
         <el-table-column prop="standardCode" label="常规编码" />
         <el-table-column prop="singleWeight" label="单重" />
         <el-table-column prop="mouldStatus" label="模具状态" />
@@ -48,11 +49,11 @@
         <el-table-column label="外购信息" width="100">
           <template #default="{ row }">
             <el-button
-              v-if="row.purchaseInfos && row.purchaseInfos.length"
+              v-if="row.purchased"
               size="small"
               type="primary"
               text
-              @click="openPurchaseDialog(row.purchaseInfos)"
+              @click="openPurchaseDialog(row.purchaseInfo)"
             >
               查看
             </el-button>
@@ -84,23 +85,35 @@
       </div>
     </div>
     <el-dialog v-model="purchaseDialogVisible" title="外购信息" width="600px">
-      <el-table :data="currentPurchaseInfos" border>
-        <el-table-column label="图片" width="80">
-          <template #default="{ row }">
-            <img
-              v-if="row.pictureUrl"
-              :src="getFullImageUrl(row.pictureUrl)"
-              alt="外购图片"
-              style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px"
-            />
+        <div v-if="currentPurchaseInfo" class="purchase-info-container">
+          <div class="info-item">
+            <strong>采购编码:</strong> {{ currentPurchaseInfo.purchaseCode }}
+          </div>
+          <div class="info-item">
+            <strong>ID:</strong> {{ currentPurchaseInfo.id }}
+          </div>
+          <div class="info-item">
+            <strong>物料ID:</strong> {{ currentPurchaseInfo.materialId }}
+          </div>
+          <div class="info-item">
+            <strong>单价:</strong> {{ currentPurchaseInfo.unitPrice.toFixed(2) }}
+          </div>
+          <div class="info-item">
+            <strong>供应商:</strong> {{ currentPurchaseInfo.supplier }}
+          </div>
+          <div class="info-item">
+            <strong>图片:</strong>
+            <div v-if="currentPurchaseInfo.pictureUrl" class="image-container">
+              <img
+                :src="getFullImageUrl(currentPurchaseInfo.pictureUrl)"
+                alt="外购图片"
+                class="purchase-image"
+              />
+            </div>
             <span v-else>暂无图片</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="purchaseCode" label="采购编码" />
-        <el-table-column prop="unitPrice" label="单价" />
-        <el-table-column prop="supplier" label="供应商" />
-      </el-table>
-    </el-dialog>
+          </div>
+        </div>
+      </el-dialog>
   </el-card>
   <MaterialDialog
     v-model="showDialog"
@@ -138,15 +151,23 @@ const data = ref([])
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
-const purchaseDialogVisible = ref(false)
-const currentPurchaseInfos = ref<any[]>([])
-
-const openPurchaseDialog = (infos: any[]) => {
-  currentPurchaseInfos.value = infos
-  purchaseDialogVisible.value = true
+interface PurchaseInfo {
+  id: number;
+  purchaseCode: string;
+  pictureUrl: string;
+  unitPrice: number;
+  materialId: number;
+  supplier: string;
 }
 
+const currentPurchaseInfo = ref<PurchaseInfo | null>(null)
 
+const purchaseDialogVisible = ref(false)
+
+const openPurchaseDialog = (purchaseInfo: PurchaseInfo) => {
+  currentPurchaseInfo.value = purchaseInfo
+  purchaseDialogVisible.value = true
+}
 
 const fetchData = async () => {
   const res = await getMaterialList({
@@ -275,5 +296,29 @@ const onExport = async () => {
 <style>
 .card-actions {
   margin-right: 20px;
+}
+.purchase-info-container {
+  font-family: Arial, sans-serif;
+  line-height: 1.8;
+}
+
+.info-item {
+  margin-bottom: 10px;
+}
+
+strong {
+  font-weight: 600;
+}
+
+.image-container {
+  margin-top: 10px;
+}
+
+.purchase-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
 }
 </style>

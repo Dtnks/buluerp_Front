@@ -14,6 +14,7 @@ const handleSearch = (params: Record<string, any>) => {
   const filteredParams = {
     mouldNumber: params.mouldNumber || null,
     mouldManufacturer: params.mouldManufacturer || null,
+    purchased: params.purchased || null,
   }
   searchParams.value = filteredParams
   console.log('父组件发送搜索参数', searchParams.value)

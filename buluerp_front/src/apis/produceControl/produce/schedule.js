@@ -15,7 +15,7 @@ export function listScheduleByOrderCode(orderCode) {
     headers: headers,
   })
   }
-  
+
 }
 
 
@@ -36,7 +36,7 @@ export function finishSchedule(data) {
 }
 export function getScheduleListByOrderId(orderId) {
   return httpInstance({
-    url: `system/products-schedule/list?orderCode=${orderId}`,
+    url: `system/products-schedule/list?orderCodeExact=${orderId}`,
     method: 'get',
     headers: headers,
   })

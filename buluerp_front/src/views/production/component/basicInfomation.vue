@@ -269,10 +269,10 @@ interface MaterialItem {
     <el-card>
       <template #header><div class="card-header">产品详情</div></template>
 
-      <el-steps :active="1" align-center>
+      <!-- <el-steps :active="1" align-center>
         <el-step title="填写产品组装物料信息" />
         <el-step title="完成" />
-      </el-steps>
+      </el-steps> -->
 
       <el-table :data="tableData" style="width: 100%" max-height="400">
         <el-table-column prop="mouldNumber" label="模具编号"  />
