@@ -79,7 +79,8 @@
   </el-space>
 
   <div style="text-align: right; margin-top: 8px">
-    <el-link type="primary" @click="handleDownloadTemplate">下载导入模板</el-link>
+    <el-link type="primary" @click="handleDownloadTemplate">下载内部导入模板</el-link>
+    <el-link type="primary" @click="DownloadPurchasedTemplate">下载外购导入模板</el-link>
   </div>
 </el-col>
 
@@ -133,7 +134,8 @@ import {
   addMaterial,
   getMaterialTemplate,
   addPurMaterial,
-  importPurMaterialFile
+  importPurMaterialFile,
+  getPurchasedTemplate
 } from '@/apis/materials'
 import { messageBox } from '@/components/message/messageBox'
 import MaterialDialog from '@/views/production/component/materialDialog.vue'
@@ -290,7 +292,20 @@ const handleDownloadTemplate = async () => {
     const res = await getMaterialTemplate()
     downloadBinaryFile(
       res,
-      '模具模板.xlsx',
+      '内部模具模板.xlsx',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+  } catch (e) {
+    messageBox('error', null, '', '下载失败', '')
+  }
+}
+
+const DownloadPurchasedTemplate = async () => {
+  try {
+    const res = await getPurchasedTemplate()
+    downloadBinaryFile(
+      res,
+      '外购模具模板.xlsx',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     )
   } catch (e) {
