@@ -104,7 +104,7 @@ const newFormData = ref({
         label: '进出数量',
         key: 'inOutQuantity',
         width: 12,
-        rules: [positiveNumberRule,requiredRule],
+        rules: [requiredRule],
       },
       {
         type: 'input',

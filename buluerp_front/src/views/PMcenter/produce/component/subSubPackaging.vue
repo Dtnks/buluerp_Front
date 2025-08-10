@@ -175,7 +175,7 @@ const newSubSubFormData = ref([
       type: 'input',
       label: '总重量',
       key: 'totalWeight',
-      width: 8,
+      width: 12,
       rules: [positiveNumberRule,requiredRule],
     }
   ],
@@ -280,7 +280,7 @@ const handleSubSubSubmit = () => {
 
 .detail-label {
   width: 120px;
-  color: #606266;
+  color: #303133;
 }
 
 .detail-value {

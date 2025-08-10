@@ -127,7 +127,7 @@ const formConfig = [
       label: '单重',
       key: 'singleWeight',
       type: 'number',
-      width: 8
+      width: 12
     }
   ],
   [
@@ -177,7 +177,7 @@ const formConfig = [
       label: '备用编码',
       key: 'spareCode',
       type: 'input',
-      width: 8
+      width: 12
     }
   ],
 ]
