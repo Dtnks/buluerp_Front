@@ -241,16 +241,26 @@ const newFormData = ref([
       disabled: true,  // 设置为禁用状态
     },
     {
-      type: 'inputSelect',
+      type: 'input',  // 改为只读显示类型
       label: '产品',
       key: 'productId',
       width: 12,
-      showKey: [{ key: 'id', label: "产品ID" }, { key: 'name', label: "产品名称" }],
-      rules: [requiredRule],
-      options: [],
-      loading: false,
-      remoteFunc: searchFunc('system/products/list', 'id'),
+      value: props.detail.productId,  // 直接显示传入的产品ID
+      displayFormat: (value) => `${props.detail.productId} (${props.detail.productName})`,
+      readonly: true,
+      disabled: true,  // 设置为禁用状态
     },
+    // {
+    //   type: 'inputSelect',
+    //   label: '产品',
+    //   key: 'productId',
+    //   width: 12,
+    //   showKey: [{ key: 'id', label: "产品ID" }, { key: 'name', label: "产品名称" }],
+    //   rules: [requiredRule],
+    //   options: [],
+    //   loading: false,
+    //   remoteFunc: searchFunc('system/products/list', 'id'),
+    // },
   ],
   [
     { type: 'input', label: '生产线', key: 'productionLine', width: 12, rules: [requiredRule] },
@@ -341,7 +351,7 @@ const handleSubmit = () => {
   createFormRef.value.validateForm((valid) => {
     if (valid) {
       newSubmit.value.releaseDate = parseTime(newSubmit.value.releaseDate, '{y}-{m}-{d}')
-      newPackaging({ ...newSubmit.value, orderCode: props.orderCode }).then((res) => {
+      newPackaging({ ...newSubmit.value, orderCode: props.orderCode, productId: orderProduct.value[0].id }).then((res) => {
         relatedOrdersTable.value[2].actions = [{ name: '查看', method: viewPackagingList }]
         messageBox('success', null, '分包创建成功')
         DialogVisible.value = false
