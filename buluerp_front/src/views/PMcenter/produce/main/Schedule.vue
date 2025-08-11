@@ -136,7 +136,7 @@ const newFormData = ref([
       key: 'mouldNumber',
       width: 12,
       rules: [requiredRule],
-      showKey:[{key:'id',label:"物料ID"},{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
+      showKey:[{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
       remoteFunc: searchFunc('system/material-info/list', 'mouldNumber'),
       options: [],
       loading: false,

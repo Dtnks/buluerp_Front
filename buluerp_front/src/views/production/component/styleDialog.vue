@@ -51,11 +51,11 @@
             </div>
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+        <!-- <el-col :span="12">
           <el-form-item label="物料ID" prop="materialId">
             <el-input v-model="form.materialId" />
           </el-form-item>
-        </el-col>
+        </el-col> -->
         <el-col :span="12">
           <el-form-item label="模具类型" prop="mouldCategory">
             <el-input v-model="form.mouldCategory" />
@@ -134,7 +134,6 @@ const rules = {
   color: [{ required: true, message: '必填', trigger: 'blur' }],
   quantity: [{ required: true, type: 'number', message: '请输入数字', trigger: 'blur' }],
   material: [{ required: true, message: '必填', trigger: 'blur' }],
-  materialId: [{ required: true, type: 'number', message: '请输入物料ID', trigger: 'blur' }],
   mouldNumber: [{ required: true, message: '必填', trigger: 'blur' }]
 }
 
