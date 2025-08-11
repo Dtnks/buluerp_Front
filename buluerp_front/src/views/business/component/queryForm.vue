@@ -1,6 +1,6 @@
 <template>
   <Form :data="data" :title="title" :onSubmit="onSubmit" :onCreate="onCreate" :onImport="onImport"
-    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm" :control="control" :formState="formState"></Form>
+    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm" :formState="formState"></Form>
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
 
@@ -52,7 +52,7 @@ import type { SubmitFormType } from '../types'
 const dialogFormVisible = ref(false)
 console.log(resMap,'resMap')
 const emit = defineEmits(['onSubmit', 'onAdd', 'checkCustomerName', 'customerSuggestions'])
-defineProps(['control'])
+
 const dialogForm = reactive({
   status: 0, // 确保 status 有默认值
   createTime: '',

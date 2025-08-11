@@ -59,6 +59,8 @@ const logout = () => {
           props.addTab(
             '我的信息',
             defineAsyncComponent(() => import('@/views/person/main/Information.vue')),
+            null,
+            '/UserInformation',
           )
         "
       >

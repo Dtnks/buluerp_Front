@@ -20,7 +20,7 @@ import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { searchFunc } from '@/utils/search/search'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
-const props = defineProps(['control'])
+
 //渲染页面
 const formData = ref([
   [
@@ -260,7 +260,6 @@ const operation = ref([
     },
 
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
   {
     func: (row) => {
@@ -270,15 +269,8 @@ const operation = ref([
       })
     },
     value: '完成采购',
-    disabled: props.control[1].disabled,
   },
-  // {
-  //   func: (row) => {
-  //     props.addTab('采购计划-' + row.id, PlanDetail, row, null)
-  //   },
-  //   value: '查看',
-  //   disabled: false,
-  // },
+
 ])
 
 //新增与修改
@@ -457,7 +449,6 @@ listPurchasePlan(page.value, pageSize.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent"
-        :control="control"
       />
       <TableList
         :tableData="tableData"
@@ -465,7 +456,6 @@ listPurchasePlan(page.value, pageSize.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
-        :control="control"
       >
         <slot>
           <div

@@ -22,7 +22,7 @@ import { messageBox } from '@/components/message/messageBox'
 import { searchFunc } from '@/utils/search/search'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 import { ElMessage } from 'element-plus'
-const props = defineProps(['control', 'addTab'])
+const props = defineProps(['addTab'])
 //渲染页面
 const createNewFormRef = ref()
 const createEditFormRef = ref({})
@@ -361,7 +361,6 @@ const operation = ref([
       editSubmit.value = { ...row }
     },
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
   {
     func: (row) => {
@@ -371,7 +370,6 @@ const operation = ref([
       })
     },
     value: '完成布产',
-    disabled: props.control[1].disabled,
   },
 ])
 const title = ref('新增')
@@ -707,7 +705,6 @@ listSchedule(page.value, pageSize.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent"
-        :control="control"
       />
       <TableList
         :tableData="tableData"
@@ -716,7 +713,6 @@ listSchedule(page.value, pageSize.value).then((res) => {
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
         :transToArrange="transToArrange"
-        :control="control"
       >
         <slot>
           <div

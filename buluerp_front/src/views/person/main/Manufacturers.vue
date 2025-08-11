@@ -19,7 +19,7 @@ import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessage, FormInstance, FormRules } from 'element-plus'
 //渲染页面
-const props = defineProps(['control'])
+
 const formData = ref([
   [
     { type: 'input', label: '姓名', key: 'name' },
@@ -77,7 +77,6 @@ const operation = ref([
       newSubmit.value = { ...row }
     },
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
 ])
 const searchContent = ref({ name: '', creatTime: '', email: '', remark: '', tel: '' })
@@ -247,7 +246,6 @@ listManufacturers(page.value, pageSize.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :search-form="searchContent"
-        :control="control"
       />
       <TableList
         :tableData="tableData"
@@ -255,7 +253,6 @@ listManufacturers(page.value, pageSize.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
-        :control="control"
       >
         <slot>
           <div

@@ -111,8 +111,8 @@ const props = defineProps<{
   detail: any
   id: number
   orderCode: string
-  addTab: (targetName: string, component: any, data?: any, control?: any) => void
-  control: Array<object>
+  addTab: (targetName: string, component: any, data?: any,targetPath?:string) => void
+
 }>()
 const tabStore = useTabStore()
 const orderDetail = computed(() => props.detail)
@@ -199,7 +199,8 @@ const viewPuchaseOrder = (row: any) => {
     `订单${props.orderCode} 外购`,
     PurchaseInfo,
     { orderCode: props.orderCode, purchaseId: orderDetail.value.purchaseId, orderId: props.id },
-    props.control,
+    `/business/PurchaseInfo/${props.orderCode}`,
+
   )
 }
 
@@ -209,7 +210,8 @@ const viewProductsSchedule = (row: any) => {
     `订单${props.orderCode} 布产`,
     ProductionSchedule,
     { orderCode: props.orderCode },
-    props.control,
+    `/business/ProductionSchedule/${props.orderCode}`,
+
   )
 }
 
@@ -220,7 +222,8 @@ const handleAction = (method: Function, row: any) => {
 
 const viewPackagingList = (row) => {
   getPackagingListByOrderId(props.orderCode).then((res) => {
-    props.addTab(`订单${props.orderCode} 分包`, PackagingDetail, res.rows[0].id, props.control)
+    props.addTab(`订单${props.orderCode} 分包`, PackagingDetail, res.rows[0].id,
+    `/business/PackagingDetail/${props.orderCode}`)
   })
 }
 const DialogVisible = ref(false)

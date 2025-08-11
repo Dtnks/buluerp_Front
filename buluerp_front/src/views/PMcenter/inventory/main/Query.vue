@@ -29,7 +29,7 @@ const TypeOptions = [
   },
 ]
 const mapList = { 'packaging-material': '料包', part: '胶件', product: '成品' }
-const props = defineProps(['control'])
+
 //渲染页面
 const formData = ref({
   'packaging-material': [
@@ -176,7 +176,6 @@ const operations = ref({
         changeNumber.value = row.safeQuantity
       },
       value: '修改安全阈值',
-      disabled: props.control[1].disabled,
     },
   ],
   'packaging-material': null,
@@ -314,7 +313,7 @@ storeRecording(page.value, pageSize.value, type.value).then((res) => {
         :data="formData[type]"
         :onSubmit="onSubmit"
         :searchForm="searchContent[type]"
-        :control="control"
+
       >
         <el-select v-model="type" placeholder="Select" style="width: 100px" @change="refreshList">
           <el-option
@@ -328,7 +327,7 @@ storeRecording(page.value, pageSize.value, type.value).then((res) => {
       <TableList
         :tableData="tableData[type]"
         :listData="listData"
-        :control="control"
+
         :exportCharts="openDialog"
         :operations="operations[type]"
         :key="type"

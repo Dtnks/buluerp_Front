@@ -45,7 +45,7 @@ const TypeOptions = [
   },
 ]
 const mapList = { 'packaging-material': '料包', part: '胶件', product: '成品' }
-const props = defineProps(['control'])
+
 //渲染页面
 const createFormRef = ref(null)
 const formData = ref({
@@ -443,7 +443,6 @@ const operation = ref([
       newSubmit.value[type.value] = { ...row }
     },
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
 ])
 
@@ -771,7 +770,7 @@ listRecording(page.value, pageSize.value, type.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent[type]"
-        :control="control"
+
       >
         <el-select v-model="type" placeholder="Select" style="width: 100px" @change="refreshList">
           <el-option
@@ -788,7 +787,7 @@ listRecording(page.value, pageSize.value, type.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
-        :control="control"
+
       >
         <slot>
           <div

@@ -7,7 +7,7 @@ import TableList from '@/components/table/TableList.vue'
 import { ref, nextTick } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { messageBox } from '@/components/message/messageBox'
-const props = defineProps(['control', 'addTab'])
+const props = defineProps([ 'addTab'])
 //渲染页面
 const createFormRef = ref()
 const formData = ref([
@@ -158,14 +158,12 @@ listLog(page.value, pageSize.value).then((res) => {
         :data="formData"
         :onSubmit="onSubmit"
         :searchForm="searchContent"
-        :control="control"
       />
       <TableList
         :tableData="tableData"
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
-        :control="control"
       >
         <slot>
           <div

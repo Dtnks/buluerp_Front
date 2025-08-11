@@ -7,7 +7,7 @@
       >
         <span>展示</span>
         <div class="card-actions">
-          <el-button type="danger" @click="onDelete" :disabled="control[2].disabled"
+          <el-button type="danger" @click="onDelete"
             >删除</el-button
           >
           <el-button type="primary" @click="onExport">导出</el-button>
@@ -95,8 +95,8 @@ import Detail from '../main/Detail.vue'
 
 const props = defineProps<{
   queryParams: Record<string, any>
-  addTab: (targetName: string, component: any, data?: any) => void
-  control: Array<object>
+  addTab: (targetName: string, component: any, data?: any,targetPath?:string) => void
+
 }>()
 
 const getRowKey = (row: any) => row.id
@@ -219,7 +219,7 @@ const onExport = async () => {
 }
 
 const onView = (row: any) => {
-  props.addTab(`产品详情页-${row.name}`, Detail, row, props.control)
+  props.addTab(`产品详情页-${row.name}`, Detail, row, `/production/Detail/${row.id}`)
 }
 </script>
 <style>

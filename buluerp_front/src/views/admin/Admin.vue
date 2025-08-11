@@ -4,7 +4,7 @@ import { getOptionselect, newUser, getUserList } from '@/apis/admin.js'
 import Table from './component/Table.vue'
 import { ref } from 'vue'
 import { ElMessage, FormInstance, FormRules } from 'element-plus'
-defineProps(['control'])
+
 const options = ref({})
 
 const searchContent = ref({ roleId: '', userName: '', nickName: '' })
@@ -123,7 +123,6 @@ const newDialogVisible = ref(false)
                 newDialogVisible = true
               }
             "
-            :disabled="control[0].disabled"
             >新建</el-button
           >
           <el-button type="primary" @click="search">查询</el-button>
@@ -177,7 +176,7 @@ const newDialogVisible = ref(false)
           <!-- </div> -->
         </el-form>
         <div style="height: 20px"></div>
-        <Table :tableData="tableData" :options="options" :setPage="setPage" :control="control" />
+        <Table :tableData="tableData" :options="options" :setPage="setPage" />
         <div style="height: 20px"></div>
         <div style="right: 40px; bottom: 20px">
           <el-pagination

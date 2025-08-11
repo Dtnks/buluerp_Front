@@ -5,7 +5,7 @@
       <div style="display: flex; justify-content: space-between; align-items: center">
         <span>列表</span>
         <div>
-          <el-button type="danger" @click="onDelete" :disabled="control[2].disabled">删除</el-button>
+          <el-button type="danger" @click="onDelete" >删除</el-button>
           <el-button type="primary" @click="onExport">导出</el-button>
         </div>
       </div>
@@ -32,7 +32,7 @@
       </el-table-column>
       <el-table-column label="操作">
         <template #default="{ row }">
-          <el-button link type="primary" @click="onEdit(row)" :disabled="control[1].disabled">编辑</el-button>
+          <el-button link type="primary" @click="onEdit(row)">编辑</el-button>
           <el-button link type="primary" @click="()=>{
                       emit('onUpdated', { ...row,status:row.status+1 })
                       emit('fetchData')
@@ -94,9 +94,8 @@ import useTabStore from '@/stores/modules/tabs'
 
 const props = defineProps<{
   // queryParams: Record<string, any>
-  addTab: (targetName: string, component: any, data?: any, control: Array<object>) => void
+  addTab: (targetName: string, component: any, data?: any,targetPath?:string) => void
   tableData: any[]
-  control: Array<object>
   pagination: {
     page: number
     pageSize: number
@@ -125,7 +124,11 @@ const columns = [
 const onCheck = (row: TableDataType) => {
   console.log('查看：', row)
   props.addTab(
-    `订单详情 ${row.id}`, BusinessDetail, { addTab: props.addTab, id: row.id, orderCode: row.innerId, status: row.status, remark: row.remark, createTime: row.createTime, customerName: row.customerName, }, props.control,
+    `订单详情 ${row.id}`, 
+    BusinessDetail, 
+    { addTab: props.addTab, id: row.id, orderCode: row.innerId, status: row.status, remark: row.remark, createTime: row.createTime, customerName: row.customerName, },
+    `/business/BusinessDetail/${row.id}`,
+
   )
 }
 

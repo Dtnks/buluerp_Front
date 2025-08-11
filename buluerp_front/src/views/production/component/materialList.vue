@@ -143,7 +143,7 @@ const currentRow = ref({})
 
 const props = defineProps<{
   queryParams: Record<string, any>
-  addTab: (targetName: string, component: any, data?: any) => void
+  addTab: (targetName: string, component: any, data?: any,targetPath?:string) => void
 }>()
 const getRowKey = (row: any) => row.id
 
