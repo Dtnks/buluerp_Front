@@ -145,7 +145,7 @@ const newFormData = ref([
 const newSubmit = ref({
 
 })
-
+const finishedTitle=ref([])
 const editFormData = ref([
   [
     { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 8, rules: [requiredRule] },
@@ -663,6 +663,7 @@ listSchedule(page.value, pageSize.value).then((res) => {
     </el-dialog>
     <el-dialog v-model="transDialogVisible" title="导入排产" width="800px"
       ><CreateForm :data="transFormData" :Formvalue="transSubmit" ref="createTransFormRef" />
+
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmitTrans"> 确认 </el-button>

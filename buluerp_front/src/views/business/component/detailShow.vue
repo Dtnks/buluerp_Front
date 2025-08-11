@@ -156,7 +156,7 @@ const orderProduct = ref([])
 const promap={'0':'未生产','1':'已生产'}
 // 获取订单产品数据
 const fetchOrderProduct = async () => {
-    const res = await getProductsByOrderId(props.detail.productId)
+    const res = await getProductsByOrderId(props.detail.productId )
     console.log(res,'res')
     orderProduct.value = res.rows
     orderProduct.value[0].designStatus = promap[orderProduct.value[0].designStatus]
