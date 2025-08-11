@@ -83,7 +83,11 @@ const newDialogVisible = ref(false)
     <BordShow content="授权管理" path="管理员/授权管理" />
     <div class="greyBack">
       <el-card class="col">
-        <div class="row">
+        <el-form
+          :inline="true"
+          label-width="auto"
+          style="margin-bottom: 0;"
+        >
           <el-form-item label="角色" class="input row">
             <el-select
               v-model="searchContent.roleId"
@@ -110,68 +114,68 @@ const newDialogVisible = ref(false)
             <el-input v-model="searchContent.nickName" />
           </el-form-item>
 
-          <div class="row" style="justify-content: flex-end; margin: 15px">
-            <el-button
-              type="primary"
-              @click="
-                () => {
-                  resetSubmit()
-                  newDialogVisible = true
-                }
-              "
-              :disabled="control[0].disabled"
-              >新建</el-button
-            >
-            <el-button type="primary" @click="search">查询</el-button>
-            <el-dialog v-model="newDialogVisible" title="新建系统账号" width="500" center>
-              <!-- 绑定表单引用和校验规则 -->
-              <el-form ref="formRef" :model="newSubmit" :rules="rules" label-width="80px">
-                <el-form-item label="帐号" prop="userName">
-                  <el-input v-model="newSubmit.userName" style="width: 240px" />
-                </el-form-item>
-                <el-form-item label="姓名" prop="nickName">
-                  <el-input v-model="newSubmit.nickName" style="width: 240px" />
-                </el-form-item>
-                <el-form-item label="密码" prop="password">
-                  <el-input v-model="newSubmit.password" style="width: 240px" type="password" />
-                </el-form-item>
-                <el-form-item label="角色" prop="roleIds">
-                  <el-select
-                    v-model="newSubmit.roleIds"
-                    multiple
-                    collapse-tags
-                    collapse-tags-tooltip
-                    :max-collapse-tags="2"
-                    placeholder="Select"
-                    style="width: 240px"
-                  >
-                    <el-option
-                      v-for="item in options"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                    />
-                  </el-select>
-                </el-form-item>
-              </el-form>
-              <template #footer>
-                <div class="dialog-footer">
-                  <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-                  <el-button
-                    type="info"
-                    @click="
-                      () => {
-                        newDialogVisible = false
-                      }
-                    "
-                  >
-                    取消
-                  </el-button>
-                </div>
-              </template>
-            </el-dialog>
-          </div>
-        </div>
+          <!-- <div class="row" style="justify-content: flex-end; margin: 15px"> -->
+          <el-button
+            type="primary"
+            @click="
+              () => {
+                resetSubmit()
+                newDialogVisible = true
+              }
+            "
+            :disabled="control[0].disabled"
+            >新建</el-button
+          >
+          <el-button type="primary" @click="search">查询</el-button>
+          <el-dialog v-model="newDialogVisible" title="新建系统账号" width="500" center>
+            <!-- 绑定表单引用和校验规则 -->
+            <el-form ref="formRef" :model="newSubmit" :rules="rules" label-width="80px">
+              <el-form-item label="帐号" prop="userName">
+                <el-input v-model="newSubmit.userName" style="width: 240px" />
+              </el-form-item>
+              <el-form-item label="姓名" prop="nickName">
+                <el-input v-model="newSubmit.nickName" style="width: 240px" />
+              </el-form-item>
+              <el-form-item label="密码" prop="password">
+                <el-input v-model="newSubmit.password" style="width: 240px" type="password" />
+              </el-form-item>
+              <el-form-item label="角色" prop="roleIds">
+                <el-select
+                  v-model="newSubmit.roleIds"
+                  multiple
+                  collapse-tags
+                  collapse-tags-tooltip
+                  :max-collapse-tags="2"
+                  placeholder="Select"
+                  style="width: 240px"
+                >
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-form>
+            <template #footer>
+              <div class="dialog-footer">
+                <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
+                <el-button
+                  type="info"
+                  @click="
+                    () => {
+                      newDialogVisible = false
+                    }
+                  "
+                >
+                  取消
+                </el-button>
+              </div>
+            </template>
+          </el-dialog>
+          <!-- </div> -->
+        </el-form>
         <div style="height: 20px"></div>
         <Table :tableData="tableData" :options="options" :setPage="setPage" :control="control" />
         <div style="height: 20px"></div>
@@ -205,10 +209,11 @@ const newDialogVisible = ref(false)
 .input .el-input {
   width: 240px;
 }
-.cardCenter .el-input {
+.cardCenter  {
   margin-bottom: 20px;
 }
-.row .el-button {
+.el-button {
   margin-right: 10px;
+  margin-bottom: 18px;
 }
 </style>

@@ -43,30 +43,30 @@ const newFormData = ref([
       type: 'input',
       label: '排产数量',
       key: 'productionQuantity',
-      width: 8,
+      width: 12,
       rules: [positiveNumberRule,requiredRule],
     },
     {
       type: 'input',
       label: '排产重量',
       key: 'productionWeight',
-      width: 8,
+      width: 12,
       rules: [positiveNumberRule,requiredRule],
     },
   ],
   [
-    { 
-      type: 'input', 
-      label: '出模数', 
-      key: 'mouldOutput', 
-      width: 12, 
+    {
+      type: 'input',
+      label: '出模数',
+      key: 'mouldOutput',
+      width: 12,
       rules: [positiveNumberRule,requiredRule] },
-    { 
-      type: 'input', 
-      label: '单重', 
-      key: 'singleWeight', 
-      width: 12, 
-      rules: [positiveNumberRule,requiredRule] 
+    {
+      type: 'input',
+      label: '单重',
+      key: 'singleWeight',
+      width: 12,
+      rules: [positiveNumberRule,requiredRule]
     },
 
   ],
