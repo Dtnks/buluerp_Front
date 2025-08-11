@@ -54,9 +54,9 @@ const newFormData = ref([
       key: 'purchaseInfoId',
       width: 8,
       rules: [requiredRule],
-      showKey:[{key:'id',label:"ID"},{key:'materialId',label:"物料"},{key:'unitPrice',label:"单价"}],
-      
-      remoteFunc: searchFunc('system/purchase-info/list', 'id'),
+      showKey:[{key:'purchaseCode',label:"外购ID"},{key:'materialId',label:"物料"},{key:'unitPrice',label:"单价"}],
+
+      remoteFunc: searchFunc('system/purchase-info/list', 'purchaseCode'),
       options: [],
       loading: false,
     },
@@ -123,7 +123,7 @@ const editFormData = ref([
       rules: [requiredRule],
     },
   ],[
-    
+
     {
       type: 'textarea',
       label: '备注',
@@ -147,7 +147,7 @@ const searchContent = ref({
   colorCode: '',
   supplier: '',
   materialType: '',
-}) 
+})
 
 const tableData = ref([
   {
@@ -165,7 +165,7 @@ const tableData = ref([
     label: '订单ID',
     type: 'text',
   },
-  
+
   {
     value: 'materialType',
     label: '料别',
@@ -258,7 +258,7 @@ const operation = ref([
         createFormRef.value.clearValidate()
       })
     },
-    
+
     value: '编辑',
     disabled: props.control[1].disabled,
   },
@@ -292,7 +292,7 @@ const handleSubmit = () => {
     editFormRef.value.validateForm((valid)=>{
       if(valid){
         newSubmit.value.deliveryDate = parseTime(newSubmit.value.deliveryDate, '{y}-{m}-{d}')
-        
+
         changePurchasePlan(newSubmit.value).then((res) => {
           page.value = 1
           listPurchasePlan(page.value, pageSize.value).then((res) => {

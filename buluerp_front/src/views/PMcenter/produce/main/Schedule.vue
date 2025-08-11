@@ -21,6 +21,7 @@ import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { searchFunc } from '@/utils/search/search'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
+import { ElMessage } from 'element-plus'
 const props = defineProps(['control', 'addTab'])
 //渲染页面
 const createNewFormRef = ref()
@@ -114,7 +115,7 @@ const newFormData = ref([
   ],
     [
     { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 12, rules: [requiredRule] },
-    
+
     { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 12, rules: [requiredRule] }
   ],
   [
@@ -131,16 +132,16 @@ const newFormData = ref([
     },
     {
       type: 'inputSelect',
-      label: '物料',
-      key: 'materialId',
+      label: '模具编号',
+      key: 'mouldNumber',
       width: 12,
       rules: [requiredRule],
-      showKey:[{key:'id',label:"物料ID"},{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
-      remoteFunc: searchFunc('system/material-info/list', 'id'),
+      showKey:[{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
+      remoteFunc: searchFunc('system/material-info/list', 'mouldNumber'),
       options: [],
       loading: false,
     }],
-  
+
   ])
 const newSubmit = ref({
 
@@ -216,7 +217,7 @@ const editFormData = ref([
     },
     { type: 'input', label: '用量', key: 'usage', width: 8, rules: [positiveNumberRule,requiredRule] },
   ]
-  
+
   ])
 const editSubmit = ref({
 
@@ -237,7 +238,7 @@ const tableData = ref([
     type: 'text',
   },
   { value: 'pictureUrl', label: '图片', type: 'picture' },
-  
+
   {
     value: 'orderCode',
     label: '订单编号',
@@ -248,7 +249,7 @@ const tableData = ref([
     label: '产品编号',
     type: 'text',
   },
-  
+
 
   {
     value: 'materialId',
@@ -326,12 +327,12 @@ const tableData = ref([
     type: 'text',
   },
   { value: 'supplier', label: '供应商', type: 'text' },
-  { 
-    value: 'mouldManufacturer', 
-    label: '模具厂家', 
-    type: 'tags' 
+  {
+    value: 'mouldManufacturer',
+    label: '模具厂家',
+    type: 'tags'
   },
-  
+
   {
     value: 'cycleTime',
     label: '生产周期(s)',
@@ -379,11 +380,119 @@ const importDialogVisible = ref(false)
 const editDialogVisible = ref(false)
 
 const newDialogVisible = ref(false)
+
+const newList = ref<Array<{
+  form: Record<string, any>,
+  finished: boolean,
+}>>([])
+const createNewFormRefs = ref<any[]>([])
+
+const activeIndex = ref<number | null>(null) // 当前正在编辑哪条
+
+const addNewItem = () => {
+  // 若当前有正在编辑的表单，先校验并保存为 finished
+  if (activeIndex.value !== null) {
+    const currentFormRef = createNewFormRefs.value[activeIndex.value]
+    if (!currentFormRef || typeof currentFormRef.validateForm !== 'function') return
+
+    currentFormRef.validateForm((valid) => {
+
+      if (!valid) return
+      newList.value[activeIndex.value].finished = true
+      activeIndex.value = newList.value.length
+      newList.value.push({ form: {}, finished: false })
+    })
+  } else {
+    activeIndex.value = newList.value.length
+    newList.value.push({ form: {}, finished: false })
+  }
+}
+
+const editItem = (index: number) => {
+  if (activeIndex.value !== null) {
+    const currentFormRef = createNewFormRefs.value[activeIndex.value]
+    if (!currentFormRef || typeof currentFormRef.validateForm !== 'function') return
+
+    currentFormRef.validateForm((valid) => {
+
+      if (!valid) return
+      newList.value[activeIndex.value].finished = true
+      activeIndex.value = index
+      nextTick(() => {
+        createNewFormRef.value.clearValidate()
+      })
+    })
+  } else {
+    activeIndex.value = index
+  }
+}
+
+const removeItem = (index: number) => {
+  newList.value.splice(index, 1)
+  if (activeIndex.value === index) {
+    activeIndex.value = null
+  } else if (activeIndex.value !== null && index < activeIndex.value) {
+    activeIndex.value -= 1
+  }
+}
+const submitAll = () => {
+  if (activeIndex.value !== null) {
+    const currentFormRef = createNewFormRefs.value[activeIndex.value]
+    if (!currentFormRef || typeof currentFormRef.validateForm !== 'function') return
+
+    currentFormRef.validateForm((valid) => {
+
+      if (!valid) return
+      newList.value[activeIndex.value].finished = true
+      activeIndex.value = null
+      callSubmit()
+    })
+  } else {
+    callSubmit()
+  }
+}
+
+const callSubmit = () => {
+  const list = newList.value.filter(i => i.finished)
+  if (!list.length) {
+    ElMessage.warning('请先添加并完成至少一条记录')
+    return
+  }
+
+  Promise.all(list.map(item => newSchedule(item.form))).then(() => {
+    ElMessage.success('批量新增完成')
+    newDialogVisible.value = false
+    newList.value = []
+    listSchedule(page.value, pageSize.value).then((res) => {
+      listData.value = res.rows
+      total.value = res.total
+    })
+  })
+}
+
+const completeForm = () => {
+  if (activeIndex.value !== null) {
+    const currentFormRef = createNewFormRefs.value[activeIndex.value]
+    if (!currentFormRef || typeof currentFormRef.validateForm !== 'function') return
+
+    currentFormRef.validateForm((valid) => {
+
+      if (!valid) return
+      newList.value[activeIndex.value].finished = true
+      activeIndex.value = null
+    })
+  }
+}
+
+const cancelForm = (index) => {
+  activeIndex.value = null
+  removeItem(index)
+}
+
 const handleSubmit = () => {
   if (title.value == '编辑') {
   createEditFormRef.value.validateForm((valid) => {
     if (valid) {
-      
         changeSchedule(editSubmit.value).then((res) => {
           page.value = 1
           listSchedule(page.value, pageSize.value).then((res) => {
@@ -394,7 +503,11 @@ const handleSubmit = () => {
           editDialogVisible.value = false
         })
       } })}else {
-        createNewFormRef.value.validateForm((valid) => {
+        const currentFormRef = createNewFormRefs.value[activeIndex.value]
+        if (!currentFormRef || typeof currentFormRef.validateForm !== 'function') return
+
+        currentFormRef.validateForm((valid) => {
+
           if (valid) {
              newSchedule(newSubmit.value).then((res) => {
              page.value = 1
@@ -418,12 +531,17 @@ const resetnewSubmit = () => {
 }
 const onCreate = () => {
   resetnewSubmit()
+  newList.value = []
+  activeIndex.value = 0
   title.value = '新增'
   newDialogVisible.value = true
+  newList.value.push({ form: {}, finished: false }) // 新增第一条空记录
+
   nextTick(() => {
-        createNewFormRef.value.clearValidate()
-      })
+    createNewFormRef.value?.clearValidate()
+  })
 }
+
 
 const onSubmit = () => {
   page.value = 1
@@ -625,24 +743,36 @@ listSchedule(page.value, pageSize.value).then((res) => {
       </TableList>
     </div>
 
-    <el-dialog v-model="newDialogVisible" :title="title" width="800px"
-      ><CreateForm :data="newFormData" :Formvalue="newSubmit" ref="createNewFormRef" />
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button
-            type="info"
-            @click="
-              () => {
-                newDialogVisible = false
-              }
-            "
-          >
-            取消
-          </el-button>
+    <el-dialog v-model="newDialogVisible" title="批量新增布产" width="800px">
+      <div v-for="(item, index) in newList" :key="index">
+        <div v-if="activeIndex === index">
+          <CreateForm
+            :data="newFormData"
+            :Formvalue="item.form"
+            :ref="el => createNewFormRefs[index] = el"
+          />
+          <div style="margin-top: 10px; text-align: right">
+            <el-button type="primary" size="small" @click="completeForm">完成当前记录</el-button>
+            <el-button type="default" @click="cancelForm(index)">取消</el-button>
+          </div>
         </div>
+        <div v-else class="card-style">
+          设计总表ID：{{ item.form.designPatternId }} |
+          物料ID：{{ item.form.materialId }} |
+          出货时间：{{ item.form.shipmentTime }}
+          <el-button type="text" @click="editItem(index)">编辑</el-button>
+          <el-button type="text" @click="removeItem(index)">删除</el-button>
+        </div>
+      </div>
+
+      <el-button type="primary" @click="addNewItem">添加一条布产</el-button>
+
+      <template #footer>
+        <el-button type="primary" @click="submitAll">完成</el-button>
+        <el-button @click="newDialogVisible = false">取消</el-button>
       </template>
     </el-dialog>
+
     <el-dialog v-model="editDialogVisible" :title="title" width="800px"
       ><CreateForm :data="editFormData" :Formvalue="editSubmit" ref="createEditFormRef" />
       <template #footer>
@@ -698,3 +828,15 @@ listSchedule(page.value, pageSize.value).then((res) => {
     </el-dialog>
   </div>
 </template>
+<style>
+.card-style{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  margin-top: 8px;
+  border: 1px solid #ebeef5;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+</style>

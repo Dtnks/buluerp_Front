@@ -28,13 +28,13 @@
           </el-form-item>
         </el-col>
         <el-col :span="24">
-          <el-form-item label="物料ID" prop="materialId">
+          <el-form-item label="模具编号" prop="mouldNumber">
             <el-select
-              v-model="form.materialId"
+              v-model="form.mouldNumber"
               filterable
               remote
               reserve-keyword
-              placeholder="请输入物料ID"
+              placeholder="请输入模具编号"
               :remote-method="handleSearchMaterial"
               :loading="materialLoading"
               style="width: 100%"
@@ -47,16 +47,16 @@
               />
             </el-select>
             <div class="el-form-item__extra" style="color: #409EFF; font-size: 13px;">
-              提示：填写物料ID后会自动填写模具编号，模具类型与图片
+              提示：填写模具编号后会自动填写物料ID，模具类型与图片
             </div>
           </el-form-item>
         </el-col>
-        <el-col :span="8">
-          <el-form-item label="模具编号" prop="mouldNumber">
-            <el-input v-model="form.mouldNumber" />
+        <!-- <el-col :span="12">
+          <el-form-item label="物料ID" prop="materialId">
+            <el-input v-model="form.materialId" />
           </el-form-item>
-        </el-col>
-        <el-col :span="8">
+        </el-col> -->
+        <el-col :span="12">
           <el-form-item label="模具类型" prop="mouldCategory">
             <el-input v-model="form.mouldCategory" />
           </el-form-item>
@@ -134,7 +134,6 @@ const rules = {
   color: [{ required: true, message: '必填', trigger: 'blur' }],
   quantity: [{ required: true, type: 'number', message: '请输入数字', trigger: 'blur' }],
   material: [{ required: true, message: '必填', trigger: 'blur' }],
-  materialId: [{ required: true, type: 'number', message: '请输入物料ID', trigger: 'blur' }],
   mouldNumber: [{ required: true, message: '必填', trigger: 'blur' }]
 }
 
@@ -152,11 +151,11 @@ const handleSearchMaterial = async (query: string) => {
   if (!query) return
   materialLoading.value = true
   try {
-    const res = await getMaterialList({ id: query })
+    const res = await getMaterialList({ mouldNumber: query })
     materialOptions.value = (res.rows || []).map(m => ({
-      value: m.id,
-      label: `${m.id} - ${m.materialType || ''}`,
-      mouldNumber: m.mouldNumber,
+      value: m.mouldNumber,
+      label: `${m.mouldNumber} - ${m.materialType || ''}`,
+      materialId: m.id,
       mouldCategory: m.materialType
     }))
   } finally {
@@ -164,10 +163,10 @@ const handleSearchMaterial = async (query: string) => {
   }
 }
 
-watch(() => form.value.materialId, (newVal) => {
+watch(() => form.value.mouldNumber, (newVal) => {
   const matched = materialOptions.value.find(opt => opt.value === newVal)
   if (matched) {
-    form.value.mouldNumber = matched.mouldNumber || ''
+    form.value.materialId = matched.materialId || null
     form.value.mouldCategory = matched.mouldCategory || ''
   }
 })

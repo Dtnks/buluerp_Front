@@ -114,7 +114,7 @@ const formConfig = [
   [
     {
       type: 'inputSelect',
-      label: '材料类型',
+      label: '料型',
       key: 'materialType',
       width: 12,
       rules: [requiredRule],
@@ -127,7 +127,7 @@ const formConfig = [
       label: '单重',
       key: 'singleWeight',
       type: 'number',
-      width: 8
+      width: 12
     }
   ],
   [
@@ -154,13 +154,18 @@ const formConfig = [
       label: '模具厂商',
       key: 'mouldManufacturer',
       type: 'input',
-      width: 12
+      width: 8
     },{
       label: '生产周期',
       key: 'cycleTime',
       type: 'number',
-      width: 12
-    }
+      width: 8
+    },{
+      label: '产品ID',
+      key: 'productCode',
+      type: 'input',
+      width: 8
+    },
   ],
   [
     {
@@ -172,7 +177,7 @@ const formConfig = [
       label: '备用编码',
       key: 'spareCode',
       type: 'input',
-      width: 8
+      width: 12
     }
   ],
 ]
@@ -225,6 +230,22 @@ watch(
 )
 
 const handleClose = () => {
+  form.value ={
+    cavityCount: null,
+    cycleTime: null,
+    drawingReferenceFile: null,
+    materialType: '',
+    mouldStatus: '',
+    mouldManufacturer: '',
+    mouldNumber: '',
+    sampleLocation: '',
+    remarks: '',
+    specificationName: '',
+    standardCode: '',
+    singleWeight: null,
+    spareCode: '',
+    deleteDrawingReference: false
+  }
   visible.value = false
 }
 const removeImage = () => {

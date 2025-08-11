@@ -42,7 +42,7 @@ export function listPackaging(pageNum, pageSize, searchContent = {}) {
 
 export function getPackagingListByOrderId(orderId) {
   return httpInstance({
-    url: `system/packaging-list/list?orderCode=${orderId}`,
+    url: `system/packaging-list/list?orderCodeExact=${orderId}`,
     method: 'get',
     headers: headers,
   })

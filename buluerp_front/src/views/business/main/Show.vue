@@ -2,23 +2,22 @@
 import numberCard from '../component/numberCard.vue'
 import { getOrdersData } from '@/apis/orderShow'
 import { ref } from 'vue'
+
 const deliveredCount = ref(0)
 const UndeliveredCount = ref(0)
 const punctualPercent = ref(0)
 const orderStateCount = ref({})
 const orderStateCountList = ref([])
+
 getOrdersData().then((res) => {
-  console.log(res)
   deliveredCount.value = res.data.deliveredCount
   UndeliveredCount.value = res.data.totalCount - res.data.deliveredCount
   punctualPercent.value = ((res.data.punctualCount / res.data.deliveredCount) * 100 ).toFixed(2)
   orderStateCountList.value = [res.data.punctualRateWeekOnWeek, res.data.punctualRateDayOnDay]
-  orderStateCount.value=res.data.statusCount  
+  orderStateCount.value = res.data.statusCount
 })
 
-  
 const value = ref('')
-// const defaultTime = new Date(2025, 7, 1, 12, 0, 0)
 </script>
 
 <template>
@@ -36,139 +35,131 @@ const value = ref('')
     <div id="boxShow" class="col">
       <div class="row header">
         <div class="title">公司业务订单情况</div>
-        <!-- <div class="timeSelect">
-          <span>今日</span><span>本周</span><span>本月</span><span>全年</span
-          ><el-date-picker
-            v-model="value"
-            type="daterange"
-            start-placeholder="Start date"
-            end-placeholder="End date"
-            style="width: 250px"
-          />
-        </div> -->
       </div>
-      <div style="flex: 1; position: relative; overflow: scroll">
-        <div class="box col" style="top: 8vh; left: 4vw">
-          <div>创建(未审核)</div>
-          <div>{{ orderStateCount['创建(未审核)']||0 }}笔</div>
-        </div>
-        <div class="toright" style="top: 13vh; left: 10vw"></div>
-        <div class="arrow-right" style="top: 12vh; left: 15vw"></div>
-
-        <div class="box col" style="top: 8vh; left: 16vw">
-          <div>待设计</div>
-          <div>{{ orderStateCount['待设计'] || 0 }}笔</div>
-        </div>
-        <div class="toright" style="top: 13vh; left: 22vw"></div>
-        <div class="arrow-right" style="top: 12vh; left: 27vw"></div>
-
-        <div class="box col" style="top: 8vh; left: 28vw">
-          <div>设计中</div>
-          <div>{{ orderStateCount['设计中']||0 }}笔</div>
-        </div>
-        <div class="toright" style="top: 13vh; left: 34vw"></div>
-        <div class="arrow-right" style="top: 12vh; left: 39vw"></div>
-
-        <div class="box col" style="top: 8vh; left: 40vw">
-          <div>待布产</div>
-          <div>{{ orderStateCount['待制定布产计划']||0 }}笔</div>
-        </div>
-        <div class="toright" style="top: 13vh; left: 46vw"></div>
-        <div class="arrow-right" style="top: 12vh; left: 51vw"></div>
-
-        <div class="box col" style="top: 8vh; left: 52vw">
-          <div>待排产</div>
-          <div>{{ orderStateCount['待排产']||0}}笔</div>
-        </div>
-        <div class="toright" style="top: 13vh; left: 58vw"></div>
-        <div class="arrow-right" style="top: 12vh; left: 63vw"></div>
-
-        <div class="box col" style="top: 8vh; left: 64vw">
-          <div>排产中</div>
-          <div>{{ orderStateCount['排产中']||0}}笔</div>
-        </div>
-        <div class="box col" style="top: 8vh; left: 76vw">
-          <div>待采购</div>
-          <div>{{ orderStateCount['生产完成(待采购完成)']||0}}笔</div>
-        </div>
-        <div class="toright" style="top: 13vh; left: 70vw"></div>
-        <div class="arrow-right" style="top: 12vh; left: 75vw"></div>
-
-        <div class="tobottom" style="top: 18vh; left: 79vw"></div>
-        <div class="arrow-bottom" style="top: 24vh; left: 78.5vw"></div>
-        <div class="box col" style="top: 26vh; left: 76vw">
-            <div>齐料入库</div>
-            <div>{{ orderStateCount['已齐料入库(待套料)']||0 }}笔</div>
+      <div style="flex: 1; position: relative; overflow: auto">
+        <div class="flowchart-wrapper">
+          <div class="box col" style="top: 86px; left: 77px">
+            <div>创建(未审核)</div>
+            <div>{{ orderStateCount['创建(未审核)']||0 }}笔</div>
           </div>
-        <div class="toright" style="top: 31vh; left: 70vw"></div>
-        <div class="arrow-left" style="top: 30vh; left: 70vw"></div>
+          <div class="toright" style="top: 140px; left: 192px"></div>
+          <div class="arrow-right" style="top: 129px; left: 288px"></div>
 
-        <div class="box col" style="top: 26vh; left: 64vw">
-          <div>套料中</div>
-          <div>{{ orderStateCount['套料中']||0 }}笔</div>
-        </div>
-        <div class="toright" style="top: 31vh; left: 58vw"></div>
-        <div class="arrow-left" style="top: 30vh; left: 58vw"></div>
+          <div class="box col" style="top: 86px; left: 307px">
+            <div>待设计</div>
+            <div>{{ orderStateCount['待设计'] || 0 }}笔</div>
+          </div>
+          <div class="toright" style="top: 140px; left: 422px"></div>
+          <div class="arrow-right" style="top: 129px; left: 518px"></div>
 
-        <div class="box col" style="top: 26vh; left: 52vw">
-          <div>待拉线</div>
-          <div>{{ orderStateCount['套料完成(待拉线)']||0 }}笔</div>
-        </div>
-        <div class="toright" style="top: 31vh; left: 46vw"></div>
-        <div class="arrow-left" style="top: 30vh; left: 46vw"></div>
+          <div class="box col" style="top: 86px; left: 538px">
+            <div>设计中</div>
+            <div>{{ orderStateCount['设计中']||0 }}笔</div>
+          </div>
+          <div class="toright" style="top: 140px; left: 653px"></div>
+          <div class="arrow-right" style="top: 129px; left: 749px"></div>
 
-        <div class="box col" style="top: 26vh; left: 40vw">
-          <div>拉线组包中</div>
-          <div>{{ orderStateCount['拉线组包中']||0 }}笔</div>
-        </div>
-        <div class="toright" style="top: 31vh; left: 34vw"></div>
-        <div class="arrow-left" style="top: 30vh; left: 34vw"></div>
+          <div class="box col" style="top: 86px; left: 768px">
+            <div>待布产</div>
+            <div>{{ orderStateCount['待制定布产计划']||0 }}笔</div>
+          </div>
+          <div class="toright" style="top: 140px; left: 883px"></div>
+          <div class="arrow-right" style="top: 129px; left: 979px"></div>
 
-        <div class="box col" style="top: 26vh; left: 28vw">
-          <div>分包已入库</div>
-          <div>{{ orderStateCount['拉线完成(分包已入库)']||0 }}笔</div>
-        </div>
-        <div class="toright" style="top: 31vh; left: 22vw"></div>
-        <div class="arrow-left" style="top: 30vh; left: 22vw"></div>
+          <div class="box col" style="top: 86px; left: 998px">
+            <div>待排产</div>
+            <div>{{ orderStateCount['待排产']||0}}笔</div>
+          </div>
+          <div class="toright" style="top: 140px; left: 1113px"></div>
+          <div class="arrow-right" style="top: 129px; left: 1209px"></div>
 
-        <div class="box col" style="top: 26vh; left: 16vw">
-          <div>包装中</div>
-          <div>{{ orderStateCount['包装中']||0 }}笔</div>
-        </div>
-        <div class="toright" style="top: 31vh; left: 10vw"></div>
-        <div class="arrow-left" style="top: 30vh; left: 10vw"></div>
+          <div class="box col" style="top: 86px; left: 1228px">
+            <div>排产中</div>
+            <div>{{ orderStateCount['排产中']||0}}笔</div>
+          </div>
+          <div class="box col" style="top: 86px; left: 1460px">
+            <div>待采购</div>
+            <div>{{ orderStateCount['生产完成(待采购完成)']||0}}笔</div>
+          </div>
+          <div class="toright" style="top: 140px; left: 1344px"></div>
+          <div class="arrow-right" style="top: 129px; left: 1440px"></div>
 
-        <div class="box col" style="top: 26vh; left: 4vw">
-          <div>已发货</div>
-          <div>{{ orderStateCount['已发货']||0 }}笔</div>
-        </div>
-        <div class="tobottom" style="top: 36vh; left: 7vw"></div>
-        <div class="arrow-bottom" style="top: 42vh; left: 6.5vw"></div>
+          <div class="tobottom" style="top: 194px; left: 1517px"></div>
+          <div class="arrow-bottom" style="top: 259px; left: 1507px"></div>
+          <div class="box col" style="top: 281px; left: 1460px">
+              <div>齐料入库</div>
+              <div>{{ orderStateCount['已齐料入库(待套料)']||0 }}笔</div>
+          </div>
+          <div class="toright" style="top: 335px; left: 1344px"></div>
+          <div class="arrow-left" style="top: 324px; left: 1344px"></div>
 
-        <div class="box col" style="top: 44vh; left: 4vw">
-          <div>已完成</div>
-          <div>{{ orderStateCount['已完成']||0 }}笔</div>
-        </div>
+          <div class="box col" style="top: 281px; left: 1228px">
+            <div>套料中</div>
+            <div>{{ orderStateCount['套料中']||0 }}笔</div>
+          </div>
+          <div class="toright" style="top: 335px; left: 1113px"></div>
+          <div class="arrow-left" style="top: 324px; left: 1113px"></div>
 
-        <div class="box col" style="top: 44vh; left: 16vw">
-          <div>审核不通过</div>
-          <div>{{ orderStateCount['审核不通过'] || 0 }}笔</div>
+          <div class="box col" style="top: 281px; left: 998px">
+            <div>待拉线</div>
+            <div>{{ orderStateCount['套料完成(待拉线)']||0 }}笔</div>
+          </div>
+          <div class="toright" style="top: 335px; left: 883px"></div>
+          <div class="arrow-left" style="top: 324px; left: 883px"></div>
+
+          <div class="box col" style="top: 281px; left: 768px">
+            <div>拉线组包中</div>
+            <div>{{ orderStateCount['拉线组包中']||0 }}笔</div>
+          </div>
+          <div class="toright" style="top: 335px; left: 653px"></div>
+          <div class="arrow-left" style="top: 324px; left: 653px"></div>
+
+          <div class="box col" style="top: 281px; left: 538px">
+            <div>分包已入库</div>
+            <div>{{ orderStateCount['拉线完成(分包已入库)']||0 }}笔</div>
+          </div>
+          <div class="toright" style="top: 335px; left: 422px"></div>
+          <div class="arrow-left" style="top: 324px; left: 422px"></div>
+
+          <div class="box col" style="top: 281px; left: 307px">
+            <div>包装中</div>
+            <div>{{ orderStateCount['包装中']||0 }}笔</div>
+          </div>
+          <div class="toright" style="top: 335px; left: 192px"></div>
+          <div class="arrow-left" style="top: 324px; left: 192px"></div>
+
+          <div class="box col" style="top: 281px; left: 77px">
+            <div>已发货</div>
+            <div>{{ orderStateCount['已发货']||0 }}笔</div>
+          </div>
+          <div class="tobottom" style="top: 389px; left: 134px"></div>
+          <div class="arrow-bottom" style="top: 454px; left: 125px"></div>
+
+          <div class="box col" style="top: 475px; left: 77px">
+            <div>已完成</div>
+            <div>{{ orderStateCount['已完成']||0 }}笔</div>
+          </div>
+
+          <div class="box col" style="top: 475px; left: 307px">
+            <div>审核不通过</div>
+            <div>{{ orderStateCount['审核不通过'] || 0 }}笔</div>
+          </div>
         </div>
-     
       </div>
     </div>
   </div>
 </template>
+
 <style scoped>
 #boxShow {
-  height: 60vh;
+  height: 648px;
   background-color: white;
   margin: 30px;
   box-shadow: var(--el-box-shadow-light);
 }
 .header {
-  height: 6vh;
-  line-height: 6vh;
+  height: 65px;
+  line-height: 65px;
   padding: 0 24px;
   justify-content: space-between;
   border-bottom: 2px solid rgba(240, 242, 245, 1);
@@ -177,8 +168,8 @@ const value = ref('')
   margin: 0 12px;
 }
 .box {
-  width: 6vw;
-  height: 10vh;
+  width: 115px;
+  height: 108px;
   border: var(--el-border);
   position: absolute;
   box-shadow: var(--el-box-shadow-light);
@@ -190,13 +181,13 @@ const value = ref('')
 .arrow-right {
   width: 0;
   height: 0;
-  border-top: 1vh solid transparent;
-  border-bottom: 1vh solid transparent;
-  border-left: 1vw solid gray;
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
+  border-left: 19px solid gray;
   position: absolute;
 }
 .toright {
-  width: 6vw;
+  width: 115px;
   height: 1px;
   background-color: gray;
   position: absolute;
@@ -204,24 +195,29 @@ const value = ref('')
 .arrow-bottom {
   width: 0;
   height: 0;
-  border-left: 1vh solid transparent;
-  border-right: 1vh solid transparent;
-  border-top: 1vw solid gray;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-top: 19px solid gray;
   position: absolute;
 }
 
 .arrow-left {
   width: 0;
   height: 0;
-  border-right: 1vw solid gray;
-  border-top: 1vh solid transparent;
-  border-bottom: 1vh solid transparent;
+  border-right: 19px solid gray;
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
   position: absolute;
 }
 .tobottom {
   width: 1px;
-  height: 8vh;
+  height: 86px;
   background-color: gray;
   position: absolute;
 }
+.flowchart-wrapper {
+  transform-origin: top left;
+  transform: scale(0.85);
+}
+
 </style>
