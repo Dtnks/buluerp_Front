@@ -23,8 +23,7 @@
         <el-input v-model="createForm.outerId" placeholder="请输入外部编号" />
       </el-form-item>
       <el-form-item label="产品图片" prop="image">
-        <el-upload class="avatar-uploader" :show-file-list="false" :before-upload="beforeImageUpload"
-          :on-change="handleImageChange">
+        <el-upload class="avatar-uploader" :show-file-list="false" :before-upload="beforeImageUpload">
           <div class="upload-box">
             <img v-if="createForm.image" :src="createForm.image" class="avatar" />
             <div v-else class="upload-placeholder">
