@@ -485,18 +485,19 @@ const onBoxCancel = () => {
 .related-orders-grid {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  margin-bottom: 10px;
+  width: 1100px;
+  margin: 0 10px 10px 0;
+
 }
 
 .related-orders-row {
   display: flex;
-  width: 100%;
+  // width: 100%;
 }
 
 .related-orders-cell {
   flex: 1;
-  text-align: center;
+  text-align: left;
   padding: 8px 0;
 }
 
