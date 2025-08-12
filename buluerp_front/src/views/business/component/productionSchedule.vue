@@ -12,19 +12,27 @@ import {
   downLoadModule,
   finishSchedule,
   selectTransToArrange,
+  getScheduleListByOrderId,
 } from '@/apis/produceControl/produce/schedule'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, onMounted } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { searchFunc } from '@/utils/search/search'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
-const props = defineProps(['data','control'])
-console.log(props.data)
+const props = defineProps(['data', 'control'])
+
+onMounted(() => {
+  getScheduleListByOrderId(props.data.orderCode).then((res) => {
+    if (res.rows.length == 0) {
+      onCreate()
+    }
+  })
+})
 //渲染页面
-const listSchedule=listScheduleByOrderCode(props.data.orderCode)
+const listSchedule = listScheduleByOrderCode(props.data.orderCode)
 const createNewFormRef = ref()
 const createEditFormRef = ref({})
 const formData = ref([
@@ -60,7 +68,7 @@ const formData = ref([
 ])
 const newFormData = ref([
   [
-      {
+    {
       type: 'input',
       label: '布产模数PCS',
       key: 'productionMouldCount',
@@ -89,7 +97,7 @@ const newFormData = ref([
       label: '布产重量',
       key: 'productionWeight',
       width: 8,
-      rules: [positiveNumberRule,requiredRule],
+      rules: [positiveNumberRule, requiredRule],
     },
     {
       type: 'timer',
@@ -112,11 +120,11 @@ const newFormData = ref([
       loading: false,
       remoteFunc: searchFunc('system/manufacturer/list', 'name'),
     },
-    { type: 'input', label: '用量', key: 'usage', width: 12, rules: [positiveNumberRule,requiredRule] },
+    { type: 'input', label: '用量', key: 'usage', width: 12, rules: [positiveNumberRule, requiredRule] },
   ],
-    [
+  [
     { type: 'input', label: '生产时间(h)', key: 'timeHours', width: 12, rules: [requiredRule] },
-    
+
     { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 12, rules: [requiredRule] }
   ],
   [
@@ -126,7 +134,7 @@ const newFormData = ref([
       key: 'designPatternId',
       width: 12,
       rules: [requiredRule],
-      showKey:[{key:'id',label:"ID"},{key:'orderId',label:"订单ID"},{key:'productId',label:"产品ID"}],
+      showKey: [{ key: 'id', label: "ID" }, { key: 'orderId', label: "订单ID" }, { key: 'productId', label: "产品ID" }],
       remoteFunc: searchFunc('system/patterns/list', 'id'),
       options: [],
       loading: false,
@@ -137,13 +145,13 @@ const newFormData = ref([
       key: 'materialId',
       width: 12,
       rules: [requiredRule],
-      showKey:[{key:'id',label:"物料ID"},{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
+      showKey: [{ key: 'id', label: "物料ID" }, { key: 'materialType', label: "料别" }, { key: 'mouldNumber', label: "模具编号" }],
       remoteFunc: searchFunc('system/material-info/list', 'id'),
       options: [],
       loading: false,
     }],
-  
-  ])
+
+])
 const newSubmit = ref({
 
 })
@@ -157,14 +165,14 @@ const editFormData = ref([
       key: 'materialId',
       width: 12,
       rules: [requiredRule],
-      showKey:[{key:'id',label:"物料ID"},{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
+      showKey: [{ key: 'id', label: "物料ID" }, { key: 'materialType', label: "料别" }, { key: 'mouldNumber', label: "模具编号" }],
       remoteFunc: searchFunc('system/material-info/list', 'id'),
       options: [],
       loading: false,
     }
   ],
-    [
-      {
+  [
+    {
       type: 'input',
       label: '布产模数PCS',
       key: 'productionMouldCount',
@@ -192,7 +200,7 @@ const editFormData = ref([
       label: '布产重量',
       key: 'productionWeight',
       width: 8,
-      rules: [positiveNumberRule,requiredRule],
+      rules: [positiveNumberRule, requiredRule],
     },
     {
       type: 'timer',
@@ -216,10 +224,10 @@ const editFormData = ref([
       loading: false,
       remoteFunc: searchFunc('system/manufacturer/list', 'name'),
     },
-    { type: 'input', label: '用量', key: 'usage', width: 8, rules: [positiveNumberRule,requiredRule] },
+    { type: 'input', label: '用量', key: 'usage', width: 8, rules: [positiveNumberRule, requiredRule] },
   ]
-  
-  ])
+
+])
 const editSubmit = ref({
 
 })
@@ -238,7 +246,7 @@ const tableData = ref([
     type: 'text',
   },
   { value: 'pictureUrl', label: '图片', type: 'picture' },
-  
+
   {
     value: 'orderCode',
     label: '订单编号',
@@ -249,7 +257,7 @@ const tableData = ref([
     label: '产品编号',
     type: 'text',
   },
-  
+
 
   {
     value: 'materialId',
@@ -327,12 +335,12 @@ const tableData = ref([
     type: 'text',
   },
   { value: 'supplier', label: '供应商', type: 'text' },
-  { 
-    value: 'mouldManufacturer', 
-    label: '模具厂家', 
-    type: 'tags' 
+  {
+    value: 'mouldManufacturer',
+    label: '模具厂家',
+    type: 'tags'
   },
-  
+
   {
     value: 'cycleTime',
     label: '生产周期(s)',
@@ -366,8 +374,8 @@ const operation = ref([
   },
   {
     func: (row) => {
-      finishSchedule({orderCode:row.orderCode}).then((res) => {
-        console.log({orderCode:row.orderCode})
+      finishSchedule({ orderCode: row.orderCode }).then((res) => {
+        console.log({ orderCode: row.orderCode })
         ElMessage.success(res.msg)
       })
     },
@@ -383,9 +391,9 @@ const editDialogVisible = ref(false)
 const newDialogVisible = ref(false)
 const handleSubmit = () => {
   if (title.value == '编辑') {
-  createEditFormRef.value.validateForm((valid) => {
-    if (valid) {
-      
+    createEditFormRef.value.validateForm((valid) => {
+      if (valid) {
+
         changeSchedule(editSubmit.value).then((res) => {
           page.value = 1
           listSchedule(page.value, pageSize.value).then((res) => {
@@ -395,27 +403,29 @@ const handleSubmit = () => {
           ElMessage.success(res.msg)
           editDialogVisible.value = false
         })
-      } })}else {
-        createNewFormRef.value.validateForm((valid) => {
-          if (valid) {
-             newSchedule(newSubmit.value).then((res) => {
-             page.value = 1
-             listSchedule(page.value, pageSize.value).then((res) => {
-                listData.value = res.rows
-                total.value = res.total
-              })
-              ElMessage.success(res.msg)
-              newDialogVisible.value = false
-            })
-          }
+      }
+    })
+  } else {
+    createNewFormRef.value.validateForm((valid) => {
+      if (valid) {
+        newSchedule(newSubmit.value).then((res) => {
+          page.value = 1
+          listSchedule(page.value, pageSize.value).then((res) => {
+            listData.value = res.rows
+            total.value = res.total
+          })
+          ElMessage.success(res.msg)
+          newDialogVisible.value = false
         })
       }
-    }
+    })
+  }
+}
 
 //传给form组件的参数
 const resetnewSubmit = () => {
   newSubmit.value = {
-    orderCode:props.data.orderCode,
+    orderCode: props.data.orderCode,
   }
 }
 const onCreate = () => {
@@ -423,8 +433,8 @@ const onCreate = () => {
   title.value = '新增'
   newDialogVisible.value = true
   nextTick(() => {
-        createNewFormRef.value.clearValidate()
-      })
+    createNewFormRef.value.clearValidate()
+  })
 }
 
 const onSubmit = () => {
@@ -510,7 +520,7 @@ const transDialogVisible = ref(false)
 const createTransFormRef = ref()
 const transFormData = ref([
   [
-    { type: 'input', label: '出模数', key: 'mouldOutput', width: 12, rules: [positiveNumberRule,requiredRule] },
+    { type: 'input', label: '出模数', key: 'mouldOutput', width: 12, rules: [positiveNumberRule, requiredRule] },
     {
       type: 'timer',
       label: '安排时间',
@@ -521,7 +531,7 @@ const transFormData = ref([
     },
   ],
   [{ type: 'textarea', label: '备注', key: 'remarks', width: 24 }],
-  [{ type: 'image', label: '样例图', key: 'pictureFile',rules: [requiredRule], width: 12 }],
+  [{ type: 'image', label: '样例图', key: 'pictureFile', rules: [requiredRule], width: 12 }],
 ])
 const transSubmit = ref({
 
@@ -583,113 +593,74 @@ listSchedule(page.value, pageSize.value).then((res) => {
   <div class="col">
     <BordShow content="布产表" path="订单详情/布产表" />
     <div class="greyBack">
-      <FormSearch
-        title="查询"
-        :data="formData"
-        :onCreate="onCreate"
-        :onSubmit="onSubmit"
-        :onImport="onImport"
-        :onDownloadTemplate="onDownloadTemplate"
-        :searchForm="searchContent"
-        :control="control"
-      />
-      <TableList
-        :tableData="tableData"
-        :operations="operation"
-        :listData="listData"
-        :DeleteFunc="DeleteFunc"
-        :exportFunc="exportFunc"
-        :transToArrange="transToArrange"
-        :control="control"
-      >
+      <FormSearch title="查询" :data="formData" :onCreate="onCreate" :onSubmit="onSubmit" :onImport="onImport"
+        :onDownloadTemplate="onDownloadTemplate" :searchForm="searchContent" :control="control" />
+      <TableList :tableData="tableData" :operations="operation" :listData="listData" :DeleteFunc="DeleteFunc"
+        :exportFunc="exportFunc" :transToArrange="transToArrange" :control="control">
         <slot>
-          <div
-            style="
+          <div style="
               margin-top: 20px;
               display: flex;
               justify-content: space-between;
               align-items: center;
-            "
-          >
+            ">
             <div>共 {{ total }} 条</div>
-            <el-pagination
-              background
-              layout="prev, pager, next, jumper, ->, total, sizes"
-              :current-page="page"
-              :page-size="pageSize"
-              :page-sizes="[5, 10, 20, 50]"
-              :total="total"
-              @current-change="handlePageChange"
-              @size-change="handleSizeChange"
-            />
+            <el-pagination background layout="prev, pager, next, jumper, ->, total, sizes" :current-page="page"
+              :page-size="pageSize" :page-sizes="[5, 10, 20, 50]" :total="total" @current-change="handlePageChange"
+              @size-change="handleSizeChange" />
           </div>
         </slot>
       </TableList>
     </div>
 
-    <el-dialog v-model="newDialogVisible" :title="title" width="800px"
-      ><CreateForm :data="newFormData" :Formvalue="newSubmit" ref="createNewFormRef" />
+    <el-dialog v-model="newDialogVisible" :title="title" width="800px">
+      <CreateForm :data="newFormData" :Formvalue="newSubmit" ref="createNewFormRef" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button
-            type="info"
-            @click="
-              () => {
-                newDialogVisible = false
-              }
-            "
-          >
+          <el-button type="info" @click="
+            () => {
+              newDialogVisible = false
+            }
+          ">
             取消
           </el-button>
         </div>
       </template>
     </el-dialog>
-    <el-dialog v-model="editDialogVisible" :title="title" width="800px"
-      ><CreateForm :data="editFormData" :Formvalue="editSubmit" ref="createEditFormRef" />
+    <el-dialog v-model="editDialogVisible" :title="title" width="800px">
+      <CreateForm :data="editFormData" :Formvalue="editSubmit" ref="createEditFormRef" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button
-            type="info"
-            @click="
-              () => {
-                editDialogVisible = false
-              }
-            "
-          >
+          <el-button type="info" @click="
+            () => {
+              editDialogVisible = false
+            }
+          ">
             取消
           </el-button>
         </div>
       </template>
     </el-dialog>
-    <el-dialog v-model="transDialogVisible" title="导入排产" width="800px"
-      ><CreateForm :data="transFormData" :Formvalue="transSubmit" ref="createTransFormRef" />
+    <el-dialog v-model="transDialogVisible" title="导入排产" width="800px">
+      <CreateForm :data="transFormData" :Formvalue="transSubmit" ref="createTransFormRef" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmitTrans"> 确认 </el-button>
-          <el-button
-            type="info"
-            @click="
-              () => {
-                transDialogVisible = false
-              }
-            "
-          >
+          <el-button type="info" @click="
+            () => {
+              transDialogVisible = false
+            }
+          ">
             取消
           </el-button>
         </div>
       </template>
     </el-dialog>
     <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
-      <el-upload
-        class="upload-demo"
-        drag
-        :show-file-list="false"
-        :before-upload="beforeUpload"
-        :http-request="handleUpload"
-        accept=".xlsx,.xls"
-      >
+      <el-upload class="upload-demo" drag :show-file-list="false" :before-upload="beforeUpload"
+        :http-request="handleUpload" accept=".xlsx,.xls">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
         <template v-slot:tip>
