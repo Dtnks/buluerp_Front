@@ -121,6 +121,11 @@ const router = createRouter({
           name: 'PMProducePackaging',
           component: BlankComponent,
         },
+        {
+          path: '/:pathMatch(.*)*',
+          name: '',
+          component: BlankComponent,
+        },
       ],
     },
     {
@@ -155,11 +160,13 @@ router.beforeEach((to, from, next) => {
   } else {
     if (token) {
       const store = useTabStore()
-      if (Object.keys(store.path2Label).includes(to.name)) {
+      console.log(store.path2Label)
+      if (Object.keys(store.path2Label).includes(to.name as string)) {
         store.setEditValue(to.name)
+        next()
       }
+      next({ name: from.name })
       // 有 token 时，允许访问其他页面
-      next()
     } else {
       // 无 token 时，重定向到登录页
       next({ name: 'Login' })

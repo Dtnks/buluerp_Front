@@ -1,5 +1,13 @@
 import { defineStore } from 'pinia'
-
+import router from '@/router'
+function addDynamicRoute(name) {
+  const route = {
+    path: `/${name}`, // 路径需唯一，可用 name 作为路径
+    name,
+    component: () => import('@/views/empty/empty.vue'),
+  }
+  router.addRoute('Main',route); // 动态添加
+}
 const useTabStore = defineStore('tabs', {
   state: () => ({
     editableTabs: [],
@@ -19,6 +27,9 @@ const useTabStore = defineStore('tabs', {
       if(targetPath){
         this.$state.path2Label[targetPath] = targetName
       }
+      if(targetPath){
+        addDynamicRoute(targetPath)
+      }
       this.$state.editableTabs.push({
         title: targetName,
         name: targetPath,
@@ -27,10 +38,10 @@ const useTabStore = defineStore('tabs', {
         targetPath:targetPath,
         key: targetName,
       })
+      router.push({path:targetPath})
       this.$state.editableTabsValue = targetPath
     },
     removeTab(targetName) {
-      console.log(targetName,this.$state.editableTabsValue)
       if (targetName == 'all') {
         this.$state.editableTabs = []
         this.$state.editableTabsValue = ''
@@ -76,7 +87,6 @@ const useTabStore = defineStore('tabs', {
     },
     setEditValue(value) {
       this.$state.editableTabsValue = value
-      console.log(this.$state.editableTabs)
     }
   },
 })

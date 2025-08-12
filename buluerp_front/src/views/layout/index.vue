@@ -21,6 +21,7 @@ const handleHiddenMenu = () => {
   isCollapse.value = !isCollapse.value
   reverse.value = reverse.value == '' ? 'flipped-image' : ''
 }
+
 </script>
 <template>
   <div class="row">
@@ -34,7 +35,8 @@ const handleHiddenMenu = () => {
         closable
         editable
         @tab-remove="store.removeTab"
-        @tab-click="(item)=>{console.log(item)}"
+        @tab-click="(item)=>{
+          router.push({name:item.props.name})}"
       >
         <template #add-icon>
           <el-icon @click="store.removeTab('all')"><CircleClose /></el-icon>

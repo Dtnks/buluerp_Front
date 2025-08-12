@@ -85,7 +85,7 @@ const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
             "
             v-if="!subItem.disabled && subItem.path != '/'"
           >
-            <router-link :to="{name:subItem.path}">{{ subItem.label }}</router-link>
+            {{ subItem.label }}
           </el-menu-item>
           <el-sub-menu :index="subItem.id" v-else-if="!subItem.disabled">
             <template #title
@@ -105,7 +105,7 @@ const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
                 )
               "
               >
-                <router-link :to="{name:subSubItem.path}">{{ subSubItem.label }}</router-link>
+                {{ subSubItem.label }}
               </el-menu-item
             >
           </el-sub-menu>
