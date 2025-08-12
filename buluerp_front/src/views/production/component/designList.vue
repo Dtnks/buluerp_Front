@@ -84,7 +84,7 @@ const currentRow = ref({})
 
 const props = defineProps<{
   queryParams: Record<string, any>
-  addTab: (targetName: string, component: any, data?: any) => void
+  addTab: (targetName: string, component: any, data?: any,targetPath?:string) => void
 }>()
 const getRowKey = (row: any) => row.id
 
@@ -221,7 +221,7 @@ const onExport = async () => {
   }
 }
 const onView = (row: any) => {
-  props.addTab(`造型表 - ID: ${row.id}`, Style, { productId: row.productId })
+  props.addTab(`造型表 - ID: ${row.id}`, Style, { productId: row.productId },`/production/StyleTable/${row.id}`)
 }
 </script>
 <style>

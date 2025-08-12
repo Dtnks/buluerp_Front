@@ -22,7 +22,7 @@ import { messageBox } from '@/components/message/messageBox'
 import { searchFunc } from '@/utils/search/search'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 import { ElMessage } from 'element-plus'
-const props = defineProps(['control', 'addTab'])
+const props = defineProps(['addTab'])
 //渲染页面
 const createNewFormRef = ref()
 const createEditFormRef = ref({})
@@ -132,12 +132,12 @@ const newFormData = ref([
     },
     {
       type: 'inputSelect',
-      label: '物料',
-      key: 'materialId',
+      label: '模具编号',
+      key: 'mouldNumber',
       width: 12,
       rules: [requiredRule],
-      showKey:[{key:'id',label:"物料ID"},{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
-      remoteFunc: searchFunc('system/material-info/list', 'id'),
+      showKey:[{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
+      remoteFunc: searchFunc('system/material-info/list', 'mouldNumber'),
       options: [],
       loading: false,
     }],
@@ -146,7 +146,7 @@ const newFormData = ref([
 const newSubmit = ref({
 
 })
-
+const finishedTitle=ref([])
 const editFormData = ref([
   [
     { type: 'input', label: '生产周期(s)', key: 'cycleTime', width: 8, rules: [requiredRule] },
@@ -361,7 +361,6 @@ const operation = ref([
       editSubmit.value = { ...row }
     },
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
   {
     func: (row) => {
@@ -371,7 +370,6 @@ const operation = ref([
       })
     },
     value: '完成布产',
-    disabled: props.control[1].disabled,
   },
 ])
 const title = ref('新增')
@@ -707,7 +705,6 @@ listSchedule(page.value, pageSize.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent"
-        :control="control"
       />
       <TableList
         :tableData="tableData"
@@ -716,7 +713,6 @@ listSchedule(page.value, pageSize.value).then((res) => {
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
         :transToArrange="transToArrange"
-        :control="control"
       >
         <slot>
           <div
@@ -793,6 +789,7 @@ listSchedule(page.value, pageSize.value).then((res) => {
     </el-dialog>
     <el-dialog v-model="transDialogVisible" title="导入排产" width="800px"
       ><CreateForm :data="transFormData" :Formvalue="transSubmit" ref="createTransFormRef" />
+
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmitTrans"> 确认 </el-button>

@@ -18,7 +18,7 @@ import { ref, nextTick } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
-import { ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { searchFunc } from '@/utils/search/search'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 const type = ref('packaging-material')
@@ -45,7 +45,7 @@ const TypeOptions = [
   },
 ]
 const mapList = { 'packaging-material': '料包', part: '胶件', product: '成品' }
-const props = defineProps(['control'])
+
 //渲染页面
 const createFormRef = ref(null)
 const formData = ref({
@@ -103,16 +103,22 @@ const newFormData = ref({
         type: 'input',
         label: '进出数量',
         key: 'inOutQuantity',
-        width: 12,
-        rules: [positiveNumberRule,requiredRule],
+        width: 8,
+        rules: [requiredRule],
       },
       {
         type: 'input',
         label: '料包编号',
         key: 'packagingNumber',
-        width: 12,
+        width: 8,
         rules: [requiredRule],
-      },
+      },{
+        type: 'input',
+        label: '产品货号',
+        key: 'productPartNumber',
+        width: 8,
+        rules: [requiredRule]
+      }
     ],
     [
       {
@@ -162,7 +168,7 @@ const newFormData = ref({
         label: '进出数量',
         key: 'inOutQuantity',
         width: 12,
-        rules: [positiveNumberRule,requiredRule],
+        rules: [requiredRule],
       },
       {
         type: 'timer',
@@ -196,7 +202,7 @@ const newFormData = ref({
         label: '进出数量',
         key: 'inOutQuantity',
         width: 12,
-        rules: [positiveNumberRule,requiredRule],
+        rules: [requiredRule],
       },
       {
         type: 'timer',
@@ -347,21 +353,37 @@ const tableData = ref({
       value: 'id',
       label: '采购单号',
       type: 'text',
+    },{
+      value: 'inOutQuantity',
+      label: '进出数量',
+      type: 'text',
+    },{
+      value: 'totalQuantity',
+      label: '总数',
+      type: 'text'
     },
     { value: 'creationTime', label: '创建时间', type: 'text' },
     {
       value: 'operator',
       label: '操作人',
       type: 'text',
+    },{
+      value: 'changeDate',
+      label: '修改时间',
+      type: 'text',
     },
     {
-      value: 'materialType',
-      label: '料别',
+      value: 'colorCode',
+      label: '颜色编号',
       type: 'text',
     },
     {
       value: 'mouldNumber',
       label: '模具编号',
+      type: 'text',
+    },{
+      value: 'remarks',
+      label: '备注',
       type: 'text',
     },
   ],
@@ -421,7 +443,6 @@ const operation = ref([
       newSubmit.value[type.value] = { ...row }
     },
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
 ])
 
@@ -491,10 +512,128 @@ const resetSubmit = () => {
 const onCreate = () => {
   resetSubmit()
   title.value = '新增'
-  editDialogVisible.value = true
+  newDialogVisible.value = true
+  newList.value = []
+  activeIndex.value = 0
+  newDialogVisible.value = true
+  newList.value.push({ form: {}, finished: false })
 
+  nextTick(() => {
+    createFormRef.value?.clearValidate()
+  })
   createFormRef.value.clearValidate()
 }
+
+const newDialogVisible = ref(false)
+
+const newList = ref<Array<{
+  form: Record<string, any>,
+  finished: boolean,
+}>>([])
+const createNewFormRefs = ref<any[]>([])
+
+const activeIndex = ref<number | null>(null) // 当前正在编辑哪条
+
+const addNewItem = () => {
+  // 若当前有正在编辑的表单，先校验并保存为 finished
+  if (activeIndex.value !== null) {
+    const currentFormRef = createNewFormRefs.value[activeIndex.value]
+    if (!currentFormRef || typeof currentFormRef.validateForm !== 'function') return
+
+    currentFormRef.validateForm((valid) => {
+
+      if (!valid) return
+      newList.value[activeIndex.value].finished = true
+      activeIndex.value = newList.value.length
+      newList.value.push({ form: {}, finished: false })
+    })
+  } else {
+    activeIndex.value = newList.value.length
+    newList.value.push({ form: {}, finished: false })
+  }
+}
+
+const editItem = (index: number) => {
+  if (activeIndex.value !== null) {
+    const currentFormRef = createNewFormRefs.value[activeIndex.value]
+    if (!currentFormRef || typeof currentFormRef.validateForm !== 'function') return
+
+    currentFormRef.validateForm((valid) => {
+
+      if (!valid) return
+      newList.value[activeIndex.value].finished = true
+      activeIndex.value = index
+      nextTick(() => {
+        createNewFormRef.value.clearValidate()
+      })
+    })
+  } else {
+    activeIndex.value = index
+  }
+}
+
+const removeItem = (index: number) => {
+  newList.value.splice(index, 1)
+  if (activeIndex.value === index) {
+    activeIndex.value = null
+  } else if (activeIndex.value !== null && index < activeIndex.value) {
+    activeIndex.value -= 1
+  }
+}
+const submitAll = () => {
+  if (activeIndex.value !== null) {
+    const currentFormRef = createNewFormRefs.value[activeIndex.value]
+    if (!currentFormRef || typeof currentFormRef.validateForm !== 'function') return
+
+    currentFormRef.validateForm((valid) => {
+
+      if (!valid) return
+      newList.value[activeIndex.value].finished = true
+      activeIndex.value = null
+      callSubmit()
+    })
+  } else {
+    callSubmit()
+  }
+}
+
+const callSubmit = () => {
+  const list = newList.value.filter(i => i.finished)
+  if (!list.length) {
+    ElMessage.warning('请先添加并完成至少一条记录')
+    return
+  }
+
+  Promise.all(list.map(item => newRecording(item.form,type.value))).then((res) => {
+    page.value = 1
+    listRecording(page.value, pageSize.value, type.value).then((res) => {
+      listData.value = res.rows
+      total.value = res.total
+    })
+    ElMessage.success(res.msg)
+    newDialogVisible.value = false
+  })
+}
+
+const completeForm = () => {
+  if (activeIndex.value !== null) {
+    const currentFormRef = createNewFormRefs.value[activeIndex.value]
+    if (!currentFormRef || typeof currentFormRef.validateForm !== 'function') return
+
+    currentFormRef.validateForm((valid) => {
+
+      if (!valid) return
+      newList.value[activeIndex.value].finished = true
+      activeIndex.value = null
+    })
+  }
+}
+
+const cancelForm = (index) => {
+  activeIndex.value = null
+  removeItem(index)
+}
+
 
 const onSubmit = () => {
   page.value = 1
@@ -631,7 +770,7 @@ listRecording(page.value, pageSize.value, type.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent[type]"
-        :control="control"
+
       >
         <el-select v-model="type" placeholder="Select" style="width: 100px" @change="refreshList">
           <el-option
@@ -648,7 +787,7 @@ listRecording(page.value, pageSize.value, type.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
-        :control="control"
+
       >
         <slot>
           <div
@@ -674,6 +813,35 @@ listRecording(page.value, pageSize.value, type.value).then((res) => {
         </slot>
       </TableList>
     </div>
+    <el-dialog v-model="newDialogVisible" title="批量新增" width="800px">
+      <div v-for="(item, index) in newList" :key="index">
+        <div v-if="activeIndex === index">
+          <CreateForm
+            :data="newFormData[type]"
+            :Formvalue="item.form"
+            :ref="el => createNewFormRefs[index] = el"
+          />
+          <div style="margin-top: 10px; text-align: right">
+            <el-button type="primary" size="small" @click="completeForm">完成当前记录</el-button>
+            <el-button type="default" @click="cancelForm(index)">取消</el-button>
+          </div>
+        </div>
+        <div v-else class="card-style">
+          订单ID：{{ item.form.orderCode }} |
+          进出数量：{{ item.form.inOutQuantity }} |
+          日期：{{ item.form.changeDate }}
+          <el-button type="text" @click="editItem(index)">编辑</el-button>
+          <el-button type="text" @click="removeItem(index)">删除</el-button>
+        </div>
+      </div>
+
+      <el-button type="primary" @click="addNewItem">添加一条</el-button>
+
+      <template #footer>
+        <el-button type="primary" @click="submitAll">完成</el-button>
+        <el-button @click="newDialogVisible = false">取消</el-button>
+      </template>
+    </el-dialog>
 
     <el-dialog v-model="editDialogVisible" :title="title" width="800px">
       <CreateForm :data="newFormData[type]" :Formvalue="newSubmit[type]" ref="createFormRef" />

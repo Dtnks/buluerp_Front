@@ -22,15 +22,7 @@ import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { searchFunc } from '@/utils/search/search'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
-const props = defineProps(['data', 'control'])
-
-onMounted(() => {
-  getScheduleListByOrderId(props.data.orderCode).then((res) => {
-    if (res.rows.length == 0) {
-      onCreate()
-    }
-  })
-})
+const props = defineProps(['data'])
 //渲染页面
 const listSchedule = listScheduleByOrderCode(props.data.orderCode)
 const createNewFormRef = ref()
@@ -370,7 +362,6 @@ const operation = ref([
       editSubmit.value.orderCode = props.data.orderCode
     },
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
   {
     func: (row) => {
@@ -380,7 +371,6 @@ const operation = ref([
       })
     },
     value: '完成布产',
-    disabled: props.control[1].disabled,
   },
 ])
 const title = ref('新增')
@@ -593,10 +583,25 @@ listSchedule(page.value, pageSize.value).then((res) => {
   <div class="col">
     <BordShow content="布产表" path="订单详情/布产表" />
     <div class="greyBack">
-      <FormSearch title="查询" :data="formData" :onCreate="onCreate" :onSubmit="onSubmit" :onImport="onImport"
-        :onDownloadTemplate="onDownloadTemplate" :searchForm="searchContent" :control="control" />
-      <TableList :tableData="tableData" :operations="operation" :listData="listData" :DeleteFunc="DeleteFunc"
-        :exportFunc="exportFunc" :transToArrange="transToArrange" :control="control">
+      <FormSearch
+        title="查询"
+        :data="formData"
+        :onCreate="onCreate"
+        :onSubmit="onSubmit"
+        :onImport="onImport"
+        :onDownloadTemplate="onDownloadTemplate"
+        :searchForm="searchContent"
+
+      />
+      <TableList
+        :tableData="tableData"
+        :operations="operation"
+        :listData="listData"
+        :DeleteFunc="DeleteFunc"
+        :exportFunc="exportFunc"
+        :transToArrange="transToArrange"
+
+      >
         <slot>
           <div style="
               margin-top: 20px;

@@ -19,7 +19,7 @@ import { messageBox } from '@/components/message/messageBox'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 import { searchFunc } from '@/utils/search/search'
 const createFormRef = ref()
-const props = defineProps(['control'])
+
 //渲染页面
 const formData = ref([
   [
@@ -147,7 +147,6 @@ const operation = ref([
       newSubmit.value = { ...row }
     },
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
   {
     func: (row) => {
@@ -157,7 +156,6 @@ const operation = ref([
       count += 1
     },
     value: '订单发票',
-    disabled: props.control[1].disabled,
   },
 ])
 const FileSubmit = ref({
@@ -349,7 +347,6 @@ listPurchaseList(page.value, pageSize.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent"
-        :control="control"
       />
       <TableList
         :tableData="tableData"
@@ -357,7 +354,6 @@ listPurchaseList(page.value, pageSize.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
-        :control="control"
       >
         <slot>
           <div

@@ -55,6 +55,7 @@
   </el-dialog>
 </template>
 
+
 <script lang="ts" setup>
 import { ref, reactive } from 'vue'
 import type { FormInstance } from 'element-plus'
@@ -64,7 +65,7 @@ import { messageBox } from '@/components/message/messageBox'
 import Form from '@/components/form/Form.vue'
 
 const emit = defineEmits(['search', 'created'])
-defineProps(['control'])
+
 
 // data: 表单数据
 const data = reactive([

@@ -16,12 +16,12 @@
                 <div v-if="field.value" class="field-value">
                   {{ field.value }}
                 </div>
-                <div v-else class="field-value ">
-                  <el-input v-if="field.label == '客户姓名'" v-model="updateFields.customerName" placeholder="请输入" />
-                  <el-input v-else-if="field.label == '备注'" v-model="updateFields.remark" placeholder="请输入" />
-                  <el-date-picker v-else-if="field.label == '交付日期'" v-model="updateFields.deliveryTime"
+                <div v-else class="field-value">
+                  <el-input v-if="field.label == '客户姓名：'" v-model="updateFields.customerName" placeholder="请输入" />
+                  <el-input v-else-if="field.label == '备注：'" v-model="updateFields.remark" placeholder="请输入" />
+                  <el-date-picker v-else-if="field.label == '交付日期：'" v-model="updateFields.deliveryTime"
                     style="width: 200px" placeholder="请选择" />
-                  <el-date-picker v-else-if="field.label == '交付截止日期'" v-model="updateFields.deliveryDeadline"
+                  <el-date-picker v-else-if="field.label == '交付截止日期：'" v-model="updateFields.deliveryDeadline"
                     style="width: 200px" placeholder="请选择" />
                 </div>
               </div>
@@ -112,8 +112,8 @@ const props = defineProps<{
   detail: any
   id: number
   orderCode: string
-  addTab: (targetName: string, component: any, data?: any, control?: any) => void
-  control: Array<object>
+  addTab: (targetName: string, component: any, data?: any,targetPath?:string) => void
+
 }>()
 const tabStore = useTabStore()
 const orderDetail = computed(() => props.detail)
@@ -126,16 +126,16 @@ onMounted(() => {
 
   // 业务订单基本信息的字段信息
   fields.value = [
-    { label: '订单ID', value: props.detail.id },
-    { label: '创建时间', value: props.detail.createTime },
-    { label: '订单状态', value: statusText.value },
-    { label: '内部编号', value: props.detail.innerId },
-    { label: '外部编号', value: props.detail.outerId },
-    { label: '客户姓名', value: props.detail.customerName },
-    { label: '交付日期', value: props.detail.deliveryTime },
-    { label: '交付截止日期', value: props.detail.deliveryDeadline },
-    { label: '备注', value: props.detail.remark },
-  ]
+  { label: '订单ID：', value: props.detail.id },
+  { label: '创建时间：', value: props.detail.createTime },
+  { label: '订单状态：', value: statusText.value },
+  { label: '内部编号：', value: props.detail.innerId },
+  { label: '外部编号：', value: props.detail.outerId },
+  { label: '客户姓名：', value: props.detail.customerName },
+  { label: '交付日期：', value: props.detail.deliveryTime },
+  { label: '交付截止日期：', value: props.detail.deliveryDeadline },
+  { label: '备注：', value: props.detail.remark },
+]
 
   // 修改订单基本信息
   updateFields.value = {
@@ -200,7 +200,8 @@ const viewPuchaseOrder = (row: any) => {
     `订单${props.orderCode} 采购`,
     PurchaseInfo,
     { orderCode: props.orderCode, purchaseId: orderDetail.value.purchaseId, orderId: props.id },
-    props.control,
+    `/business/PurchaseInfo/${props.orderCode}`,
+
   )
 }
 
@@ -210,7 +211,8 @@ const viewProductsSchedule = (row: any) => {
     `订单${props.orderCode} 布产`,
     ProductionSchedule,
     { orderCode: props.orderCode },
-    props.control,
+    `/business/ProductionSchedule/${props.orderCode}`,
+
   )
 }
 
@@ -221,7 +223,8 @@ const handleAction = (method: Function, row: any) => {
 
 const viewPackagingList = (row) => {
   getPackagingListByOrderId(props.orderCode).then((res) => {
-    props.addTab(`订单${props.orderCode} 分包`, PackagingDetail, res.rows[0].id, props.control)
+    props.addTab(`订单${props.orderCode} 分包`, PackagingDetail, res.rows[0].id,
+    `/business/PackagingDetail/${props.orderCode}`)
   })
 }
 const DialogVisible = ref(false)

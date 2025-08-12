@@ -12,7 +12,6 @@ import useTabStore from '@/stores/modules/tabs'
 const props = defineProps<{
   detail: any
   materialData: any[]
-  control: Array<object>
 }>()
 
 const tableData = ref<MaterialItem[]>([])
@@ -258,7 +257,7 @@ interface MaterialItem {
       <div style="text-align: right; margin-top: 20px">
         <el-space>
           <el-button @click="onCancel">取消</el-button>
-          <el-button type="primary" @click="submitMainForm" :disabled="control[1].disabled"
+          <el-button type="primary" @click="submitMainForm" 
             >提交</el-button
           >
           <el-button @click="onClear">重置</el-button>

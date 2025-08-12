@@ -157,7 +157,6 @@ import { updateProduct } from '@/apis/products'
 
 const props = defineProps<{
   detail: any
-  control: any[]
 }>()
 
 const getRowKey = (row: any) => row.id

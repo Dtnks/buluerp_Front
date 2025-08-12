@@ -18,7 +18,6 @@ import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessage, ElMessageBox, FormInstance, FormRules } from 'element-plus'
-const props = defineProps(['control'])
 
 // 定义表单校验规则
 const rules = ref<FormRules>({
@@ -88,7 +87,6 @@ const operation = ref([
       newSubmit.value = { ...row }
     },
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
 ])
 
@@ -262,7 +260,6 @@ listCustomer(page.value, pageSize.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent"
-        :control="control"
       />
       <TableList
         :tableData="tableData"
@@ -270,7 +267,6 @@ listCustomer(page.value, pageSize.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
-        :control="control"
       >
         <slot>
           <div

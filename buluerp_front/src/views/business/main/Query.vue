@@ -3,9 +3,9 @@
     <el-config-provider :locale="zhCn">
       <BordShow content="业务订单查询列表" path="业务中心/查询" />
       <div class="greyBack">
-        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd" :control="control"
+        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd"
           @customerSuggestions="customerSuggestions" @checkCustomerName="checkCustomerName"></QueryForm>
-        <QueryTable :addTab="props.addTab" :pagination="pagination" :tableData="tableData" :control="control"
+        <QueryTable :addTab="props.addTab" :pagination="pagination" :tableData="tableData"
           @onPageChange="handlePageChange" @onPageSizeChange="handleSizeChange" @fetchData="fetchTableData"
           @onUpdated="handleUpdate" @customerSuggestions="customerSuggestions" @checkCustomerName="checkCustomerName">
         </QueryTable>
@@ -28,8 +28,8 @@ import { listCustomerAll } from '@/apis/custom'
 import useTabStore from '@/stores/modules/tabs'
 
 const props = defineProps<{
-  addTab: (targetName: string, component: any, data?: any, control?: Array<object>) => void
-  control: Array<object>
+  addTab: (targetName: string, component: any, data?: any, targetPath?: string) => void
+
 }>()
 const tabStore = useTabStore()
 // pagination: 分页数据

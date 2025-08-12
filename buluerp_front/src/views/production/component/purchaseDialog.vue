@@ -119,7 +119,7 @@ const formConfig = [
       label: '单重',
       key: 'singleWeight',
       type: 'number',
-      width: 8
+      width: 12
     }
   ],
   [
@@ -127,14 +127,14 @@ const formConfig = [
       label: '单价',
       key: 'unitPrice',
       type: 'number',
-      width: 8,
+      width: 12,
       rules: [{ type: 'number', message: '请输入有效的数字', trigger: 'blur' }]
     },
     {
       label: '模具编号',
       key: 'mouldNumber',
       type: 'input',
-      width: 8
+      width: 12
     }
   ],
   [

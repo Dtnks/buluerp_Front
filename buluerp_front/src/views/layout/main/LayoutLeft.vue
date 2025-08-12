@@ -39,7 +39,6 @@ const ComponentsGroup = {
   PMProduceArrange: () => import('@/views/PMcenter/produce/main/Arrange.vue'),
   PMProduceSchedule: () => import('@/views/PMcenter/produce/main/Schedule.vue'),
   PMProducePackaging: () => import('@/views/PMcenter/produce/main/Packaging.vue'),
-
 }
 const LazyComponentsGroup = new Proxy(
   {},
@@ -82,7 +81,7 @@ const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
           <el-menu-item
             :index="subItem.id"
             @click="
-              addTab(subItem.label, LazyComponentsGroup[subItem.path], null, subItem.children)
+              addTab(subItem.label, LazyComponentsGroup[subItem.path], null,subItem.path, subItem.children)
             "
             v-if="!subItem.disabled && subItem.path != '/'"
           >
@@ -101,10 +100,13 @@ const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
                   subSubItem.label,
                   LazyComponentsGroup[subSubItem.path],
                   null,
+                  subSubItem.path,
                   subSubItem.children,
                 )
               "
-              >{{ subSubItem.label }}</el-menu-item
+              >
+                {{ subSubItem.label }}
+              </el-menu-item
             >
           </el-sub-menu>
         </div>
@@ -149,5 +151,10 @@ const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
 .el-menu-item.is-active {
   background-color: inherit !important;
   border-bottom-color: transparent;
+}
+a{
+  color: #fff !important;
+  text-decoration: none !important;
+  width: 100%;
 }
 </style>

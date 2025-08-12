@@ -18,7 +18,6 @@ import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 
 import { requiredRule } from '@/utils/form/valid'
-const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
   [
@@ -120,7 +119,6 @@ const operation = ref([
       })
     },
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
 
 ])
@@ -293,7 +291,6 @@ listMaterialInfo(page.value, pageSize.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent"
-        :control="control"
       />
       <TableList
         :tableData="tableData"
@@ -301,7 +298,6 @@ listMaterialInfo(page.value, pageSize.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
-        :control="control"
       >
         <slot>
           <div
