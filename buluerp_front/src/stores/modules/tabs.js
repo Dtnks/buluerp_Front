@@ -12,42 +12,45 @@ const useTabStore = defineStore('tabs', {
     addTab(targetName, component, data, targetPath) {
       if (this.$state.editableTabs.filter((item) => item.title == targetName).length > 0) {
         if(targetName=='订单查询' && this.$state.orderFreshFn){
-          console.log('fresh')
           this.$state.orderFreshFn()
         }
-        return targetName
+        return
       }
       if(targetPath){
         this.$state.path2Label[targetPath] = targetName
       }
       this.$state.editableTabs.push({
         title: targetName,
-        name: targetName,
+        name: targetPath,
         component: component,
         data: data,
+        targetPath:targetPath,
         key: targetName,
       })
-      this.$state.editableTabsValue = targetName
+      this.$state.editableTabsValue = targetPath
     },
-    removeTab(targetName, currentName) {
+    removeTab(targetName) {
+      console.log(targetName,this.$state.editableTabsValue)
       if (targetName == 'all') {
         this.$state.editableTabs = []
+        this.$state.editableTabsValue = ''
+        this.$state.path2Label = {}
+        return
       }
       const tabs = this.$state.editableTabs
-      let activeName = currentName
+      let activeName = this.$state.editableTabsValue
       if (activeName === targetName) {
         tabs.forEach((tab, index) => {
           if (tab.name === targetName) {
             const nextTab = tabs[index + 1] || tabs[index - 1]
             if (nextTab) {
-              activeName = nextTab.name
+              this.$state.editableTabsValue = nextTab.targetPath
             }
           }
         })
       }
-
+      delete this.$state.path2Label[targetName]
       this.$state.editableTabs = tabs.filter((tab) => tab.name !== targetName)
-      return activeName
     },
     freshTab(targetName) {
       const tabs = this.$state.editableTabs
@@ -73,6 +76,7 @@ const useTabStore = defineStore('tabs', {
     },
     setEditValue(value) {
       this.$state.editableTabsValue = value
+      console.log(this.$state.editableTabs)
     }
   },
 })

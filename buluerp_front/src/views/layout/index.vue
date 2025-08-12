@@ -5,6 +5,7 @@ import { ref } from 'vue'
 // import type { TabPaneName } from 'element-plus'
 import { CircleClose } from '@element-plus/icons-vue'
 import useTabStore from '@/stores/modules/tabs'
+import router from '@/router'
 // const editableTabsValue = ref('')
 const store = useTabStore()
 // const addTab = (targetName: string, component, data,targetPath?:string) => {
@@ -33,6 +34,7 @@ const handleHiddenMenu = () => {
         closable
         editable
         @tab-remove="store.removeTab"
+        @tab-click="(item)=>{console.log(item)}"
       >
         <template #add-icon>
           <el-icon @click="store.removeTab('all')"><CircleClose /></el-icon>
@@ -44,7 +46,7 @@ const handleHiddenMenu = () => {
             v-for="item in store.editableTabs"
             :key="item.name"
             :label="item.title"
-            :name="item.name"
+            :name="item.targetPath"
           >
             <keep-alive>
               <component

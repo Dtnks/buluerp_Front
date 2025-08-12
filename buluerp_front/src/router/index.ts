@@ -156,7 +156,7 @@ router.beforeEach((to, from, next) => {
     if (token) {
       const store = useTabStore()
       if (Object.keys(store.path2Label).includes(to.name)) {
-        store.setEditValue(store.path2Label[to.name])
+        store.setEditValue(to.name)
       }
       // 有 token 时，允许访问其他页面
       next()
