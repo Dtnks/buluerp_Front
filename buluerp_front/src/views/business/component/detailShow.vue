@@ -16,7 +16,7 @@
                 <div v-if="field.value" class="field-value">
                   {{ field.value }}
                 </div>
-                <div v-else class="field-value">
+                <div v-else class="field-value ">
                   <el-input v-if="field.label == '客户姓名'" v-model="updateFields.customerName" placeholder="请输入" />
                   <el-input v-else-if="field.label == '备注'" v-model="updateFields.remark" placeholder="请输入" />
                   <el-date-picker v-else-if="field.label == '交付日期'" v-model="updateFields.deliveryTime"
@@ -30,13 +30,10 @@
         </informationCard>
         <!-- 订单详情 -->
         <informationCard title="订单详情">
-          <el-table :data="orderProduct" style="width: 100%">
+          <el-table :data="orderProduct" style="width: 100%; font-size: medium;">
             <el-table-column label="产品编码" prop="id" />
-
             <el-table-column label="内部编码" prop="innerId" />
-
             <el-table-column label="外部编码" prop="outerId" />
-
             <el-table-column label="产品名称" prop="name" />
             <el-table-column label="创建时间" prop="createTime" />
             <el-table-column label="更新时间" prop="updateTime" />
@@ -48,7 +45,7 @@
           <div class="related-orders-grid">
             <!-- 第一行：订单类型 -->
             <div class="related-orders-row">
-              <div v-for="item in relatedOrdersTable" :key="item.type" class="related-orders-cell type-cell">
+              <div v-for="item in relatedOrdersTable" :key="item.type" class="related-orders-cell type-cell ">
                 {{ item.type }}
               </div>
             </div>
@@ -56,7 +53,7 @@
             <div class="related-orders-row">
               <div v-for="(item, idx) in relatedOrdersTable" :key="item.type + '-action'"
                 class="related-orders-cell action-cell">
-                <el-button v-for="action in item.actions" :key="action.name" link type="primary" size="small"
+                <el-button v-for="action in item.actions" :key="action.name" link type="primary"
                   @click="handleAction(action.method, item)">
                   {{ action.name }}
                 </el-button>
@@ -432,6 +429,15 @@ const onBoxCancel = () => {
 </script>
 
 <style scoped lang="less">
+.field-content-middle {
+  font-size: medium;
+}
+
+.field-content-small {
+  font-size: small;
+  color: #707070;
+}
+
 .detail-box {
   display: flex;
   flex-direction: column;
@@ -459,14 +465,14 @@ const onBoxCancel = () => {
 
   .field-value {
     margin-top: 6px;
-    font-size: small;
+    font-size: medium;
     color: #707070;
   }
 }
 
 .add-row {
   margin-top: 4px;
-  font-size: small;
+  font-size: medium;
   color: #424548;
 }
 
