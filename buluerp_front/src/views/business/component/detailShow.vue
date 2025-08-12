@@ -30,13 +30,10 @@
         </informationCard>
         <!-- 订单详情 -->
         <informationCard title="订单详情">
-          <el-table :data="orderProduct" style="width: 100%">
+          <el-table :data="orderProduct" style="width: 100%; font-size: medium;">
             <el-table-column label="产品编码" prop="id" />
-
             <el-table-column label="内部编码" prop="innerId" />
-
             <el-table-column label="外部编码" prop="outerId" />
-
             <el-table-column label="产品名称" prop="name" />
             <el-table-column label="创建时间" prop="createTime" />
             <el-table-column label="更新时间" prop="updateTime" />
@@ -48,7 +45,7 @@
           <div class="related-orders-grid">
             <!-- 第一行：订单类型 -->
             <div class="related-orders-row">
-              <div v-for="item in relatedOrdersTable" :key="item.type" class="related-orders-cell type-cell">
+              <div v-for="item in relatedOrdersTable" :key="item.type" class="related-orders-cell type-cell ">
                 {{ item.type }}
               </div>
             </div>
@@ -56,7 +53,7 @@
             <div class="related-orders-row">
               <div v-for="(item, idx) in relatedOrdersTable" :key="item.type + '-action'"
                 class="related-orders-cell action-cell">
-                <el-button v-for="action in item.actions" :key="action.name" link type="primary" size="small"
+                <el-button v-for="action in item.actions" :key="action.name" link type="primary"
                   @click="handleAction(action.method, item)">
                   {{ action.name }}
                 </el-button>
@@ -106,6 +103,10 @@ import { getPackagingListByOrderId, newPackaging } from '@/apis/produceControl/p
 import PackagingDetail from '@/views/PMcenter/produce/component/PackagingDetail.vue'
 import { searchFunc } from '@/utils/search/search'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
+import { getPurchaseInfo } from '@/apis/produceControl/purchase/purchaseInfo'
+import { getPurchaseListByOrderCode } from '@/apis/produceControl/purchase/purchaseList'
+import { getScheduleListByOrderId } from '@/apis/produceControl/produce/schedule'
+import { detailPurchasePlan, listPurchasePlanByOrderCode } from '@/apis/produceControl/purchase/purchasePlan'
 // Props
 const props = defineProps<{
   detail: any
@@ -116,14 +117,14 @@ const props = defineProps<{
 }>()
 const tabStore = useTabStore()
 const orderDetail = computed(() => props.detail)
-const fields=ref()
-const statusText=ref()
-const updateFields=ref()
+const fields = ref()
+const statusText = ref()
+const updateFields = ref()
 onMounted(() => {
   // 订单状态
-statusText.value = resMap[props.detail.status]
+  statusText.value = resMap[props.detail.status]
 
-// 业务订单基本信息的字段信息
+  // 业务订单基本信息的字段信息
   fields.value = [
   { label: '订单ID：', value: props.detail.id },
   { label: '创建时间：', value: props.detail.createTime },
@@ -136,15 +137,15 @@ statusText.value = resMap[props.detail.status]
   { label: '备注：', value: props.detail.remark },
 ]
 
-// 修改订单基本信息
- updateFields.value = {
-  ...orderDetail.value,
-  id: props.detail.id,
-  deliveryTime: props.detail.deliveryTime || '',
-  deliveryDeadline: props.detail.deliveryDeadline || '',
-  remark: props.detail.remark || '',
-  customerName: props.detail.customerName || '',
-}
+  // 修改订单基本信息
+  updateFields.value = {
+    ...orderDetail.value,
+    id: props.detail.id,
+    deliveryTime: props.detail.deliveryTime || '',
+    deliveryDeadline: props.detail.deliveryDeadline || '',
+    remark: props.detail.remark || '',
+    customerName: props.detail.customerName || '',
+  }
   fetchOrderProduct()
 
 })
@@ -164,7 +165,7 @@ interface ProductInfo {
 const orderProduct = ref<ProductInfo[]>([])
 
 
-const promap={'0':'未生产','1':'已生产'}
+const promap = { '0': '未生产', '1': '已生产' }
 // 获取订单产品数据
 const fetchOrderProduct = async () => {
   const productId = props.detail.productId
@@ -196,7 +197,7 @@ const fetchOrderProduct = async () => {
 // viewPuchaseOrder: 查看采购表
 const viewPuchaseOrder = (row: any) => {
   props.addTab(
-    `订单${props.orderCode} 外购`,
+    `订单${props.orderCode} 采购`,
     PurchaseInfo,
     { orderCode: props.orderCode, purchaseId: orderDetail.value.purchaseId, orderId: props.id },
     `/business/PurchaseInfo/${props.orderCode}`,
@@ -230,27 +231,36 @@ const DialogVisible = ref(false)
 const newFormData = ref([
   [
     {
-      type: 'inputSelect',
+      type: 'input',  // 改为只读显示类型
       label: '订单',
       key: 'orderCode',
       width: 12,
-      rules: [requiredRule],
-      showKey:[{key:'innerId',label:"内部编号"},{key:'outerId',label:"外部编号"}],
-      remoteFunc: searchFunc('system/orders/list', 'innerId'),
-      options: [],
-      loading: false,
+      value: props.detail.innerId,  // 直接显示传入的订单编号
+      displayFormat: (value) => `${props.detail.innerId} (${props.detail.outerId})`,
+      readonly: true,
+      disabled: true,  // 设置为禁用状态
     },
     {
-      type: 'inputSelect',
+      type: 'input',  // 改为只读显示类型
       label: '产品',
       key: 'productId',
       width: 12,
-      showKey:[{key:'id',label:"产品ID"},{key:'name',label:"产品名称"}],
-      rules: [requiredRule],
-      options: [],
-      loading: false,
-      remoteFunc: searchFunc('system/products/list', 'id'),
+      value: props.detail.productId,  // 直接显示传入的产品ID
+      displayFormat: (value) => `${props.detail.productId} (${props.detail.productName})`,
+      readonly: true,
+      disabled: true,  // 设置为禁用状态
     },
+    // {
+    //   type: 'inputSelect',
+    //   label: '产品',
+    //   key: 'productId',
+    //   width: 12,
+    //   showKey: [{ key: 'id', label: "产品ID" }, { key: 'name', label: "产品名称" }],
+    //   rules: [requiredRule],
+    //   options: [],
+    //   loading: false,
+    //   remoteFunc: searchFunc('system/products/list', 'id'),
+    // },
   ],
   [
     { type: 'input', label: '生产线', key: 'productionLine', width: 12, rules: [requiredRule] },
@@ -264,20 +274,20 @@ const newFormData = ref([
       rules: [requiredRule],
     },
   ],
-    [
+  [
     {
       type: 'number',
       label: '配件种类',
       key: 'accessoryType',
       width: 12,
-      rules: [positiveNumberRule,requiredRule],
+      rules: [positiveNumberRule, requiredRule],
     },
     {
       type: 'number',
       label: '配件数量',
       key: 'accessoryTotal',
       width: 12,
-      rules: [positiveNumberRule,requiredRule],
+      rules: [positiveNumberRule, requiredRule],
     },
   ],
   [
@@ -320,6 +330,7 @@ const newFormData = ref([
 ])
 
 const newSubmit = ref({
+  orderCode: '',
   productId: '',
   materialType: '',
   productNameCn: '',
@@ -340,7 +351,7 @@ const handleSubmit = () => {
   createFormRef.value.validateForm((valid) => {
     if (valid) {
       newSubmit.value.releaseDate = parseTime(newSubmit.value.releaseDate, '{y}-{m}-{d}')
-      newPackaging({ ...newSubmit.value, orderCode: props.orderCode }).then((res) => {
+      newPackaging({ ...newSubmit.value, orderCode: props.orderCode, productId: orderProduct.value[0].id }).then((res) => {
         relatedOrdersTable.value[2].actions = [{ name: '查看', method: viewPackagingList }]
         messageBox('success', null, '分包创建成功')
         DialogVisible.value = false
@@ -350,7 +361,12 @@ const handleSubmit = () => {
   })
 }
 const addPackagingList = () => {
+  newSubmit.value = {
+    ...newSubmit.value,  // 保留其他字段的值
+    orderCode: props.detail.innerId,  // 设置订单编号
+  }
   DialogVisible.value = true
+
 }
 
 // 关联订单
@@ -368,6 +384,23 @@ const relatedOrdersTable = ref([
     actions: [{ name: '查看', method: viewPackagingList }],
   },
 ])
+
+detailPurchasePlan(props.orderCode).then((res) => {
+  if (res.rows.length == 0) {
+    relatedOrdersTable.value[0].actions = [{ name: '创建', method: viewPuchaseOrder }]
+  } else {
+    relatedOrdersTable.value[0].actions = [{ name: '查看', method: viewPuchaseOrder }]
+  }
+})
+
+getScheduleListByOrderId(props.orderCode).then((res) => {
+  if (res.rows.length == 0) {
+    relatedOrdersTable.value[1].actions = [{ name: '创建', method: viewProductsSchedule }]
+  } else {
+    relatedOrdersTable.value[1].actions = [{ name: '查看', method: viewProductsSchedule }]
+  }
+})
+
 getPackagingListByOrderId(props.orderCode).then((res) => {
   if (res.rows.length == 0) {
     relatedOrdersTable.value[2].actions = [{ name: '创建', method: addPackagingList }]
@@ -375,6 +408,8 @@ getPackagingListByOrderId(props.orderCode).then((res) => {
     relatedOrdersTable.value[2].actions = [{ name: '查看', method: viewPackagingList }]
   }
 })
+
+
 
 // //  页脚按钮
 // onBoxSubmit: 提交按钮
@@ -397,6 +432,15 @@ const onBoxCancel = () => {
 </script>
 
 <style scoped lang="less">
+.field-content-middle {
+  font-size: medium;
+}
+
+.field-content-small {
+  font-size: small;
+  color: #707070;
+}
+
 .detail-box {
   display: flex;
   flex-direction: column;
@@ -424,14 +468,14 @@ const onBoxCancel = () => {
 
   .field-value {
     margin-top: 6px;
-    font-size: small;
+    font-size: medium;
     color: #707070;
   }
 }
 
 .add-row {
   margin-top: 4px;
-  font-size: small;
+  font-size: medium;
   color: #424548;
 }
 
@@ -450,18 +494,19 @@ const onBoxCancel = () => {
 .related-orders-grid {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  margin-bottom: 10px;
+  width: 1100px;
+  margin: 0 10px 10px 0;
+
 }
 
 .related-orders-row {
   display: flex;
-  width: 100%;
+  // width: 100%;
 }
 
 .related-orders-cell {
   flex: 1;
-  text-align: center;
+  text-align: left;
   padding: 8px 0;
 }
 

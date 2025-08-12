@@ -3,7 +3,6 @@
     :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm" :formState="formState"></Form>
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
-
       <el-form-item label="客户姓名">
         <el-autocomplete v-model="dialogForm.customerName" :fetch-suggestions="customerSuggestions" :value-key="'value'"
           @blur="checkCustomerName" placeholder="请输入" />
@@ -50,7 +49,7 @@ import { format } from 'date-fns'
 import type { SubmitFormType } from '../types'
 
 const dialogFormVisible = ref(false)
-console.log(resMap,'resMap')
+console.log(resMap, 'resMap')
 const emit = defineEmits(['onSubmit', 'onAdd', 'checkCustomerName', 'customerSuggestions'])
 
 const dialogForm = reactive({

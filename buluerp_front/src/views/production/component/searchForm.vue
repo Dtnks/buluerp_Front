@@ -1,95 +1,16 @@
 <template>
-  <el-card style="margin: 0 20px">
+  <!-- <el-card style="margin: 0 20px">
     <template #header>
       <div class="card-header">
         <span>查询</span>
       </div>
-    </template>
+    </template> -->
 
-    <el-form ref="formRef" :model="formState" label-width="100px" class="search-form">
-      <!-- 第一行 -->
-      <el-row :gutter="20" align="middle">
-        <el-col :span="6">
-          <el-form-item label="产品编码" prop="productCode">
-            <el-input v-model.number="formState.productCode" placeholder="请输入产品编码" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="6">
-          <el-form-item label="产品状态" prop="productStatus">
-            <el-select v-model="formState.productStatus" placeholder="请选择产品状态">
-              <el-option label="设计中" :value="0" />
-              <el-option label="已完成" :value="1" />
-            </el-select>
-          </el-form-item>
-        </el-col>
-        <el-col :span="6">
-          <el-form-item label="创建日期" prop="createDate">
-            <el-date-picker
-              v-model="formState.createDate"
-              type="daterange"
-              value-format="YYYY-MM-DD HH:mm:ss"
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-            />
-          </el-form-item>
-        </el-col>
-        <el-col :span="6" style="text-align: right">
-          <el-space>
-            <el-button type="primary" @click="onSubmit">查询</el-button>
-            <el-button @click="onClear">重置</el-button>
-          </el-space>
-        </el-col>
-      </el-row>
+  <Form :data="data" :title="title" :onSubmit="onSubmit" :onCreate="onCreate" :onImport="onImport"
+    :onDownloadTemplate="onDownloadTemplate" :searchForm="formState" :control="control" :formState="formState">
+  </Form>
+  <!-- </el-card> -->
 
-      <!-- 第二行 -->
-      <el-row :gutter="20" align="middle" style="margin-top: 16px">
-        <el-col :span="6">
-          <el-form-item label="产品名称" prop="productName">
-            <el-input v-model="formState.productName" placeholder="请输入产品名称" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="6">
-          <el-form-item label="创建人姓名" prop="creatorName">
-            <el-input v-model="formState.creatorName" placeholder="请输入创建人姓名" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="6">
-          <!-- <el-form-item label="其他搜索" prop="otherSearch">
-            <el-input v-model="formState.otherSearch" placeholder="请输入其他搜索条件" />
-          </el-form-item> -->
-        </el-col>
-        <el-col :span="6" style="text-align: right">
-          <el-space>
-            <el-button type="primary" @click="onCreate" 
-              >新建</el-button
-            >
-            <el-button @click="onImport">导入</el-button>
-          </el-space>
-        </el-col>
-      </el-row>
-
-      <div style="text-align: right; margin-top: 8px">
-        <el-link type="primary" @click="onDownloadTemplate">下载导入模板</el-link>
-      </div>
-    </el-form>
-  </el-card>
-  <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
-    <el-upload
-      class="upload-demo"
-      drag
-      :show-file-list="false"
-      :before-upload="beforeUpload"
-      :http-request="handleUpload"
-      accept=".xlsx,.xls"
-    >
-      <i class="el-icon-upload"></i>
-      <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
-      <template v-slot:tip>
-        <div class="el-upload__tip">只能上传 xls/xlsx 文件，大小不超过 5MB</div>
-      </template>
-    </el-upload>
-  </el-dialog>
   <el-dialog v-model="createDialogVisible" title="新建产品" width="500px">
     <el-form ref="createFormRef" :model="createForm" :rules="createFormRules" label-width="100px">
       <el-form-item label="产品名称" prop="name">
@@ -102,16 +23,14 @@
         <el-input v-model="createForm.outerId" placeholder="请输入外部编号" />
       </el-form-item>
       <el-form-item label="产品图片" prop="image">
-        <el-upload
-          class="avatar-uploader"
-          :show-file-list="false"
-          :before-upload="beforeImageUpload"
-          :on-change="handleImageChange"
-        >
+        <el-upload class="avatar-uploader" :show-file-list="false" :before-upload="beforeImageUpload"
+          :on-change="handleImageChange">
           <div class="upload-box">
             <img v-if="createForm.image" :src="createForm.image" class="avatar" />
             <div v-else class="upload-placeholder">
-              <el-icon><Plus /></el-icon>
+              <el-icon>
+                <Plus />
+              </el-icon>
               <div style="margin-top: 4px; font-size: 12px; color: #999">点击上传</div>
             </div>
           </div>
@@ -124,20 +43,91 @@
       <el-button type="primary" @click="handleCreateSubmit">提交</el-button>
     </template>
   </el-dialog>
+
+  <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
+    <el-upload class="upload-demo" drag :show-file-list="false" :before-upload="beforeUpload"
+      :http-request="handleUpload" accept=".xlsx,.xls">
+      <i class="el-icon-upload"></i>
+      <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
+      <template v-slot:tip>
+        <div class="el-upload__tip">只能上传 xls/xlsx 文件，大小不超过 5MB</div>
+      </template>
+    </el-upload>
+  </el-dialog>
 </template>
+
 
 <script lang="ts" setup>
 import { ref, reactive } from 'vue'
 import type { FormInstance } from 'element-plus'
-// import { ElMessage } from 'element-plus' // ✅ 已移除
 import { createProduct, importProductFile, getProductTemplate } from '@/apis/products.js'
 import { downloadBinaryFile } from '@/utils/file/base64'
-import { messageBox } from '@/components/message/messageBox' // ✅ 使用自定义封装
-import { getMaterialList } from '@/apis/materials'
+import { messageBox } from '@/components/message/messageBox'
+import Form from '@/components/form/Form.vue'
 
 const emit = defineEmits(['search', 'created'])
 
 
+// data: 表单数据
+const data = reactive([
+  [
+    {
+      label: '产品编码',
+      type: 'input',
+      key: 'productCode',
+    },
+    {
+      label: '产品状态',
+      type: 'select',
+      key: 'productStatus',
+      options: [
+        { label: '设计中', value: 0 },
+        { label: '已完成', value: 1 },
+      ],
+    },
+    {
+      label: '创建日期',
+      type: 'timer',
+      key: 'createDate',
+      timerType: 'daterange',
+    },
+  ],
+  [
+    {
+      label: '产品名称',
+      type: 'input',
+      key: 'productName',
+    },
+    {
+      label: '创建人姓名',
+      type: 'input',
+      key: 'creatorName',
+    },
+  ],
+])
+
+const title = '查询'
+
+// 表单状态
+const formState = reactive({
+  productCode: '',
+  productStatus: '',
+  createDate: [],
+  productName: '',
+  creatorName: '',
+  otherSearch: '',
+})
+
+// 查询条件
+const searchForm = ref({
+  productCode: '',
+  productStatus: '',
+  createDate: [],
+  productName: '',
+  creatorName: '',
+})
+
+// 新建相关
 const createDialogVisible = ref(false)
 const createForm = reactive({
   name: '',
@@ -155,6 +145,33 @@ const createFormRules = {
 }
 
 const imageFile = ref<File | null>(null)
+const importDialogVisible = ref(false)
+
+// 方法
+const onSubmit = () => {
+  const params = {
+    productCode: formState.productCode || '',
+    productName: formState.productName || '',
+    productStatus: formState.productStatus,
+    creatorName: formState.creatorName || '',
+    createDate: formState.createDate || [],
+    otherSearch: formState.otherSearch || '',
+  }
+  emit('search', params)
+}
+
+const onCreate = () => {
+  createDialogVisible.value = true
+}
+
+const onCreateCancel = () => {
+  createDialogVisible.value = false
+  resetCreateForm()
+}
+
+const onImport = () => {
+  importDialogVisible.value = true
+}
 
 const handleCreateSubmit = async () => {
   const valid = await createFormRef.value?.validate().catch(() => false)
@@ -175,7 +192,6 @@ const handleCreateSubmit = async () => {
     'warning',
     () =>
       createProduct(formData).then((res) => {
-        console.log(res)
         createDialogVisible.value = false
         resetCreateForm()
         emit('created')
@@ -196,73 +212,6 @@ const resetCreateForm = () => {
   createFormRef.value?.clearValidate?.()
 }
 
-const formRef = ref<FormInstance>()
-const formState = reactive({
-  productCode: '',
-  productStatus: '',
-  createDate: [],
-  productName: '',
-  creatorName: '',
-  otherSearch: '',
-})
-
-const importDialogVisible = ref(false)
-
-const onSubmit = () => {
-  const params = {
-    productCode: formState.productCode || '',
-    productName: formState.productName || '',
-    productStatus: formState.productStatus,
-    creatorName: formState.creatorName || '',
-    createDate: formState.createDate || [],
-    otherSearch: formState.otherSearch || '',
-  }
-  emit('search', params)
-}
-
-const onClear = () => {
-  formRef.value?.resetFields()
-}
-
-const onCreate = () => {
-  createDialogVisible.value = true
-}
-
-const onCreateCancel = () => {
-  createDialogVisible.value = false
-  resetCreateForm()
-}
-
-const onImport = () => {
-  importDialogVisible.value = true
-}
-
-const materialOptions = ref<any[]>([])        // 查询结果选项
-const materialLoading = ref(false)            // loading 状态
-
-const handleRemoteSearch = async (query: string) => {
-  if (!query) {
-    materialOptions.value = []
-    return
-  }
-
-  materialLoading.value = true
-  try {
-    const res = await getMaterialList({
-      id: query,
-      pageNum: 1,
-      pageSize: 20,
-    })
-    materialOptions.value = res.rows || []
-  } catch (error) {
-    console.error('获取物料失败', error)
-    materialOptions.value = []
-  } finally {
-    materialLoading.value = false
-  }
-}
-
-// 文件校验
 const beforeUpload = (file: File) => {
   const isExcel =
     file.type === 'application/vnd.ms-excel' ||
@@ -336,13 +285,6 @@ const beforeImageUpload = (file: File) => {
 </script>
 
 <style scoped>
-.search-form {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
 .avatar-uploader .upload-box {
   width: 100px;
   height: 100px;
