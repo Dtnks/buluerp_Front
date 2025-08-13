@@ -223,26 +223,14 @@ const onExport = () => {
     messageBox('error', null, null, '请先选择要导出的订单')
     return
   }
-  // const today = new Date()
-  // const dateStr = today.toISOString().split('T')[0].replace(/-/g, '')
-  // const exportData = selectedRows.value.map((item) => {
-  //   const row: Record<string, any> = {}
-  //   exportFields.forEach((field) => {
-  //     row[field.label] = item[field.key]
-  //   })
-  //   return row
-  // })
-  // exportToExcel(exportData, `订单数据_${dateStr}`)
   const formData = new URLSearchParams()
   const ids = selectedRows.value.map((ele) => {
     return ele.id
   })
   formData.append('ids', ids)
   exportOrder(formData).then((res) => {
-    console.log(res, '43242342342')
     const now = new Date()
     downloadBinaryFile(res, '订单数据_' + now.toLocaleDateString() + '_' + '.xlsx')
-    // count += 1
   })
 }
 </script>
