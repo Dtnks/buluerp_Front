@@ -217,7 +217,7 @@ const onDelete = async () => {
 //   { label: '分包ID', key: 'subcontractId' },
 //   { label: '其它信息', key: 'remark' },
 // ]
-
+let count = 1
 const onExport = () => {
   if (selectedRows.value.length === 0) {
     messageBox('error', null, null, '请先选择要导出的订单')
@@ -230,7 +230,8 @@ const onExport = () => {
   formData.append('ids', ids)
   exportOrder(formData).then((res) => {
     const now = new Date()
-    downloadBinaryFile(res, '订单数据_' + now.toLocaleDateString() + '_' + '.xlsx')
+    downloadBinaryFile(res, '订单数据_' + now.toLocaleDateString() + '_' + count + '.xlsx')
+    ++count
   })
 }
 </script>
