@@ -83,28 +83,11 @@ const newDialogVisible = ref(false)
     <BordShow content="授权管理" path="管理员/授权管理" />
     <div class="greyBack">
       <el-card class="col">
-        <el-form
-          :inline="true"
-          label-width="auto"
-          style="margin-bottom: 0;"
-        >
+        <el-form :inline="true" label-width="auto" style="margin-bottom: 0;">
           <el-form-item label="角色" class="input row">
-            <el-select
-              v-model="searchContent.roleId"
-              collapse-tags
-              clearable
-              value-on-clear=""
-              collapse-tags-tooltip
-              :max-collapse-tags="2"
-              placeholder="Select"
-              style="width: 280px"
-            >
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
+            <el-select v-model="searchContent.roleId" collapse-tags clearable value-on-clear="" collapse-tags-tooltip
+              :max-collapse-tags="2" placeholder="Select" style="width: 280px">
+              <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
           </el-form-item>
           <el-form-item class="input row" label="账号">
@@ -115,17 +98,14 @@ const newDialogVisible = ref(false)
           </el-form-item>
 
           <!-- <div class="row" style="justify-content: flex-end; margin: 15px"> -->
-          <el-button
-            type="primary"
-            @click="
-              () => {
-                resetSubmit()
-                newDialogVisible = true
-              }
-            "
-            >新建</el-button
-          >
           <el-button type="primary" @click="search">查询</el-button>
+          <el-button type="primary" @click="
+            () => {
+              resetSubmit()
+              newDialogVisible = true
+            }
+          ">新建</el-button>
+
           <el-dialog v-model="newDialogVisible" title="新建系统账号" width="500" center>
             <!-- 绑定表单引用和校验规则 -->
             <el-form ref="formRef" :model="newSubmit" :rules="rules" label-width="80px">
@@ -139,35 +119,20 @@ const newDialogVisible = ref(false)
                 <el-input v-model="newSubmit.password" style="width: 240px" type="password" />
               </el-form-item>
               <el-form-item label="角色" prop="roleIds">
-                <el-select
-                  v-model="newSubmit.roleIds"
-                  multiple
-                  collapse-tags
-                  collapse-tags-tooltip
-                  :max-collapse-tags="2"
-                  placeholder="Select"
-                  style="width: 240px"
-                >
-                  <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
+                <el-select v-model="newSubmit.roleIds" multiple collapse-tags collapse-tags-tooltip
+                  :max-collapse-tags="2" placeholder="Select" style="width: 240px">
+                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
                 </el-select>
               </el-form-item>
             </el-form>
             <template #footer>
               <div class="dialog-footer">
                 <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-                <el-button
-                  type="info"
-                  @click="
-                    () => {
-                      newDialogVisible = false
-                    }
-                  "
-                >
+                <el-button type="info" @click="
+                  () => {
+                    newDialogVisible = false
+                  }
+                ">
                   取消
                 </el-button>
               </div>
@@ -179,17 +144,9 @@ const newDialogVisible = ref(false)
         <Table :tableData="tableData" :options="options" :setPage="setPage" />
         <div style="height: 20px"></div>
         <div style="right: 40px; bottom: 20px">
-          <el-pagination
-            style="float: right"
-            v-model:current-page="currentPage"
-            background
-            layout="prev, pager, next"
-            :total="total"
-            :page-size="8"
-            @prev-click="setPage(currentPage)"
-            @current-change="setPage(currentPage)"
-            @next-click="setPage(currentPage)"
-          />
+          <el-pagination style="float: right" v-model:current-page="currentPage" background layout="prev, pager, next"
+            :total="total" :page-size="8" @prev-click="setPage(currentPage)" @current-change="setPage(currentPage)"
+            @next-click="setPage(currentPage)" />
         </div>
       </el-card>
     </div>
@@ -199,18 +156,22 @@ const newDialogVisible = ref(false)
 .input {
   flex: 1;
 }
+
 .input span {
   width: 40px;
   text-align: left;
   padding: 0 10px;
   line-height: 32px;
 }
+
 .input .el-input {
   width: 240px;
 }
-.cardCenter  {
+
+.cardCenter {
   margin-bottom: 20px;
 }
+
 .el-button {
   margin-right: 10px;
   margin-bottom: 18px;
