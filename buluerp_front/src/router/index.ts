@@ -146,7 +146,6 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('Authorization') // 从本地存储获取 token
-
   if (to.name === 'Login') {
     next()
   } else if (to.name === 'Main') {
@@ -160,7 +159,6 @@ router.beforeEach((to, from, next) => {
   } else {
     if (token) {
       const store = useTabStore()
-      console.log(store.path2Label)
       if (Object.keys(store.path2Label).includes(to.name as string)) {
         store.setEditValue(to.name)
         next()

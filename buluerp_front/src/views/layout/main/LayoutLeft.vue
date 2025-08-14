@@ -6,57 +6,13 @@ const props = defineProps({
 import useMenuState from '@/stores/modules/menu.js'
 import { ref, onMounted } from 'vue'
 import { Grid, Memo, CircleCheck, User, Menu } from '@element-plus/icons-vue'
-import LoadingComponent from '@/components/Loading.vue'
 const menuStore = useMenuState()
 const menuOptions = ref([])
 onMounted(async () => {
   await menuStore.refreshMenu()
-  console.log('menuStore.menu.children:', menuStore.menu.children)
   menuOptions.value = menuStore.menu.children
 })
-import { defineAsyncComponent } from 'vue'
 
-const ComponentsGroup = {
-  UserInformation: () => import('@/views/person/main/Information.vue'),
-  CustomQuery: () => import('@/views/person/main/Custom.vue'),
-  Manufacturers: () => import('@/views/person/main/Manufacturers.vue'),
-  BusinessShow: () => import('@/views/business/main/Show.vue'),
-  BusinessQuery: () => import('@/views/business/main/Query.vue'),
-  ProQuery: () => import('@/views/production/main/Query.vue'),
-  ProMaterial: () => import('@/views/production/main/Material.vue'),
-  ProMaterialType: () => import('@/views/production/main/MaterialType.vue'),
-  DesignTable: () => import('@/views/production/main/DesignTable.vue'),
-  Admin: () => import('@/views/admin/Admin.vue'),
-  Audit: () => import('@/views/admin/Audit.vue'),
-  Role: () => import('@/views/admin/Role.vue'),
-  Log: () => import('@/views/admin/Log.vue'),
-  AuditPage: () => import('@/views/Audit/Audit.vue'),
-  PMInventoryList: () => import('@/views/PMcenter/inventory/main/List.vue'),
-  PMInventoryQuery: () => import('@/views/PMcenter/inventory/main/Query.vue'),
-  PMProcurementQuery: () => import('@/views/PMcenter/procurement/main/List.vue'),
-  PMProcurementPlan: () => import('@/views/PMcenter/procurement/main/Plan.vue'),
-  PMProcurementOut: () => import('@/views/PMcenter/procurement/main/Outpurchase.vue'),
-  PMProduceArrange: () => import('@/views/PMcenter/produce/main/Arrange.vue'),
-  PMProduceSchedule: () => import('@/views/PMcenter/produce/main/Schedule.vue'),
-  PMProducePackaging: () => import('@/views/PMcenter/produce/main/Packaging.vue'),
-}
-const LazyComponentsGroup = new Proxy(
-  {},
-  {
-    get(target, prop) {
-      if (!target[prop] && ComponentsGroup[prop]) {
-        // 首次访问时解析动态导入
-        target[prop] = defineAsyncComponent({
-          // 加载函数
-          loader: ComponentsGroup[prop],
-          // 加载异步组件时使用的组件
-          loadingComponent: LoadingComponent,
-        })
-      }
-      return target[prop]
-    },
-  },
-)
 const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
 </script>
 <template>
@@ -81,7 +37,7 @@ const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
           <el-menu-item
             :index="subItem.id"
             @click="
-              addTab(subItem.label, LazyComponentsGroup[subItem.path], null,subItem.path, subItem.children)
+              addTab(subItem.label, subItem.path, null,subItem.path, subItem.children)
             "
             v-if="!subItem.disabled && subItem.path != '/'"
           >
@@ -98,7 +54,7 @@ const IconGroup = { Grid, Memo, CircleCheck, User, Menu }
               @click="
                 addTab(
                   subSubItem.label,
-                  LazyComponentsGroup[subSubItem.path],
+                  subSubItem.path,
                   null,
                   subSubItem.path,
                   subSubItem.children,

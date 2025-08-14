@@ -15,6 +15,7 @@ const useTabStore = defineStore('tabs', {
     editableTabsValue: '',
     path2Label:{}
   }),
+  persist: { storage: sessionStorage },
   actions: {
     // 获取字典
     addTab(targetName, component, data, targetPath) {
@@ -38,6 +39,7 @@ const useTabStore = defineStore('tabs', {
         targetPath:targetPath,
         key: targetName,
       })
+      console.log(this.$state.editableTabs)
       router.push({path:targetPath})
       this.$state.editableTabsValue = targetPath
     },
