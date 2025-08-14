@@ -5,7 +5,7 @@
       <div style="display: flex; justify-content: space-between; align-items: center">
         <span>列表</span>
         <div>
-          <el-button type="danger" @click="onDelete" >删除</el-button>
+          <el-button type="danger" @click="onDelete">删除</el-button>
           <el-button type="primary" @click="onExport">导出</el-button>
         </div>
       </div>
@@ -33,11 +33,10 @@
       <el-table-column label="操作">
         <template #default="{ row }">
           <el-button link type="primary" @click="onEdit(row)">编辑</el-button>
-          <el-button link type="primary" @click="()=>{
-                      emit('onUpdated', { ...row,status:row.status+1 })
-                      emit('fetchData')
-                      }" 
-            v-if="[7,8,11,12,13].includes(row.status)">{{ resMap[row.status+1] }}</el-button>
+          <el-button link type="primary" @click="() => {
+            emit('onUpdated', { ...row, status: row.status + 1 })
+            emit('fetchData')
+          }" v-if="[7, 8, 11, 12, 13].includes(row.status)">{{ resMap[row.status + 1] }}</el-button>
           <el-button link type="primary" @click="onCheck(row)">查看</el-button>
         </template>
       </el-table-column>
@@ -83,18 +82,17 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { ElButton, ElTable, ElTableColumn, ElPagination, ElDialog, ElForm, ElFormItem, ElInput, ElMessageBox, ElAutocomplete, ElSelect, ElOption } from 'element-plus'
-import { deleteOrders } from '@/apis/orders'
+import { deleteOrders, exportOrder } from '@/apis/orders'
 import type { TableDataType } from '@/types/orderResponse'
 import BusinessDetail from '@/views/business/main/Detail.vue'
-import { exportToExcel } from '@/utils/file/exportExcel'
-import {  resMap } from '../utils/statusMap'
+import { resMap } from '../utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
 import useTabStore from '@/stores/modules/tabs'
-
+import { downloadBinaryFile } from '@/utils/file/base64'
 
 const props = defineProps<{
   // queryParams: Record<string, any>
-  addTab: (targetName: string, component: any, data?: any,targetPath?:string) => void
+  addTab: (targetName: string, component: any, data?: any, targetPath?: string) => void
   tableData: any[]
   pagination: {
     page: number
@@ -124,8 +122,8 @@ const columns = [
 const onCheck = (row: TableDataType) => {
   console.log('查看：', row)
   props.addTab(
-    `订单详情 ${row.id}`, 
-    BusinessDetail, 
+    `订单详情 ${row.id}`,
+    BusinessDetail,
     { addTab: props.addTab, id: row.id, orderCode: row.innerId, status: row.status, remark: row.remark, createTime: row.createTime, customerName: row.customerName, },
     `/business/BusinessDetail/${row.id}`,
 
@@ -205,36 +203,36 @@ const onDelete = async () => {
     messageBox('success', null, '已取消删除操作')
   }
 }
-// 导出字段配置，方便维护和扩展
-const exportFields = [
-  { label: '内部编号', key: 'innerId' },
-  { label: '外部编号', key: 'id' },
-  { label: '数量', key: 'quantity' },
-  { label: '交货期限', key: 'deliveryDeadline' },
-  { label: '交货时间', key: 'deliveryTime' },
-  { label: '状态', key: 'status' },
-  { label: '产品ID', key: 'productId' },
-  { label: '布产ID', key: 'productionId' },
-  { label: '外购ID', key: 'purchaseId' },
-  { label: '分包ID', key: 'subcontractId' },
-  { label: '其它信息', key: 'remark' },
-]
-
+// // 导出字段配置，方便维护和扩展
+// const exportFields = [
+//   { label: '内部编号', key: 'innerId' },
+//   { label: '外部编号', key: 'id' },
+//   { label: '数量', key: 'quantity' },
+//   { label: '交货期限', key: 'deliveryDeadline' },
+//   { label: '交货时间', key: 'deliveryTime' },
+//   { label: '状态', key: 'status' },
+//   { label: '产品ID', key: 'productId' },
+//   { label: '布产ID', key: 'productionId' },
+//   { label: '外购ID', key: 'purchaseId' },
+//   { label: '分包ID', key: 'subcontractId' },
+//   { label: '其它信息', key: 'remark' },
+// ]
+let count = 1
 const onExport = () => {
   if (selectedRows.value.length === 0) {
     messageBox('error', null, null, '请先选择要导出的订单')
     return
   }
-  const today = new Date()
-  const dateStr = today.toISOString().split('T')[0].replace(/-/g, '')
-  const exportData = selectedRows.value.map((item) => {
-    const row: Record<string, any> = {}
-    exportFields.forEach((field) => {
-      row[field.label] = item[field.key]
-    })
-    return row
+  const formData = new URLSearchParams()
+  const ids = selectedRows.value.map((ele) => {
+    return ele.id
   })
-  exportToExcel(exportData, `订单数据_${dateStr}`)
+  formData.append('ids', ids)
+  exportOrder(formData).then((res) => {
+    const now = new Date()
+    downloadBinaryFile(res, '订单数据_' + now.toLocaleDateString() + '_' + count + '.xlsx')
+    ++count
+  })
 }
 </script>
 
