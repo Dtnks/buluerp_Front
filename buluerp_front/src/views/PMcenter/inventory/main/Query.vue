@@ -8,7 +8,7 @@ import * as echarts from 'echarts'
 const type = ref('part')
 const refreshList = () => {
   storeRecording(page.value, pageSize.value, type.value).then((res) => {
-    console.log(res)
+     
     listData.value = res.rows
     total.value = res.total
   })
@@ -194,7 +194,6 @@ const chartDom = ref(null)
 //table 导出
 onMounted(() => {
   chartDom.value = document.getElementById('chart')
-  console.log(chartDom)
 })
 const ChartVisible = ref(false)
 const mapKey = {
@@ -299,7 +298,7 @@ const handleSizeChange = async (val: number) => {
   })
 }
 storeRecording(page.value, pageSize.value, type.value).then((res) => {
-  console.log(res)
+   
   listData.value = res.rows
   total.value = res.total
 })

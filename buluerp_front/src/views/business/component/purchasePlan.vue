@@ -242,15 +242,7 @@ const tableData = ref([
   },
 ])
 const operation = ref([
-  // {
-  //   func: (id) => {
-  //     console.log(id)
-  //     detailCustomer(id).then((res) => {
-  //       console.log(res)
-  //     })
-  //   },
-  //   value: '查看',
-  // },
+
   {
     func: (row) => {
       title.value = '编辑'
@@ -267,7 +259,6 @@ const operation = ref([
   {
     func: (row) => {
       finishPurchasePlan({ orderCode: row.orderCode }).then((res) => {
-        console.log(res)
         ElMessage.success(res.msg)
       })
     },
@@ -434,7 +425,7 @@ const handleSizeChange = async (val: number) => {
 
 //初次渲染
 listPurchasePlan(page.value, pageSize.value).then((res) => {
-  console.log(res)
+
   total.value = res.total
   listData.value = res.rows
 })

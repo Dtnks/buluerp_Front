@@ -48,7 +48,6 @@ export function getPackagingListByOrderId(orderId) {
   })
 }
 export function exportSelectTable(id) {
-  console.log(`system/packaging-list/export?ids=${id}`)
   return httpInstance({
     url: `system/packaging-list/export?id=${id}`,
     method: 'post',

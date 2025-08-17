@@ -9,12 +9,6 @@ const request = axios.create({
 // 请求拦截器
 request.interceptors.request.use(
   (config) => {
-    console.log(config.baseURL,'config.baseURL');
-    console.log(config.url,'config.url');
-    console.log(config,'config');
-
-
-
     const Authorization = localStorage.getItem('Authorization') // 获取 Authorization
     if (Authorization) {
       config.headers.Authorization = `Bearer ${Authorization}` // 设置请求头

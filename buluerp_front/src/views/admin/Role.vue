@@ -390,7 +390,6 @@ function handleUpdate(row) {
 /** 根据角色ID查询菜单树结构 */
 function getRoleMenuTreeselect(roleId) {
   return roleMenuTreeselect(roleId).then((response) => {
-    console.log()
     menuOptions.value = response.menus.filter((ele) => {
       if (ele.label == '前端菜单') {
         return ele

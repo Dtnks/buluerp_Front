@@ -126,15 +126,6 @@ const tableData = ref([
   },
 ])
 const operation = ref([
-  // {
-  //   func: (id) => {
-  //     console.log(id)
-  //     detailCustomer(id).then((res) => {
-  //       console.log(res)
-  //     })
-  //   },
-  //   value: '查看',
-  // },
   {
     func: (row) => {
       const id = row.id
@@ -238,7 +229,7 @@ const onSubmit = () => {
   searchContent.value.createTimeTo = parseTime(searchContent.value.createTime[1], '{y}-{m}-{d}')
   page.value = 1
   listPurchaseList(page.value, pageSize.value, searchContent.value).then((res) => {
-    console.log(res)
+     
     listData.value = res.rows
     total.value = res.total
   })
@@ -330,7 +321,7 @@ const handleSizeChange = async (val: number) => {
 
 //初次渲染
 listPurchaseList(page.value, pageSize.value).then((res) => {
-  console.log(res)
+   
   total.value = res.total
   listData.value = res.rows
 })

@@ -9,7 +9,6 @@ export function useDict(...args) {
   return (() => {
     args.forEach((dictType, index) => {
       res.value[dictType] = []
-      console.log(useDictStore())
       const dicts = useDictStore().getDict(dictType)
       if (dicts) {
         res.value[dictType] = dicts

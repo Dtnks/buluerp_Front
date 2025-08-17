@@ -7,6 +7,7 @@ import LoadingComponent from '@/components/Loading.vue'
 import { CircleClose } from '@element-plus/icons-vue'
 import useTabStore from '@/stores/modules/tabs'
 import router from '@/router'
+import BlankComponent from '@/router/BlankComponent.vue'
 // const editableTabsValue = ref('')
 const store = useTabStore()
 // const addTab = (targetName: string, component, data,targetPath?:string) => {
@@ -30,7 +31,11 @@ const ComponentsGroup = {
   Manufacturers: () => import('@/views/person/main/Manufacturers.vue'),
   BusinessShow: () => import('@/views/business/main/Show.vue'),
   BusinessQuery: () => import('@/views/business/main/Query.vue'),
+  BusinessDetail: () => import('@/views/business/main/Detail.vue'),
+  ProductionSchedule: () => import('@/views/business/component/productionSchedule.vue'),
+  PurchaseInfo: () => import('@/views/business/component/purchasePlan.vue'),
   ProQuery: () => import('@/views/production/main/Query.vue'),
+  ProductDetail: () => import('@/views/production/main/Detail.vue'),
   ProMaterial: () => import('@/views/production/main/Material.vue'),
   ProMaterialType: () => import('@/views/production/main/MaterialType.vue'),
   DesignTable: () => import('@/views/production/main/DesignTable.vue'),
@@ -47,17 +52,15 @@ const ComponentsGroup = {
   PMProduceArrange: () => import('@/views/PMcenter/produce/main/Arrange.vue'),
   PMProduceSchedule: () => import('@/views/PMcenter/produce/main/Schedule.vue'),
   PMProducePackaging: () => import('@/views/PMcenter/produce/main/Packaging.vue'),
+  PMProducePackagingDetail: () => import('@/views/PMcenter/produce/component/PackagingDetail.vue'),
 }
 const LazyComponentsGroup = new Proxy(
   {},
   {
     get(target, prop) {
       if (!target[prop] && ComponentsGroup[prop]) {
-        // 首次访问时解析动态导入
         target[prop] = defineAsyncComponent({
-          // 加载函数
           loader: ComponentsGroup[prop],
-          // 加载异步组件时使用的组件
           loadingComponent: LoadingComponent,
         })
       }

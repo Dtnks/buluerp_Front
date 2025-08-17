@@ -70,15 +70,7 @@ const tableData = ref([
   { value: 'creatTime', label: '创建时间', type: 'text' },
 ])
 const operation = ref([
-  // {
-  //   func: (id) => {
-  //     console.log(id)
-  //     detailCustomer(id).then((res) => {
-  //       console.log(res)
-  //     })
-  //   },
-  //   value: '查看',
-  // },
+
   {
     func: (row) => {
       const id = row.id
@@ -150,7 +142,6 @@ const onSubmit = () => {
 
   page.value = 1
   listCustomer(page.value, pageSize.value, searchContent.value).then((res) => {
-    console.log(res)
     listData.value = res.rows
     total.value = res.total
   })

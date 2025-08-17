@@ -19,10 +19,7 @@ onMounted(async () => {
   if (props.data.id) {
     detail.value = (await getOrderDetail(props.data.id))[0]
     // const productsRes = await getOderProducts(props.data.id)
-    // orderProduct.value = productsRes
-    console.log('detail.value', detail.value)
   } else {
-    console.log('找不到订单ID');
     messageBox('找不到订单ID', 'error')
   }
 })

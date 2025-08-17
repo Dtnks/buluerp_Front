@@ -50,7 +50,6 @@ export const getOrderDetailById = (id) => {
 
 // 新增
 export const postOrder = (data) => {
-  console.log('postOrder data:', data)
   return httpInstance({
     url: 'system/orders',
     method: 'post',

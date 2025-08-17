@@ -23,7 +23,6 @@ const useTabStore = defineStore('tabs', {
         if(targetName=='订单查询' && this.$state.orderFreshFn){
           this.$state.orderFreshFn()
         }
-        return
       }
       if(targetPath){
         this.$state.path2Label[targetPath] = targetName
@@ -39,7 +38,6 @@ const useTabStore = defineStore('tabs', {
         targetPath:targetPath,
         key: targetName,
       })
-      console.log(this.$state.editableTabs)
       router.push({path:targetPath})
       this.$state.editableTabsValue = targetPath
     },

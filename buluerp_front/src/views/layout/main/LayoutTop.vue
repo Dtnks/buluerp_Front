@@ -17,7 +17,6 @@ GetUserInfo().then((res) => {
 
 const total = ref(0)
 GetMessage().then((res) => {
-  console.log()
   if (res.data.total !== undefined) {
     total.value = res.data.total
   }

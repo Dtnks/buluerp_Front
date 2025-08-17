@@ -10,7 +10,6 @@ const useMenuState = defineStore('menu', {
         async refreshMenu() {
       await GetMenuInfo().then((res) => {
         this.$state.menu = getChildren(res[0])
-        console.log(this.$state.menu,'menu')
       })
     },
   },

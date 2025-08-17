@@ -366,7 +366,6 @@ const operation = ref([
   {
     func: (row) => {
       finishSchedule({ orderCode: row.orderCode }).then((res) => {
-        console.log({ orderCode: row.orderCode })
         ElMessage.success(res.msg)
       })
     },
@@ -527,7 +526,6 @@ const transSubmit = ref({
 
 })
 const handleSubmitTrans = () => {
-  console.log(ids.value)
   transSubmit.value.scheduledTime = parseTime(transSubmit.value.scheduledTime, '{y}-{m}-{d}')
   createTransFormRef.value.validateForm((valid) => {
     if (valid) {
@@ -574,7 +572,6 @@ const handleSizeChange = async (val: number) => {
 
 //初次渲染
 listSchedule(page.value, pageSize.value).then((res) => {
-  console.log(res)
   total.value = res.total
   listData.value = res.rows
 })

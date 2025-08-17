@@ -7,7 +7,6 @@ export async function GetMenuInfo() {
     url: '/system/menu/roleMenuTreeselect/' + id,
     method: 'get',
   })
-  console.log(menu, 'menu')
   let data = menu.menus.filter((ele) => {
     if (ele.label == '前端菜单') {
       return ele

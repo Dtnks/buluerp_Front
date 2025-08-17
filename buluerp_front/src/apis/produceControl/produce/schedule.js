@@ -115,7 +115,6 @@ export function importFile(formData) {
 }
 
 export function selectTransToArrange(data) {
-  console.log(data)
   return httpInstance({
     url: `system/production-arrange/from-schedule`,
     method: 'post',

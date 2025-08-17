@@ -26,31 +26,25 @@ export const useQueryTableDataStore = defineStore('table', () => {
   })
   // getOders: 获取订单数据(支持查询和分页)
   const getOrders = async () => {
-    try {
-      // 过滤掉空值或无效值
-      const validParams = Object.fromEntries(
-        Object.entries(queryParams).filter(
-          ([_, value]) => value !== '' && value !== null && value !== undefined,
-        ),
-      )
-      console.log('有效的查询参数：', validParams)
+    // 过滤掉空值或无效值
+    const validParams = Object.fromEntries(
+      Object.entries(queryParams).filter(
+        ([_, value]) => value !== '' && value !== null && value !== undefined,
+      ),
+    )
 
-      const res = await getOrdersList({
-        ...validParams,
-        page: pagination.current || 1,
-        pageSize: pagination.pageSize || 5,
-      })
-      tableData.value = res?.rows ?? []
-      total.value = res.total || 0
-    } catch (err) {
-      console.log('获取订单数据失败：', err)
-    }
+    const res = await getOrdersList({
+      ...validParams,
+      page: pagination.current || 1,
+      pageSize: pagination.pageSize || 5,
+    })
+    tableData.value = res?.rows ?? []
+    total.value = res.total || 0
   }
 
   // 设置查询条件
   const setQueryParams = (params: Record<string, any>) => {
     Object.assign(queryParams, params)
-    console.log('设置查询条件：', queryParams)
   }
 
   // 设置分页数据
@@ -64,38 +58,20 @@ export const useQueryTableDataStore = defineStore('table', () => {
 
   // addTableData: 添加订单数据
   const addTableData = (newData: TableDataType) => {
-    try {
-      console.log('添加订单数据--pinia：', newData)
-      tableData.value.push(newData)
-      // // 设置分页数据总数量
-      // pagination.total = res.total;
-    } catch (err) {
-      console.log('添加订单数据失败：', err)
-    }
+    tableData.value.push(newData)
+    // // 设置分页数据总数量
+    // pagination.total = res.total;
   }
 
   // editTableData: 编辑订单数据
   const editTableData = async (aditData: TableDataType) => {
-    try {
-      const res = await putOrder(aditData)
-      if (res.code === 200) {
-        console.log('编辑订单数据--pinia：', res)
+    await putOrder(aditData)
+    // 更新
+    const index = tableData.value.findIndex((item) => item.id === aditData.id)
+    tableData.value[index] = { ...tableData.value[index], ...aditData }
 
-        // 更新
-        const index = tableData.value.findIndex((item) => item.id === aditData.id)
-        if (index !== -1) {
-          tableData.value[index] = { ...tableData.value[index], ...aditData }
-        } else {
-          console.log('未找到要更新的订单数据')
-        }
-        // // 设置分页数据总数量
-        // pagination.total = res.total;
-      } else {
-        console.log('编辑订单数据失败：', res)
-      }
-    } catch (err) {
-      console.log('编辑订单数据失败：', err)
-    }
+    // // 设置分页数据总数量
+    // pagination.total = res.total;
   }
 
   return {

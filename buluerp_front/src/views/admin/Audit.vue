@@ -49,25 +49,21 @@ const auditTypeMap = {
 // auditSwitchList 查询审核开关列表
 const auditSwitchList = async () => {
   const res = await getAuditSwitchList()
-  console.log(res, '获取审核开关列表0000')
   tableData.value = res.rows
 }
 
 const handleSwitchChange = debounce(async (row: any) => {
-  console.log(row, 'row')
   // 这里可以添加逻辑来处理开关状态变化
   // 例如，调用API更新状态
   const res = await updateAuditSwitch(row.auditType, row.status)
 
-  console.log('更新成功', res)
   tabStore.freshTab('审核')
   messageBox('success', null, res.msg)
 }, 500) // 500ms防抖
 
-const getAuditEnabled = async (auditType: number) => {
-  const res = await getAuditSwitchEnabled(auditType)
-  console.log(res, '获取审核开关状态')
-}
+// const getAuditEnabled = async (auditType: number) => {
+//   const res = await getAuditSwitchEnabled(auditType)
+// }
 </script>
 
 <style scoped lang="less"></style>

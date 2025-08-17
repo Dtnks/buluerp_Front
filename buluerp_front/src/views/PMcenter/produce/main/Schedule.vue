@@ -688,7 +688,7 @@ const handleSizeChange = async (val: number) => {
 
 //初次渲染
 listSchedule(page.value, pageSize.value).then((res) => {
-  console.log(res)
+   
   total.value = res.total
   listData.value = res.rows
 })

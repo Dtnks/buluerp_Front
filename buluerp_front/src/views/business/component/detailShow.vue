@@ -94,19 +94,13 @@ import { getProductsByOrderId } from '../function/oders'
 import { getOrdersList, putOrder } from '@/apis/orders'
 import { parseTime } from '@/utils/ruoyi'
 import { ElButton, ElInput, ElDatePicker, ElRow, ElCol, ElTable, ElTableColumn, ElFooter, ElDialog, dayjs } from 'element-plus'
-import ProductionSchedule from './productionSchedule.vue'
 import { messageBox } from '@/components/message/messageBox'
-import PurchaseInfo from './purchasePlan.vue'
 import CreateForm from '@/components/form/CreateForm.vue'
 import useTabStore from '@/stores/modules/tabs'
 import { getPackagingListByOrderId, newPackaging } from '@/apis/produceControl/produce/packaging'
-import PackagingDetail from '@/views/PMcenter/produce/component/PackagingDetail.vue'
-import { searchFunc } from '@/utils/search/search'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
-import { getPurchaseInfo } from '@/apis/produceControl/purchase/purchaseInfo'
-import { getPurchaseListByOrderCode } from '@/apis/produceControl/purchase/purchaseList'
 import { getScheduleListByOrderId } from '@/apis/produceControl/produce/schedule'
-import { detailPurchasePlan, listPurchasePlanByOrderCode } from '@/apis/produceControl/purchase/purchasePlan'
+import { detailPurchasePlan } from '@/apis/produceControl/purchase/purchasePlan'
 // Props
 const props = defineProps<{
   detail: any
@@ -198,7 +192,7 @@ const fetchOrderProduct = async () => {
 const viewPuchaseOrder = (row: any) => {
   props.addTab(
     `订单${props.orderCode} 采购`,
-    PurchaseInfo,
+    'PurchaseInfo',
     { orderCode: props.orderCode, purchaseId: orderDetail.value.purchaseId, orderId: props.id },
     `/business/PurchaseInfo/${props.orderCode}`,
 
@@ -209,7 +203,7 @@ const viewPuchaseOrder = (row: any) => {
 const viewProductsSchedule = (row: any) => {
   props.addTab(
     `订单${props.orderCode} 布产`,
-    ProductionSchedule,
+    'ProductionSchedule',
     { orderCode: props.orderCode },
     `/business/ProductionSchedule/${props.orderCode}`,
 
@@ -223,7 +217,7 @@ const handleAction = (method: Function, row: any) => {
 
 const viewPackagingList = (row) => {
   getPackagingListByOrderId(props.orderCode).then((res) => {
-    props.addTab(`订单${props.orderCode} 分包`, PackagingDetail, res.rows[0].id,
+    props.addTab(`订单${props.orderCode} 分包`, 'PMProducePackagingDetail', res.rows[0].id,
     `/business/PackagingDetail/${props.orderCode}`)
   })
 }

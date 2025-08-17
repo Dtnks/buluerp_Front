@@ -1,7 +1,6 @@
 import httpInstance from '@/utils/httpsInstance.js'
 let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
 export function newArrange(data) {
-  console.log(data)
   return httpInstance({
     url: `system/production-arrange`,
     method: 'post',
@@ -15,7 +14,6 @@ export function newArrange(data) {
 }
 
 export function changeArrange(data) {
-  console.log(data)
   return httpInstance({
     url: `system/production-arrange`,
     method: 'put',

@@ -91,8 +91,6 @@ import { messageBox } from '@/components/message/messageBox'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 import { downloadBinaryFile } from '@/utils/file/base64'
 
-import Detail from '../main/Detail.vue'
-
 const props = defineProps<{
   queryParams: Record<string, any>
   addTab: (targetName: string, component: any, data?: any,targetPath?:string) => void
@@ -219,7 +217,7 @@ const onExport = async () => {
 }
 
 const onView = (row: any) => {
-  props.addTab(`产品详情页-${row.name}`, Detail, row, `/production/Detail/${row.id}`)
+  props.addTab(`产品详情页-${row.name}`, 'ProductDetail', row, `/production/Detail/${row.id}`)
 }
 </script>
 <style>

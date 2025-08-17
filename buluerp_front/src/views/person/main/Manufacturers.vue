@@ -60,15 +60,7 @@ const tableData = ref([
   { value: 'createTime', label: '创建时间', type: 'text' },
 ])
 const operation = ref([
-  // {
-  //   func: (id) => {
-  //     console.log(id)
-  //     detailCustomer(id).then((res) => {
-  //       console.log(res)
-  //     })
-  //   },
-  //   value: '查看',
-  // },
+
   {
     func: (row) => {
       const id = row.id
@@ -130,13 +122,10 @@ const onCreate = () => {
 }
 
 const onSubmit = () => {
-  console.log(searchContent.value)
   searchContent.value.createTimeFrom = parseTime(searchContent.value.creatTime[0], '{y}-{m}-{d}')
   searchContent.value.createTimeTo = parseTime(searchContent.value.creatTime[1], '{y}-{m}-{d}')
   page.value = 1
-  console.log(searchContent)
   listManufacturers(page.value, pageSize.value, searchContent.value).then((res) => {
-    console.log(res)
     listData.value = res.rows
     total.value = res.total
   })
@@ -231,7 +220,6 @@ const handleSizeChange = async (val: number) => {
 listManufacturers(page.value, pageSize.value).then((res) => {
   total.value = res.total
   listData.value = res.rows
-  console.log(res, '厂商')
 })
 </script>
 <template>
