@@ -23,6 +23,8 @@ const useTabStore = defineStore('tabs', {
         if(targetName=='订单查询' && this.$state.orderFreshFn){
           this.$state.orderFreshFn()
         }
+        this.$state.editableTabsValue = targetPath
+        return
       }
       if(targetPath){
         this.$state.path2Label[targetPath] = targetName
