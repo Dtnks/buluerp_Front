@@ -1,5 +1,15 @@
 <template>
-  <el-form ref="formRef" :model="Formvalue" :rules="formRules" label-width="120px">
+  <div v-if="title" style="width: 100%; height: 80px;">
+    <div>{{ title }}</div>
+      <!-- 使用 v-for 渲染列表数据 -->
+    <el-row :gutter="20" align="middle" v-for="(list, index) in data" :key="index">
+      <el-col :span="ele.width || 12" v-for="ele in list" :key="ele.label">
+        {{ele.label}}:{{ Formvalue[ele.key] }}
+      </el-col>
+    </el-row>
+      
+  </div>
+  <el-form v-else ref="formRef" :model="Formvalue" :rules="formRules" label-width="120px">
     <el-row :gutter="20" align="middle" v-for="(list, index) in data" :key="index">
       <el-col :span="ele.width || 12" v-for="ele in list" :key="ele.label">
         <el-form-item
@@ -165,6 +175,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  title:{
+    type:String,
+    default:''
+  }
 })
 // 从 data 中提取所有规则
 const formRules = computed(() => {
