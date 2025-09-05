@@ -90,15 +90,16 @@ import BordShow from '@/components/board/SecBoard.vue'
 
 import { TypeOptions, columns, getTypeOptions, formData } from './data/auditData'
 import { onMounted, onUnmounted, ref } from 'vue'
-import { getAuditList, getAuditOrderPending, getAuditProductionPending, getAuditPurchasePending, getAuditSubcontractPending, postAuditOder, postAuditProduction, postAuditPurchase, postAuditSubcontract, } from '@/apis/audit'
+import { getAuditDetail, getAuditList, getAuditOrderPending, getAuditProductionPending, getAuditPurchasePending, getAuditSubcontractPending, postAuditOder, postAuditProduction, postAuditPurchase, postAuditSubcontract, } from '@/apis/audit'
 import { resMap } from '../business/utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
-import { getOrderDetailById } from '@/apis/orders'
+import { getOrderDetailById, getOrderDetailByInnerId } from '@/apis/orders'
 import { getPurchasePlanDetail } from '@/apis/produceControl/purchase/purchasePlan'
 import { getPackagingDetail } from '@/apis/produceControl/produce/packaging'
 import { getProductionScheduleById } from '@/apis/produceControl/produce/schedule'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 import useTabStore from '@/stores/modules/tabs'
+import Log from '../admin/Log.vue'
 
 const type = ref('all')
 const isLoadingCompleted = ref(false)
@@ -159,7 +160,7 @@ const auditPostApiMap = {
 }
 
 const viewApiMap = {
-  order: getOrderDetailById,
+  order: getOrderDetailByInnerId,
   production: getProductionScheduleById,
   purchase: getPurchasePlanDetail,
   subcontract: getPackagingDetail,
@@ -240,14 +241,22 @@ const onCancel = () => {
 const detailData = ref<Record<string, any>>({})
 
 const dialogVisible = ref(false)
-const onView = async (auditType: number, auditId: number) => {
-  const api = viewApiMap[type.value as keyof typeof viewApiMap]
-  if (api) {
-    const res = await api(auditId)
 
-    dialogVisible.value = true
-    detailData.value = res.data || res.rows[0]
-    // 处理查看数据
+// onView: 用于查看审核详情
+const onView = async (auditType: number, auditId: number) => {
+  // const api = viewApiMap[type.value as keyof typeof viewApiMap]
+  // if (api) {
+  //   const res = await api(auditId)
+
+  //   dialogVisible.value = true
+  //   detailData.value = res.data[0] || res.rows[0]
+
+  // }
+  const res = await getAuditDetail(auditId, auditType)
+  if (res && res.data) {
+    console.log('获取审核详情', res);
+
+    detailData.value = { ...detailData.value, ...res.data }
   }
 }
 </script>

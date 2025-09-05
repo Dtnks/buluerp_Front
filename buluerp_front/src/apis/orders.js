@@ -48,6 +48,17 @@ export const getOrderDetailById = (id) => {
   })
 }
 
+// 根据内部编号查询订单详情
+export const getOrderDetailByInnerId = async (innerIds) => {
+  const res = await httpInstance({
+    url: `/system/orders/inner-id`,
+    method: 'get',
+    params: { innerIds },
+    headers: headers,
+  })
+  return res
+}
+
 // 新增
 export const postOrder = (data) => {
   console.log('postOrder data:', data)
