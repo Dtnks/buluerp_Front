@@ -28,7 +28,7 @@ export const getAuditSwitchEnabled = (auditType) => {
 // getAuditDetail: 获取审核详情
 export const getAuditDetail = (auditId, auditType) => {
   return httpInstance({
-    url: `system/audit/detail`,
+    url: `system/audit/detail/${auditId}`,
     params: { auditId, auditType },
     method: 'get',
     headers: headers,

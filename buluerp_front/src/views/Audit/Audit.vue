@@ -87,7 +87,7 @@
 
 <script setup lang="ts">
 import BordShow from '@/components/board/SecBoard.vue'
-
+import { getFullImageUrl } from '@/utils/image/getUrl'
 import { TypeOptions, columns, getTypeOptions, formData } from './data/auditData'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { getAuditDetail, getAuditList, getAuditOrderPending, getAuditProductionPending, getAuditPurchasePending, getAuditSubcontractPending, postAuditOder, postAuditProduction, postAuditPurchase, postAuditSubcontract, } from '@/apis/audit'
@@ -237,8 +237,9 @@ const onView = async (auditType: number, auditId: number) => {
   const res = await getAuditDetail(auditId, auditType)
   if (res && res.data) {
     console.log('获取审核详情', res);
-
+    dialogVisible.value = true
     detailData.value = { ...detailData.value, ...res.data }
+
   }
 }
 </script>
