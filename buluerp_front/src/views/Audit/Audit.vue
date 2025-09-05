@@ -97,8 +97,6 @@ import { getOrderDetailById, getOrderDetailByInnerId } from '@/apis/orders'
 import { getPurchasePlanDetail } from '@/apis/produceControl/purchase/purchasePlan'
 import { getPackagingDetail } from '@/apis/produceControl/produce/packaging'
 import { getProductionScheduleById } from '@/apis/produceControl/produce/schedule'
-import { getFullImageUrl } from '@/utils/image/getUrl'
-import useTabStore from '@/stores/modules/tabs'
 import Log from '../admin/Log.vue'
 
 const type = ref('all')
@@ -113,24 +111,10 @@ onMounted(async () => {
 
   const token = localStorage.getItem('Authorization');
   if (!token) {
-    console.error('Token 不存在');
     return;
   }
   ws = new WebSocket(`ws://154.201.77.135:8080/websocket/${token}`)
 
-  ws.onopen = () => {
-    console.log('WebSocket 连接已建立')
-  }
-  ws.onmessage = (event) => {
-    // 收到消息后刷新审核数据
-    fetchAuditData(true)
-  }
-  ws.onerror = (err) => {
-    console.error('WebSocket 错误', err)
-  }
-  ws.onclose = () => {
-    console.log('WebSocket 连接已关闭')
-  }
 })
 
 onUnmounted(() => {
@@ -140,7 +124,6 @@ onUnmounted(() => {
   }
 })
 const tableData = ref([])
-const tabStore = useTabStore()
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
@@ -197,7 +180,6 @@ const fetchAuditData = async (resetPage: boolean) => {
     const res = await api(page.value, pageSize.value)
     tableData.value = res.rows
     total.value = res.total
-    console.log('获取审核数据', res)
   }
 }
 

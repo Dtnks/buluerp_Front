@@ -9,7 +9,9 @@ import { useDict } from '@/utils/dict'
 import { download } from '@/utils/httpsInstance'
 import { parseTime, resetForm, addDateRange } from '@/utils/ruoyi.js'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
-const pinia = createPinia()
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+
+const pinia = createPinia().use(piniaPluginPersistedstate)
 
 const app = createApp(App)
 app.use(router).use(ElementPlus, { locale: zhCn }).use(pinia)

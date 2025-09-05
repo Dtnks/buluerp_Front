@@ -72,7 +72,6 @@ const handleSubmit = () => {
 
 const search = () => {
   currentPage.value = 1
-  console.log(searchContent.value)
   getUserList(currentPage.value, searchContent.value).then((res) => renderData(res))
 }
 const tableData = ref([])

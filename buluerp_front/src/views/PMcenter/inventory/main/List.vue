@@ -24,7 +24,7 @@ import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 const type = ref('packaging-material')
 const refreshList = () => {
   listRecording(page.value, pageSize.value, type.value).then((res) => {
-    console.log(res)
+     
     listData.value = res.rows
     total.value = res.total
   })
@@ -454,7 +454,7 @@ const handleSubmit = () => {
     if (valid) {
       if (title.value == '编辑') {
         changeRecording(newSubmit.value[type.value], type.value).then((res) => {
-          console.log(res)
+           
 
           page.value = 1
           listRecording(page.value, pageSize.value, type.value).then((res) => {
@@ -653,10 +653,9 @@ const onSubmit = () => {
     searchContent.value[type.value].creationTime[1],
     '{y}-{m}-{d}',
   )
-  console.log(searchContent.value[type.value])
   listRecording(page.value, pageSize.value, type.value, searchContent.value[type.value]).then(
     (res) => {
-      console.log(res)
+       
       listData.value = res.rows
       total.value = res.total
     },
@@ -753,7 +752,7 @@ const handleSizeChange = async (val: number) => {
   })
 }
 listRecording(page.value, pageSize.value, type.value).then((res) => {
-  console.log(res)
+   
   listData.value = res.rows
   total.value = res.total
 })

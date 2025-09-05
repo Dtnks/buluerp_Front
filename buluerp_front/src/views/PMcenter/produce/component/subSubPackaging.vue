@@ -128,7 +128,7 @@ const subSubDialogVisible = ref(false)
 const details = ref()
 const refresh = () => {
   Sub.getBagList(props.id).then((res) => {
-    console.log(res)
+     
     details.value = res.rows
   })
 }

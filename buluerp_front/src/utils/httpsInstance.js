@@ -64,7 +64,6 @@ httpInstance.interceptors.response.use(
         type: 'error',
         dangerouslyUseHTMLString: true,
       })
-      console.log(error_text)
       return Promise.reject(res.data)
     } else if (res.data.code === 506) {
       return res.data

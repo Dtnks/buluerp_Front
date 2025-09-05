@@ -2,11 +2,11 @@ import { defineStore } from 'pinia'
 import router from '@/router'
 function addDynamicRoute(name) {
   const route = {
-    path: `/${name}`, // 路径需唯一，可用 name 作为路径
+    path: `/${name}`,
     name,
-    component: () => import('@/views/empty/empty.vue'),
+    component: () => import('@/router/BlankComponent.vue'),
   }
-  router.addRoute('Main',route); // 动态添加
+  router.addRoute('Main',route); 
 }
 const useTabStore = defineStore('tabs', {
   state: () => ({
@@ -15,13 +15,17 @@ const useTabStore = defineStore('tabs', {
     editableTabsValue: '',
     path2Label:{}
   }),
+  persist: { storage: sessionStorage },
   actions: {
     // 获取字典
     addTab(targetName, component, data, targetPath) {
-      if (this.$state.editableTabs.filter((item) => item.title == targetName).length > 0) {
+      
+      if (this.$state.editableTabs.filter((item) => item.targetPath == targetPath).length > 0) {
+        console.log(targetName,this.$state.orderFreshFn)
         if(targetName=='订单查询' && this.$state.orderFreshFn){
           this.$state.orderFreshFn()
         }
+        this.$state.editableTabsValue = targetPath
         return
       }
       if(targetPath){

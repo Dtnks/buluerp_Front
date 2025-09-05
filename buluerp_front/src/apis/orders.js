@@ -61,7 +61,6 @@ export const getOrderDetailByInnerId = async (innerIds) => {
 
 // 新增
 export const postOrder = (data) => {
-  console.log('postOrder data:', data)
   return httpInstance({
     url: 'system/orders',
     method: 'post',

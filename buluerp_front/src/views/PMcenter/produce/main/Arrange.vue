@@ -183,7 +183,7 @@ const operation = ref([
   //   func: (id) => {
   //     console.log(id)
   //     detailCustomer(id).then((res) => {
-  //       console.log(res)
+  //        
   //     })
   //   },
   //   value: '查看',

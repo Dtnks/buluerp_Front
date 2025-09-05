@@ -84,7 +84,6 @@ import { reactive, ref } from 'vue'
 import { ElButton, ElTable, ElTableColumn, ElPagination, ElDialog, ElForm, ElFormItem, ElInput, ElMessageBox, ElAutocomplete, ElSelect, ElOption } from 'element-plus'
 import { deleteOrders, exportOrder } from '@/apis/orders'
 import type { TableDataType } from '@/types/orderResponse'
-import BusinessDetail from '@/views/business/main/Detail.vue'
 import { resMap } from '../utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
 import useTabStore from '@/stores/modules/tabs'
@@ -120,10 +119,9 @@ const columns = [
 
 
 const onCheck = (row: TableDataType) => {
-  console.log('查看：', row)
   props.addTab(
     `订单详情 ${row.id}`,
-    BusinessDetail,
+    'BusinessDetail',
     { addTab: props.addTab, id: row.id, orderCode: row.innerId, status: row.status, remark: row.remark, createTime: row.createTime, customerName: row.customerName, },
     `/business/BusinessDetail/${row.id}`,
 

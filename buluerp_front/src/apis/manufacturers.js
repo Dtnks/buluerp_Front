@@ -1,7 +1,6 @@
 import httpInstance from '@/utils/httpsInstance.js'
 let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
 export function newManufacturers(data) {
-  console.log(data, 'data')
   return httpInstance({
     url: `system/manufacturer`,
     method: 'post',
@@ -28,7 +27,6 @@ export function detailManufacturers(id) {
 }
 
 export function deleteManufacturers(ids) {
-  console.log(`system/manufacturer/${ids.join(',')}`)
   return httpInstance({
     url: `system/manufacturer/${ids.join(',')}`,
     method: 'delete',
