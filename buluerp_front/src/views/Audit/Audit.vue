@@ -76,7 +76,7 @@
       <el-form-item v-for="item in formData[type]" :key="item.value" :label="item.label" class="form-item">
         <span class="form-value" v-if="detailData[item.value] && item.value != 'pictureUrl'">{{
           detailData[item.value]
-          }}</span>
+        }}</span>
         <el-image v-else-if="detailData[item.value] && item.value == 'pictureUrl'"
           :src="getFullImageUrl(detailData[item.value])"></el-image>
         <span class="form-value" v-else>暂无数据</span>
@@ -93,11 +93,10 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import { getAuditDetail, getAuditList, getAuditOrderPending, getAuditProductionPending, getAuditPurchasePending, getAuditSubcontractPending, postAuditOder, postAuditProduction, postAuditPurchase, postAuditSubcontract, } from '@/apis/audit'
 import { resMap } from '../business/utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
-import { getOrderDetailById, getOrderDetailByInnerId } from '@/apis/orders'
+import { getOrderDetailByInnerId } from '@/apis/orders'
 import { getPurchasePlanDetail } from '@/apis/produceControl/purchase/purchasePlan'
 import { getPackagingDetail } from '@/apis/produceControl/produce/packaging'
 import { getProductionScheduleById } from '@/apis/produceControl/produce/schedule'
-import Log from '../admin/Log.vue'
 
 const type = ref('all')
 const isLoadingCompleted = ref(false)
@@ -226,17 +225,8 @@ const dialogVisible = ref(false)
 
 // onView: 用于查看审核详情
 const onView = async (auditType: number, auditId: number) => {
-  // const api = viewApiMap[type.value as keyof typeof viewApiMap]
-  // if (api) {
-  //   const res = await api(auditId)
-
-  //   dialogVisible.value = true
-  //   detailData.value = res.data[0] || res.rows[0]
-
-  // }
   const res = await getAuditDetail(auditId, auditType)
   if (res && res.data) {
-    console.log('获取审核详情', res);
     dialogVisible.value = true
     detailData.value = { ...detailData.value, ...res.data }
 
