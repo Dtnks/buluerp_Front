@@ -24,6 +24,7 @@ const renderData = (res) => {
   }))
   total.value = res.total
 }
+
 setPage()
 getOptionselect().then((res) => {
   options.value = res.rows.map(({ roleName, roleId }) => ({ value: roleId, label: roleName }))
