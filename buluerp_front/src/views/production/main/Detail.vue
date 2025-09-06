@@ -6,7 +6,7 @@ import StyleList from '../component/styleList.vue'
 import { getProductDetail } from '@/apis/products.js'
 import { getMaterialList } from '@/apis/materials.js'
 
-const props = defineProps<{ data: any; control: Array<object> }>()
+const props = defineProps<{ data: any }>()
 
 const detail = ref(props.data)
 const basicInfoRef = ref()
@@ -20,7 +20,7 @@ const refreshBasicInfo = () => {
 <template>
   <div class="col">
     <BordShow content="产品详情页" path="产品管理/详情" />
-    <basicInfomation ref="basicInfoRef" v-if="detail" :detail="detail" :materialData="materialData" :control="control" />
-    <StyleList v-if="detail" :detail="detail"  :control="control" @refresh="refreshBasicInfo"/>
+    <basicInfomation ref="basicInfoRef" v-if="detail" :detail="detail" :materialData="materialData"  />
+    <StyleList v-if="detail" :detail="detail"  @refresh="refreshBasicInfo"/>
   </div>
 </template>

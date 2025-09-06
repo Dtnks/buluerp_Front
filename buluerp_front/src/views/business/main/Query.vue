@@ -3,9 +3,9 @@
     <el-config-provider :locale="zhCn">
       <BordShow content="业务订单查询列表" path="业务中心/查询" />
       <div class="greyBack">
-        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd" :control="control"
+        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd"
           @customerSuggestions="customerSuggestions" @checkCustomerName="checkCustomerName"></QueryForm>
-        <QueryTable :addTab="props.addTab" :pagination="pagination" :tableData="tableData" :control="control"
+        <QueryTable :addTab="props.addTab" :pagination="pagination" :tableData="tableData"
           @onPageChange="handlePageChange" @onPageSizeChange="handleSizeChange" @fetchData="fetchTableData"
           @onUpdated="handleUpdate" @customerSuggestions="customerSuggestions" @checkCustomerName="checkCustomerName">
         </QueryTable>
@@ -28,8 +28,8 @@ import { listCustomerAll } from '@/apis/custom'
 import useTabStore from '@/stores/modules/tabs'
 
 const props = defineProps<{
-  addTab: (targetName: string, component: any, data?: any, control?: Array<object>) => void
-  control: Array<object>
+  addTab: (targetName: string, component: any, data?: any, targetPath?: string) => void
+
 }>()
 const tabStore = useTabStore()
 // pagination: 分页数据
@@ -70,13 +70,12 @@ tabStore.addOrderFresh(fetchTableData)
 const handleQuery = (params: any) => {
   pagination.page = 1 // 查询时重置页码为 1
   Object.assign(queryParams, params) // 更新查询条件
-  console.log('查询参数(handleQuery)', params)
   fetchTableData()
 }
 
 // handleAdd: 处理新增
 const handleAdd = async (newData: TableDataType) => {
-  const res = await addOrder(newData)
+  await addOrder(newData)
   messageBox('success', null, '订单已成功添加')
   fetchTableData()
   tabStore.freshTab('审核')
@@ -84,9 +83,7 @@ const handleAdd = async (newData: TableDataType) => {
 
 // handleUpdate: 处理编辑更新
 const handleUpdate = async (updatedData: TableDataType) => {
-  const res = await putOrder(updatedData)
-  console.log(res)
-  console.log('更新结果(handelUpdate):', res)
+  await putOrder(updatedData)
   messageBox('success', null, '订单已成功更新')
   fetchTableData()
   tabStore.freshTab('审核')
@@ -131,7 +128,6 @@ const customerSuggestions = async (queryString: string, cb) => {
 const checkCustomerName = async (customerName: string) => {
   await customerSuggestions(customerName, (suggestions) => {
     suggestionResult.value = suggestions
-    console.log('校验客户姓名:', suggestionResult.value)
     if (suggestionResult.value.length === 0) {
       messageBox('error', null, null, '没有找到匹配的客户姓名, 请先添加客户')
     }

@@ -1,9 +1,8 @@
 <template>
   <Form :data="data" :title="title" :onSubmit="onSubmit" :onCreate="onCreate" :onImport="onImport"
-    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm" :control="control" :formState="formState"></Form>
+    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm" :formState="formState"></Form>
   <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
     <el-form :model="dialogForm">
-
       <el-form-item label="客户姓名">
         <el-autocomplete v-model="dialogForm.customerName" :fetch-suggestions="customerSuggestions" :value-key="'value'"
           @blur="checkCustomerName" placeholder="请输入" />
@@ -50,9 +49,8 @@ import { format } from 'date-fns'
 import type { SubmitFormType } from '../types'
 
 const dialogFormVisible = ref(false)
-console.log(resMap,'resMap')
 const emit = defineEmits(['onSubmit', 'onAdd', 'checkCustomerName', 'customerSuggestions'])
-defineProps(['control'])
+
 const dialogForm = reactive({
   status: 0, // 确保 status 有默认值
   createTime: '',
@@ -182,7 +180,6 @@ const onAddCancel = () => {
 // onAddConfirm: 确认新增订单
 const onAddConfirm = () => {
   emit('onAdd', { ...dialogForm })
-  console.log('新增订单数据：', { ...dialogForm })
   dialogFormVisible.value = false
   dialogForm.customerName = ''
   dialogForm.innerId = ''
@@ -197,19 +194,16 @@ const onImport = () => {
 
 // 文件校验（限制大小）
 const beforeUpload = (file: File) => {
-  console.log('beforeUpload file:mmmmmmm')
 
   const isExcel =
     file.type === 'application/vnd.ms-excel' ||
     file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   const isLt5M = file.size / 1024 / 1024 < 5
   if (!isExcel) {
-    console.log('beforeUpload file: !isExcel')
     messageBox('error', null, null, '只能上传 xls/xlsx 文件')
     return false
   }
   if (!isLt5M) {
-    console.log('beforeUpload file: !isLt5M')
     messageBox('error', null, null, '文件大小不能超过 5MB')
     return false
   }

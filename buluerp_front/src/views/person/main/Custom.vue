@@ -18,7 +18,6 @@ import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { ElMessage, ElMessageBox, FormInstance, FormRules } from 'element-plus'
-const props = defineProps(['control'])
 
 // 定义表单校验规则
 const rules = ref<FormRules>({
@@ -71,15 +70,7 @@ const tableData = ref([
   { value: 'creatTime', label: '创建时间', type: 'text' },
 ])
 const operation = ref([
-  // {
-  //   func: (id) => {
-  //     console.log(id)
-  //     detailCustomer(id).then((res) => {
-  //       console.log(res)
-  //     })
-  //   },
-  //   value: '查看',
-  // },
+
   {
     func: (row) => {
       const id = row.id
@@ -88,7 +79,6 @@ const operation = ref([
       newSubmit.value = { ...row }
     },
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
 ])
 
@@ -152,7 +142,6 @@ const onSubmit = () => {
 
   page.value = 1
   listCustomer(page.value, pageSize.value, searchContent.value).then((res) => {
-    console.log(res)
     listData.value = res.rows
     total.value = res.total
   })
@@ -262,7 +251,6 @@ listCustomer(page.value, pageSize.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent"
-        :control="control"
       />
       <TableList
         :tableData="tableData"
@@ -270,7 +258,6 @@ listCustomer(page.value, pageSize.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
-        :control="control"
       >
         <slot>
           <div

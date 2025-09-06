@@ -61,14 +61,14 @@ const value = ref('')
 
           <div class="box col" style="top: 86px; left: 768px">
             <div>待布产</div>
-            <div>{{ orderStateCount['待制定布产计划']||0 }}笔</div>
+            <div>{{ orderStateCount['待定制布产计划']||0 }}笔</div>
           </div>
           <div class="toright" style="top: 140px; left: 883px"></div>
           <div class="arrow-right" style="top: 129px; left: 979px"></div>
 
           <div class="box col" style="top: 86px; left: 998px">
             <div>待排产</div>
-            <div>{{ orderStateCount['待排产']||0}}笔</div>
+            <div>{{ orderStateCount['布产计划已定制(待排产)']||0}}笔</div>
           </div>
           <div class="toright" style="top: 140px; left: 1113px"></div>
           <div class="arrow-right" style="top: 129px; left: 1209px"></div>
@@ -88,35 +88,35 @@ const value = ref('')
           <div class="arrow-bottom" style="top: 259px; left: 1507px"></div>
           <div class="box col" style="top: 281px; left: 1460px">
               <div>齐料入库</div>
-              <div>{{ orderStateCount['已齐料入库(待套料)']||0 }}笔</div>
+              <div>{{ orderStateCount['已齐料入库(待拉线)']||0 }}笔</div>
           </div>
           <div class="toright" style="top: 335px; left: 1344px"></div>
           <div class="arrow-left" style="top: 324px; left: 1344px"></div>
 
           <div class="box col" style="top: 281px; left: 1228px">
-            <div>套料中</div>
-            <div>{{ orderStateCount['套料中']||0 }}笔</div>
+            <div>拉线组包中</div>
+            <div>{{ orderStateCount['拉线组包中']||0 }}笔</div>
           </div>
           <div class="toright" style="top: 335px; left: 1113px"></div>
           <div class="arrow-left" style="top: 324px; left: 1113px"></div>
 
           <div class="box col" style="top: 281px; left: 998px">
-            <div>待拉线</div>
-            <div>{{ orderStateCount['套料完成(待拉线)']||0 }}笔</div>
+            <div>待套料</div>
+            <div>{{ orderStateCount['拉线完成(待套料)']||0 }}笔</div>
           </div>
           <div class="toright" style="top: 335px; left: 883px"></div>
           <div class="arrow-left" style="top: 324px; left: 883px"></div>
 
           <div class="box col" style="top: 281px; left: 768px">
-            <div>拉线组包中</div>
-            <div>{{ orderStateCount['拉线组包中']||0 }}笔</div>
+            <div>套料中</div>
+            <div>{{ orderStateCount['套料中']||0 }}笔</div>
           </div>
           <div class="toright" style="top: 335px; left: 653px"></div>
           <div class="arrow-left" style="top: 324px; left: 653px"></div>
 
           <div class="box col" style="top: 281px; left: 538px">
-            <div>分包已入库</div>
-            <div>{{ orderStateCount['拉线完成(分包已入库)']||0 }}笔</div>
+            <div>待包装</div>
+            <div>{{ orderStateCount['套料完成(待包装)']||0 }}笔</div>
           </div>
           <div class="toright" style="top: 335px; left: 422px"></div>
           <div class="arrow-left" style="top: 324px; left: 422px"></div>

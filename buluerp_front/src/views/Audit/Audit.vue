@@ -76,7 +76,7 @@
       <el-form-item v-for="item in formData[type]" :key="item.value" :label="item.label" class="form-item">
         <span class="form-value" v-if="detailData[item.value] && item.value != 'pictureUrl'">{{
           detailData[item.value]
-          }}</span>
+        }}</span>
         <el-image v-else-if="detailData[item.value] && item.value == 'pictureUrl'"
           :src="getFullImageUrl(detailData[item.value])"></el-image>
         <span class="form-value" v-else>暂无数据</span>
@@ -87,18 +87,16 @@
 
 <script setup lang="ts">
 import BordShow from '@/components/board/SecBoard.vue'
-
+import { getFullImageUrl } from '@/utils/image/getUrl'
 import { TypeOptions, columns, getTypeOptions, formData } from './data/auditData'
 import { onMounted, onUnmounted, ref } from 'vue'
-import { getAuditList, getAuditOrderPending, getAuditProductionPending, getAuditPurchasePending, getAuditSubcontractPending, postAuditOder, postAuditProduction, postAuditPurchase, postAuditSubcontract, } from '@/apis/audit'
+import { getAuditDetail, getAuditList, getAuditOrderPending, getAuditProductionPending, getAuditPurchasePending, getAuditSubcontractPending, postAuditOder, postAuditProduction, postAuditPurchase, postAuditSubcontract, } from '@/apis/audit'
 import { resMap } from '../business/utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
-import { getOrderDetailById } from '@/apis/orders'
+import { getOrderDetailByInnerId } from '@/apis/orders'
 import { getPurchasePlanDetail } from '@/apis/produceControl/purchase/purchasePlan'
 import { getPackagingDetail } from '@/apis/produceControl/produce/packaging'
 import { getProductionScheduleById } from '@/apis/produceControl/produce/schedule'
-import { getFullImageUrl } from '@/utils/image/getUrl'
-import useTabStore from '@/stores/modules/tabs'
 
 const type = ref('all')
 const isLoadingCompleted = ref(false)
@@ -112,24 +110,10 @@ onMounted(async () => {
 
   const token = localStorage.getItem('Authorization');
   if (!token) {
-    console.error('Token 不存在');
     return;
   }
   ws = new WebSocket(`ws://154.201.77.135:8080/websocket/${token}`)
 
-  ws.onopen = () => {
-    console.log('WebSocket 连接已建立')
-  }
-  ws.onmessage = (event) => {
-    // 收到消息后刷新审核数据
-    fetchAuditData(true)
-  }
-  ws.onerror = (err) => {
-    console.error('WebSocket 错误', err)
-  }
-  ws.onclose = () => {
-    console.log('WebSocket 连接已关闭')
-  }
 })
 
 onUnmounted(() => {
@@ -139,7 +123,6 @@ onUnmounted(() => {
   }
 })
 const tableData = ref([])
-const tabStore = useTabStore()
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
@@ -159,7 +142,7 @@ const auditPostApiMap = {
 }
 
 const viewApiMap = {
-  order: getOrderDetailById,
+  order: getOrderDetailByInnerId,
   production: getProductionScheduleById,
   purchase: getPurchasePlanDetail,
   subcontract: getPackagingDetail,
@@ -196,7 +179,6 @@ const fetchAuditData = async (resetPage: boolean) => {
     const res = await api(page.value, pageSize.value)
     tableData.value = res.rows
     total.value = res.total
-    console.log('获取审核数据', res)
   }
 }
 
@@ -240,14 +222,14 @@ const onCancel = () => {
 const detailData = ref<Record<string, any>>({})
 
 const dialogVisible = ref(false)
-const onView = async (auditType: number, auditId: number) => {
-  const api = viewApiMap[type.value as keyof typeof viewApiMap]
-  if (api) {
-    const res = await api(auditId)
 
+// onView: 用于查看审核详情
+const onView = async (auditType: number, auditId: number) => {
+  const res = await getAuditDetail(auditId, auditType)
+  if (res && res.data) {
     dialogVisible.value = true
-    detailData.value = res.data || res.rows[0]
-    // 处理查看数据
+    detailData.value = { ...detailData.value, ...res.data }
+
   }
 }
 </script>

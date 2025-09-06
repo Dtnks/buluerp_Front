@@ -45,8 +45,8 @@ import Tablelist from '@/components/table/TableList.vue'
 
 const props = defineProps<{
   queryParams: Record<string, any>
-  addTab: (targetName: string, component: any, data?: any) => void
-  control: Array<object>
+  addTab: (targetName: string, component: any, data?: any,targetPath?:string) => void
+
 }>()
 
 const data = ref([])
@@ -102,7 +102,7 @@ const tableData = [
 const operations = [
   {
     value: '查看',
-    func: (row: any) => props.addTab(`产品详情页-${row.name}`, Detail, row, props.control),
+    func: (row: any) => props.addTab(`产品详情页-${row.name}`, 'ProductDetail', row, `/production/Detail/${row.id}`),
   },
 ]
 
@@ -145,5 +145,9 @@ const onExport = async (rows: any[]) => {
   } catch (err) {
     messageBox('error', null, '', '导出失败', '')
   }
+}
+
+const onView = (row: any) => {
+  props.addTab(`产品详情页-${row.name}`, 'ProductDetail', row, `/production/Detail/${row.id}`)
 }
 </script>

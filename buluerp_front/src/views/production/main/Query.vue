@@ -5,8 +5,8 @@ import SearchForm from '../component/searchForm.vue'
 import SearchList from '../component/searchList.vue'
 
 const props = defineProps<{
-  addTab: (targetName: string, component: any, data?: any) => void
-  control: Array<object>
+  addTab: (targetName: string, component: any, data?: any,targetPath?:string) => void
+
 }>()
 
 const searchParams = ref<Record<string, any>>({}) // 初始为空对象
@@ -36,9 +36,9 @@ const handleCreated = () => {
   <div class="col">
     <BordShow content="产品查询列表" path="产品管理/查询" />
     <div class="greyBack">
-      <SearchForm @search="handleSearch" @created="handleCreated" :control="control"  />
+      <SearchForm @search="handleSearch" @created="handleCreated"  />
 
-        <SearchList :queryParams="searchParams" :addTab="props.addTab" :control="control" />
+        <SearchList :queryParams="searchParams" :addTab="props.addTab"  />
 
     </div>
   </div>

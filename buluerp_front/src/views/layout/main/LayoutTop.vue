@@ -17,7 +17,6 @@ GetUserInfo().then((res) => {
 
 const total = ref(0)
 GetMessage().then((res) => {
-  console.log()
   if (res.data.total !== undefined) {
     total.value = res.data.total
   }
@@ -59,6 +58,8 @@ const logout = () => {
           props.addTab(
             '我的信息',
             defineAsyncComponent(() => import('@/views/person/main/Information.vue')),
+            null,
+            '/UserInformation',
           )
         "
       >

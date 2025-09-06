@@ -20,7 +20,6 @@ import { messageBox } from '@/components/message/messageBox'
 import { ElMessageBox } from 'element-plus'
 import { searchFunc } from '@/utils/search/search'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
-const props = defineProps(['control'])
 //渲染页面
 const formData = ref([
   [
@@ -105,7 +104,7 @@ const operation = ref([
   //   func: (id) => {
   //     console.log(id)
   //     detailCustomer(id).then((res) => {
-  //       console.log(res)
+  //        
   //     })
   //   },
   //   value: '查看',
@@ -121,15 +120,8 @@ const operation = ref([
       })
     },
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
-  // {
-  //   func: (row) => {
-  //     props.addTab('外购资料-' + row.id, InfoDetail, row, null)
-  //   },
-  //   value: '查看',
-  //   disabled: false,
-  // },
+
 ])
 
 //新增与修改
@@ -285,7 +277,7 @@ const handleSizeChange = async (val: number) => {
 
 //初次渲染
 listPurchaseInfo(page.value, pageSize.value).then((res) => {
-  console.log(res)
+   
   total.value = res.total
   listData.value = res.rows
 })
@@ -302,7 +294,7 @@ listPurchaseInfo(page.value, pageSize.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent"
-        :control="control"
+
       />
       <TableList
         :tableData="tableData"
@@ -310,7 +302,7 @@ listPurchaseInfo(page.value, pageSize.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
-        :control="control"
+
       >
         <slot>
           <div

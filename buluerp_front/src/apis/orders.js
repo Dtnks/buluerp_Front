@@ -11,14 +11,14 @@ export function getOrdersList(params = {}) {
     params,
   })
 }
-export const getDesignIdByOrderCode=(orderCode)=>{
+export const getDesignIdByOrderCode = (orderCode) => {
   return httpInstance({
     url: 'system/orders/designId',
     method: 'get',
     params: { orderCode },
     headers: headers,
   })
-} 
+}
 export const editOder = (data) => {
   return httpInstance({
     url: 'system/orders/edit',
@@ -48,9 +48,19 @@ export const getOrderDetailById = (id) => {
   })
 }
 
+// 根据内部编号查询订单详情
+export const getOrderDetailByInnerId = async (innerIds) => {
+  const res = await httpInstance({
+    url: `/system/orders/inner-id`,
+    method: 'get',
+    params: { innerIds },
+    headers: headers,
+  })
+  return res
+}
+
 // 新增
 export const postOrder = (data) => {
-  console.log('postOrder data:', data)
   return httpInstance({
     url: 'system/orders',
     method: 'post',
@@ -87,6 +97,25 @@ export function getProductTemplate() {
     url: 'system/orders/export/template',
     method: 'get',
     responseType: 'blob',
+  })
+}
+
+// 导出
+// export const exportOrder = (ids) => {
+//   return httpInstance({
+//     url: `system/orders/export`,
+//     method: 'post',
+//     data: { ids },
+//     headers: headers,
+//   })
+// }
+export function exportOrder(data) {
+  return httpInstance({
+    url: `system/orders/export`,
+    method: 'post',
+    headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
+    responseType: 'blob',
+    data: data,
   })
 }
 

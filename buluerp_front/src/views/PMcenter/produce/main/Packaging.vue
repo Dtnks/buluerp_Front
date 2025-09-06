@@ -17,11 +17,10 @@ import { ref, nextTick } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { searchFunc } from '@/utils/search/search'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
-import PackagingDetail from '@/views/PMcenter/produce/component/PackagingDetail.vue'
-const props = defineProps(['control', 'addTab'])
+const props = defineProps([ 'addTab'])
 const createFormRef = ref()
 //渲染页面
 const formData = ref([
@@ -249,7 +248,7 @@ const operation = ref([
   //   func: (id) => {
   //     console.log(id)
   //     detailCustomer(id).then((res) => {
-  //       console.log(res)
+  //        
   //     })
   //   },
   //   value: '查看',
@@ -265,7 +264,6 @@ const operation = ref([
       })
     },
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
   {
     func: (row) => {
@@ -281,11 +279,10 @@ const operation = ref([
         })
     },
     value: '分包完成',
-    disabled: props.control[1].disabled,
   },
   {
     func: (row) => {
-      props.addTab('分包-' + row.id, PackagingDetail, row.id, null)
+      props.addTab('分包-' + row.id, 'PMProducePackagingDetail', row.id,`main/PackagingDetail/${row.id}`)
     },
     value: '查看',
     disabled: false,
@@ -392,7 +389,7 @@ const exportFunc = (row) => {
   }
   for (const i in row) {
     exportSelectTable(row[i].id).then((res) => {
-      console.log(res)
+       
       const now = new Date()
       downloadBinaryFile(
         res,
@@ -450,7 +447,7 @@ const handleSizeChange = async (val: number) => {
 
 //初次渲染
 listPackaging(page.value, pageSize.value).then((res) => {
-  console.log(res)
+  console.log(res,'detail')
   total.value = res.total
   listData.value = res.rows
 })
@@ -467,7 +464,6 @@ listPackaging(page.value, pageSize.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent"
-        :control="control"
       />
       <TableList
         :tableData="tableData"
@@ -475,7 +471,6 @@ listPackaging(page.value, pageSize.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
-        :control="control"
       >
         <slot>
           <div

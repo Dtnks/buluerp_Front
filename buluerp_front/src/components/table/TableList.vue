@@ -19,7 +19,6 @@
                 select.clearSelection()
               }
             "
-            :disabled="control[2].disabled"
             >删除</el-button
           >
           <el-button
@@ -107,7 +106,6 @@ defineProps([
   'listData',
   'exportFunc',
   'DeleteFunc',
-  'control',
   'exportCharts',
   'transToArrange',
 ])

@@ -12,6 +12,14 @@ export function newPurchaseList(data) {
   })
 }
 
+export function getPurchaseListByOrderCode(orderCode) {
+  return httpInstance({
+    url: `system/purchase/order/list?orderCode=${orderCode}`,
+    method: 'get',
+    headers: headers,
+  })
+}
+
 export function changePurchaseList(data) {
   return httpInstance({
     url: `system/purchase/order`,

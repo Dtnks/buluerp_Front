@@ -18,7 +18,6 @@
             <el-button
               type="primary"
               @click="onCreate"
-              :disabled="control[0].disabled"
               style="width: auto"
               v-if="onCreate"
               >新建</el-button
@@ -49,7 +48,6 @@ const props = defineProps([
   'onDownloadTemplate',
   'formState',
   'searchForm',
-  'control',
 ])
 const onClear = () => {
   // props.searchForm = {}

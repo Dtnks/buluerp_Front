@@ -1,50 +1,71 @@
-import { add } from 'date-fns'
 import { defineStore } from 'pinia'
-
+import router from '@/router'
+function addDynamicRoute(name) {
+  const route = {
+    path: `/${name}`,
+    name,
+    component: () => import('@/router/BlankComponent.vue'),
+  }
+  router.addRoute('Main',route); 
+}
 const useTabStore = defineStore('tabs', {
   state: () => ({
     editableTabs: [],
-    orderFreshFn:undefined
+    orderFreshFn:undefined,
+    editableTabsValue: '',
+    path2Label:{}
   }),
+  persist: { storage: sessionStorage },
   actions: {
     // 获取字典
-    addTab(targetName, component, data, control = null) {
-      if (this.$state.editableTabs.filter((item) => item.title == targetName).length > 0) {
+    addTab(targetName, component, data, targetPath) {
+      
+      if (this.$state.editableTabs.filter((item) => item.targetPath == targetPath).length > 0) {
+        console.log(targetName,this.$state.orderFreshFn)
         if(targetName=='订单查询' && this.$state.orderFreshFn){
-          console.log('fresh')
           this.$state.orderFreshFn()
         }
-        return targetName
+        this.$state.editableTabsValue = targetPath
+        return
+      }
+      if(targetPath){
+        this.$state.path2Label[targetPath] = targetName
+      }
+      if(targetPath){
+        addDynamicRoute(targetPath)
       }
       this.$state.editableTabs.push({
         title: targetName,
-        name: targetName,
+        name: targetPath,
         component: component,
         data: data,
-        control: control,
+        targetPath:targetPath,
         key: targetName,
       })
-      return targetName
+      router.push({path:targetPath})
+      this.$state.editableTabsValue = targetPath
     },
-    removeTab(targetName, currentName) {
+    removeTab(targetName) {
       if (targetName == 'all') {
         this.$state.editableTabs = []
+        this.$state.editableTabsValue = ''
+        this.$state.path2Label = {}
+        return
       }
       const tabs = this.$state.editableTabs
-      let activeName = currentName
+      let activeName = this.$state.editableTabsValue
       if (activeName === targetName) {
         tabs.forEach((tab, index) => {
           if (tab.name === targetName) {
             const nextTab = tabs[index + 1] || tabs[index - 1]
             if (nextTab) {
-              activeName = nextTab.name
+              this.$state.editableTabsValue = nextTab.targetPath
             }
           }
         })
       }
-
+      delete this.$state.path2Label[targetName]
       this.$state.editableTabs = tabs.filter((tab) => tab.name !== targetName)
-      return activeName
     },
     freshTab(targetName) {
       const tabs = this.$state.editableTabs
@@ -68,6 +89,9 @@ const useTabStore = defineStore('tabs', {
     addOrderFresh(freshFn) {
       this.$state.orderFreshFn = freshFn
     },
+    setEditValue(value) {
+      this.$state.editableTabsValue = value
+    }
   },
 })
 

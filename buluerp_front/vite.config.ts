@@ -23,6 +23,9 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  build: {
+    target: 'esnext',
+  },
   server: {
     proxy: {
       '/dev-api': {

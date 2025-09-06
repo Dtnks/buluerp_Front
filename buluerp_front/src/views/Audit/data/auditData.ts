@@ -43,7 +43,6 @@ export async function getTypeOptions(): Promise<{ label: string; value: string }
         }
       }
     }
-    console.log('获取审核类型成功:', TypeOptions.value)
     return TypeOptions.value
   } catch (error) {
     console.error('获取审核类型时发生错误:', error)

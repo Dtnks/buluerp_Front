@@ -23,7 +23,6 @@ export function finishPurchasePlan(data) {
     headers: headers,
     data: data,
   })
-
 }
 
 export function changePurchasePlan(data) {
@@ -85,20 +84,22 @@ export function exportSelectTable(data) {
     data: data,
   })
 }
-export function listPurchasePlanByOrderCode(orderCode){
-  let context= `system/purchase-collection/list?orderCodeExact=${orderCode}`
-  return function(pageNum, pageSize, searchContent = {}) {
-  let concatText = Object.keys(searchContent)
-    .map((key) => {
-      return `&${key}=${searchContent[key]}`
+export function listPurchasePlanByOrderCode(orderCode) {
+  let context = `system/purchase-collection/list?orderCodeExact=${orderCode}`
+  return function (pageNum, pageSize, searchContent = {}) {
+    let concatText = Object.keys(searchContent)
+      .map((key) => {
+        return `&${key}=${searchContent[key]}`
+      })
+      .join('')
+    return httpInstance({
+      url: `${context}&pageNum=${pageNum}&pageSize=${pageSize}${concatText}`,
+      method: 'get',
+      headers: headers,
     })
-    .join('')
-  return httpInstance({
-    url: `${context}&pageNum=${pageNum}&pageSize=${pageSize}${concatText}`,
-    method: 'get',
-    headers: headers,
-  })
-}}
+  }
+}
+
 export function importFile(formData) {
   return httpInstance({
     url: 'system/purchase-collection/import',

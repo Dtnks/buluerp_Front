@@ -19,7 +19,7 @@ import { messageBox } from '@/components/message/messageBox'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 import { searchFunc } from '@/utils/search/search'
 const createFormRef = ref()
-const props = defineProps(['control'])
+
 //渲染页面
 const formData = ref([
   [
@@ -126,15 +126,6 @@ const tableData = ref([
   },
 ])
 const operation = ref([
-  // {
-  //   func: (id) => {
-  //     console.log(id)
-  //     detailCustomer(id).then((res) => {
-  //       console.log(res)
-  //     })
-  //   },
-  //   value: '查看',
-  // },
   {
     func: (row) => {
       const id = row.id
@@ -147,7 +138,6 @@ const operation = ref([
       newSubmit.value = { ...row }
     },
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
   {
     func: (row) => {
@@ -157,7 +147,6 @@ const operation = ref([
       count += 1
     },
     value: '订单发票',
-    disabled: props.control[1].disabled,
   },
 ])
 const FileSubmit = ref({
@@ -240,7 +229,7 @@ const onSubmit = () => {
   searchContent.value.createTimeTo = parseTime(searchContent.value.createTime[1], '{y}-{m}-{d}')
   page.value = 1
   listPurchaseList(page.value, pageSize.value, searchContent.value).then((res) => {
-    console.log(res)
+     
     listData.value = res.rows
     total.value = res.total
   })
@@ -332,7 +321,7 @@ const handleSizeChange = async (val: number) => {
 
 //初次渲染
 listPurchaseList(page.value, pageSize.value).then((res) => {
-  console.log(res)
+   
   total.value = res.total
   listData.value = res.rows
 })
@@ -349,7 +338,6 @@ listPurchaseList(page.value, pageSize.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent"
-        :control="control"
       />
       <TableList
         :tableData="tableData"
@@ -357,7 +345,6 @@ listPurchaseList(page.value, pageSize.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
-        :control="control"
       >
         <slot>
           <div

@@ -24,7 +24,7 @@ import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 const type = ref('packaging-material')
 const refreshList = () => {
   listRecording(page.value, pageSize.value, type.value).then((res) => {
-    console.log(res)
+     
     listData.value = res.rows
     total.value = res.total
   })
@@ -45,7 +45,7 @@ const TypeOptions = [
   },
 ]
 const mapList = { 'packaging-material': '料包', part: '胶件', product: '成品' }
-const props = defineProps(['control'])
+
 //渲染页面
 const createFormRef = ref(null)
 const formData = ref({
@@ -443,7 +443,6 @@ const operation = ref([
       newSubmit.value[type.value] = { ...row }
     },
     value: '编辑',
-    disabled: props.control[1].disabled,
   },
 ])
 
@@ -455,7 +454,7 @@ const handleSubmit = () => {
     if (valid) {
       if (title.value == '编辑') {
         changeRecording(newSubmit.value[type.value], type.value).then((res) => {
-          console.log(res)
+           
 
           page.value = 1
           listRecording(page.value, pageSize.value, type.value).then((res) => {
@@ -654,10 +653,9 @@ const onSubmit = () => {
     searchContent.value[type.value].creationTime[1],
     '{y}-{m}-{d}',
   )
-  console.log(searchContent.value[type.value])
   listRecording(page.value, pageSize.value, type.value, searchContent.value[type.value]).then(
     (res) => {
-      console.log(res)
+       
       listData.value = res.rows
       total.value = res.total
     },
@@ -754,7 +752,7 @@ const handleSizeChange = async (val: number) => {
   })
 }
 listRecording(page.value, pageSize.value, type.value).then((res) => {
-  console.log(res)
+   
   listData.value = res.rows
   total.value = res.total
 })
@@ -771,7 +769,7 @@ listRecording(page.value, pageSize.value, type.value).then((res) => {
         :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent[type]"
-        :control="control"
+
       >
         <el-select v-model="type" placeholder="Select" style="width: 100px" @change="refreshList">
           <el-option
@@ -788,7 +786,7 @@ listRecording(page.value, pageSize.value, type.value).then((res) => {
         :listData="listData"
         :DeleteFunc="DeleteFunc"
         :exportFunc="exportFunc"
-        :control="control"
+
       >
         <slot>
           <div

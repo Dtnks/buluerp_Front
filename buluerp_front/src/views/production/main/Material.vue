@@ -4,7 +4,7 @@ import BordShow from '@/components/board/SecBoard.vue'
 import MaterialForm from '../component/materialForm.vue';
 import MaterialList from '../component/materialList.vue';
 const props = defineProps<{
-  addTab: (targetName: string, component: any, data?: any) => void
+  addTab: (targetName: string, component: any, data?: any,targetPath?:string) => void
 }>()
 
 const searchParams = ref<Record<string, any>>({}) // 初始为空对象
