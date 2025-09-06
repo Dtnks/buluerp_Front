@@ -25,7 +25,6 @@ export async function getTypeOptions(): Promise<{ label: string; value: string }
   try {
     const response = await getAuditSwitchList()
     // const TypeOptions = [{ label: '全部审核记录', value: '' }]
-
     for (const item of response.rows) {
       if (item.status === 1) {
         const value = auditTypeValueMap[item.auditType] // 使用 auditTypeValueMap 获取英文单词

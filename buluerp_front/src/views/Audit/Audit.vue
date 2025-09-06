@@ -76,7 +76,7 @@
       <el-form-item v-for="item in formData[type]" :key="item.value" :label="item.label" class="form-item">
         <span class="form-value" v-if="detailData[item.value] && item.value != 'pictureUrl'">{{
           detailData[item.value]
-          }}</span>
+        }}</span>
         <el-image v-else-if="detailData[item.value] && item.value == 'pictureUrl'"
           :src="getFullImageUrl(detailData[item.value])"></el-image>
         <span class="form-value" v-else>暂无数据</span>
@@ -93,10 +93,6 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import { getAuditDetail, getAuditList, getAuditOrderPending, getAuditProductionPending, getAuditPurchasePending, getAuditSubcontractPending, postAuditOder, postAuditProduction, postAuditPurchase, postAuditSubcontract, } from '@/apis/audit'
 import { resMap } from '../business/utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
-import { getOrderDetailByInnerId } from '@/apis/orders'
-import { getPurchasePlanDetail } from '@/apis/produceControl/purchase/purchasePlan'
-import { getPackagingDetail } from '@/apis/produceControl/produce/packaging'
-import { getProductionScheduleById } from '@/apis/produceControl/produce/schedule'
 
 const type = ref('all')
 const isLoadingCompleted = ref(false)
