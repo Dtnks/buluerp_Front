@@ -10,9 +10,11 @@ const options = ref({})
 const searchContent = ref({ roleId: '', userName: '', nickName: '' })
 const currentPage = ref(1)
 const total = ref()
+
 const setPage = (page = 0) => {
   getUserList(page ? page : currentPage.value, searchContent.value).then((res) => renderData(res))
 }
+
 const renderData = (res) => {
   tableData.value = res.rows.map(({ userId, userName, nickName, roleNames, status, roleIds }) => ({
     userId,
@@ -26,6 +28,7 @@ const renderData = (res) => {
 }
 
 setPage()
+
 getOptionselect().then((res) => {
   options.value = res.rows.map(({ roleName, roleId }) => ({ value: roleId, label: roleName }))
 })
@@ -141,12 +144,12 @@ const newDialogVisible = ref(false)
           <!-- </div> -->
         </el-form>
         <div style="height: 20px"></div>
-        <Table :tableData="tableData" :options="options" :setPage="setPage" />
+        <Table :tableData="tableData" :options="options" :setPage="setPage" :currentPage="currentPage" />
         <div style="height: 20px"></div>
         <div style="right: 40px; bottom: 20px">
           <el-pagination style="float: right" v-model:current-page="currentPage" background layout="prev, pager, next"
-            :total="total" :page-size="8" @prev-click="setPage(currentPage)" @current-change="setPage(currentPage)"
-            @next-click="setPage(currentPage)" />
+            :total="total" :page-size="8" @prev-click="setPage(currentPage - 1)" @current-change="setPage(currentPage)"
+            @next-click="setPage(currentPage + 1)" />
         </div>
       </el-card>
     </div>
