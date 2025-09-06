@@ -115,12 +115,10 @@ import {
 } from '@/apis/styles'
 import { pmcConfirm, pmcCancel, exportDesignFile } from '@/apis/designs'
 import { messageBox } from '@/components/message/messageBox'
-import { ElMessageBox } from 'element-plus'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 import StyleDialog from '../component/styleDialog.vue'
 import useTabStore from '@/stores/modules/tabs'
-import { updateProduct } from '@/apis/products'
 
 const props = defineProps<{
   detail: any

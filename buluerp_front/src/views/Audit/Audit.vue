@@ -76,7 +76,7 @@
       <el-form-item v-for="item in formData[type]" :key="item.value" :label="item.label" class="form-item">
         <span class="form-value" v-if="detailData[item.value] && item.value != 'pictureUrl'">{{
           detailData[item.value]
-        }}</span>
+          }}</span>
         <el-image v-else-if="detailData[item.value] && item.value == 'pictureUrl'"
           :src="getFullImageUrl(detailData[item.value])"></el-image>
         <span class="form-value" v-else>暂无数据</span>
@@ -139,13 +139,6 @@ const auditPostApiMap = {
   production: postAuditProduction,
   purchase: postAuditPurchase,
   subcontract: postAuditSubcontract,
-}
-
-const viewApiMap = {
-  order: getOrderDetailByInnerId,
-  production: getProductionScheduleById,
-  purchase: getPurchasePlanDetail,
-  subcontract: getPackagingDetail,
 }
 
 const auditTypeMap = {

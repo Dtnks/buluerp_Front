@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import type { TableDataType } from '@/types/orderResponse'
 import { reactive, ref } from 'vue'
-import { getCustomerNameById } from '../views/business/function/oders'
 import { getOrdersList, putOrder } from '@/apis/orders'
 
 export const useQueryTableDataStore = defineStore('table', () => {

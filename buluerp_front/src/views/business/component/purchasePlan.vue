@@ -11,11 +11,10 @@ import {
   importFile,
   downLoadModule,
   finishPurchasePlan,
-  detailPurchasePlan
 } from '@/apis/produceControl/purchase/purchasePlan'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
-import { ref, nextTick, onMounted } from 'vue'
+import { ref, nextTick } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
@@ -253,7 +252,7 @@ const operation = ref([
         createFormRef.value.clearValidate()
       })
     },
-    
+
     value: '编辑'
   },
   {
@@ -434,24 +433,10 @@ listPurchasePlan(page.value, pageSize.value).then((res) => {
   <div class="col">
     <BordShow content="采购计划" path="生产管理/采购/采购计划" />
     <div class="greyBack">
-      <FormSearch
-        title="查询"
-        :data="formData"
-        :onCreate="onCreate"
-        :onSubmit="onSubmit"
-        :onImport="onImport"
-        :onDownloadTemplate="onDownloadTemplate"
-        :searchForm="searchContent"
-
-      />
-      <TableList
-        :tableData="tableData"
-        :operations="operation"
-        :listData="listData"
-        :DeleteFunc="DeleteFunc"
-        :exportFunc="exportFunc"
-
-      >
+      <FormSearch title="查询" :data="formData" :onCreate="onCreate" :onSubmit="onSubmit" :onImport="onImport"
+        :onDownloadTemplate="onDownloadTemplate" :searchForm="searchContent" />
+      <TableList :tableData="tableData" :operations="operation" :listData="listData" :DeleteFunc="DeleteFunc"
+        :exportFunc="exportFunc">
         <slot>
           <div style="
               margin-top: 20px;
