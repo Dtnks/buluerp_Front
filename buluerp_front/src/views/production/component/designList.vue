@@ -1,38 +1,18 @@
 <template>
 
-    <Tablelist
-      :tableData="tableData"
-      :listData="data"
-      :operations="operations"
-      :exportFunc="onExport"
-      :DeleteFunc="onDelete"
-      :control="control"
-    >
-      <!-- 分页器 -->
-      <div
-        style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center"
-      >
-        <div>共 {{ total }} 条</div>
-        <el-pagination
-          background
-          layout="prev, pager, next, jumper, ->, total, sizes"
-          :current-page="page"
-          :page-size="pageSize"
-          :page-sizes="[5, 10, 20, 50]"
-          :total="total"
-          @current-change="handlePageChange"
-          @size-change="handleSizeChange"
-        />
-      </div>
-    </Tablelist>
+  <Tablelist :tableData="tableData" :listData="data" :operations="operations" :exportFunc="onExport"
+    :DeleteFunc="onDelete" :control="control">
+    <!-- 分页器 -->
+    <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center">
+      <div>共 {{ total }} 条</div>
+      <el-pagination background layout="prev, pager, next, jumper, ->, total, sizes" :current-page="page"
+        :page-size="pageSize" :page-sizes="[5, 10, 20, 50]" :total="total" @current-change="handlePageChange"
+        @size-change="handleSizeChange" />
+    </div>
+  </Tablelist>
 
-    <!-- 编辑对话框 -->
-    <DesignDialog
-      v-model="showDialog"
-      :isEdit="isEdit"
-      :currentData="currentRow"
-      @submit="handleSubmit"
-    />
+  <!-- 编辑对话框 -->
+  <DesignDialog v-model="showDialog" :isEdit="isEdit" :currentData="currentRow" @submit="handleSubmit" />
 
 </template>
 
@@ -51,7 +31,7 @@ const currentRow = ref({})
 
 const props = defineProps<{
   queryParams: Record<string, any>
-  addTab: (targetName: string, component: any, data?: any,targetPath?:string) => void
+  addTab: (targetName: string, component: any, data?: any, targetPath?: string) => void
 }>()
 
 const data = ref([])
@@ -166,7 +146,6 @@ const onExport = async (rows: any[]) => {
     downloadBinaryFile(blob, '设计总表导出.xlsx')
   } catch (err) {
     messageBox('error', () => Promise.reject(), '', '导出失败', '')
-    console.error('导出错误:', err)
   }
 }
 

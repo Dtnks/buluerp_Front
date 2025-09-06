@@ -37,7 +37,7 @@ const newFormData = ref([
       key: 'materialId',
       width: 12,
       rules: [requiredRule],
-      showKey:[{key:'id',label:"物料ID"},{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
+      showKey: [{ key: 'id', label: "物料ID" }, { key: 'materialType', label: "料别" }, { key: 'mouldNumber', label: "模具编号" }],
       remoteFunc: searchFunc('system/material-info/list', 'id'),
       options: [],
       loading: false,
@@ -51,7 +51,7 @@ const newFormData = ref([
     },
   ],
   [
-    { type: 'input', label: '单价', key: 'unitPrice', width: 12, rules: [positiveNumberRule,requiredRule] },
+    { type: 'input', label: '单价', key: 'unitPrice', width: 12, rules: [positiveNumberRule, requiredRule] },
     { type: 'input', label: '供应商', key: 'supplier', width: 12, rules: [requiredRule] },
   ],
   [{ type: 'image', label: '样例图', key: 'picture', width: 12 }],
@@ -102,9 +102,8 @@ const tableData = ref([
 const operation = ref([
   // {
   //   func: (id) => {
-  //     console.log(id)
   //     detailCustomer(id).then((res) => {
-  //        
+  //
   //     })
   //   },
   //   value: '查看',
@@ -277,7 +276,7 @@ const handleSizeChange = async (val: number) => {
 
 //初次渲染
 listPurchaseInfo(page.value, pageSize.value).then((res) => {
-   
+
   total.value = res.total
   listData.value = res.rows
 })
@@ -286,76 +285,44 @@ listPurchaseInfo(page.value, pageSize.value).then((res) => {
   <div class="col">
     <BordShow content="外购资料" path="生产管理/采购/外购资料" />
     <div class="greyBack">
-      <FormSearch
-        title="查询"
-        :data="formData"
-        :onCreate="onCreate"
-        :onSubmit="onSubmit"
-        :onImport="onImport"
-        :onDownloadTemplate="onDownloadTemplate"
-        :searchForm="searchContent"
-
-      />
-      <TableList
-        :tableData="tableData"
-        :operations="operation"
-        :listData="listData"
-        :DeleteFunc="DeleteFunc"
-        :exportFunc="exportFunc"
-
-      >
+      <FormSearch title="查询" :data="formData" :onCreate="onCreate" :onSubmit="onSubmit" :onImport="onImport"
+        :onDownloadTemplate="onDownloadTemplate" :searchForm="searchContent" />
+      <TableList :tableData="tableData" :operations="operation" :listData="listData" :DeleteFunc="DeleteFunc"
+        :exportFunc="exportFunc">
         <slot>
-          <div
-            style="
+          <div style="
               margin-top: 20px;
               display: flex;
               justify-content: space-between;
               align-items: center;
-            "
-          >
+            ">
             <div>共 {{ total }} 条</div>
-            <el-pagination
-              background
-              layout="prev, pager, next, jumper, ->, total, sizes"
-              :current-page="page"
-              :page-size="pageSize"
-              :page-sizes="[5, 10, 20, 50]"
-              :total="total"
-              @current-change="handlePageChange"
-              @size-change="handleSizeChange"
-            />
+            <el-pagination background layout="prev, pager, next, jumper, ->, total, sizes" :current-page="page"
+              :page-size="pageSize" :page-sizes="[5, 10, 20, 50]" :total="total" @current-change="handlePageChange"
+              @size-change="handleSizeChange" />
           </div>
         </slot>
       </TableList>
     </div>
 
-    <el-dialog v-model="editDialogVisible" :title="title" width="800px"
-      ><CreateForm :data="newFormData" :Formvalue="newSubmit" ref="createFormRef" />
+    <el-dialog v-model="editDialogVisible" :title="title" width="800px">
+      <CreateForm :data="newFormData" :Formvalue="newSubmit" ref="createFormRef" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button
-            type="info"
-            @click="
-              () => {
-                editDialogVisible = false
-              }
-            "
-          >
+          <el-button type="info" @click="
+            () => {
+              editDialogVisible = false
+            }
+          ">
             取消
           </el-button>
         </div>
       </template>
     </el-dialog>
     <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
-      <el-upload
-        class="upload-demo"
-        drag
-        :show-file-list="false"
-        :before-upload="beforeUpload"
-        :http-request="handleUpload"
-        accept=".xlsx,.xls"
-      >
+      <el-upload class="upload-demo" drag :show-file-list="false" :before-upload="beforeUpload"
+        :http-request="handleUpload" accept=".xlsx,.xls">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
         <template v-slot:tip>

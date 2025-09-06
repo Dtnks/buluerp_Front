@@ -18,6 +18,7 @@ import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
 import { searchFunc } from '@/utils/search/search'
+import { ElMessage } from 'element-plus'
 const createFormRef = ref()
 
 //渲染页面
@@ -40,8 +41,8 @@ const newFormData = ref([
       key: 'purchaseId',
       width: 12,
       rules: [requiredRule],
-      showKey:[{key:'id',label:"采购计划"},{key:'purchaseQuantity',label:"采购数量"}
-              ,{key:'materialType',label:"料别"},{key:'mouldNumber',label:"模具编号"}],
+      showKey: [{ key: 'id', label: "采购计划" }, { key: 'purchaseQuantity', label: "采购数量" }
+        , { key: 'materialType', label: "料别" }, { key: 'mouldNumber', label: "模具编号" }],
       remoteFunc: searchFunc('system/purchase-collection/list', 'id'),
       loading: false,
       options: [],
@@ -51,7 +52,7 @@ const newFormData = ref([
       label: '订单金额',
       key: 'amount',
       width: 12,
-      rules: [positiveNumberRule,requiredRule],
+      rules: [positiveNumberRule, requiredRule],
     },
   ],
   [
@@ -179,7 +180,6 @@ const handleSubmit = () => {
     if (valid) {
       if (title.value == '编辑') {
         delete newSubmit.value.invoice
-        console.log(newSubmit.value)
         changePurchaseList(newSubmit.value).then((res) => {
           page.value = 1
           listPurchaseList(page.value, pageSize.value).then((res) => {
@@ -229,7 +229,7 @@ const onSubmit = () => {
   searchContent.value.createTimeTo = parseTime(searchContent.value.createTime[1], '{y}-{m}-{d}')
   page.value = 1
   listPurchaseList(page.value, pageSize.value, searchContent.value).then((res) => {
-     
+
     listData.value = res.rows
     total.value = res.total
   })
@@ -271,11 +271,9 @@ const handleChangeInvoice = async () => {
     })
   }
   if (FileSubmit.value.invoiceList.length > 0) {
-    console.log('append1')
     promiseList.push(deletePurchaseInvoice(FileSubmit.value.invoiceList))
   }
   if (FileSubmit.value.invoice.length > 0) {
-    console.log('append2')
     promiseList.push(
       changePurchaseList({ invoice: FileSubmit.value.invoice, id: FileSubmit.value.id }),
     )
@@ -285,8 +283,6 @@ const handleChangeInvoice = async () => {
     return
   } else if (promiseList.length === 1) {
     promiseList[0].then((res) => {
-      console.log(res, 1)
-
       ElMessage.success(res.msg)
       close()
     })
@@ -321,7 +317,7 @@ const handleSizeChange = async (val: number) => {
 
 //初次渲染
 listPurchaseList(page.value, pageSize.value).then((res) => {
-   
+
   total.value = res.total
   listData.value = res.rows
 })
@@ -330,79 +326,45 @@ listPurchaseList(page.value, pageSize.value).then((res) => {
   <div class="col">
     <BordShow content="采购单" path="生产管理/采购/采购单" />
     <div class="greyBack">
-      <FormSearch
-        title="查询"
-        :data="formData"
-        :onCreate="onCreate"
-        :onSubmit="onSubmit"
-        :onImport="onImport"
-        :onDownloadTemplate="onDownloadTemplate"
-        :searchForm="searchContent"
-      />
-      <TableList
-        :tableData="tableData"
-        :operations="operation"
-        :listData="listData"
-        :DeleteFunc="DeleteFunc"
-        :exportFunc="exportFunc"
-      >
+      <FormSearch title="查询" :data="formData" :onCreate="onCreate" :onSubmit="onSubmit" :onImport="onImport"
+        :onDownloadTemplate="onDownloadTemplate" :searchForm="searchContent" />
+      <TableList :tableData="tableData" :operations="operation" :listData="listData" :DeleteFunc="DeleteFunc"
+        :exportFunc="exportFunc">
         <slot>
-          <div
-            style="
+          <div style="
               margin-top: 20px;
               display: flex;
               justify-content: space-between;
               align-items: center;
-            "
-          >
+            ">
             <div>共 {{ total }} 条</div>
-            <el-pagination
-              background
-              layout="prev, pager, next, jumper, ->, total, sizes"
-              :current-page="page"
-              :page-size="pageSize"
-              :page-sizes="[5, 10, 20, 50]"
-              :total="total"
-              @current-change="handlePageChange"
-              @size-change="handleSizeChange"
-            />
+            <el-pagination background layout="prev, pager, next, jumper, ->, total, sizes" :current-page="page"
+              :page-size="pageSize" :page-sizes="[5, 10, 20, 50]" :total="total" @current-change="handlePageChange"
+              @size-change="handleSizeChange" />
           </div>
         </slot>
       </TableList>
     </div>
 
-    <el-dialog v-model="editDialogVisible" :title="title" width="800px"
-      ><CreateForm
-        :data="title == '新增' ? newFormData : changeFormData"
-        :Formvalue="newSubmit"
-        ref="createFormRef"
-        :key="count"
-      />
+    <el-dialog v-model="editDialogVisible" :title="title" width="800px">
+      <CreateForm :data="title == '新增' ? newFormData : changeFormData" :Formvalue="newSubmit" ref="createFormRef"
+        :key="count" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button
-            type="info"
-            @click="
-              () => {
-                editDialogVisible = false
-              }
-            "
-          >
+          <el-button type="info" @click="
+            () => {
+              editDialogVisible = false
+            }
+          ">
             取消
           </el-button>
         </div>
       </template>
     </el-dialog>
     <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
-      <el-upload
-        class="upload-demo"
-        drag
-        :show-file-list="false"
-        :before-upload="beforeUpload"
-        :http-request="handleUpload"
-        accept=".xlsx,.xls"
-      >
+      <el-upload class="upload-demo" drag :show-file-list="false" :before-upload="beforeUpload"
+        :http-request="handleUpload" accept=".xlsx,.xls">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
         <template v-slot:tip>
@@ -411,23 +373,15 @@ listPurchaseList(page.value, pageSize.value).then((res) => {
       </el-upload>
     </el-dialog>
     <el-dialog v-model="fileChangeVisible" title="修改发票文件" width="600px">
-      <CreateForm
-        :data="InvoiceFormData"
-        :Formvalue="FileSubmit"
-        :key="count"
-        ref="createFormRef"
-      />
+      <CreateForm :data="InvoiceFormData" :Formvalue="FileSubmit" :key="count" ref="createFormRef" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleChangeInvoice"> 确认 </el-button>
-          <el-button
-            type="info"
-            @click="
-              () => {
-                fileChangeVisible = false
-              }
-            "
-          >
+          <el-button type="info" @click="
+            () => {
+              fileChangeVisible = false
+            }
+          ">
             取消
           </el-button>
         </div>

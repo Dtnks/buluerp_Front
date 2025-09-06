@@ -36,14 +36,14 @@ const formData = ref([
 ])
 
 const newFormData = ref([
-    [
+  [
     {
       type: 'inputSelect',
       label: '设计总表ID',
       key: 'designPatternId',
       width: 8,
       rules: [requiredRule],
-      showKey:[{key:'id',label:"ID"},{key:'orderId',label:"订单ID"},{key:'productId',label:"产品ID"}],
+      showKey: [{ key: 'id', label: "ID" }, { key: 'orderId', label: "订单ID" }, { key: 'productId', label: "产品ID" }],
       remoteFunc: searchFunc('system/patterns/list', 'id'),
       options: [],
       loading: false,
@@ -54,7 +54,7 @@ const newFormData = ref([
       key: 'purchaseInfoId',
       width: 8,
       rules: [requiredRule],
-      showKey:[{key:'purchaseCode',label:"外购ID"},{key:'materialId',label:"物料"},{key:'unitPrice',label:"单价"}],
+      showKey: [{ key: 'purchaseCode', label: "外购ID" }, { key: 'materialId', label: "物料" }, { key: 'unitPrice', label: "单价" }],
 
       remoteFunc: searchFunc('system/purchase-info/list', 'purchaseCode'),
       options: [],
@@ -66,7 +66,7 @@ const newFormData = ref([
       label: '采购数量',
       key: 'purchaseQuantity',
       width: 8,
-      rules: [positiveNumberRule,requiredRule],
+      rules: [positiveNumberRule, requiredRule],
     }],
   [
     {
@@ -98,7 +98,7 @@ const newFormData = ref([
 ])
 const editFormData = ref([
   [
-        {
+    {
       type: 'timer',
       label: '交货时间',
       key: 'deliveryDate',
@@ -112,7 +112,7 @@ const editFormData = ref([
       label: '采购数量',
       key: 'purchaseQuantity',
       width: 8,
-      rules: [positiveNumberRule,requiredRule],
+      rules: [positiveNumberRule, requiredRule],
     },
     {
       type: 'timer',
@@ -122,7 +122,7 @@ const editFormData = ref([
       width: 8,
       rules: [requiredRule],
     },
-  ],[
+  ], [
 
     {
       type: 'textarea',
@@ -137,7 +137,7 @@ const newSubmit = ref({
   designPatternId: '',
   purchaseInfoId: '',
   purchaseQuantity: '',
-  orderTime:'',
+  orderTime: '',
   remarks: '',
 })
 const searchContent = ref({
@@ -241,7 +241,6 @@ const tableData = ref([
 const operation = ref([
   // {
   //   func: (id) => {
-  //     console.log(id)
   //     detailCustomer(id).then((res) => {
   //        
   //     })
@@ -263,8 +262,8 @@ const operation = ref([
   },
   {
     func: (row) => {
-      finishPurchasePlan({orderCode:row.orderCode}).then((res) => {
-         
+      finishPurchasePlan({ orderCode: row.orderCode }).then((res) => {
+
         ElMessage.success(res.msg)
       })
     },
@@ -281,8 +280,8 @@ const createFormRef = ref(null)
 const editFormRef = ref(null)
 const handleSubmit = () => {
   if (title.value === '编辑') {
-    editFormRef.value.validateForm((valid)=>{
-      if(valid){
+    editFormRef.value.validateForm((valid) => {
+      if (valid) {
         newSubmit.value.deliveryDate = parseTime(newSubmit.value.deliveryDate, '{y}-{m}-{d}')
 
         changePurchasePlan(newSubmit.value).then((res) => {
@@ -297,8 +296,8 @@ const handleSubmit = () => {
       }
     })
   } else {
-  createFormRef.value.validateForm((valid) => {
-    if (valid) {
+    createFormRef.value.validateForm((valid) => {
+      if (valid) {
         newSubmit.value.deliveryTime = parseTime(newSubmit.value.deliveryTime, '{y}-{m}-{d}')
         newSubmit.value.orderTime = parseTime(newSubmit.value.orderTime, '{y}-{m}-{d}')
         newPurchasePlan(newSubmit.value).then((res) => {
@@ -324,12 +323,12 @@ const resetSubmit = () => {
   }
 }
 const onCreate = () => {
-    resetSubmit()
-    title.value = '新增'
-    newDialogVisible.value = true
-    nextTick(() => {
-        createFormRef.value.clearValidate()
-      })
+  resetSubmit()
+  title.value = '新增'
+  newDialogVisible.value = true
+  nextTick(() => {
+    createFormRef.value.clearValidate()
+  })
 }
 
 
@@ -432,7 +431,7 @@ const handleSizeChange = async (val: number) => {
 
 //初次渲染
 listPurchasePlan(page.value, pageSize.value).then((res) => {
-   
+
   total.value = res.total
   listData.value = res.rows
 })
@@ -441,42 +440,21 @@ listPurchasePlan(page.value, pageSize.value).then((res) => {
   <div class="col">
     <BordShow content="采购计划" path="生产管理/采购/采购计划" />
     <div class="greyBack">
-      <FormSearch
-        title="查询"
-        :data="formData"
-        :onCreate="onCreate"
-        :onSubmit="onSubmit"
-        :onImport="onImport"
-        :onDownloadTemplate="onDownloadTemplate"
-        :searchForm="searchContent"
-      />
-      <TableList
-        :tableData="tableData"
-        :operations="operation"
-        :listData="listData"
-        :DeleteFunc="DeleteFunc"
-        :exportFunc="exportFunc"
-      >
+      <FormSearch title="查询" :data="formData" :onCreate="onCreate" :onSubmit="onSubmit" :onImport="onImport"
+        :onDownloadTemplate="onDownloadTemplate" :searchForm="searchContent" />
+      <TableList :tableData="tableData" :operations="operation" :listData="listData" :DeleteFunc="DeleteFunc"
+        :exportFunc="exportFunc">
         <slot>
-          <div
-            style="
+          <div style="
               margin-top: 20px;
               display: flex;
               justify-content: space-between;
               align-items: center;
-            "
-          >
+            ">
             <div>共 {{ total }} 条</div>
-            <el-pagination
-              background
-              layout="prev, pager, next, jumper, ->, total, sizes"
-              :current-page="page"
-              :page-size="pageSize"
-              :page-sizes="[5, 10, 20, 50]"
-              :total="total"
-              @current-change="handlePageChange"
-              @size-change="handleSizeChange"
-            />
+            <el-pagination background layout="prev, pager, next, jumper, ->, total, sizes" :current-page="page"
+              :page-size="pageSize" :page-sizes="[5, 10, 20, 50]" :total="total" @current-change="handlePageChange"
+              @size-change="handleSizeChange" />
           </div>
         </slot>
       </TableList>
@@ -487,14 +465,11 @@ listPurchasePlan(page.value, pageSize.value).then((res) => {
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button
-            type="info"
-            @click="
-              () => {
-                newDialogVisible = false
-              }
-            "
-          >
+          <el-button type="info" @click="
+            () => {
+              newDialogVisible = false
+            }
+          ">
             取消
           </el-button>
         </div>
@@ -505,28 +480,19 @@ listPurchasePlan(page.value, pageSize.value).then((res) => {
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button
-            type="info"
-            @click="
-              () => {
-                editDialogVisible = false
-              }
-            "
-          >
+          <el-button type="info" @click="
+            () => {
+              editDialogVisible = false
+            }
+          ">
             取消
           </el-button>
         </div>
       </template>
     </el-dialog>
     <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
-      <el-upload
-        class="upload-demo"
-        drag
-        :show-file-list="false"
-        :before-upload="beforeUpload"
-        :http-request="handleUpload"
-        accept=".xlsx,.xls"
-      >
+      <el-upload class="upload-demo" drag :show-file-list="false" :before-upload="beforeUpload"
+        :http-request="handleUpload" accept=".xlsx,.xls">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
         <template v-slot:tip>

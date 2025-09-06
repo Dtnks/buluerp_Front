@@ -194,7 +194,6 @@ const onDelete = async () => {
       emit('fetchData')
       selectedRows.value = [] // 清空选中行
     } catch (error) {
-      console.error('删除失败:', error)
       messageBox('error', null, null, '删除失败,请稍后重试')
     }
   } catch (err) {

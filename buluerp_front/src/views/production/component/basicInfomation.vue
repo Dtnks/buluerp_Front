@@ -6,7 +6,7 @@ import { searchMaterial } from '@/apis/materials'
 import { searchDesignDetail } from '@/apis/designs.js'
 import { messageBox } from '@/components/message/messageBox' // 替换弹窗组件
 import { getFullImageUrl } from '@/utils/image/getUrl'
-import  uploadPicture  from '@/components/upload/editUpload.vue'
+import uploadPicture from '@/components/upload/editUpload.vue'
 import useTabStore from '@/stores/modules/tabs'
 
 const props = defineProps<{
@@ -71,7 +71,6 @@ const refreshData = async () => {
       const res = await searchDesignDetail(val.id)
       tableData.value = flattenDesignDetail(res.data)
     } catch (err) {
-      console.error('获取设计明细失败', err)
       tableData.value = []
       messageBox('error', null, '', '获取设计明细失败', '')
     }
@@ -138,20 +137,20 @@ const submitMainForm = async () => {
     await mainFormRef.value.validate()
 
     const payload: any = {
-    id: Number(props.detail?.id),
-    name: mainFormState.productName,
-    orderId: mainFormState.orderId,
-    designStatus: Number(mainFormState.designStatus),
-    innerId: mainFormState.innerId,
-    outerId: mainFormState.outerId,
-    deletePicture: 0, // 默认保留图片
-  }
+      id: Number(props.detail?.id),
+      name: mainFormState.productName,
+      orderId: mainFormState.orderId,
+      designStatus: Number(mainFormState.designStatus),
+      innerId: mainFormState.innerId,
+      outerId: mainFormState.outerId,
+      deletePicture: 0, // 默认保留图片
+    }
 
-  if (pictureFile.value) {
-    payload.picture = pictureFile.value // 用户上传新图
-  } else if (!pictureUrl.value) {
-    payload.deletePicture = 1 // 用户主动删除图片
-  }
+    if (pictureFile.value) {
+      payload.picture = pictureFile.value // 用户上传新图
+    } else if (!pictureUrl.value) {
+      payload.deletePicture = 1 // 用户主动删除图片
+    }
 
 
     await updateProduct(payload)
@@ -167,7 +166,6 @@ const submitMainForm = async () => {
 
     messageBox('success', null, '提交成功', '', '')
   } catch (err) {
-    console.error('提交失败', err)
     messageBox('error', null, '', '提交失败', '')
   }
 }
@@ -194,7 +192,9 @@ interface MaterialItem {
 <template>
   <el-form ref="mainFormRef" :model="mainFormState" label-width="120px" class="greyBack">
     <el-card>
-      <template #header><div class="card-header">业务订单基础信息</div></template>
+      <template #header>
+        <div class="card-header">业务订单基础信息</div>
+      </template>
 
       <el-row :gutter="20">
         <el-col :span="8">
@@ -220,13 +220,13 @@ interface MaterialItem {
             <el-input v-model="mainFormState.productName" placeholder="请输入" />
           </el-form-item>
         </el-col>
-      <el-col :span="8">
-        <el-form-item label="产品设计状态">
-          <el-text>
-            {{ mainFormState.designStatus === 1 ? '已确认' : '未确认' }}
-          </el-text>
-        </el-form-item>
-      </el-col>
+        <el-col :span="8">
+          <el-form-item label="产品设计状态">
+            <el-text>
+              {{ mainFormState.designStatus === 1 ? '已确认' : '未确认' }}
+            </el-text>
+          </el-form-item>
+        </el-col>
         <el-col :span="8">
           <el-form-item label="外部编号" prop="outerId">
             <el-input v-model="mainFormState.outerId" placeholder="请输入" />
@@ -257,16 +257,16 @@ interface MaterialItem {
       <div style="text-align: right; margin-top: 20px">
         <el-space>
           <el-button @click="onCancel">取消</el-button>
-          <el-button type="primary" @click="submitMainForm" 
-            >提交</el-button
-          >
+          <el-button type="primary" @click="submitMainForm">提交</el-button>
           <el-button @click="onClear">重置</el-button>
         </el-space>
       </div>
     </el-card>
 
     <el-card>
-      <template #header><div class="card-header">产品详情</div></template>
+      <template #header>
+        <div class="card-header">产品详情</div>
+      </template>
 
       <!-- <el-steps :active="1" align-center>
         <el-step title="填写产品组装物料信息" />
@@ -274,19 +274,19 @@ interface MaterialItem {
       </el-steps> -->
 
       <el-table :data="tableData" style="width: 100%" max-height="400">
-        <el-table-column prop="mouldNumber" label="模具编号"  />
-        <el-table-column prop="lddNumber" label="LDD编号"  />
-        <el-table-column prop="mouldCategory" label="模具分类"  />
-        <el-table-column prop="materialId" label="物料ID"  />
-        <el-table-column prop="pictureUrl" label="图片" >
+        <el-table-column prop="mouldNumber" label="模具编号" />
+        <el-table-column prop="lddNumber" label="LDD编号" />
+        <el-table-column prop="mouldCategory" label="模具分类" />
+        <el-table-column prop="materialId" label="物料ID" />
+        <el-table-column prop="pictureUrl" label="图片">
           <template #default="scope">
             <el-image :src="getFullImageUrl(scope.row.pictureUrl)" style="width: 80px; height: 80px;" />
           </template>
         </el-table-column>
-        <el-table-column prop="color" label="颜色"  />
-        <el-table-column prop="productName" label="产品名称"  />
-        <el-table-column prop="quantity" label="数量"  />
-        <el-table-column prop="material" label="原材料"  />
+        <el-table-column prop="color" label="颜色" />
+        <el-table-column prop="productName" label="产品名称" />
+        <el-table-column prop="quantity" label="数量" />
+        <el-table-column prop="material" label="原材料" />
 
       </el-table>
     </el-card>
@@ -299,15 +299,18 @@ interface MaterialItem {
   font-weight: bold;
   font-size: 16px;
 }
+
 .preview-container {
   display: flex;
   flex-wrap: wrap;
   margin-top: 10px;
 }
+
 .preview-item {
   width: 120px;
   text-align: center;
 }
+
 .preview-image {
   width: 100%;
   height: 100px;
@@ -315,10 +318,12 @@ interface MaterialItem {
   border-radius: 4px;
   border: 1px solid #dcdfe6;
 }
+
 .mt-4 {
   margin-top: 16px;
 }
-.deletebutton{
+
+.deletebutton {
   margin-bottom: 20px;
 }
 </style>
