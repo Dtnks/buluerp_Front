@@ -182,7 +182,7 @@ const tableData = ref([
     value: 'done',
     label: '完成情况',
     type: 'Maptext',
-    map: { true: '否', false: '是' },
+    map: { true: '是', false: '否' },
   },
   {
     value: 'orderCode',
@@ -228,19 +228,19 @@ const tableData = ref([
     value: 'isManual',
     label: '说明书',
     type: 'Maptext',
-    map: { true: '否', false: '是' },
+    map: { true: '是', false: '否' },
   },
   {
     value: 'isMinifigure',
     label: '人偶',
     type: 'Maptext',
-    map: { true: '否', false: '是' },
+    map: { true: '是', false: '否' },
   },
   {
     value: 'isTool',
     label: '起件器',
     type: 'Maptext',
-    map: { true: '否', false: '是' },
+    map: { true: '是', false: '否' },
   },
 ])
 const operation = ref([
