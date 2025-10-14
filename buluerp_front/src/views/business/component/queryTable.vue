@@ -36,7 +36,7 @@
           <el-button link type="primary" @click="() => {
             emit('onUpdated', { ...row, status: row.status + 1 })
             emit('fetchData')
-          }" v-if="[7, 8, 11, 12, 13].includes(row.status)">{{ resMap[row.status + 1] }}</el-button>
+          }" v-if="[9, 10, 11, 12, 13].includes(row.status)">{{ resMap[row.status + 1] }}</el-button>
           <el-button link type="primary" @click="onCheck(row)">查看</el-button>
         </template>
       </el-table-column>
