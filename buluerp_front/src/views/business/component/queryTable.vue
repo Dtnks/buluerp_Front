@@ -44,7 +44,7 @@
 
     <!-- 分页 -->
     <div class="pagination-box">
-      <el-pagination background layout="prev, pager, next, sizes, total" :total="pagination.total"
+      <el-pagination background layout="prev, pager, next, sizes, total" :total="paginatitotal"
         :page-size="pagination.pageSize" :current-page="pagination.page" @size-change="emit('onPageSizeChange', $event)"
         @current-change="emit('onPageChange', $event)" :page-sizes="[5, 10, 20, 50]" class="pagination" />
     </div>
@@ -194,7 +194,6 @@ const onDelete = async () => {
       emit('fetchData')
       selectedRows.value = [] // 清空选中行
     } catch (error) {
-      console.error('删除失败:', error)
       messageBox('error', null, null, '删除失败,请稍后重试')
     }
   } catch (err) {

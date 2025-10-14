@@ -66,7 +66,7 @@ const formData = ref([
     { type: 'input', label: '操作人', key: 'operator' },
     { type: 'input', label: '订单编号', key: 'orderCode' },
   ],
-  
+
 ])
 const newFormData = ref([
   [
@@ -182,7 +182,7 @@ const tableData = ref([
     value: 'done',
     label: '完成情况',
     type: 'Maptext',
-    map: { true: '否', false: '是' },
+    map: { true: '是', false: '否' },
   },
   {
     value: 'orderCode',
@@ -228,27 +228,26 @@ const tableData = ref([
     value: 'isManual',
     label: '说明书',
     type: 'Maptext',
-    map: { true: '否', false: '是' },
+    map: { true: '是', false: '否' },
   },
   {
     value: 'isMinifigure',
     label: '人偶',
     type: 'Maptext',
-    map: { true: '否', false: '是' },
+    map: { true: '是', false: '否' },
   },
   {
     value: 'isTool',
     label: '起件器',
     type: 'Maptext',
-    map: { true: '否', false: '是' },
+    map: { true: '是', false: '否' },
   },
 ])
 const operation = ref([
   // {
   //   func: (id) => {
-  //     console.log(id)
   //     detailCustomer(id).then((res) => {
-  //        
+  //
   //     })
   //   },
   //   value: '查看',
@@ -297,7 +296,6 @@ const handleSubmit = () => {
     if (valid) {
       newSubmit.value.releaseDate = parseTime(newSubmit.value.releaseDate, '{y}-{m}-{d}')
       if (title.value == '编辑') {
-        console.log(newSubmit.value)
         changePackaging(newSubmit.value).then((res) => {
           page.value = 1
           listPackaging(page.value, pageSize.value).then((res) => {
@@ -389,7 +387,7 @@ const exportFunc = (row) => {
   }
   for (const i in row) {
     exportSelectTable(row[i].id).then((res) => {
-       
+
       const now = new Date()
       downloadBinaryFile(
         res,
@@ -447,7 +445,6 @@ const handleSizeChange = async (val: number) => {
 
 //初次渲染
 listPackaging(page.value, pageSize.value).then((res) => {
-  console.log(res,'detail')
   total.value = res.total
   listData.value = res.rows
 })

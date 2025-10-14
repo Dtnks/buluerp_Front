@@ -3,8 +3,8 @@
     <el-config-provider :locale="zhCn">
       <BordShow content="业务订单查询列表" path="业务中心/查询" />
       <div class="greyBack">
-        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd"
-          @customerSuggestions="customerSuggestions" @checkCustomerName="checkCustomerName"></QueryForm>
+        <QueryForm @onSubmit="handleQuery" @onAdd="handleAdd" @customerSuggestions="customerSuggestions"
+          @checkCustomerName="checkCustomerName"></QueryForm>
         <QueryTable :addTab="props.addTab" :pagination="pagination" :tableData="tableData"
           @onPageChange="handlePageChange" @onPageSizeChange="handleSizeChange" @fetchData="fetchTableData"
           @onUpdated="handleUpdate" @customerSuggestions="customerSuggestions" @checkCustomerName="checkCustomerName">
@@ -61,7 +61,6 @@ const fetchTableData = async () => {
     tableData.value = res.rows || []
     pagination.total = res.total || 0
   } catch (error) {
-    console.error('获取订单数据失败(queryTable.vue):', error)
     messageBox('error', null, null, '获取订单数据失败', '请稍后重试')
   }
 }

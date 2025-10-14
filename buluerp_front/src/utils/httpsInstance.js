@@ -69,7 +69,7 @@ httpInstance.interceptors.response.use(
       return res.data
     } else if (res.data instanceof Blob) {
       return res.data
-    }else{
+    } else {
       ElMessage.error(res.data.msg || '请求失败')
       return Promise.reject(res.data)
     }

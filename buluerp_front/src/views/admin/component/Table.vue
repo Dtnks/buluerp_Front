@@ -2,7 +2,7 @@
 import { changeStatus, changeRoles, resetPassword } from '@/apis/admin.js'
 import { messageBox } from '@/components/message/messageBox.js'
 import { ElMessage } from 'element-plus'
-const props = defineProps(['tableData', 'total', 'setPage', 'options'])
+const props = defineProps(['tableData', 'total', 'setPage', 'options', 'currentPage'])
 import { ref } from 'vue'
 const editPerson = ref({
   userName: null,
@@ -15,12 +15,13 @@ const handleRole = (row) => {
   editPerson.value = row
   DialogVisible.value = true
 }
+
 const submitRole = () => {
   changeRoles({ userId: editPerson.value.userId, roleIds: editPerson.value.roleIds }).then(
     (res) => {
       DialogVisible.value = false
       ElMessage({ type: 'success', message: '授权成功' })
-      props.setPage(1)
+      props.setPage(props.currentPage)
     },
   )
 }
@@ -83,19 +84,14 @@ const filterHandler = (value: string, row: User, column: TableColumnCtx<User>) =
           <div style="display: flex; align-items: center">
             <el-tag style="margin-left: 10px" v-for="roleTag in scope.row.roleNames">{{
               roleTag
-            }}</el-tag>
+              }}</el-tag>
           </div>
         </template>
       </el-table-column>
-      <el-table-column
-        label="状态"
-        width="180"
-        :filters="[
-          { text: '生效', value: '生效' },
-          { text: '离职', value: '离职' },
-        ]"
-        :filter-method="filterHandler"
-      >
+      <el-table-column label="状态" width="180" :filters="[
+        { text: '生效', value: '生效' },
+        { text: '离职', value: '离职' },
+      ]" :filter-method="filterHandler">
         <template #default="scope">
           <div style="display: flex; align-items: center">
             <span style="margin-left: 10px">{{ scope.row.status }}</span>
@@ -104,36 +100,17 @@ const filterHandler = (value: string, row: User, column: TableColumnCtx<User>) =
       </el-table-column>
       <el-table-column label="操作">
         <template #default="scope">
-          <el-button
-            size="small"
-            type="primary"
-            @click="handleRole(scope.row)"
-            v-if="scope.row.status == '生效'"
-          >
+          <el-button size="small" type="primary" @click="handleRole(scope.row)" v-if="scope.row.status == '生效'">
             授权
           </el-button>
-          <el-button
-            type="primary"
-            size="small"
-            @click="handelResetPassword(scope.row)"
-            v-if="scope.row.status == '生效'"
-          >
+          <el-button type="primary" size="small" @click="handelResetPassword(scope.row)"
+            v-if="scope.row.status == '生效'">
             重置密码
           </el-button>
-          <el-button
-            size="small"
-            type="danger"
-            @click="handleStatus(scope.row, 1)"
-            v-if="scope.row.status == '生效'"
-          >
+          <el-button size="small" type="danger" @click="handleStatus(scope.row, 1)" v-if="scope.row.status == '生效'">
             离职失效
           </el-button>
-          <el-button
-            size="small"
-            type="primary"
-            @click="handleStatus(scope.row, 0)"
-            v-else
-          >
+          <el-button size="small" type="primary" @click="handleStatus(scope.row, 0)" v-else>
             恢复
           </el-button>
         </template>
@@ -145,21 +122,9 @@ const filterHandler = (value: string, row: User, column: TableColumnCtx<User>) =
       <div style="margin: 20px 10px">账号 : {{ editPerson.userName }}</div>
       <div style="margin: 20px 10px">
         角色 :
-        <el-select
-          v-model="editPerson.roleIds"
-          multiple
-          collapse-tags
-          collapse-tags-tooltip
-          :max-collapse-tags="2"
-          placeholder="Select"
-          style="width: 280px"
-        >
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          />
+        <el-select v-model="editPerson.roleIds" multiple collapse-tags collapse-tags-tooltip :max-collapse-tags="2"
+          placeholder="Select" style="width: 280px">
+          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
       </div>
 
@@ -167,14 +132,11 @@ const filterHandler = (value: string, row: User, column: TableColumnCtx<User>) =
         <div class="dialog-footer">
           <el-button type="primary" @click="submitRole"> 确认 </el-button>
 
-          <el-button
-            type="info"
-            @click="
-              () => {
-                DialogVisible = false
-              }
-            "
-          >
+          <el-button type="info" @click="
+            () => {
+              DialogVisible = false
+            }
+          ">
             取消
           </el-button>
         </div>
@@ -186,7 +148,8 @@ const filterHandler = (value: string, row: User, column: TableColumnCtx<User>) =
 span {
   margin: 0 !important;
 }
-.cell .el-button + .el-button {
+
+.cell .el-button+.el-button {
   margin-left: 10px;
 }
 </style>

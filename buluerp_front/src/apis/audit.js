@@ -45,6 +45,16 @@ export const getAuditList = (pageNum, pageSize) => {
   })
 }
 
+// getAuditListPending: 获取待审核列表
+export const getAuditListPending = (pageNum, pageSize, confirm = 0) => {
+  return httpInstance({
+    url: `system/audit/list`,
+    method: 'get',
+    headers: headers,
+    params: { pageNum, pageSize, confirm },
+  })
+}
+
 // getAuditOrderPending: 获取待审核订单列表
 export const getAuditOrderPending = (pageNum, pageSize) => {
   return httpInstance({

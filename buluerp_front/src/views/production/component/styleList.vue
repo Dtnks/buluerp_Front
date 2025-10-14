@@ -27,24 +27,15 @@
       <div v-for="[groupId, groupItems] in groupedData" :key="groupId" style="margin-bottom: 40px">
         <div style="font-weight: bold; margin: 10px 0">分组：{{ groupId }}</div>
 
-        <el-table
-          :data="groupItems"
-          border
-          style="width: 100%"
-          :row-key="getRowKey"
-          @selection-change="handleSelectionChange"
-        >
+        <el-table :data="groupItems" border style="width: 100%" :row-key="getRowKey"
+          @selection-change="handleSelectionChange">
           <!-- 表头保持不变 -->
           <el-table-column type="selection" width="55" />
           <el-table-column prop="id" label="ID" />
           <el-table-column label="胶件图片">
             <template #default="{ row }">
-              <img
-                v-if="row.pictureUrl"
-                :src="getFullImageUrl(row.pictureUrl)"
-                alt="产品图片"
-                style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px"
-              />
+              <img v-if="row.pictureUrl" :src="getFullImageUrl(row.pictureUrl)" alt="产品图片"
+                style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px" />
               <span v-else>暂无图片</span>
             </template>
           </el-table-column>
@@ -65,11 +56,7 @@
         </el-table>
 
         <!-- 每组下方新增按钮 -->
-        <el-button
-          type="success"
-          style="margin-top: 10px; width: 100%"
-          @click="onCreateWithGroup(groupId)"
-        >
+        <el-button type="success" style="margin-top: 10px; width: 100%" @click="onCreateWithGroup(groupId)">
           + 新增造型表（分组 {{ groupId }}）
         </el-button>
       </div>
@@ -78,20 +65,11 @@
         + 新增分组
       </el-button>
 
-      <div
-        style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center"
-      >
+      <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center">
         <div>共 {{ total }} 条</div>
-        <el-pagination
-          background
-          layout="prev, pager, next, jumper, ->, total, sizes"
-          :current-page="page"
-          :page-size="pageSize"
-          :page-sizes="[5, 10, 20, 50]"
-          :total="total"
-          @current-change="handlePageChange"
-          @size-change="handleSizeChange"
-        />
+        <el-pagination background layout="prev, pager, next, jumper, ->, total, sizes" :current-page="page"
+          :page-size="pageSize" :page-sizes="[5, 10, 20, 50]" :total="total" @current-change="handlePageChange"
+          @size-change="handleSizeChange" />
         <div style="margin-top: 20px; text-align: right">
           <el-button type="success" @click="handleConfirm">PMC确认</el-button>
           <el-button type="warning" @click="handleCancelConfirm">取消确认</el-button>
@@ -99,14 +77,8 @@
       </div>
 
       <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
-        <el-upload
-          class="upload-demo"
-          drag
-          :show-file-list="false"
-          :before-upload="beforeUpload"
-          :http-request="handleUpload"
-          accept=".xlsx,.xls"
-        >
+        <el-upload class="upload-demo" drag :show-file-list="false" :before-upload="beforeUpload"
+          :http-request="handleUpload" accept=".xlsx,.xls">
           <i class="el-icon-upload"></i>
           <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
           <template #tip>
@@ -125,12 +97,7 @@
         </template>
       </el-dialog>
 
-      <StyleDialog
-        v-model="showDialog"
-        :isEdit="isEdit"
-        :currentData="currentRow"
-        @submit="handleSubmit"
-      />
+      <StyleDialog v-model="showDialog" :isEdit="isEdit" :currentData="currentRow" @submit="handleSubmit" />
     </el-card>
   </div>
 </template>
@@ -148,12 +115,10 @@ import {
 } from '@/apis/styles'
 import { pmcConfirm, pmcCancel, exportDesignFile } from '@/apis/designs'
 import { messageBox } from '@/components/message/messageBox'
-import { ElMessageBox } from 'element-plus'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 import StyleDialog from '../component/styleDialog.vue'
 import useTabStore from '@/stores/modules/tabs'
-import { updateProduct } from '@/apis/products'
 
 const props = defineProps<{
   detail: any
@@ -184,7 +149,6 @@ const groupedData = computed(() => {
 })
 
 const fetchData = async () => {
-  console.log('props.detail:', props.detail.id)
   const res = await getStyleList({
     productId: props.detail.id,
     pageNum: page.value,
@@ -401,20 +365,19 @@ const handleSubmit = async (rawForm: Record<string, any>) => {
 }
 //Dialog 中只负责传值，FormData 永远由父组件构造和发送。!!!!!!!!!
 const handleConfirm = async () => {
-  // console.log(props.detail)
   //   const res2 = await updateProduct({
   //     id: Number(props.detail.id),
   //     designStatus: Number(1),
   //     name: props.detail.name,
   //     picture: getFullImageUrl(props.detail.pictureUrl,)
   //   })
-    const res = await pmcConfirm(props.detail.id)
-    if (res.code==200) {
-      messageBox('success', null, '确认成功', '', '')
-      tabStore.freshTab('产品查询')
-    } else {
-      messageBox('error',null,'确认失败',res.data.msg,'')
-    }
+  const res = await pmcConfirm(props.detail.id)
+  if (res.code == 200) {
+    messageBox('success', null, '确认成功', '', '')
+    tabStore.freshTab('产品查询')
+  } else {
+    messageBox('error', null, '确认失败', res.data.msg, '')
+  }
 }
 
 const handleCancelConfirm = async () => {
@@ -442,11 +405,13 @@ watch(showDialog, (val) => {
   font-weight: bold;
   font-size: 16px;
 }
+
 .card-header-flex {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .bg {
   padding: 0 40px 0 40px;
   background-color: rgb(240, 242, 245);

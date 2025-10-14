@@ -5,14 +5,13 @@ import SearchForm from '../component/searchForm.vue'
 import SearchList from '../component/searchList.vue'
 
 const props = defineProps<{
-  addTab: (targetName: string, component: any, data?: any,targetPath?:string) => void
+  addTab: (targetName: string, component: any, data?: any, targetPath?: string) => void
 
 }>()
 
 const searchParams = ref<Record<string, any>>({}) // 初始为空对象
 
 const handleSearch = (params: Record<string, any>) => {
-  console.log('父组件收到搜索参数', params)
   const filteredParams = {
     id: params.productCode || null,
     name: params.productName || null,
@@ -23,7 +22,6 @@ const handleSearch = (params: Record<string, any>) => {
     otherSearch: params.otherSearch || null,
   }
   searchParams.value = filteredParams
-  console.log('父组件发送搜索参数', searchParams.value)
 }
 
 const handleCreated = () => {
@@ -36,9 +34,9 @@ const handleCreated = () => {
   <div class="col">
     <BordShow content="产品查询列表" path="产品管理/查询" />
     <div class="greyBack">
-      <SearchForm @search="handleSearch" @created="handleCreated"  />
+      <SearchForm @search="handleSearch" @created="handleCreated" />
 
-        <SearchList :queryParams="searchParams" :addTab="props.addTab"  />
+      <SearchList :queryParams="searchParams" :addTab="props.addTab" />
 
     </div>
   </div>

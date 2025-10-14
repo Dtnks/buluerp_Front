@@ -1,6 +1,3 @@
-// import request from '@/utils/request'
-// import type { AxiosResponse } from 'axios'
-// import type { OrderResponse } from '@/types/orderResponse'
 import httpInstance from '@/utils/httpsInstance'
 let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
 export function getOrdersList(params = {}) {

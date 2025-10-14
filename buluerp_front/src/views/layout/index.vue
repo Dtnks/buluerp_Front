@@ -3,12 +3,10 @@ import LayoutLeft from '@/views/layout/main/LayoutLeft.vue'
 import LayoutTop from '@/views/layout/main/LayoutTop.vue'
 import { ref } from 'vue'
 import LoadingComponent from '@/components/Loading.vue'
-// import type { TabPaneName } from 'element-plus'
 import { CircleClose } from '@element-plus/icons-vue'
 import useTabStore from '@/stores/modules/tabs'
 import router from '@/router'
-import BlankComponent from '@/router/BlankComponent.vue'
-// const editableTabsValue = ref('')
+
 const store = useTabStore()
 // const addTab = (targetName: string, component, data,targetPath?:string) => {
 //   editableTabsValue.value = store.addTab(targetName, component, data,targetPath)
@@ -75,35 +73,23 @@ const LazyComponentsGroup = new Proxy(
     <LayoutLeft :isCollapse="isCollapse" :addTab="store.addTab" />
     <div class="col" style="flex: 1; height: 100vh; overflow-y: scroll">
       <LayoutTop :handleHiddenMenu="handleHiddenMenu" :reverse="reverse" :addTab="store.addTab" />
-      <el-tabs
-        v-model="store.editableTabsValue"
-        type="card"
-        class="demo-tabs"
-        closable
-        editable
-        @tab-remove="store.removeTab"
-        @tab-click="(item)=>{
-          router.push({name:item.props.name})}"
-      >
+      <el-tabs v-model="store.editableTabsValue" type="card" class="demo-tabs" closable editable
+        @tab-remove="store.removeTab" @tab-click="(item) => {
+          router.push({ name: item.props.name })
+        }">
         <template #add-icon>
-          <el-icon @click="store.removeTab('all')"><CircleClose /></el-icon>
+          <el-icon @click="store.removeTab('all')">
+            <CircleClose />
+          </el-icon>
         </template>
-        
-          <router-view>
-          <el-tab-pane
-            class="col"
-            v-for="item in store.editableTabs"
-            :key="item.name"
-            :label="item.title"
-            :name="item.targetPath"
-          >
+
+        <router-view>
+          <el-tab-pane class="col" v-for="item in store.editableTabs" :key="item.name" :label="item.title"
+            :name="item.targetPath">
             <keep-alive>
-              <component
-                :is="LazyComponentsGroup[item.component]"
-                :addTab="store.addTab"
-                :data="item.data"
-                :key="item.key"
-              ></component>
+              <component :is="LazyComponentsGroup[item.component]" :addTab="store.addTab" :data="item.data"
+                :key="item.key">
+              </component>
             </keep-alive>
           </el-tab-pane>
         </router-view>
@@ -116,6 +102,7 @@ const LazyComponentsGroup = new Proxy(
 .el-tabs {
   flex: 1;
 }
+
 .el-tab-pane {
   height: 100%;
 }

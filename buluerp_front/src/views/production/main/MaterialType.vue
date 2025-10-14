@@ -66,14 +66,14 @@ const editFormData = ref([
 const newSubmit = ref({
 
 })
-const editFormRef=ref()
+const editFormRef = ref()
 const editSubmit = ref({
 
 })
 const searchContent = ref({
-    colorCode: '',
-    colorWeight: '',
-    name: '',
+  colorCode: '',
+  colorWeight: '',
+  name: '',
 })
 const tableData = ref([
   {
@@ -101,7 +101,6 @@ const tableData = ref([
 const operation = ref([
   // {
   //   func: (id) => {
-  //     console.log(id)
   //     detailCustomer(id).then((res) => {
   //        
   //     })
@@ -130,37 +129,38 @@ const newDialogVisible = ref(false)
 const createFormRef = ref(null)
 
 const handleSubmit = () => {
-  
-      if (title.value === '编辑') {
-        editFormRef.value.validateForm((valid) => { 
-          if (valid) {
-            changeMaterialInfo(editSubmit.value).then((res) => {
-            page.value = 1
-            listMaterialInfo(page.value, pageSize.value).then((res) => {
-              listData.value = res.rows
-              total.value = res.total
+
+  if (title.value === '编辑') {
+    editFormRef.value.validateForm((valid) => {
+      if (valid) {
+        changeMaterialInfo(editSubmit.value).then((res) => {
+          page.value = 1
+          listMaterialInfo(page.value, pageSize.value).then((res) => {
+            listData.value = res.rows
+            total.value = res.total
           })
           ElMessage.success(res.msg)
           editDialogVisible.value = false
-          })}
         })
       }
-       else {
-        createFormRef.value.validateForm((valid) => {
-          if (valid) {
-            newMaterialInfo(newSubmit.value).then((res) => {
-              page.value = 1
-              listMaterialInfo(page.value, pageSize.value).then((res) => {
-                listData.value = res.rows
-                total.value = res.total
-              })
-              ElMessage.success(res.msg)
-              newDialogVisible.value = false
-            })
-          }
+    })
+  }
+  else {
+    createFormRef.value.validateForm((valid) => {
+      if (valid) {
+        newMaterialInfo(newSubmit.value).then((res) => {
+          page.value = 1
+          listMaterialInfo(page.value, pageSize.value).then((res) => {
+            listData.value = res.rows
+            total.value = res.total
+          })
+          ElMessage.success(res.msg)
+          newDialogVisible.value = false
         })
       }
-    }
+    })
+  }
+}
 
 const title = ref('编辑')
 //传给form组件的参数
@@ -274,7 +274,7 @@ const handleSizeChange = async (val: number) => {
 
 //初次渲染
 listMaterialInfo(page.value, pageSize.value).then((res) => {
-   
+
   total.value = res.total
   listData.value = res.rows
 })
@@ -283,92 +283,59 @@ listMaterialInfo(page.value, pageSize.value).then((res) => {
   <div class="col">
     <BordShow content="料型表" path="物料管理/料型" />
     <div class="greyBack">
-      <FormSearch
-        title="查询"
-        :data="formData"
-        :onCreate="onCreate"
-        :onSubmit="onSubmit"
-        :onImport="onImport"
-        :onDownloadTemplate="onDownloadTemplate"
-        :searchForm="searchContent"
-      />
-      <TableList
-        :tableData="tableData"
-        :operations="operation"
-        :listData="listData"
-        :DeleteFunc="DeleteFunc"
-        :exportFunc="exportFunc"
-      >
+      <FormSearch title="查询" :data="formData" :onCreate="onCreate" :onSubmit="onSubmit" :onImport="onImport"
+        :onDownloadTemplate="onDownloadTemplate" :searchForm="searchContent" />
+      <TableList :tableData="tableData" :operations="operation" :listData="listData" :DeleteFunc="DeleteFunc"
+        :exportFunc="exportFunc">
         <slot>
-          <div
-            style="
+          <div style="
               margin-top: 20px;
               display: flex;
               justify-content: space-between;
               align-items: center;
-            "
-          >
+            ">
             <div>共 {{ total }} 条</div>
-            <el-pagination
-              background
-              layout="prev, pager, next, jumper, ->, total, sizes"
-              :current-page="page"
-              :page-size="pageSize"
-              :page-sizes="[5, 10, 20, 50]"
-              :total="total"
-              @current-change="handlePageChange"
-              @size-change="handleSizeChange"
-            />
+            <el-pagination background layout="prev, pager, next, jumper, ->, total, sizes" :current-page="page"
+              :page-size="pageSize" :page-sizes="[5, 10, 20, 50]" :total="total" @current-change="handlePageChange"
+              @size-change="handleSizeChange" />
           </div>
         </slot>
       </TableList>
     </div>
 
-    <el-dialog v-model="newDialogVisible" :title="title" width="800px"
-      ><CreateForm :data="newFormData" :Formvalue="newSubmit" ref="createFormRef" />
+    <el-dialog v-model="newDialogVisible" :title="title" width="800px">
+      <CreateForm :data="newFormData" :Formvalue="newSubmit" ref="createFormRef" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button
-            type="info"
-            @click="
-              () => {
-                newDialogVisible = false
-              }
-            "
-          >
+          <el-button type="info" @click="
+            () => {
+              newDialogVisible = false
+            }
+          ">
             取消
           </el-button>
         </div>
       </template>
     </el-dialog>
-    <el-dialog v-model="editDialogVisible" :title="title" width="800px"
-      ><CreateForm :data="editFormData" :Formvalue="editSubmit" ref="editFormRef" />
+    <el-dialog v-model="editDialogVisible" :title="title" width="800px">
+      <CreateForm :data="editFormData" :Formvalue="editSubmit" ref="editFormRef" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button
-            type="info"
-            @click="
-              () => {
-                editDialogVisible = false
-              }
-            "
-          >
+          <el-button type="info" @click="
+            () => {
+              editDialogVisible = false
+            }
+          ">
             取消
           </el-button>
         </div>
       </template>
     </el-dialog>
     <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
-      <el-upload
-        class="upload-demo"
-        drag
-        :show-file-list="false"
-        :before-upload="beforeUpload"
-        :http-request="handleUpload"
-        accept=".xlsx,.xls"
-      >
+      <el-upload class="upload-demo" drag :show-file-list="false" :before-upload="beforeUpload"
+        :http-request="handleUpload" accept=".xlsx,.xls">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
         <template v-slot:tip>

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import FormSearch from '@/components/form/Form.vue'
 import BordShow from '@/components/board/SecBoard.vue'
-import { getLog, deleteLog, listLog, exportSelectTable } from '@/apis/Log'
+import { deleteLog, listLog, exportSelectTable } from '@/apis/Log'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
-import { ref, nextTick } from 'vue'
+import { ref } from 'vue'
 import { parseTime } from '@/utils/ruoyi'
 import { messageBox } from '@/components/message/messageBox'
-const props = defineProps([ 'addTab'])
+const props = defineProps(['addTab'])
 //渲染页面
 const createFormRef = ref()
 const formData = ref([
@@ -151,38 +151,19 @@ listLog(page.value, pageSize.value).then((res) => {
   <div class="col">
     <BordShow content="日志系统" path="管理/日志系统" />
     <div class="greyBack">
-      <FormSearch
-        title="查询"
-        :data="formData"
-        :onSubmit="onSubmit"
-        :searchForm="searchContent"
-      />
-      <TableList
-        :tableData="tableData"
-        :listData="listData"
-        :DeleteFunc="DeleteFunc"
-        :exportFunc="exportFunc"
-      >
+      <FormSearch title="查询" :data="formData" :onSubmit="onSubmit" :searchForm="searchContent" />
+      <TableList :tableData="tableData" :listData="listData" :DeleteFunc="DeleteFunc" :exportFunc="exportFunc">
         <slot>
-          <div
-            style="
+          <div style="
               margin-top: 20px;
               display: flex;
               justify-content: space-between;
               align-items: center;
-            "
-          >
+            ">
             <div>共 {{ total }} 条</div>
-            <el-pagination
-              background
-              layout="prev, pager, next, jumper, ->, total, sizes"
-              :current-page="page"
-              :page-size="pageSize"
-              :page-sizes="[5, 10, 20, 50]"
-              :total="total"
-              @current-change="handlePageChange"
-              @size-change="handleSizeChange"
-            />
+            <el-pagination background layout="prev, pager, next, jumper, ->, total, sizes" :current-page="page"
+              :page-size="pageSize" :page-sizes="[5, 10, 20, 50]" :total="total" @current-change="handlePageChange"
+              @size-change="handleSizeChange" />
           </div>
         </slot>
       </TableList>

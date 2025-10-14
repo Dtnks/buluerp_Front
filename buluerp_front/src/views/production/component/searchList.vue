@@ -1,36 +1,21 @@
 <template>
 
-    <div>
-      <!-- 用 Tablelist 替换 el-table -->
-      <Tablelist
-        :tableData="tableData"
-        :listData="data"
-        :operations="operations"
-        :exportFunc="onExport"
-        :DeleteFunc="onDelete"
-        :control="control"
-      >
+  <div>
+    <!-- 用 Tablelist 替换 el-table -->
+    <Tablelist :tableData="tableData" :listData="data" :operations="operations" :exportFunc="onExport"
+      :DeleteFunc="onDelete" :control="control">
 
-        <!-- 分页器 -->
-        <slot>
-          <div
-            style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center"
-          >
-            <div>共 {{ total }} 条</div>
-            <el-pagination
-              background
-              layout="prev, pager, next, jumper, ->, total, sizes"
-              :current-page="page"
-              :page-size="pageSize"
-              :page-sizes="[5, 10, 20, 50]"
-              :total="total"
-              @current-change="handlePageChange"
-              @size-change="handleSizeChange"
-            />
-          </div>
-        </slot>
-      </Tablelist>
-    </div>
+      <!-- 分页器 -->
+      <slot>
+        <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center">
+          <div>共 {{ total }} 条</div>
+          <el-pagination background layout="prev, pager, next, jumper, ->, total, sizes" :current-page="page"
+            :page-size="pageSize" :page-sizes="[5, 10, 20, 50]" :total="total" @current-change="handlePageChange"
+            @size-change="handleSizeChange" />
+        </div>
+      </slot>
+    </Tablelist>
+  </div>
 
 </template>
 
@@ -38,14 +23,12 @@
 import { ref, watch, onMounted } from 'vue'
 import { getList_pro, deleteProduct, exportProduct } from '@/apis/products.js'
 import { messageBox } from '@/components/message/messageBox'
-import { getFullImageUrl } from '@/utils/image/getUrl'
 import { downloadBinaryFile } from '@/utils/file/base64'
-import Detail from '../main/Detail.vue'
 import Tablelist from '@/components/table/TableList.vue'
 
 const props = defineProps<{
   queryParams: Record<string, any>
-  addTab: (targetName: string, component: any, data?: any,targetPath?:string) => void
+  addTab: (targetName: string, component: any, data?: any, targetPath?: string) => void
 
 }>()
 

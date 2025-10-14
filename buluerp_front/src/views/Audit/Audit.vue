@@ -93,10 +93,6 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import { getAuditDetail, getAuditList, getAuditOrderPending, getAuditProductionPending, getAuditPurchasePending, getAuditSubcontractPending, postAuditOder, postAuditProduction, postAuditPurchase, postAuditSubcontract, } from '@/apis/audit'
 import { resMap } from '../business/utils/statusMap'
 import { messageBox } from '@/components/message/messageBox'
-import { getOrderDetailByInnerId } from '@/apis/orders'
-import { getPurchasePlanDetail } from '@/apis/produceControl/purchase/purchasePlan'
-import { getPackagingDetail } from '@/apis/produceControl/produce/packaging'
-import { getProductionScheduleById } from '@/apis/produceControl/produce/schedule'
 
 const type = ref('all')
 const isLoadingCompleted = ref(false)
@@ -139,13 +135,6 @@ const auditPostApiMap = {
   production: postAuditProduction,
   purchase: postAuditPurchase,
   subcontract: postAuditSubcontract,
-}
-
-const viewApiMap = {
-  order: getOrderDetailByInnerId,
-  production: getProductionScheduleById,
-  purchase: getPurchasePlanDetail,
-  subcontract: getPackagingDetail,
 }
 
 const auditTypeMap = {

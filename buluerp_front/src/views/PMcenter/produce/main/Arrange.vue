@@ -181,9 +181,8 @@ const tableData = ref([
 const operation = ref([
   // {
   //   func: (id) => {
-  //     console.log(id)
   //     detailCustomer(id).then((res) => {
-  //        
+  //
   //     })
   //   },
   //   value: '查看',
@@ -203,7 +202,6 @@ const operation = ref([
       } else {
         delete newSubmit.value.pictureUrl
       }
-      console.log(newSubmit.value)
     },
     value: '编辑',
   },
@@ -356,7 +354,6 @@ const handleSizeChange = async (val: number) => {
 listArrange(page.value, pageSize.value).then((res) => {
   total.value = res.total
   listData.value = res.rows
-  console.log(res.rows)
 })
 </script>
 <template>
