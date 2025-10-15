@@ -36,6 +36,7 @@ const ComponentsGroup = {
   ProductDetail: () => import('@/views/production/main/Detail.vue'),
   ProMaterial: () => import('@/views/production/main/Material.vue'),
   ProMaterialType: () => import('@/views/production/main/MaterialType.vue'),
+  Mould: () => import('@/views/production/main/Mould.vue'),
   DesignTable: () => import('@/views/production/main/DesignTable.vue'),
   Admin: () => import('@/views/admin/Admin.vue'),
   Audit: () => import('@/views/admin/Audit.vue'),

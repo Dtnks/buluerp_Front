@@ -29,6 +29,17 @@
     </div>
   </el-dialog>
 
+    <!-- 外购信息弹窗 -->
+  <el-dialog v-model="showDetailDialog" title="模具信息" width="600px">
+    <div v-if="currentRow" class="purchase-info-container">
+      <div class="info-item"><strong>模具名称:</strong> {{ currentRow.mould_name }}</div>
+      <div class="info-item"><strong>模具厂家ID:</strong> {{ currentRow.mould_factory_id }}</div>
+      <div class="info-item"><strong>设计时间:</strong> {{ currentRow.mould_design_time }}</div>
+      <div class="info-item"><strong>验收时间:</strong> {{ currentRow.mould_check_time}}</div>
+      <div class="info-item"><strong>模具状态:</strong> {{ currentRow.mould_status }}</div>
+    </div>
+  </el-dialog>
+
   <!-- 编辑对话框 -->
   <MaterialDialog v-model="showDialog" :isEdit="isEdit" :currentData="currentRow" @submit="handleSubmit" />
 
@@ -49,6 +60,7 @@ import MaterialDialog from '@/views/production/component/materialDialog.vue'
 import Tablelist from '@/components/table/TableList.vue'
 
 const showDialog = ref(false)
+const showDetailDialog = ref(false)
 const isEdit = ref(false)
 const currentRow = ref({})
 
@@ -88,7 +100,7 @@ const tableData = [
   { value: 'materialType', label: '料型', type: 'text' },
   { value: 'standardCode', label: '常规编码', type: 'text' },
   { value: 'singleWeight', label: '单重', type: 'text' },
-  { value: 'mouldStatus', label: '模具状态', type: 'text' },
+  { value: 'mouldStatus', label: '模具状态', type: 'tags' },
   { value: 'mouldManufacturer', label: '模具厂家', type: 'text' },
   { value: 'cycleTime', label: '周期/s', type: 'text' },
   { value: 'remarks', label: '备注', type: 'text' },
@@ -107,6 +119,7 @@ const tableData = [
 
 // 操作列
 const operations = [
+  { value: '模具详情', func: (row: any) => onDetail(row), disabled: false },
   { value: '编辑', func: (row: any) => onEdit(row), disabled: false },
   { value: '查看外购', func: (row: any) => openPurchaseDialog(row.purchaseInfo), disabled: false },
 ]
@@ -142,6 +155,11 @@ const handleSubmit = async (formData: any) => {
   } finally {
     showDialog.value = false
   }
+}
+
+const onDetail =  (row: any) => {
+  currentRow.value = { ...row }
+  showDetailDialog.value = true
 }
 
 onMounted(() => {

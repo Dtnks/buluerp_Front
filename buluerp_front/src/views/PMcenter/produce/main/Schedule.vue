@@ -319,7 +319,7 @@ const tableData = ref([
   {
     value: 'mouldCondition',
     label: '模具状态',
-    type: 'text',
+    type: 'tags',
   },
   {
     value: 'usage',

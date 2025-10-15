@@ -46,6 +46,11 @@ const router = createRouter({
           component: BlankComponent,
         },
         {
+          path: '/Mould',
+          name: 'Mould',
+          component: BlankComponent,
+        },
+        {
           path: '/ProMaterialType',
           name: 'ProMaterialType',
           component: BlankComponent,
