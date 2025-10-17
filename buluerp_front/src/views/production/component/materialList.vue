@@ -32,11 +32,13 @@
     <!-- 外购信息弹窗 -->
   <el-dialog v-model="showDetailDialog" title="模具信息" width="600px">
     <div v-if="currentRow" class="purchase-info-container">
-      <div class="info-item"><strong>模具名称:</strong> {{ currentRow.mould_name }}</div>
-      <div class="info-item"><strong>模具厂家ID:</strong> {{ currentRow.mould_factory_id }}</div>
-      <div class="info-item"><strong>设计时间:</strong> {{ currentRow.mould_design_time }}</div>
-      <div class="info-item"><strong>验收时间:</strong> {{ currentRow.mould_check_time}}</div>
-      <div class="info-item"><strong>模具状态:</strong> {{ currentRow.mould_status }}</div>
+      <div class="info-item"><strong>模具ID:</strong> {{ currentRow.mouldNumber }}</div>
+      <div class="info-item"><strong>模具厂家ID:</strong> {{ currentRow.manufacturerId }}</div>
+      <div class="info-item"><strong>试模时间:</strong> {{ currentRow.trialDate }}</div>
+      <div class="info-item"><strong>模具状态:</strong> {{ currentRow.status }}</div>
+    </div>
+    <div v-else class="purchase-info-container">
+      <div class="info-item">此模具不存在！</div>
     </div>
   </el-dialog>
 
@@ -53,6 +55,9 @@ import {
   getMaterialList,
   updateMaterial,
 } from '@/apis/materials.js'
+import {
+  getMouldDetail
+} from '@/apis/mould'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import { messageBox } from '@/components/message/messageBox'
 import { getFullImageUrl } from '@/utils/image/getUrl'
@@ -82,6 +87,7 @@ interface PurchaseInfo {
   materialId: number
   supplier: string
 }
+
 const currentPurchaseInfo = ref<PurchaseInfo | null>(null)
 const purchaseDialogVisible = ref(false)
 
@@ -157,10 +163,20 @@ const handleSubmit = async (formData: any) => {
   }
 }
 
-const onDetail =  (row: any) => {
-  currentRow.value = { ...row }
-  showDetailDialog.value = true
+const onDetail = async (row: any) => {
+  try {
+    console.log(row.mouldNumber)
+    const res = await getMouldDetail(Number(row.mouldNumber))
+    currentRow.value = res.data  // 注意：这里才是实际数据
+    console.log(currentRow.value)
+    showDetailDialog.value = true
+  }
+   catch (error) {
+    console.error('获取模具详情失败', error)
+    console.log('err', error)
+  }
 }
+
 
 onMounted(() => {
   fetchData()

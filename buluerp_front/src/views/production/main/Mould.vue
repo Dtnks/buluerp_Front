@@ -1,15 +1,20 @@
 <template>
   <div class="col">
     <BordShow content="模具列表" path="模具管理/模具" />
+
     <div class="greyBack">
+      <!-- 查询表单 -->
       <FormSearch
         title="查询"
         :data="formData"
         :onSubmit="onSubmit"
         :onImport="onImport"
+        :onCreate="onCreate"
         :onDownloadTemplate="onDownloadTemplate"
         :searchForm="searchContent"
       />
+
+      <!-- 表格 -->
       <TableList
         :tableData="tableData"
         :operations="operation"
@@ -19,12 +24,7 @@
       >
         <slot>
           <div
-            style="
-              margin-top: 20px;
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-            "
+            style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center"
           >
             <div>共 {{ total }} 条</div>
             <el-pagination
@@ -42,25 +42,18 @@
       </TableList>
     </div>
 
-    <el-dialog v-model="editDialogVisible" :title="title" width="800px"
-      ><CreateForm :data="newFormData" :Formvalue="newSubmit" ref="createFormRef" />
-
+    <!-- 新增 / 编辑弹窗 -->
+    <el-dialog v-model="editDialogVisible" :title="title" width="800px">
+      <CreateForm :data="dynamicFormData" :Formvalue="newSubmit" ref="createFormRef" />
       <template #footer>
         <div class="dialog-footer">
-          <el-button type="primary" @click="handleSubmit"> 确认 </el-button>
-          <el-button
-            type="info"
-            @click="
-              () => {
-                editDialogVisible = false
-              }
-            "
-          >
-            取消
-          </el-button>
+          <el-button type="primary" @click="handleSubmit">确认</el-button>
+          <el-button @click="() => (editDialogVisible = false)">取消</el-button>
         </div>
       </template>
     </el-dialog>
+
+    <!-- 导入弹窗 -->
     <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
       <el-upload
         class="upload-demo"
@@ -72,375 +65,275 @@
       >
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
-        <template v-slot:tip>
+        <template #tip>
           <div class="el-upload__tip">只能上传 xls/xlsx 文件，大小不超过 5MB</div>
         </template>
       </el-upload>
     </el-dialog>
   </div>
 </template>
+
 <script setup lang="ts">
+import { ref, nextTick } from 'vue'
 import FormSearch from '@/components/form/Form.vue'
 import CreateForm from '@/components/form/CreateForm.vue'
-import BordShow from '@/components/board/SecBoard.vue'
-import {
-  listPackaging,
-  changePackaging,
-  newPackaging,
-  exportSelectTable,
-  deletePackaging,
-  importFile,
-  downLoadModule,
-} from '@/apis/produceControl/produce/packaging'
-import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
-import { ref, nextTick } from 'vue'
-import { parseTime } from '@/utils/ruoyi'
+import BordShow from '@/components/board/SecBoard.vue'
+import { ElMessage } from 'element-plus'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
-import { ElMessage } from 'element-plus'
-import { searchFunc } from '@/utils/search/search'
-import { requiredRule, positiveNumberRule } from '@/utils/form/valid'
-const props = defineProps([ 'addTab'])
-const createFormRef = ref()
-//渲染页面
+import { parseTime } from '@/utils/ruoyi'
+import { downloadBinaryFile } from '@/utils/file/base64'
+import { requiredRule } from '@/utils/form/valid'
+import {
+  getMouldList,
+  createMould,
+  deleteMould,
+  updateMould,
+  exportMould,
+  importMouldFile,
+  getMouldTemplate,
+} from '@/apis/mould'
+import {searchFunc} from "@/utils/search/search"
+// 查询表单
 const formData = ref([
   [
-    { type: 'input', label: '模具编号', key: 'id' },
-    { type: 'input', label: '模具厂商', key: 'mould_factory_id' },
+    { type: 'input', label: '模具编号', key: 'mouldNumber' },
+    { type: 'input', label: '模具厂商', key: 'manufacturerId' },
     {
       type: 'select',
       label: '模具状态',
-      key: 'mould_status',
+      key: 'status',
       options: [
-        { value: 1, label: '是' },
-        { value: 0, label: '否' },
+        { value: '创建(待制作)', label: '创建(待制作)' },
+        { value: '制作完成(待验收)', label: '制作完成(待验收)' },
+        { value: '验收通过', label: '验收通过' },
+        { value: '试模完成', label: '试模完成' },
       ],
     },
   ],
 ])
-const newFormData = ref([
-  [
-    {
-      type: 'inputSelect',
-      label: '订单',
-      key: 'orderCode',
-      width: 8,
-      rules: [requiredRule],
-      showKey:[{key:'innerId',label:"内部编号"},{key:'outerId',label:"外部编号"}],
-      remoteFunc: searchFunc('system/orders/list', 'innerId'),
+
+
+const searchContent = ref({
+  id: '',
+  manufacturerId: '',
+  status: '',
+})
+
+// 表格列
+const tableData = ref([
+  { value: 'id', label: 'id', type: 'text' },
+  { value : 'mouldNumber', label: '模具编号', type: 'text' },
+  { value: 'manufacturerId', label: '模具厂商', type: 'text' },
+  { value: 'trialDate', label: '试模日期', type: 'text' },
+  {
+    value: 'status',
+    label: '模具状态',
+    type: 'text',
+  },
+])
+
+// 表单项
+import { computed } from 'vue'
+
+// 动态表单项
+const dynamicFormData = computed(() => {
+  if (title.value === '新增') {
+    // 新增只显示两项
+    return [
+      [
+        { type: 'input', label: '模具编号', key: 'mouldNumber', width: 8, rules: [requiredRule] },
+        { type: 'inputSelect', label: '模具厂商', key: 'manufacturerId', width: 8, rules: [requiredRule],
+        showKey:[{key:'id',label:"厂商编号"},{key:'name',label:"厂商名称"}],
+      remoteFunc: searchFunc('system/manufacturer/list', 'id'),
       options: [],
-      loading: false,
-    },
-
-
-    { type: 'input', label: '模具名称', key: 'mould_name', width: 8, rules: [requiredRule] },
-
-    {
-      type: 'timer',
-      label: '设计时间',
-      key: 'mould_design_time',
-      timerType: 'date',
-      width: 8,
-      rules: [requiredRule],
-    },
-  ],
-  [
-    {
-      type: 'select',
-      label: '模具状态',
-      key: 'mould_status',
-      width: 8,
-      options: [
-        { value: 0, label: '否' },
-        { value: 1, label: '是' },
+      loading: false, },
       ],
-      rules: [requiredRule],
-    },
-    {
-      type: 'select',
-      label: '人偶',
-      key: 'isMinifigure',
-      width: 8,
-      options: [
-        { value: 0, label: '否' },
-        { value: 1, label: '是' },
+    ]
+  } else {
+    // 编辑显示四项
+    return [
+      [
+        { type: 'input', label: '模具编号', key: 'mouldNumber', width: 8, rules: [requiredRule] },
+        { type: 'inputSelect', label: '模具厂商', key: 'manufacturerId', width: 8, rules: [requiredRule],
+        showKey:[{key:'id',label:"厂商编号"},{key:'name',label:"厂商名称"}],
+      remoteFunc: searchFunc('system/manufacturer/list', 'id'),
+      options: [],
+      loading: false, },
+        {
+          type: 'select',
+          label: '模具状态',
+          key: 'status',
+          width: 8,
+          options: [
+            { value: '创建(待制作)', label: '创建(待制作)' },
+            { value: '制作完成(待验收)', label: '制作完成(待验收)' },
+            { value: '验收通过', label: '验收通过' },
+            { value: '试模完成', label: '试模完成' },
+          ],
+          rules: [requiredRule],
+        },
       ],
-      rules: [requiredRule],
-    },
-    {
-      type: 'select',
-      label: '起件器',
-      key: 'isTool',
-      width: 8,
-      options: [
-        { value: 0, label: '否' },
-        { value: 1, label: '是' },
+      [
+        {
+          type: 'timer',
+          label: '试模日期',
+          key: 'trialDate',
+          timerType: 'date',
+          width: 8,
+        },
       ],
-      rules: [requiredRule],
-    },
-  ],
+    ]
+  }
+})
 
-  [{ type: 'textarea', label: '备注', key: 'remark', width: 24 }],
-])
+// 表单绑定对象
 const newSubmit = ref({
-  productId: '',
-  orderCode: '',
-  materialType: '',
-  productNameCn: '',
-  releaseDate: '',
-  bagSpecification: '',
-  bagWeight: '',
-  packageQuantity: '',
-  isManual: '',
-  isMinifigure: '',
-  isTool: '',
-  packageAccessories: '',
-  accessoryType: '',
-  accessoryTotal: '',
+  mouldNumber: '',
+  manufacturerId: '',
+  trialDate: '',
+  status: '',
   remark: '',
 })
-const searchContent = ref({
-  releaseDate: '',
-  operator: '',
-  colorCode: '',
-  supplier: '',
-  materialType: '',
-})
-const tableData = ref([
-  {
-    value: 'id',
-    label: 'ID',
-    type: 'text',
-  },
-  {
-    value: 'mould_factory_id',
-    label: '模具厂商',
-    type: 'text',
-  },
-  {
-    value: 'mould_check_time',
-    label: '验收日期',
-    type: 'text',
-  },
-  {
-    value: 'mould_design_time',
-    label: '设计时间',
-    type: 'text',
-  },
-  {
-    value: 'mould_status',
-    label: '模具状态',
-    type: 'Maptext',
-    map: { true: '否', false: '是' },
-  },
-])
+
+// 表格操作列
 const operation = ref([
-  // {
-  //   func: (id) => {
-  //     console.log(id)
-  //     detailCustomer(id).then((res) => {
-  //
-  //     })
-  //   },
-  //   value: '查看',
-  // },
   {
-    func: (row) => {
-      const id = row.id
-      title.value = '编辑'
-      editDialogVisible.value = true
-      newSubmit.value = { ...row }
-      nextTick(() => {
-        createFormRef.value.clearValidate()
-      })
-    },
     value: '编辑',
-  },
-  {
     func: (row) => {
       title.value = '编辑'
-      newSubmit.value.done=true
-      changePackaging(newSubmit.value).then((res) => {
-          page.value = 1
-          listPackaging(page.value, pageSize.value).then((res) => {
-            listData.value = res.rows
-            total.value = res.total
-          })
-          ElMessage.success(res.msg)
-        })
+      newSubmit.value = { ...row }
+      editDialogVisible.value = true
+      nextTick(() => createFormRef.value.clearValidate())
     },
-    value: '状态修改',
   },
-  // {
-  //   func: (row) => {
-  //     props.addTab('分包-' + row.id, 'PMProducePackagingDetail', row.id,`main/PackagingDetail/${row.id}`)
-  //   },
-  //   value: '查看',
-  //   disabled: false,
-  // },
 ])
 
-//新增与修改
-const importDialogVisible = ref(false)
-const editDialogVisible = ref(false)
-const handleSubmit = () => {
-  createFormRef.value.validateForm((valid) => {
-    if (valid) {
-      newSubmit.value.releaseDate = parseTime(newSubmit.value.releaseDate, '{y}-{m}-{d}')
-      if (title.value == '编辑') {
-        console.log(newSubmit.value)
-        changePackaging(newSubmit.value).then((res) => {
-          page.value = 1
-          listPackaging(page.value, pageSize.value).then((res) => {
-            listData.value = res.rows
-            total.value = res.total
-          })
-          ElMessage.success(res.msg)
-          editDialogVisible.value = false
-        })
-      } else {
-        newPackaging(newSubmit.value).then((res) => {
-          page.value = 1
-          listPackaging(page.value, pageSize.value).then((res) => {
-            listData.value = res.rows
-            total.value = res.total
-          })
-          ElMessage.success(res.msg)
-          editDialogVisible.value = false
-        })
-      }
-    }
-  })
-}
-const title = ref('编辑')
-//传给form组件的参数
-const resetSubmit = () => {
-  newSubmit.value = {
-    productId: '',
-    orderCode: '',
-    materialType: '',
-    productNameCn: '',
-    releaseDate: '',
-    bagSpecification: '',
-    bagWeight: '',
-    packageQuantity: '',
-    isManual: '',
-    isMinifigure: '',
-    isTool: '',
-    packageAccessories: '',
-    accessoryType: '',
-    accessoryTotal: '',
-    remark: '',
-  }
-}
-const onCreate = () => {
-  resetSubmit()
-  title.value = '新增'
-  editDialogVisible.value = true
-  createFormRef.value.clearValidate()
-}
+// 分页与数据
+const listData = ref([])
+const page = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
 
-const onSubmit = () => {
-  searchContent.value.releaseDate = parseTime(searchContent.value.releaseDate, '{y}-{m}-{d}')
-  page.value = 1
-  listPackaging(page.value, pageSize.value, searchContent.value).then((res) => {
+// 加载数据
+const loadData = () => {
+  getMouldList({
+    pageNum: page.value,
+    pageSize: pageSize.value,
+    ...searchContent.value,
+  }).then((res) => {
     listData.value = res.rows
     total.value = res.total
   })
 }
+loadData()
 
-const onImport = () => {
-  importDialogVisible.value = true
+const handlePageChange = (val: number) => {
+  page.value = val
+  loadData()
 }
-const onDownloadTemplate = () => {
-  downLoadModule().then((res) => {
-    downloadBinaryFile(res, '分包表导入模板.xlsx')
+const handleSizeChange = (val: number) => {
+  pageSize.value = val
+  page.value = 1
+  loadData()
+}
+
+// 新增与编辑
+const editDialogVisible = ref(false)
+const title = ref('新增')
+const createFormRef = ref()
+
+// 点击“新增”按钮
+const onCreate = () => {
+  title.value = '新增'
+  // 清空表单
+  newSubmit.value = {
+    mouldNumber: '',
+    manufacturerId: '',
+    trialDate: '',
+    status: '',
+    remark: '',
+  }
+  // 打开弹窗
+  editDialogVisible.value = true
+
+  // 清除上次的校验结果
+  nextTick(() => {
+    if (createFormRef.value) createFormRef.value.clearValidate()
   })
 }
-const handleUpload = async (option: any) => {
-  const formData = new FormData()
-  formData.append('file', option.file)
 
-  importFile(formData).then((res) => {
-    ElMessage.success(res.msg)
-    listPackaging(page.value, pageSize.value).then((res) => {
-      listData.value = res.rows
-      total.value = res.total
+const handleSubmit = () => {
+  createFormRef.value.validateForm((valid) => {
+    if (!valid) return
+
+    // 拷贝表单数据
+    const payload = { ...newSubmit.value }
+    payload.mouldDesignTime = parseTime(payload.mouldDesignTime, '{y}-{m}-{d}')
+    payload.trialDate = parseTime(payload.trialDate, '{y}-{m}-{d}')
+
+    // 创建 FormData 对象
+    const formData = new FormData()
+    Object.keys(payload).forEach((key) => {
+      // 如果是 null 或 undefined，确保不出错
+      formData.append(key, payload[key] ?? '')
+    })
+
+    // 根据状态选择接口
+    const api = title.value === '编辑' ? updateMould : createMould
+
+    // 调用接口
+    api(formData).then((res) => {
+      ElMessage.success(res.msg || '操作成功')
+      editDialogVisible.value = false
+      loadData()
     })
   })
-
-  importDialogVisible.value = false
-}
-let count = 1
-//传给table组件
-const exportFunc = (row) => {
-  if (row.length === 0) {
-    ElMessage.warning('请先选择要导出的产品')
-    return
-  }
-  for (const i in row) {
-    exportSelectTable(row[i].id).then((res) => {
-
-      const now = new Date()
-      downloadBinaryFile(
-        res,
-        '分包表_' + row[i].id + '_' + now.toLocaleDateString() + '_' + count + '.xlsx',
-      )
-      count += 1
-    })
-  }
 }
 
-const DeleteFunc = (row) => {
-  if (row.length === 0) {
-    ElMessage.warning('请先选择要删除的记录')
-    return
-  }
-  const ids = row.map((ele) => {
-    return ele.id
-  })
-  const func = () => {
-    return deletePackaging(ids).then((res) => {
-      listPackaging(page.value, pageSize.value).then((res) => {
-        listData.value = res.rows
-        total.value = res.total
-      })
-    })
-  }
 
+// 删除
+const DeleteFunc = (rows) => {
+  if (!rows.length) return ElMessage.warning('请选择要删除的记录')
+  const ids = rows.map((r) => r.id)
   messageBox(
     'warning',
-    func,
-    `成功删除${ids.length}条记录`,
+    () => deleteMould(ids).then(() => loadData()),
+    `成功删除 ${ids.length} 条记录`,
     '用户权限不足',
-    `确认删除${ids.length}条记录`,
+    `确认删除 ${ids.length} 条记录？`,
   )
 }
 
-//分页
-const page = ref(1)
-const pageSize = ref(10)
-const total = ref(0)
-const listData = ref([])
-const handlePageChange = async (val: number) => {
-  page.value = val
-  listPackaging(page.value, pageSize.value).then((res) => {
-    listData.value = res.rows
-  })
-}
-const handleSizeChange = async (val: number) => {
-  pageSize.value = val
-  page.value = 1
-  listPackaging(page.value, pageSize.value).then((res) => {
-    listData.value = res.rows
+// 导入
+const importDialogVisible = ref(false)
+const onImport = () => (importDialogVisible.value = true)
+const handleUpload = (option) => {
+  const formData = new FormData()
+  formData.append('file', option.file)
+  importMouldFile(formData).then((res) => {
+    ElMessage.success(res.msg || '导入成功')
+    importDialogVisible.value = false
+    loadData()
   })
 }
 
-//初次渲染
-listPackaging(page.value, pageSize.value).then((res) => {
-  console.log(res,'detail')
-  total.value = res.total
-  listData.value = res.rows
-})
+// 下载模板
+const onDownloadTemplate = () => {
+  getMouldTemplate().then((res) => downloadBinaryFile(res, '模具导入模板.xlsx'))
+}
+
+// 导出
+const exportFunc = (rows) => {
+  if (!rows.length) return ElMessage.warning('请选择要导出的记录')
+  const ids = rows.map((r) => r.id).join(',')
+  exportMould(ids).then((res) => downloadBinaryFile(res, '模具导出.xlsx'))
+}
+
+// 查询
+const onSubmit = () => {
+  page.value = 1
+  loadData()
+}
 </script>
