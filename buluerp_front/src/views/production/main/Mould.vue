@@ -108,6 +108,7 @@ const formData = ref([
         { value: '创建(待制作)', label: '创建(待制作)' },
         { value: '制作完成(待验收)', label: '制作完成(待验收)' },
         { value: '验收通过', label: '验收通过' },
+        { value: '维修中', label: '维修中' },
         { value: '试模完成', label: '试模完成' },
       ],
     },
@@ -130,6 +131,11 @@ const tableData = ref([
   {
     value: 'status',
     label: '模具状态',
+    type: 'text',
+  },
+  {
+    value: 'mouldHouseId',
+    label: '模房id',
     type: 'text',
   },
 ])
@@ -170,6 +176,7 @@ const dynamicFormData = computed(() => {
             { value: '创建(待制作)', label: '创建(待制作)' },
             { value: '制作完成(待验收)', label: '制作完成(待验收)' },
             { value: '验收通过', label: '验收通过' },
+            { value: '维修中', label: '维修中' },
             { value: '试模完成', label: '试模完成' },
           ],
           rules: [requiredRule],
@@ -183,6 +190,16 @@ const dynamicFormData = computed(() => {
           timerType: 'date',
           width: 8,
         },
+        {
+          type: 'inputSelect',
+          label: '模房ID',
+          key: 'mouldHouseId',
+          width: 8, rules: [requiredRule],
+        showKey:[{key:'id',label:"模房编号"},{key:'name',label:"模房名称"}],
+      remoteFunc: searchFunc('system/mould-house/list', 'id'),
+      options: [],
+      loading: false,
+        }
       ],
     ]
   }
@@ -223,10 +240,15 @@ const loadData = () => {
     pageSize: pageSize.value,
     ...searchContent.value,
   }).then((res) => {
-    listData.value = res.rows
+    // 数据处理
+    listData.value = res.rows.map((item) => ({
+      ...item,
+      mouldHouseId: item.mouldHouseId === -1 ? '未维修' : item.mouldHouseId
+    }))
     total.value = res.total
   })
 }
+
 loadData()
 
 const handlePageChange = (val: number) => {

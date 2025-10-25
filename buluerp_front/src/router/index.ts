@@ -51,6 +51,11 @@ const router = createRouter({
           component: BlankComponent,
         },
         {
+          path: '/MouldHouse',
+          name: 'MouldHouse',
+          component: BlankComponent,
+        },
+        {
           path: '/ProMaterialType',
           name: 'ProMaterialType',
           component: BlankComponent,
