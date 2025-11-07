@@ -8,13 +8,13 @@ export function getMouldList(params) {
   })
 }
 
-export function createMould(formData) {
+export function createMould(data) {
   return httpInstance({
     url: 'system/mould',
     method: 'post',
-    data: formData,
-        headers: {
-      'Content-Type': 'multipart/form-data'
+    data, // 直接传 JSON 对象
+    headers: {
+      'Content-Type': 'application/json' // 使用 JSON
     }
   })
 }
