@@ -248,7 +248,7 @@ const loadData = () => {
     // 数据处理
     listData.value = res.rows.map((item) => ({
       ...item,
-      mouldHouseId: item.mouldHouseId === -1 ? '未维修' : item.mouldHouseId
+      // mouldHouseId: item.mouldHouseId === -1 ? '未维修' : item.mouldHouseId
     }))
     total.value = res.total
   })
