@@ -7,7 +7,7 @@
         {{ele.label}}:{{ Formvalue[ele.key] }}
       </el-col>
     </el-row>
-      
+
   </div>
   <el-form v-else ref="formRef" :model="Formvalue" :rules="formRules" label-width="120px">
     <el-row :gutter="20" align="middle" v-for="(list, index) in data" :key="index">
@@ -74,6 +74,7 @@
               :value="item.value"
             />
           </el-select>
+          <span v-if="ele.tip" class="form-tip">{{ ele.tip }}</span>
         </el-form-item>
         <el-form-item
           :label="ele.label"
@@ -216,4 +217,12 @@ defineExpose({
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.form-tip {
+  display: block;
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+  line-height: 1.2;
+}
+</style>

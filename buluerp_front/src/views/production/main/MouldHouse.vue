@@ -247,7 +247,7 @@ getMouldHouseList(page.value, pageSize.value).then((res) => {
 </script>
 <template>
   <div class="col">
-    <BordShow content="料型表" path="物料管理/料型" />
+    <BordShow content="模房列表" path="模具管理/模房" />
     <div class="greyBack">
       <FormSearch title="查询" :data="formData" :onCreate="onCreate" :onSubmit="onSubmit" :onImport="onImport"
         :onDownloadTemplate="onDownloadTemplate" :searchForm="searchContent" />

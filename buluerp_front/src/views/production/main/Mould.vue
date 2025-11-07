@@ -194,11 +194,16 @@ const dynamicFormData = computed(() => {
           type: 'inputSelect',
           label: '模房ID',
           key: 'mouldHouseId',
-          width: 8, rules: [requiredRule],
-        showKey:[{key:'id',label:"模房编号"},{key:'name',label:"模房名称"}],
-      remoteFunc: searchFunc('system/mould-house/list', 'id'),
-      options: [],
-      loading: false,
+          width: 8,
+          rules: [requiredRule],
+          showKey: [
+            { key: 'id', label: '模房编号' },
+            { key: 'name', label: '模房名称' }
+          ],
+          remoteFunc: searchFunc('system/mould-house/list', 'id'),
+          options: [],
+          loading: false,
+          tip: '-1 表示未维修', // ✅ 新增提示文字
         }
       ],
     ]
@@ -292,27 +297,24 @@ const handleSubmit = () => {
 
     // 拷贝表单数据
     const payload = { ...newSubmit.value }
-    payload.mouldDesignTime = parseTime(payload.mouldDesignTime, '{y}-{m}-{d}')
-    payload.trialDate = parseTime(payload.trialDate, '{y}-{m}-{d}')
 
-    // 创建 FormData 对象
-    const formData = new FormData()
-    Object.keys(payload).forEach((key) => {
-      // 如果是 null 或 undefined，确保不出错
-      formData.append(key, payload[key] ?? '')
-    })
+
+    // // 格式化日期字段（如果需要）
+    // payload.mouldDesignTime = parseTime(payload.mouldDesignTime, '{y}-{m}-{d}')
+    // payload.trialDate = parseTime(payload.trialDate, '{y}-{m}-{d}')
 
     // 根据状态选择接口
     const api = title.value === '编辑' ? updateMould : createMould
 
-    // 调用接口
-    api(formData).then((res) => {
+    // === ✅ 直接用 JSON 提交 ===
+    api(payload).then((res) => {
       ElMessage.success(res.msg || '操作成功')
       editDialogVisible.value = false
       loadData()
     })
   })
 }
+
 
 
 // 删除
