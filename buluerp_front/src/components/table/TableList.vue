@@ -47,7 +47,7 @@
           :key="item.value"
         >
           <template #default="{ row }">
-            <span v-if="item.type === 'picture'">
+            <span v-if="getType(item, row) === 'picture'">
               <el-image
                 v-if="row[item.value]"
                 :src="getFullImageUrl(row[item.value])"
@@ -55,7 +55,7 @@
                 @click="donwLoadFile(getFullImageUrl(row[item.value]))"
               />
             </span>
-            <span v-if="item.type === 'fileList'">
+            <span v-if="getType(item, row) === 'fileList'">
               <!-- <a v-for="(subItem) in row[item.value]" :href="getFullImageUrl(subItem[item.key])" :download="subItem[item.key].split('/').pop()" target="_blank">{{ subItem[item.key].split('/').pop()}}</a> -->
               <el-button
                 type="primary"
@@ -66,10 +66,13 @@
                 {{ subItem[item.key].split('/').pop() }}
               </el-button>
             </span>
-            <span v-else-if="item.type == 'text'">{{ row[item.value] }}</span>
-            <span v-else-if="item.type == 'Maptext'">{{ item.map[row[item.value]] }}</span>
-            <span v-else-if="item.type == 'tags'">
+            <span v-else-if="getType(item, row) == 'text'">{{ row[item.value] }}</span>
+            <span v-else-if="getType(item, row) == 'Maptext'">{{ item.map[row[item.value]] }}</span>
+            <span v-else-if="getType(item, row) == 'tags'">
               <el-tag v-for="tag in getList(row[item.value])">{{ tag }}</el-tag>
+            </span>
+            <span v-else-if="getType(item, row) == 'warningtags'">
+              <el-tag v-for="tag in getList(row[item.value])" type="warning">{{ tag }}</el-tag>
             </span>
           </template>
         </el-table-column>
@@ -117,6 +120,10 @@ const getList = (ele) => {
     return ele
   }
 }
+const getType = (item, row) => {
+  return typeof item.type === 'function' ? item.type(row) : item.type
+}
+
 const donwLoadFile = async (Fileurl, miniType = 'application/octet-stream') => {
   const content = await axios.get(Fileurl, { responseType: 'blob' })
   const blob = new Blob([content.data], { type: miniType })

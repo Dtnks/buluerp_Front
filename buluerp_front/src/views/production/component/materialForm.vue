@@ -137,6 +137,9 @@ import {
   importPurMaterialFile,
   getPurchasedTemplate
 } from '@/apis/materials'
+import {
+  getMouldDetail
+} from '@/apis/mould'
 import { messageBox } from '@/components/message/messageBox'
 import MaterialDialog from '@/views/production/component/materialDialog.vue'
 import { ElMessageBox } from 'element-plus'
@@ -222,6 +225,18 @@ const handleCreatePurSubmit = async (formData: any) => {
 }
 
 const handleCreateSubmit = async (formData: any) => {
+    const mouldid = formData.get('mouldNumber')
+    const mould = await getMouldDetail(mouldid)
+    if (mould.data.status == '模具故障送修中'){
+      ElMessageBox.confirm(
+    '该模具目前故障正在送修！',
+    '提示',
+    {
+      confirmButtonText: 'OK',
+      type: 'warning',
+    }
+  )
+    }
     const res = await addMaterial(formData)
 
     if (res.code === 200) {

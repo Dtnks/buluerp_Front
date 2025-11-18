@@ -105,11 +105,12 @@ const formData = ref([
       label: '模具状态',
       key: 'status',
       options: [
-        { value: '创建(待制作)', label: '创建(待制作)' },
-        { value: '制作完成(待验收)', label: '制作完成(待验收)' },
-        { value: '验收通过', label: '验收通过' },
-        { value: '维修中', label: '维修中' },
-        { value: '试模完成', label: '试模完成' },
+        { value: '新模(排产中)', label: '新模(排产中)' },
+        { value: '新模完成(待试模)', label: '新模完成(待试模)' },
+        { value: '验收合格(已入库)', label: '验收合格(已入库)' },
+        { value: '模具故障送修中', label: '模具故障送修中' },
+        { value: '维修好返厂待试模', label: '维修好返厂待试模' },
+        { value: '已外发', label: '已外发' },
       ],
     },
   ],
@@ -131,7 +132,9 @@ const tableData = ref([
   {
     value: 'status',
     label: '模具状态',
-    type: 'text',
+    type: (row) => {
+      return row.status === '模具故障送修中' ? 'warningtags' : 'tags'
+    },
   },
   {
     value: 'mouldHouseId',
@@ -173,11 +176,12 @@ const dynamicFormData = computed(() => {
           key: 'status',
           width: 8,
           options: [
-            { value: '创建(待制作)', label: '创建(待制作)' },
-            { value: '制作完成(待验收)', label: '制作完成(待验收)' },
-            { value: '验收通过', label: '验收通过' },
-            { value: '维修中', label: '维修中' },
-            { value: '试模完成', label: '试模完成' },
+            { value: '新模(排产中)', label: '新模(排产中)' },
+            { value: '新模完成(待试模)', label: '新模完成(待试模)' },
+            { value: '验收合格(已入库)', label: '验收合格(已入库)' },
+            { value: '模具故障送修中', label: '模具故障送修中' },
+            { value: '维修好返厂待试模', label: '维修好返厂待试模' },
+            { value: '已外发', label: '已外发' },
           ],
           rules: [requiredRule],
         },

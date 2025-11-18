@@ -106,8 +106,14 @@ const tableData = [
   { value: 'materialType', label: '料型', type: 'text' },
   { value: 'standardCode', label: '常规编码', type: 'text' },
   { value: 'singleWeight', label: '单重', type: 'text' },
-  { value: 'mouldStatus', label: '模具状态', type: 'tags' },
-  { value: 'mouldManufacturer', label: '模具厂家', type: 'text' },
+  {
+    value: 'mouldStatus',
+    label: '模具状态',
+    type: (row) => {
+      return row.mouldStatus === '模具故障送修中' ? 'warningtags' : 'tags'
+    }
+  },
+  // { value: 'mouldManufacturer', label: '模具厂家', type: 'text' },
   { value: 'cycleTime', label: '周期/s', type: 'text' },
   { value: 'remarks', label: '备注', type: 'text' },
   { value: 'spareCode', label: '备用编号', type: 'text' },

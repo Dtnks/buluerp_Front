@@ -131,40 +131,30 @@ const formConfig = [
     }
   ],
   [
-    {
-      label: '模具状态',
-      key: 'mouldStatus',
-      type: 'input',
-      width: 8
-    },{
+{
       label: '样品库位',
       key: 'sampleLocation',
       type: 'input',
-      width: 8
+      width: 12
     },{
       label: '常规编码',
       key: 'standardCode',
       type: 'input',
-      width: 8,
+      width: 12,
       rules: [{number: true, message: '请输入数字',trigger:'blur'}]
     }
   ],
   [
-    {
-      label: '模具厂商',
-      key: 'mouldManufacturer',
-      type: 'input',
-      width: 8
-    },{
+{
       label: '生产周期',
       key: 'cycleTime',
       type: 'number',
-      width: 8
+      width: 12
     },{
       label: '产品ID',
       key: 'productCode',
       type: 'input',
-      width: 8
+      width: 12
     },
   ],
   [

@@ -254,7 +254,7 @@ const tableData = ref([
   {
     value: 'materialId',
     label: '物料ID',
-    type: 'tags',
+    type: 'text',
   },
   {
     value: 'productionTime',
@@ -319,7 +319,9 @@ const tableData = ref([
   {
     value: 'mouldCondition',
     label: '模具状态',
-    type: 'tags',
+    type: (row) => {
+      return row.mouldCondition === '模具故障送修中' ? 'warningtags' : 'tags'
+    },
   },
   {
     value: 'usage',
