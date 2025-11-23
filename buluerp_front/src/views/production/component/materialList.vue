@@ -43,7 +43,7 @@
   </el-dialog>
 
   <!-- 编辑对话框 -->
-  <MaterialDialog v-model="showDialog" :isEdit="isEdit" :currentData="currentRow" @submit="handleSubmit" />
+  <MaterialEditDialog v-model="showDialog" :currentData="currentRow" @submit="handleSubmit" />
 
 </template>
 
@@ -62,11 +62,11 @@ import { downloadBinaryFile } from '@/utils/file/base64'
 import { messageBox } from '@/components/message/messageBox'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 import MaterialDialog from '@/views/production/component/materialDialog.vue'
+import MaterialEditDialog from './materialEditDialog.vue'
 import Tablelist from '@/components/table/TableList.vue'
 
 const showDialog = ref(false)
 const showDetailDialog = ref(false)
-const isEdit = ref(false)
 const currentRow = ref({})
 
 const props = defineProps<{
@@ -150,17 +150,14 @@ const fetchData = async () => {
 }
 
 const onEdit = (row: any) => {
-  isEdit.value = true
   currentRow.value = { ...row }
   showDialog.value = true
 }
 
 const handleSubmit = async (formData: any) => {
   try {
-    if (isEdit.value) {
-      await updateMaterial(formData)
-      messageBox('success', Promise.resolve, '更新成功', '', '')
-    }
+    await updateMaterial(formData)
+    messageBox('success', Promise.resolve, '更新成功', '', '')
     fetchData()
   } catch {
     messageBox('error', () => Promise.reject(), '', '操作失败', '')
@@ -169,10 +166,11 @@ const handleSubmit = async (formData: any) => {
   }
 }
 
+
 const onDetail = async (row: any) => {
   try {
     console.log(row.mouldNumber)
-    const res = await getMouldDetail(Number(row.mouldNumber))
+    const res = await getMouldDetail(row.mouldNumber)
     currentRow.value = res.data  // 注意：这里才是实际数据
     console.log(currentRow.value)
     showDetailDialog.value = true

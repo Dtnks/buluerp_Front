@@ -208,6 +208,42 @@ watch(
   { immediate: true }
 )
 
+import { nextTick } from 'vue'
+
+watch(visible, async (val) => {
+  if (val) {
+    await nextTick() // 等 CustomForm 渲染完成
+    formConfig.forEach(row => {
+      row.forEach(item => {
+        if (item.type === 'inputSelect' && item.remoteFunc) {
+          // 初始化加载一次空关键字，确保下拉框有数据
+          item.loading = true
+          item.remoteFunc('').then((res: any) => {
+            item.options = res || []
+            item.loading = false
+          })
+        }
+      })
+    })
+  }
+})
+watch(() => props.currentData, async (data) => {
+  if (data) {
+    form.value.materialType = data.materialType || ''
+
+    // 找到 inputSelect 字段
+    formConfig.forEach(row => {
+      row.forEach(item => {
+        if (item.type === 'inputSelect' && item.key === 'materialType') {
+          // 如果当前值不在 options 里，加入 options
+          if (form.value.materialType && !item.options.find(o => o.name === form.value.materialType)) {
+            item.options.push({ name: form.value.materialType, colorCode: '', colorWeight: '' })
+          }
+        }
+      })
+    })
+  }
+})
 
 
 watch(

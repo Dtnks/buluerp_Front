@@ -121,7 +121,7 @@
     </el-dialog>
 
     <!-- 新建模具弹窗 -->
-    <MaterialDialog v-model="dialogVisible" :isEdit="false" @submit="handleCreateSubmit" />
+    <materialCreateDialog v-model="dialogVisible" @submit="handleCreateSubmit" />
     <PurchaseDialog v-model="purchasedialogVisible" :isEdit="false" @submit="handleCreatePurSubmit" />
   </el-card>
 </template>
@@ -145,6 +145,7 @@ import MaterialDialog from '@/views/production/component/materialDialog.vue'
 import { ElMessageBox } from 'element-plus'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import PurchaseDialog from './purchaseDialog.vue'
+import materialCreateDialog from './materialCreateDialog.vue'
 
 const emit = defineEmits(['search'])
 
@@ -228,7 +229,7 @@ const handleCreateSubmit = async (formData: any) => {
     const mouldid = formData.get('mouldNumber')
     const mould = await getMouldDetail(mouldid)
     if (mould.data.status == '模具故障送修中'){
-      ElMessageBox.confirm(
+      ElMessageBox.alert(
     '该模具目前故障正在送修！',
     '提示',
     {

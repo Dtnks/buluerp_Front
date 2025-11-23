@@ -94,7 +94,8 @@ import {
   importMouldFile,
   getMouldTemplate,
 } from '@/apis/mould'
-import {searchFunc} from "@/utils/search/search"
+import { searchFunc } from "@/utils/search/search"
+
 // 查询表单
 const formData = ref([
   [
@@ -116,7 +117,6 @@ const formData = ref([
   ],
 ])
 
-
 const searchContent = ref({
   id: '',
   manufacturerId: '',
@@ -126,93 +126,16 @@ const searchContent = ref({
 // 表格列
 const tableData = ref([
   { value: 'id', label: 'id', type: 'text' },
-  { value : 'mouldNumber', label: '模具编号', type: 'text' },
+  { value: 'mouldNumber', label: '模具编号', type: 'text' },
   { value: 'manufacturerId', label: '模具厂商', type: 'text' },
   { value: 'trialDate', label: '试模日期', type: 'text' },
   {
     value: 'status',
     label: '模具状态',
-    type: (row) => {
-      return row.status === '模具故障送修中' ? 'warningtags' : 'tags'
-    },
+    type: (row) => (row.status === '模具故障送修中' ? 'warningtags' : 'tags'),
   },
-  {
-    value: 'mouldHouseId',
-    label: '模房id',
-    type: 'text',
-  },
+  { value: 'mouldHouseId', label: '模房id', type: 'text' },
 ])
-
-// 表单项
-import { computed } from 'vue'
-
-// 动态表单项
-const dynamicFormData = computed(() => {
-  if (title.value === '新增') {
-    // 新增只显示两项
-    return [
-      [
-        { type: 'input', label: '模具编号', key: 'mouldNumber', width: 8, rules: [requiredRule] },
-        { type: 'inputSelect', label: '模具厂商', key: 'manufacturerId', width: 8, rules: [requiredRule],
-        showKey:[{key:'id',label:"厂商编号"},{key:'name',label:"厂商名称"}],
-      remoteFunc: searchFunc('system/manufacturer/list', 'id'),
-      options: [],
-      loading: false, },
-      ],
-    ]
-  } else {
-    // 编辑显示四项
-    return [
-      [
-        { type: 'input', label: '模具编号', key: 'mouldNumber', width: 8, rules: [requiredRule] },
-        { type: 'inputSelect', label: '模具厂商', key: 'manufacturerId', width: 8, rules: [requiredRule],
-        showKey:[{key:'id',label:"厂商编号"},{key:'name',label:"厂商名称"}],
-      remoteFunc: searchFunc('system/manufacturer/list', 'id'),
-      options: [],
-      loading: false, },
-        {
-          type: 'select',
-          label: '模具状态',
-          key: 'status',
-          width: 8,
-          options: [
-            { value: '新模(排产中)', label: '新模(排产中)' },
-            { value: '新模完成(待试模)', label: '新模完成(待试模)' },
-            { value: '验收合格(已入库)', label: '验收合格(已入库)' },
-            { value: '模具故障送修中', label: '模具故障送修中' },
-            { value: '维修好返厂待试模', label: '维修好返厂待试模' },
-            { value: '已外发', label: '已外发' },
-          ],
-          rules: [requiredRule],
-        },
-      ],
-      [
-        {
-          type: 'timer',
-          label: '试模日期',
-          key: 'trialDate',
-          timerType: 'date',
-          width: 8,
-        },
-        {
-          type: 'inputSelect',
-          label: '模房ID',
-          key: 'mouldHouseId',
-          width: 8,
-          rules: [requiredRule],
-          showKey: [
-            { key: 'id', label: '模房编号' },
-            { key: 'name', label: '模房名称' }
-          ],
-          remoteFunc: searchFunc('system/mould-house/list', 'id'),
-          options: [],
-          loading: false,
-          tip: '-1 表示未维修', // ✅ 新增提示文字
-        }
-      ],
-    ]
-  }
-})
 
 // 表单绑定对象
 const newSubmit = ref({
@@ -223,18 +146,11 @@ const newSubmit = ref({
   remark: '',
 })
 
-// 表格操作列
-const operation = ref([
-  {
-    value: '编辑',
-    func: (row) => {
-      title.value = '编辑'
-      newSubmit.value = { ...row }
-      editDialogVisible.value = true
-      nextTick(() => createFormRef.value.clearValidate())
-    },
-  },
-])
+// 弹窗显示与表单结构
+const editDialogVisible = ref(false)
+const title = ref('新增')
+const createFormRef = ref()
+const dynamicFormData = ref([])
 
 // 分页与数据
 const listData = ref([])
@@ -249,36 +165,18 @@ const loadData = () => {
     pageSize: pageSize.value,
     ...searchContent.value,
   }).then((res) => {
-    // 数据处理
-    listData.value = res.rows.map((item) => ({
-      ...item,
-      // mouldHouseId: item.mouldHouseId === -1 ? '未维修' : item.mouldHouseId
-    }))
+    listData.value = res.rows.map((item) => ({ ...item }))
     total.value = res.total
   })
 }
 
 loadData()
-
-const handlePageChange = (val: number) => {
-  page.value = val
-  loadData()
-}
-const handleSizeChange = (val: number) => {
-  pageSize.value = val
-  page.value = 1
-  loadData()
-}
-
-// 新增与编辑
-const editDialogVisible = ref(false)
-const title = ref('新增')
-const createFormRef = ref()
+const handlePageChange = (val: number) => { page.value = val; loadData() }
+const handleSizeChange = (val: number) => { pageSize.value = val; page.value = 1; loadData() }
 
 // 点击“新增”按钮
 const onCreate = () => {
   title.value = '新增'
-  // 清空表单
   newSubmit.value = {
     mouldNumber: '',
     manufacturerId: '',
@@ -286,31 +184,112 @@ const onCreate = () => {
     status: '',
     remark: '',
   }
-  // 打开弹窗
-  editDialogVisible.value = true
 
-  // 清除上次的校验结果
-  nextTick(() => {
-    if (createFormRef.value) createFormRef.value.clearValidate()
-  })
+  dynamicFormData.value = [
+    [
+      { type: 'input', label: '模具编号', key: 'mouldNumber', width: 8, rules: [requiredRule] },
+      {
+        type: 'inputSelect',
+        label: '模具厂商',
+        key: 'manufacturerId',
+        width: 8,
+        rules: [requiredRule],
+        showKey: [
+          { key: 'id', label: '厂商编号' },
+          { key: 'name', label: '厂商名称' },
+        ],
+        remoteFunc: searchFunc('system/manufacturer/list', 'id'),
+        options: [],
+        loading: false,
+      },
+    ],
+  ]
+
+  editDialogVisible.value = true
+  nextTick(() => createFormRef.value.clearValidate())
 }
 
+// 编辑行数据
+const editRow = (row) => {
+  title.value = '编辑'
+  newSubmit.value = { ...row }
+
+  dynamicFormData.value = [
+    [
+      { type: 'input', label: '模具编号', key: 'mouldNumber', width: 8, disabled: true, rules: [requiredRule] },
+      {
+        type: 'inputSelect',
+        label: '模具厂商',
+        key: 'manufacturerId',
+        width: 8,
+        rules: [requiredRule],
+        showKey: [
+          { key: 'id', label: '厂商编号' },
+          { key: 'name', label: '厂商名称' },
+        ],
+        remoteFunc: searchFunc('system/manufacturer/list', 'id'),
+        options: [],
+        loading: false,
+      },
+      {
+        type: 'select',
+        label: '模具状态',
+        key: 'status',
+        width: 8,
+        options: [
+          { value: '新模(排产中)', label: '新模(排产中)' },
+          { value: '新模完成(待试模)', label: '新模完成(待试模)' },
+          { value: '验收合格(已入库)', label: '验收合格(已入库)' },
+          { value: '模具故障送修中', label: '模具故障送修中' },
+          { value: '维修好返厂待试模', label: '维修好返厂待试模' },
+          { value: '已外发', label: '已外发' },
+        ],
+        rules: [requiredRule],
+      },
+    ],
+    [
+      {
+        type: 'timer',
+        label: '试模日期',
+        key: 'trialDate',
+        timerType: 'date',
+        width: 8,
+      },
+      {
+        type: 'inputSelect',
+        label: '模房ID',
+        key: 'mouldHouseId',
+        width: 8,
+        rules: [requiredRule],
+        showKey: [
+          { key: 'id', label: '模房编号' },
+          { key: 'name', label: '模房名称' },
+        ],
+        remoteFunc: searchFunc('system/mould-house/list', 'id'),
+        options: [],
+        loading: false,
+        tip: '-1 表示未维修',
+      },
+    ],
+  ]
+
+  editDialogVisible.value = true
+  nextTick(() => createFormRef.value.clearValidate())
+}
+
+// 表格操作列
+const operation = ref([
+  { value: '编辑', func: (row) => editRow(row) },
+])
+
+// 提交表单
 const handleSubmit = () => {
   createFormRef.value.validateForm((valid) => {
     if (!valid) return
 
-    // 拷贝表单数据
     const payload = { ...newSubmit.value }
-
-
-    // // 格式化日期字段（如果需要）
-    // payload.mouldDesignTime = parseTime(payload.mouldDesignTime, '{y}-{m}-{d}')
-    // payload.trialDate = parseTime(payload.trialDate, '{y}-{m}-{d}')
-
-    // 根据状态选择接口
     const api = title.value === '编辑' ? updateMould : createMould
 
-    // === ✅ 直接用 JSON 提交 ===
     api(payload).then((res) => {
       ElMessage.success(res.msg || '操作成功')
       editDialogVisible.value = false
@@ -318,8 +297,6 @@ const handleSubmit = () => {
     })
   })
 }
-
-
 
 // 删除
 const DeleteFunc = (rows) => {

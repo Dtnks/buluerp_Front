@@ -17,7 +17,7 @@
           v-if="ele.type === 'input' && !ele.children"
           :prop="ele.key"
         >
-          <el-input v-model="Formvalue[ele.key]" />
+          <el-input v-model="Formvalue[ele.key]"  :disabled="ele.disabled"/>
         </el-form-item>
         <el-form-item
           :label="ele.label"
