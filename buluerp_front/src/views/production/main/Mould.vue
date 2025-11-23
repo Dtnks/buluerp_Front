@@ -79,7 +79,7 @@ import FormSearch from '@/components/form/Form.vue'
 import CreateForm from '@/components/form/CreateForm.vue'
 import TableList from '@/components/table/TableList.vue'
 import BordShow from '@/components/board/SecBoard.vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage , ElMessageBox} from 'element-plus'
 import { beforeUpload } from '@/utils/file/importExcel'
 import { messageBox } from '@/components/message/messageBox'
 import { parseTime } from '@/utils/ruoyi'
@@ -287,6 +287,15 @@ const handleSubmit = () => {
   createFormRef.value.validateForm((valid) => {
     if (!valid) return
 
+    // === 关键校验逻辑 ===
+    if (
+      newSubmit.value.status === '模具故障送修中' &&
+      (!newSubmit.value.mouldHouseId || newSubmit.value.mouldHouseId === -1)
+    ) {
+      ElMessage.error('模具状态为维修时，必须选择一个模房')
+      return
+    }
+
     const payload = { ...newSubmit.value }
     const api = title.value === '编辑' ? updateMould : createMould
 
@@ -298,18 +307,55 @@ const handleSubmit = () => {
   })
 }
 
+
 // 删除
 const DeleteFunc = (rows) => {
   if (!rows.length) return ElMessage.warning('请选择要删除的记录')
-  const ids = rows.map((r) => r.id)
-  messageBox(
-    'warning',
-    () => deleteMould(ids).then(() => loadData()),
-    `成功删除 ${ids.length} 条记录`,
-    '用户权限不足',
+
+  const ids = rows.map(r => r.id)
+
+  ElMessageBox.confirm(
     `确认删除 ${ids.length} 条记录？`,
+    '操作确认提示',
+    {
+      confirmButtonText: '继续',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
   )
+    .then(() => {
+      return deleteMould(ids)
+    })
+    .then(() => {
+      // 成功的 messageBox
+      messageBox(
+        'success',
+        () => Promise.resolve(),
+        `成功删除 ${ids.length} 条记录`,
+        '',
+        ''
+      )
+      loadData()
+    })
+    .catch((err) => {
+      if (err === 'cancel') return
+
+      const backendMsg =
+        err?.msg ||
+        err?.response?.data?.msg ||
+        '删除失败'
+
+      messageBox(
+        'error',
+        () => Promise.resolve(),
+        '',
+        backendMsg,
+        ''
+      )
+    })
 }
+
+
 
 // 导入
 const importDialogVisible = ref(false)
