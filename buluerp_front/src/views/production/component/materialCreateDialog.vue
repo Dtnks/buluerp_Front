@@ -48,6 +48,7 @@ watch(() => visible.value, (val) => emit('update:modelValue', val))
 
 const formRef = ref<any>(null)
 const formState = ref({})
+// 使用 reactive 来创建表单对象，不需要 .value
 const form = reactive({
   cavityCount: null,
   cycleTime: null,
@@ -71,11 +72,11 @@ const imageUrl = ref('')
 const setDrawingFile = (file: File | null) => {
   drawingFile.value = file
   if (file) {
-    form.value.drawingReferenceFile = ''
-    form.value.deleteDrawingReference = false
+    form.drawingReferenceFile = ''
+    form.deleteDrawingReference = false
   } else {
-    form.value.drawingReferenceFile = null
-    form.value.deleteDrawingReference = true
+    form.drawingReferenceFile = null
+    form.deleteDrawingReference = true
     imageUrl.value = ''
   }
 }
@@ -91,8 +92,8 @@ const formConfig = reactive([
   [
     { type: 'inputSelect', label: '料型', key: 'materialType', width: 12,
       remoteFunc: searchFunc('system/material-type/list', 'name'),
-      options: reactive([]),       // <---- 改成响应式
-      loading: ref(false),         // <---- 改成响应式
+      options: reactive([]),
+      loading: ref(false),
       showKey:[{key:'name',label:"名称"},{key:'colorCode',label:"颜色编码"},{key:'colorWeight',label:"色粉重量"}],
       rules: [{ required: true, message: '请输入料型', trigger: 'blur' }]
     },
@@ -112,24 +113,9 @@ const formConfig = reactive([
   ]
 ])
 
-// 打开对话框初始化远程下拉选项
-// watch(visible, async (val) => {
-//   if (val) {
-//     for (const row of formConfig) {
-//       for (const item of row) {
-//         if (item.type === 'inputSelect' && item.remoteFunc) {
-//           item.loading = true
-//           const res = await item.remoteFunc('')
-//           item.options = res || []
-//           item.loading = false
-//         }
-//       }
-//     }
-//   }
-// })
-
 const handleClose = () => {
-  form.value = {
+  // 重置 form 对象，不需要 .value
+  Object.assign(form, {
     cavityCount: null,
     cycleTime: null,
     drawingReferenceFile: null,
@@ -144,7 +130,8 @@ const handleClose = () => {
     singleWeight: null,
     spareCode: '',
     deleteDrawingReference: false
-  }
+  })
+
   imageUrl.value = ''
   drawingFile.value = null
   visible.value = false
@@ -156,14 +143,14 @@ const handleSubmit = () => {
     if (!valid) return
 
     const formData = new FormData()
-    for (const key in form.value) {
+    for (const key in form) {
       if (key === 'drawingReferenceFile') {
         if (drawingFile.value) formData.append('drawingReferenceFile', drawingFile.value)
-        else if (typeof form.value.drawingReferenceFile === 'string') formData.append('drawingReference', form.value.drawingReferenceFile)
+        else if (typeof form.drawingReferenceFile === 'string') formData.append('drawingReference', form.drawingReferenceFile)
         continue
       }
-      if (form.value.deleteDrawingReference) formData.append('deleteDrawingReference', 'true')
-      const value = form.value[key]
+      if (form.deleteDrawingReference) formData.append('deleteDrawingReference', 'true')
+      const value = form[key]
       if (Array.isArray(value)) value.forEach(v => formData.append(key, v))
       else if (value !== null && value !== undefined) formData.append(key, value)
     }
