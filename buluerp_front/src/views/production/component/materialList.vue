@@ -12,7 +12,7 @@
   </Tablelist>
 
   <!-- 外购信息弹窗 -->
-  <el-dialog v-model="purchaseDialogVisible" title="外购信息" width="600px">
+  <el-dialog v-model="purchaseDialogVisible" title="外购信息" width="600px" @close="closePurchaseDialog">
     <div v-if="currentPurchaseInfo" class="purchase-info-container">
       <div class="info-item"><strong>采购编码:</strong> {{ currentPurchaseInfo.purchaseCode }}</div>
       <div class="info-item"><strong>ID:</strong> {{ currentPurchaseInfo.id }}</div>
@@ -44,6 +44,11 @@
 
   <!-- 编辑对话框 -->
   <MaterialEditDialog v-model="showDialog" :currentData="currentRow" @submit="handleSubmit" />
+  <PurchaseDialog
+  v-model="showPurchaseDialog"
+  :currentData="currentRow"
+  @submit="handleSubmit"
+/>
 
 </template>
 
@@ -64,6 +69,7 @@ import { getFullImageUrl } from '@/utils/image/getUrl'
 import MaterialDialog from '@/views/production/component/materialDialog.vue'
 import MaterialEditDialog from './materialEditDialog.vue'
 import Tablelist from '@/components/table/TableList.vue'
+import PurchaseDialog from './purchaseDialog.vue'
 
 const showDialog = ref(false)
 const showDetailDialog = ref(false)
@@ -102,6 +108,15 @@ const tableData = [
   { value: 'id', label: '物料ID', type: 'text' },
   { value: 'mouldNumber', label: '模具编号', type: 'text' },
   { value: 'specificationName', label: '规格名称', type: 'text' },
+  {
+    value: 'purchased',
+    label: '外购信息',
+    type: 'Maptext',
+    map: {
+      true: '有',
+      false: '无',
+    },
+  },
   { value: 'cavityCount', label: '腔口数量', type: 'text' },
   { value: 'materialType', label: '料型', type: 'text' },
   { value: 'standardCode', label: '常规编码', type: 'text' },
@@ -118,15 +133,6 @@ const tableData = [
   { value: 'remarks', label: '备注', type: 'text' },
   { value: 'spareCode', label: '备用编号', type: 'text' },
   { value: 'updateTime', label: '更新时间', type: 'text' },
-  {
-    value: 'purchased',
-    label: '外购信息',
-    type: 'Maptext',
-    map: {
-      true: '有',
-      false: '无',
-    },
-  },
 ]
 
 // 操作列
@@ -149,9 +155,18 @@ const fetchData = async () => {
   total.value = res.total || 0
 }
 
+const showPurchaseDialog = ref(false)
+
 const onEdit = (row: any) => {
   currentRow.value = { ...row }
-  showDialog.value = true
+
+  if (row.purchased) {
+    // 如果是外购物料，显示外购对话框
+    showPurchaseDialog.value = true
+  } else {
+    // 否则显示普通物料编辑对话框
+    showDialog.value = true
+  }
 }
 
 const handleSubmit = async (formData: any) => {
@@ -166,7 +181,6 @@ const handleSubmit = async (formData: any) => {
   }
 }
 
-
 const onDetail = async (row: any) => {
   try {
     console.log(row.mouldNumber)
@@ -180,7 +194,10 @@ const onDetail = async (row: any) => {
     console.log('err', error)
   }
 }
-
+const closePurchaseDialog = () => {
+  currentPurchaseInfo.value = null
+  purchaseDialogVisible.value = false
+}
 
 onMounted(() => {
   fetchData()

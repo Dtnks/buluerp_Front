@@ -6,7 +6,7 @@
     @close="handleClose"
   >
     <div style="position: relative; display: inline-block; margin-bottom: 16px;">
-      <ImageUpload :initialUrl="imageUrl" :setFile="setDrawingFile" />
+      <ImageUpload v-if="visible" :initialUrl="imageUrl" :setFile="setDrawingFile" />
 
       <el-button
         v-if="imageUrl"
@@ -63,7 +63,8 @@ const form = reactive({
   standardCode: '',
   singleWeight: null,
   spareCode: '',
-  deleteDrawingReference: false
+  deleteDrawingReference: false,
+  productCode: ''
 })
 
 const drawingFile = ref<File | null>(null)
@@ -72,7 +73,7 @@ const imageUrl = ref('')
 const setDrawingFile = (file: File | null) => {
   drawingFile.value = file
   if (file) {
-    form.drawingReferenceFile = ''
+    form.drawingReferenceFile = null
     form.deleteDrawingReference = false
   } else {
     form.drawingReferenceFile = null
@@ -129,7 +130,8 @@ const handleClose = () => {
     standardCode: '',
     singleWeight: null,
     spareCode: '',
-    deleteDrawingReference: false
+    deleteDrawingReference: false,
+    productCode: ''
   })
 
   imageUrl.value = ''

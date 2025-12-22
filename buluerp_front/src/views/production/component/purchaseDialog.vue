@@ -7,7 +7,7 @@
   >
     <!-- 图片上传 -->
     <div style="position: relative; display: inline-block; margin-bottom: 16px;">
-      <ImageUpload :initialUrl="imageUrl" :setFile="setPictureFile" />
+      <ImageUpload v-if="visible" :initialUrl="imageUrl" :setFile="setPictureFile" />
 
       <el-button
         v-if="imageUrl"
@@ -58,7 +58,9 @@ watch(() => visible.value, (val) => emit('update:modelValue', val))
 
 const formRef = ref<any>(null)
 const formState = ref({})
-const form = ref<Record<string, any>>({
+import { reactive } from 'vue'
+
+const form = reactive({
   materialType: '',
   mouldNumber: '',
   pictureFile: null,
@@ -69,19 +71,20 @@ const form = ref<Record<string, any>>({
   unitPrice: null
 })
 
+
 const pictureFile = ref<File | null>(null)
+const imageUrl = ref('')
+
 const setPictureFile = (file: File | null) => {
   pictureFile.value = file
-  if (file) {
-    form.value.pictureFile = ''
-  } else {
-    form.value.pictureFile = null
+  // 只在 file 为 null 时清空 imageUrl
+  if (!file) {
+    imageUrl.value = ''
+    form.pictureFile = null
   }
 }
 
-const imageUrl = ref('')
-
-const formConfig = [
+const formConfig = ref([
   [
     {
       label: '采购编码',
@@ -113,7 +116,8 @@ const formConfig = [
       rules: [requiredRule],
       remoteFunc: searchFunc('system/material-type/list', 'name'),
       options: [],
-      loading: false,
+      showKey:[{key:'name',label:"名称"},{key:'colorCode',label:"颜色编码"},{key:'colorWeight',label:"色粉重量"}],
+      loading: false
     },
     {
       label: '单重',
@@ -134,6 +138,8 @@ const formConfig = [
       label: '模具编号',
       key: 'mouldNumber',
       type: 'input',
+      required: true,
+      rules: [{ required: true, message: '请输入模具编号', trigger: 'blur' }],
       width: 12
     }
   ],
@@ -142,40 +148,41 @@ const formConfig = [
       label: '图片',
       key: 'pictureFile',
       type: 'file',
-      width: 12,
+      width: 12
     }
   ]
-]
+])
+
 
 watch(
   () => props.currentData,
   (data) => {
-    if (data) {
-      form.value = {
-        materialType: data.materialType || '',
-        purchaseCode: data.purchaseCode || '',
-        specificationName: data.specificationName || '',
-        supplier: data.supplier || '',
-        singleWeight: data.singleWeight || null,
-        unitPrice: data.unitPrice || null,
-        mouldNumber: data.mouldNumber || '',
-        pictureFile: data.pictureFile || null,
-      }
+    if (!data) return
 
-      if (data.pictureFile) {
-        imageUrl.value = getFullImageUrl(data.pictureFile)
-        pictureFile.value = null
-      } else {
-        imageUrl.value = ''
-        pictureFile.value = null
-      }
+    Object.assign(form, {
+      materialType: data.materialType || '',
+      purchaseCode: data.purchaseCode || '',
+      specificationName: data.specificationName || '',
+      supplier: data.supplier || '',
+      singleWeight: data.singleWeight || null,
+      unitPrice: data.unitPrice || null,
+      mouldNumber: data.mouldNumber || '',
+      pictureFile: data.pictureFile || null
+    })
+
+    if (data.pictureFile) {
+      imageUrl.value = getFullImageUrl(data.pictureFile)
+      pictureFile.value = null
+    } else {
+      imageUrl.value = ''
+      pictureFile.value = null
     }
   },
   { immediate: true }
 )
 
-const handleClose = () => {
-  form.value={
+const resetForm = () => {
+  Object.assign(form, {
     materialType: '',
     mouldNumber: '',
     pictureFile: null,
@@ -184,9 +191,17 @@ const handleClose = () => {
     specificationName: '',
     supplier: '',
     unitPrice: null
-  }
+  })
+}
+
+
+const handleClose = () => {
+  resetForm()
+  imageUrl.value = ''
+  pictureFile.value = null
   visible.value = false
 }
+
 
 const removeImage = () => {
   setPictureFile(null)
@@ -200,7 +215,7 @@ const handleSubmit = () => {
 
     const formData = new FormData()
 
-    for (const key in form.value) {
+    for (const key in form) {
       if (key === 'pictureFile') {
         if (pictureFile.value) {
           formData.append('pictureFile', pictureFile.value)
@@ -208,7 +223,7 @@ const handleSubmit = () => {
         continue
       }
 
-      const value = form.value[key]
+      const value = form[key]
       if (Array.isArray(value)) {
         value.forEach(v => formData.append(key, v))
       } else if (value !== null && value !== undefined) {

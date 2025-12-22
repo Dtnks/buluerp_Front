@@ -7,7 +7,11 @@
   >
 
     <div style="position: relative; display: inline-block; margin-bottom: 16px;">
-      <ImageUpload :initialUrl="imageUrl" :setFile="setDrawingFile" />
+      <ImageUpload
+        v-if="visible"
+        :initialUrl="imageUrl"
+        :setFile="setDrawingFile"
+      />
 
       <el-button
         v-if="imageUrl"
@@ -70,7 +74,8 @@ const form = ref<Record<string, any>>({
   standardCode: '',
   singleWeight: null,
   spareCode: '',
-  deleteDrawingReference: false
+  deleteDrawingReference: false,
+  productCode: ''
 })
 
 const drawingFile = ref<File | null>(null)
@@ -191,6 +196,7 @@ watch(
         remarks: data.remarks || '',
         spareCode: data.spareCode || '',
         drawingReferenceFile: data.drawingReference || null,
+        productCode: data.productCode || null,
       }
 
       if (data.drawingReference) {
@@ -270,8 +276,11 @@ const handleClose = () => {
     standardCode: '',
     singleWeight: null,
     spareCode: '',
-    deleteDrawingReference: false
+    deleteDrawingReference: false,
+    productCode: ''
   }
+  imageUrl.value = ''
+  drawingFile.value = null
   visible.value = false
 }
 const removeImage = () => {
@@ -287,6 +296,9 @@ const handleSubmit = () => {
 
     const formData = new FormData()
 
+    if (form.value.deleteDrawingReference) {
+      formData.append('deleteDrawingReference', 'true')
+    }
     for (const key in form.value) {
       if (key === 'drawingReferenceFile') {
         if (drawingFile.value) {
@@ -298,10 +310,6 @@ const handleSubmit = () => {
           formData.append('drawingReference', form.value.drawingReferenceFile)
         }
         continue
-      }
-
-      if (form.value.deleteDrawingReference) {
-        formData.append('deleteDrawingReference', 'true')
       }
 
       const value = form.value[key]

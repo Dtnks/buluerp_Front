@@ -72,7 +72,7 @@ const imageUrl = ref('')
 const setDrawingFile = (file: File | null) => {
   drawingFile.value = file
   if (file) {
-    form.drawingReferenceFile = ''
+    form.drawingReferenceFile = null
     form.deleteDrawingReference = false
   } else {
     form.drawingReferenceFile = null

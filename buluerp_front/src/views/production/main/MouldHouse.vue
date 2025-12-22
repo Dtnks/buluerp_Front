@@ -12,6 +12,7 @@ import {
   importMouldHouseFile,
   exportMouldHouse,
 } from '@/apis/mouldHouse'
+import { ElMessage } from 'element-plus'
 import { downloadBinaryFile } from '@/utils/file/base64'
 import TableList from '@/components/table/TableList.vue'
 import { ref, nextTick } from 'vue'
@@ -175,22 +176,27 @@ const handleUpload = async (option: any) => {
 }
 let count = 1
 //传给table组件
-const exportFunc = (row) => {
-  if (row.length === 0) {
-    ElMessage.warning('请先选择要导出的产品')
-    return
-  }
-  const formData = new URLSearchParams()
-  const ids = row.map((ele) => {
-    return ele.id
-  })
-  // const idsString = Array.isArray(ids) ? ids.join(',') : ids
-  formData.append('ids', ids)
-  exportMouldHouse(formData).then((res) => {
-    const now = new Date()
-    downloadBinaryFile(res, '模房_' + now.toLocaleDateString() + '_' + count + '.xlsx')
-    count += 1
-  })
+// const exportFunc = (row) => {
+//   if (row.length === 0) {
+//     ElMessage.warning('请先选择要导出的产品')
+//     return
+//   }
+//   const formData = new URLSearchParams()
+//   const ids = row.map((ele) => {
+//     return ele.id
+//   })
+//   // const idsString = Array.isArray(ids) ? ids.join(',') : ids
+//   formData.append('ids', ids)
+//   exportMouldHouse(formData).then((res) => {
+//     const now = new Date()
+//     downloadBinaryFile(res, '模房_' + now.toLocaleDateString() + '_' + count + '.xlsx')
+//     count += 1
+//   })
+// }
+const exportFunc = (rows) => {
+  if (!rows.length) return ElMessage.warning('请选择要导出的记录')
+  const ids = rows.map((r) => r.id).join(',')
+  exportMouldHouse(ids).then((res) => downloadBinaryFile(res, '模房导出.xlsx'))
 }
 
 const DeleteFunc = (row) => {
