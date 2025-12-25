@@ -100,7 +100,7 @@ import { searchFunc } from "@/utils/search/search"
 const formData = ref([
   [
     { type: 'input', label: '模具编号', key: 'mouldNumber' },
-    { type: 'input', label: '模具厂商', key: 'manufacturerId' },
+    { type: 'input', label: '模具厂商', key: 'manufacturerName' },
     {
       type: 'select',
       label: '模具状态',
@@ -127,7 +127,7 @@ const searchContent = ref({
 const tableData = ref([
   { value: 'id', label: 'id', type: 'text' },
   { value: 'mouldNumber', label: '模具编号', type: 'text' },
-  { value: 'manufacturerId', label: '模具厂商', type: 'text' },
+  { value: 'manufacturerName', label: '模具厂商', type: 'text' },
   { value: 'trialDate', label: '试模日期', type: 'text' },
   {
     value: 'status',
@@ -191,14 +191,14 @@ const onCreate = () => {
       {
         type: 'inputSelect',
         label: '模具厂商',
-        key: 'manufacturerId',
+        key: 'manufacturerName',
         width: 8,
         rules: [requiredRule],
         showKey: [
           { key: 'id', label: '厂商编号' },
           { key: 'name', label: '厂商名称' },
         ],
-        remoteFunc: searchFunc('system/manufacturer/list', 'id'),
+        remoteFunc: searchFunc('system/manufacturer/list', 'name'),
         options: [],
         loading: false,
       },
@@ -220,14 +220,14 @@ const editRow = (row) => {
       {
         type: 'inputSelect',
         label: '模具厂商',
-        key: 'manufacturerId',
+        key: 'manufacturerName',
         width: 8,
         rules: [requiredRule],
         showKey: [
           { key: 'id', label: '厂商编号' },
           { key: 'name', label: '厂商名称' },
         ],
-        remoteFunc: searchFunc('system/manufacturer/list', 'id'),
+        remoteFunc: searchFunc('system/manufacturer/list', 'name'),
         options: [],
         loading: false,
       },

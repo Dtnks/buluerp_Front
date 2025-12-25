@@ -33,7 +33,7 @@ const newFormData = ref([
   [
     {
       type: 'inputSelect',
-      label: '物料',
+      label: '物料ID',
       key: 'materialId',
       width: 12,
       rules: [requiredRule],

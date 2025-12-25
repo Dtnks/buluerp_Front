@@ -29,11 +29,11 @@
     </div>
   </el-dialog>
 
-    <!-- 外购信息弹窗 -->
+    <!-- 模具信息弹窗 -->
   <el-dialog v-model="showDetailDialog" title="模具信息" width="600px">
     <div v-if="currentRow" class="purchase-info-container">
       <div class="info-item"><strong>模具ID:</strong> {{ currentRow.mouldNumber }}</div>
-      <div class="info-item"><strong>模具厂家ID:</strong> {{ currentRow.manufacturerId }}</div>
+      <div class="info-item"><strong>模具厂家:</strong> {{ currentRow.manufacturerName }}</div>
       <div class="info-item"><strong>试模时间:</strong> {{ currentRow.trialDate }}</div>
       <div class="info-item"><strong>模具状态:</strong> {{ currentRow.status }}</div>
     </div>

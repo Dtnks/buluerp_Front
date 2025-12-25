@@ -109,6 +109,10 @@ const newFormData = ref([
       rules: [requiredRule],
       options: [],
       loading: false,
+      showKey: [
+          { key: 'id', label: '厂家编号' },
+          { key: 'name', label: '厂家名称' },
+        ],
       remoteFunc: searchFunc('system/manufacturer/list', 'name'),
     },
     { type: 'input', label: '用量', key: 'usage', width: 12, rules: [positiveNumberRule, requiredRule] },
@@ -213,6 +217,10 @@ const editFormData = ref([
       rules: [requiredRule],
       options: [],
       loading: false,
+      showKey: [
+          { key: 'id', label: '厂家编号' },
+          { key: 'name', label: '厂家名称' },
+        ],
       remoteFunc: searchFunc('system/manufacturer/list', 'name'),
     },
     { type: 'input', label: '用量', key: 'usage', width: 8, rules: [positiveNumberRule, requiredRule] },
@@ -348,7 +356,7 @@ const tableData = ref([
   {
     value: 'customerId',
     label: '客户ID',
-    type: 'tags',
+    type: 'text',
   },
 ])
 const operation = ref([
@@ -731,7 +739,7 @@ listSchedule(page.value, pageSize.value).then((res) => {
         </div>
         <div v-else class="card-style">
           设计总表ID：{{ item.form.designPatternId }} |
-          物料ID：{{ item.form.materialId }} |
+          模具编号：{{ item.form.mouldNumber }} |
           出货时间：{{ item.form.shipmentTime }}
           <el-button type="text" @click="editItem(index)">编辑</el-button>
           <el-button type="text" @click="removeItem(index)">删除</el-button>
