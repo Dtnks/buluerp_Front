@@ -1,138 +1,230 @@
 <template>
-  <div>
-    <el-card shadow="never">
-      <!-- 搜索框 -->
-      <template #header>
-        <div>
-          <span>查询</span>
-        </div>
+  <Form :data="data" :title="title" :onSubmit="onSubmit" :onCreate="onCreate" :onImport="onImport"
+    :onDownloadTemplate="onDownloadTemplate" :searchForm="searchForm" :formState="formState"></Form>
+  <el-dialog v-model="dialogFormVisible" title="新增订单" width="500">
+    <el-form :model="dialogForm">
+      <el-form-item label="客户姓名">
+        <el-autocomplete v-model="dialogForm.customerName" :fetch-suggestions="customerSuggestions" :value-key="'value'"
+          @blur="checkCustomerName" placeholder="请输入" />
+      </el-form-item>
+      <el-form-item label="外部编号" required>
+        <el-input v-model="dialogForm.outerId" placeholder="请输入" />
+      </el-form-item>
+      <el-form-item label="内部编号" required>
+        <el-input v-model="dialogForm.innerId" placeholder="请输入" />
+      </el-form-item>
+      <el-form-item label="其他信息">
+        <el-input v-model="dialogForm.remark" autocomplete="off" placeholder="请输入" />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="onAddCancel">取消</el-button>
+        <el-button type="primary" @click="onAddConfirm"> 确定 </el-button>
+      </div>
+    </template>
+  </el-dialog>
+  <el-dialog v-model="importDialogVisible" title="导入 Excel" width="400px">
+    <el-upload class="upload-demo" drag :show-file-list="false" :before-upload="beforeUpload"
+      :http-request="handleUpload" accept=".xlsx,.xls">
+      <i class="el-icon-upload"></i>
+      <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
+      <template v-slot:tip>
+        <div class="el-upload__tip">只能上传 xls/xlsx 文件，大小不超过 5MB</div>
       </template>
-      <!-- 查询表单 -->
-      <el-row :gutter="20">
-        <!-- 业务订单ID -->
-        <el-col :span="6">
-          <el-form-item label="业务订单ID">
-            <el-input v-model="formState.name" placeholder="请输入" />
-          </el-form-item>
-        </el-col>
-
-        <!-- 订单状态 -->
-        <el-col :span="6">
-          <el-form-item label="订单状态">
-            <!-- todo: 动态渲染 -->
-            <el-select v-model="formState.region" placeholder="订单状态">
-              <el-option label="初始状态" value="shanghai" />
-              <el-option label="设计中" value="beijing" />
-              <el-option label="已完成" value="beijing2" />
-              <el-option label="作废" value="beijing3" />
-              <el-option label="布产中" value="beijing4" />
-            </el-select>
-          </el-form-item>
-        </el-col>
-
-        <!-- 创建日期 -->
-        <el-col :span="7">
-          <el-form-item label="创建日期">
-            <el-date-picker v-model="datePicker" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期"
-              style="width: 100%" />
-          </el-form-item>
-        </el-col>
-
-        <!-- 查询和重置按钮 -->
-        <el-col :span="5" class="form-buttons">
-          <el-button type="primary" @click="onSubmit">查询</el-button>
-          <el-button @click="resetForm">重置</el-button>
-        </el-col>
-      </el-row>
-
-
-      <el-row :gutter="20">
-        <!-- 客户姓名 -->
-        <el-col :span="6">
-          <el-form-item label="客户姓名">
-            <el-input v-model="formState.fieldB" placeholder="请输入" />
-          </el-form-item>
-        </el-col>
-
-        <!-- 创建人姓名 -->
-        <el-col :span="6">
-          <el-form-item label="创建人姓名">
-            <el-input v-model="formState.fieldB" placeholder="请输入" />
-          </el-form-item>
-        </el-col>
-
-        <!-- 其他搜索框 -->
-        <el-col :span="6">
-          <el-form-item label="其他搜索框">
-            <el-input v-model="formState.fieldB" placeholder="请输入" />
-          </el-form-item>
-        </el-col>
-        <!-- 新建和导入按钮 -->
-        <el-col :span="6" class="form-buttons">
-          <el-button type="primary" @click="onCreate">新建</el-button>
-          <el-button @click="onImport">导入</el-button>
-        </el-col>
-      </el-row>
-      <!-- 按钮 -->
-      <el-row>
-        <el-col :span="24" class="form-buttons">
-
-
-          <el-button type="text" @click="onDownloadTemplate">下载导入模板</el-button>
-        </el-col>
-      </el-row>
-    </el-card>
-  </div>
+    </el-upload>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue';
-import zhCn from 'element-plus/es/locale/lang/zh-cn';
-// import BordShow from '@/components/board/SecBoard.vue';
-import type { FormInstance } from 'element-plus';
-// import type { ElForm } from 'element-plus';
-import { ElInput, ElSelect, ElOption, ElDatePicker, ElButton } from 'element-plus';
-// import { Search } from '@element-plus/icons-vue';
+import { computed, reactive, ref } from 'vue'
+import type { FormInstance } from 'element-plus'
+import { ElInput, ElButton, ElDialog, ElUpload, ElAutocomplete, ElFormItem } from 'element-plus'
+import Form from '@/components/form/Form.vue'
+import { importOrderFile, getProductTemplate } from '@/apis/orders'
+import { resMap } from '../utils/statusMap'
+import { downloadBinaryFile } from '@/utils/file/base64'
+import { messageBox } from '@/components/message/messageBox'
+import { format } from 'date-fns'
+import type { SubmitFormType } from '../types'
 
-const formRef = ref<FormInstance>();
+const dialogFormVisible = ref(false)
+const emit = defineEmits(['onSubmit', 'onAdd', 'checkCustomerName', 'customerSuggestions'])
+
+const dialogForm = reactive({
+  status: 0, // 确保 status 有默认值
+  createTime: '',
+  operator: '',
+  otherInfo: '',
+  innerId: '',
+  outerId: '',
+  id: '',
+  remark: '',
+  operatorId: '0',
+  quantity: 1,
+  productName: '',
+  customerName: '',
+  operater: '',
+})
+
+
+const title = '查询表单'
+const statusOptions = computed(() =>
+  Object.entries(resMap).map(([key, value]) => ({
+    label: value,
+    value: key,
+    key: key,
+  })),
+)
+// data: 表单数据
+const data = reactive([
+  [
+    {
+      label: '业务订单ID',
+      type: 'input', // 确保 type 不为空
+      key: 'id', // 确保 key 对应 searchForm 的字段
+    },
+    {
+      label: '订单状态',
+      type: 'select',
+      key: 'status',
+      options: statusOptions,
+      // options: [
+      //   { label: '初始状态', value: Status.Initial },
+      //   { label: '设计中', value: Status.Designing },
+      //   { label: '已完成', value: Status.Completed },
+      //   { label: '作废', value: Status.Canceled },
+      //   { label: '布产中', value: Status.Producing },
+      // ],
+    },
+    { label: '创建时间', type: 'timer', key: 'createTime', timerType: 'datetimerange' },
+  ],
+  [
+    { label: '客户姓名', type: 'input', key: 'customerName' },
+    { label: '创建人姓名', type: 'input', key: 'operator' },
+    { label: '备注', type: 'input', key: 'remark' },
+  ],
+])
+
+const formRef = ref<FormInstance>()
 // 表单状态
 const formState = reactive({
-  name: '',
-  region: undefined,
-  fieldB: '',
-});
+  // orderId: '',
+  status: null,
+  createTime: [],
+  operator: '',
+  otherInfo: '',
+  innerId: '',
+  id: 14,
+  remark: '',
+  operatorId: '0',
+  quantity: 1,
+  customerId: 0,
+  customerName: '',
+})
 
-// 时间选择框
-// const datePicker = ref<[string, string] | null>(null);
-const datePicker = ref<[string, string]>(['', '']);
+// searchForm: 查询条件
+const searchForm = ref({
+  id: null,
+  status: null,
+  createTime: [], // 使用数组来存储时间范围
+  createTineFrom: '',
+  createTimeTo: '',
+  deliveryDeadline: '',
+  operator: '',
+  customerName: '',
+  remark: '',
+})
+defineExpose({ formState, formRef, searchForm })
 
-
-
-// 表单操作
+// onSubmit: 提交查询条件
 const onSubmit = () => {
-  console.log('查询表单数据：', formState);
-};
+  const createTimeFrom =
+    searchForm.value.createTime && searchForm.value.createTime.length > 0
+      ? format(new Date(searchForm.value.createTime[0]), 'yyyy-MM-dd HH:mm:ss')
+      : null
 
-const resetForm = () => {
-  // formState.name = '';
-  // formState.region = undefined;
-  // formState.fieldB = '';
-  formRef.value?.resetFields();
-};
+  const createTimeTo =
+    searchForm.value.createTime && searchForm.value.createTime.length > 1
+      ? format(new Date(searchForm.value.createTime[1]), 'yyyy-MM-dd HH:mm:ss')
+      : null
+  const submitForm: SubmitFormType = {
+    ...searchForm.value,
+    createTimeFrom,
+    createTimeTo,
+  }
+  delete submitForm.createTime // 删除 createTime 属性，避免重复提交
+  emit('onSubmit', submitForm)
+}
+
+// onCreate: 点击新建按钮
 const onCreate = () => {
-  console.log('点击新建');
-};
+  dialogFormVisible.value = true
+}
 
+const customerSuggestions = (queryString: string, cb) => {
+  emit('customerSuggestions', queryString, cb)
+}
+const checkCustomerName = () => {
+  emit('checkCustomerName', dialogForm.customerName)
+}
+// onAddCancel: 取消新增订单
+const onAddCancel = () => {
+  dialogFormVisible.value = false
+  dialogForm.customerName = ''
+  dialogForm.innerId = ''
+  dialogForm.outerId = ''
+  dialogForm.remark = ''
+}
+
+// onAddConfirm: 确认新增订单
+const onAddConfirm = () => {
+  emit('onAdd', { ...dialogForm })
+  dialogFormVisible.value = false
+  dialogForm.customerName = ''
+  dialogForm.innerId = ''
+  dialogForm.outerId = ''
+  dialogForm.remark = ''
+}
+
+const importDialogVisible = ref(false)
 const onImport = () => {
-  console.log('点击导入');
-};
+  importDialogVisible.value = true
+}
+
+// 文件校验（限制大小）
+const beforeUpload = (file: File) => {
+
+  const isExcel =
+    file.type === 'application/vnd.ms-excel' ||
+    file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  const isLt5M = file.size / 1024 / 1024 < 5
+  if (!isExcel) {
+    messageBox('error', null, null, '只能上传 xls/xlsx 文件')
+    return false
+  }
+  if (!isLt5M) {
+    messageBox('error', null, null, '文件大小不能超过 5MB')
+    return false
+  }
+  return true
+}
+
+const handleUpload = async (option: any) => {
+  const formData = new FormData()
+  formData.append('file', option.file)
+  const res = await importOrderFile(formData)
+
+  messageBox('success', null, res.msg || '导入成功')
+
+  importDialogVisible.value = false
+}
 
 const onDownloadTemplate = () => {
-  console.log('下载导入模板');
-
-
-};
-
+  getProductTemplate().then((res) => {
+    downloadBinaryFile(res, '订单信息模板.xlsx')
+  })
+}
 </script>
 
 <style scoped></style>

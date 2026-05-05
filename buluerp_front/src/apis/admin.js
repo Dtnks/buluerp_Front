@@ -1,25 +1,9 @@
 import httpInstance from '@/utils/httpsInstance.js'
 let headers = { Authorization: `${localStorage.getItem('Authorization')}` }
-// export function getPostList() {
-//   console.log(headers)
-//   return httpInstance({
-//     url: `system/post/optionselect`,
-//     method: 'get',
-//     headers: headers,
-//   })
-// }
-
-// export function getRoleList() {
-//   return httpInstance({
-//     url: `system/role/optionselect`,
-//     method: 'get',
-//     headers: headers,
-//   })
-// }
 
 export function getOptionselect() {
   return httpInstance({
-    url: `system/role/list`,
+    url: `system/role/list?pageNum=1&pageSize=100`,
     method: 'get',
     headers: headers,
   })
@@ -34,12 +18,9 @@ export function newUser(data) {
   })
 }
 
-export function getUserList(
-  page,
-  searchContent = { roleNames: null, userName: '', nickName: '', status: '' },
-) {
+export function getUserList(page, searchContent = { roleId: '', userName: '', nickName: '' }) {
   return httpInstance({
-    url: `system/user/urlist?pageNum=${page}&pageSize=8&roleNames=${searchContent.roleNames}&userName=${searchContent.userName}&nickName=${searchContent.nickName}&status=${searchContent.status}`,
+    url: `system/user/urlist?pageNum=${page}&pageSize=8&roleId=${searchContent.roleId}&userName=${searchContent.userName}&nickName=${searchContent.nickName}`,
     method: 'get',
     headers: headers,
   })
@@ -56,10 +37,9 @@ export function changeStatus(data) {
 
 export function changeRoles(data) {
   return httpInstance({
-    url: `system/user/authRole`,
+    url: `system/user/authRole?userId=${data.userId}&roleIds=${data.roleIds.join('&roleIds=')}`,
     method: 'put',
     headers: headers,
-    data: data,
   })
 }
 
@@ -74,7 +54,7 @@ export function resetPassword(data) {
 
 export function getUser(id) {
   return httpInstance({
-    url: `system/user?userId=${id}`,
+    url: `system/user/${id}`,
     method: 'get',
     headers: headers,
   })

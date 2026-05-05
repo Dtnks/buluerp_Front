@@ -2,29 +2,28 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Iphone, Lock } from '@element-plus/icons-vue'
-
+import useMenuState from '@/stores/modules/menu'
 import { Login } from '@/apis/login.js'
 import { ElMessage } from 'element-plus'
 const autoLogin = ref()
 const account = ref()
 const password = ref()
 const router = useRouter()
+const store = useMenuState()
+const fullscreenLoading = ref(false)
 const handleLogin = () => {
-  Login({ username: account.value, password: password.value }).then((res) => {
-    console.log('login-response' ,res);
+  fullscreenLoading.value = true
+  Login({ username: account.value, password: password.value }).then(async (res) => {
 
-    if (res.msg != '操作成功') {
-      ElMessage({ type: 'error', message: '账号或密码错误' })
-    } else {
-      console.log(res)
       localStorage.setItem('Authorization', res.token)
+      await store.refreshMenu()
       router.push({
         path: '/main',
       })
-
       ElMessage({ type: 'success', message: '登录成功' })
-    }
-  })
+    
+  }).catch((err) => {
+      fullscreenLoading.value = false  })
 }
 </script>
 <template>
@@ -43,11 +42,13 @@ const handleLogin = () => {
           ><template #prefix>
             <el-icon class="el-input__icon"><Lock /></el-icon> </template
         ></el-input>
-        <div class="row" style="justify-content: space-between">
+        <!-- <div class="row" style="justify-content: space-between">
           <el-checkbox v-model="autoLogin" label="自动登录" size="large" />
           <el-text style="cursor: pointer">忘记密码</el-text>
-        </div>
-        <el-button type="primary" @click="handleLogin">登录</el-button>
+        </div> -->
+        <el-button type="primary" @click="handleLogin" v-loading.fullscreen.lock="fullscreenLoading"
+          >登录</el-button
+        >
       </div>
     </div>
   </div>
@@ -60,13 +61,13 @@ const handleLogin = () => {
   align-items: center;
 }
 .back img {
-  width: auto;
-  height: 65vh;
+  width: 40vw;
+  height: auto;
   object-fit: contain;
 }
 .form {
   width: 40vw;
-  height: 65vh;
+  height: auto;
   text-align: center;
 }
 .el-text {

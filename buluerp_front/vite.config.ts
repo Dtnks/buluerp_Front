@@ -23,10 +23,12 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  build: {
+    target: 'esnext',
+  },
   server: {
     proxy: {
       '/dev-api': {
-        // target: 'http://localhost:8080', // 目标服务器的地址
         target: 'http://154.201.77.135:8080',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/dev-api/, ''),
@@ -36,11 +38,9 @@ export default defineConfig({
             console.log(`🧾 真实发送目标: ${proxyReq.getHeader('host')}`)
             console.log(`🔗 Origin: ${proxyReq.getHeader('origin')}`)
           })
-
           proxy.on('proxyRes', (proxyRes, req, res) => {
             console.log(`✅ 后端响应: ${req.method} ${req.url} → ${proxyRes.statusCode}`)
           })
-
           proxy.on('error', (err, req, res) => {
             console.error(`❌ 代理错误: ${req.method} ${req.url}`, err)
           })

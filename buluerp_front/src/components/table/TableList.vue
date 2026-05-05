@@ -1,25 +1,95 @@
 <template>
-  <el-card style="width: 100%; margin: 0 20px">
+  <el-card style="margin: 0 20px">
     <template #header>
       <div class="card-header">
         <span>展示</span>
+        <div>
+          <el-button
+            type="primary"
+            @click="exportFunc(select!.getSelectionRows())"
+            v-if="exportFunc"
+            >导出</el-button
+          >
+          <el-button
+            type="danger"
+            v-if="DeleteFunc"
+            @click="
+              () => {
+                DeleteFunc(select!.getSelectionRows())
+                select.clearSelection()
+              }
+            "
+            >删除</el-button
+          >
+          <el-button
+            type="primary"
+            v-if="exportCharts"
+            @click="exportCharts(select!.getSelectionRows())"
+            >图表</el-button
+          >
+          <el-button
+            type="primary"
+            v-if="transToArrange"
+            @click="transToArrange(select!.getSelectionRows())"
+            >导入排产</el-button
+          >
+        </div>
       </div>
     </template>
     <div>
-      <el-table :data="listData" border style="width: 100%">
+      <el-table :data="listData" border style="width: 100%" ref="select" :row-key="(row) => row.id">
+        <el-table-column type="selection" width="55" reserve-selection="true" />
+
         <el-table-column
           :prop="item.value"
           :label="item.label"
           v-for="item in tableData"
           :key="item.value"
-        />
-        <el-table-column label="操作" fixed="right">
+        >
+          <template #default="{ row }">
+            <span v-if="getType(item, row) === 'picture'">
+              <el-image
+                v-if="row[item.value]"
+                :src="getFullImageUrl(row[item.value])"
+                style="width: 50px; height: 50px"
+                @click="donwLoadFile(getFullImageUrl(row[item.value]))"
+              />
+            </span>
+            <span v-if="getType(item, row) === 'fileList'">
+              <!-- <a v-for="(subItem) in row[item.value]" :href="getFullImageUrl(subItem[item.key])" :download="subItem[item.key].split('/').pop()" target="_blank">{{ subItem[item.key].split('/').pop()}}</a> -->
+              <el-button
+                type="primary"
+                text
+                v-for="subItem in row[item.value]"
+                @click="donwLoadFile(getFullImageUrl(subItem[item.key]), item.miniType)"
+              >
+                {{ subItem[item.key].split('/').pop() }}
+              </el-button>
+            </span>
+            <span v-else-if="getType(item, row) == 'text'">{{ row[item.value] }}</span>
+            <span v-else-if="getType(item, row) == 'Maptext'">{{ item.map[row[item.value]] }}</span>
+            <span v-else-if="getType(item, row) == 'tags'">
+              <el-tag v-for="tag in getList(row[item.value])">{{ tag }}</el-tag>
+            </span>
+            <span v-else-if="getType(item, row) == 'warningtags'">
+              <el-tag v-for="tag in getList(row[item.value])" type="warning">{{ tag }}</el-tag>
+            </span>
+            <span v-else-if="getType(item, row) === 'model'" class="modelShow">
+              <div v-if="row[item.value]" style="width: 100px; height: 100px; margin: 0 auto;">
+                <ThreeShowing :modelUrl="row.modelUrl" />
+              </div>
+              <span v-else style="color: #909399;">暂无</span>
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" fixed="right" v-if="operations">
           <template #default="{ row }">
             <el-button
               size="small"
               type="primary"
               text
-              @click="operation.func(row.id)"
+              :disabled="operation.disabled"
+              @click="operation.func(row)"
               v-for="operation in operations"
               >{{ operation.value }}</el-button
             >
@@ -28,11 +98,59 @@
       </el-table>
 
       <!-- 分页器 -->
+      <div style="height: 20px"></div>
       <slot></slot>
     </div>
   </el-card>
 </template>
 
 <script lang="ts" setup>
-const props = defineProps(['tableData', 'operations', 'listData'])
+import { ref } from 'vue'
+import { getFullImageUrl } from '@/utils/image/getUrl'
+import { ElCard, ElTable, ElTableColumn, ElButton, ElTag, ElImage } from 'element-plus'
+import axios from 'axios'
+import ThreeShowing from '@/views/production/component/threeShowing.vue'
+defineProps([
+  'tableData',
+  'operations',
+  'listData',
+  'exportFunc',
+  'DeleteFunc',
+  'exportCharts',
+  'transToArrange',
+])
+const select = ref()
+const getList = (ele) => {
+  if (typeof ele === 'string') {
+    return ele.split(',')
+  } else if (Array.isArray(ele)) {
+    return ele
+  }
+}
+const getType = (item, row) => {
+  return typeof item.type === 'function' ? item.type(row) : item.type
+}
+
+const donwLoadFile = async (Fileurl, miniType = 'application/octet-stream') => {
+  const content = await axios.get(Fileurl, { responseType: 'blob' })
+  const blob = new Blob([content.data], { type: miniType })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = Fileurl.split('/').pop()
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
 </script>
+<style scoped>
+.card-header {
+  display: flex;
+  justify-content: space-between;
+}
+.modelShow {
+  display: flex;
+  justify-content: center;
+}
+</style>
