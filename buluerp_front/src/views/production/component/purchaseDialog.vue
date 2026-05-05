@@ -78,7 +78,7 @@ import { reactive } from 'vue'
 const form = reactive({
   materialType: '',
   mouldNumber: '',
-  drawingReferenceFile: null,
+  pictureFile: null,
   purchaseCode: '',
   singleWeight: null,
   specificationName: '',
@@ -100,7 +100,7 @@ const setPictureFile = (file: File | null) => {
   // 只在 file 为 null 时清空 imageUrl
   if (!file) {
     imageUrl.value = ''
-    form.drawingReferenceFile = null
+    form.pictureFile = null
   }
 }
 

@@ -162,7 +162,11 @@ const fetchData = async () => {
     pageNum: page.value,
     pageSize: pageSize.value,
   })
-  data.value = res.rows || []
+  data.value = (res.rows || []).map((row: any) => ({
+    ...row,
+    // 统一图片字段：内部物料用 drawingReference，外购物料回退到 purchaseInfo.pictureUrl
+    drawingReference: row.drawingReference || row.purchaseInfo?.pictureUrl || row.pictureFile || null,
+  }))
   total.value = res.total || 0
 }
 
