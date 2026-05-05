@@ -1,11 +1,8 @@
 <template>
 
   <div>
-    <!-- 用 Tablelist 替换 el-table -->
     <Tablelist :tableData="tableData" :listData="data" :operations="operations" :exportFunc="onExport"
       :DeleteFunc="onDelete" :control="control">
-
-      <!-- 分页器 -->
       <slot>
         <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center">
           <div>共 {{ total }} 条</div>

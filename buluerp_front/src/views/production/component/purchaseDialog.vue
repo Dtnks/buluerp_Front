@@ -5,18 +5,32 @@
     width="800px"
     @close="handleClose"
   >
-    <!-- 图片上传 -->
-    <div style="position: relative; display: inline-block; margin-bottom: 16px;">
-      <ImageUpload v-if="visible" :initialUrl="imageUrl" :setFile="setPictureFile" />
+    <div style="display: flex; gap: 20px; margin-bottom: 16px;">
+      <!-- 图片上传 -->
+      <div style="position: relative; display: inline-block;">
+        <ImageUpload v-if="visible" :initialUrl="imageUrl" :setFile="setPictureFile" />
+        <el-button
+          v-if="imageUrl"
+          type="danger"
+          size="small"
+          style="position: absolute; top: 4px; right: 4px; z-index: 0;"
+          @click="removeImage"
+          circle
+        ><el-icon><Delete /></el-icon></el-button>
+      </div>
 
-      <el-button
-        v-if="imageUrl"
-        type="danger"
-        size="small"
-        style="position: absolute; top: 4px; right: 4px; z-index: 0;"
-        @click="removeImage"
-        circle
-      ><el-icon><Delete /></el-icon></el-button>
+      <!-- STP 模型上传 -->
+      <div style="position: relative; display: inline-block;">
+        <StpUpload v-if="visible" :initialUrl="stpUrl" :setFile="setStpFile" />
+        <el-button
+          v-if="stpUrl"
+          type="danger"
+          size="small"
+          style="position: absolute; top: 4px; right: 4px; z-index: 0;"
+          @click="removeStp"
+          circle
+        ><el-icon><Delete /></el-icon></el-button>
+      </div>
     </div>
 
     <!-- 表单 -->
@@ -39,6 +53,7 @@
 import { ref, defineProps, defineEmits, watch } from 'vue'
 import CustomForm from '@/components/form/CreateForm.vue' // 替换为你封装组件的路径
 import ImageUpload from '@/components/upload/editUpload.vue'
+import StpUpload from '@/components/upload/stpUpload.vue'
 import { Delete } from '@element-plus/icons-vue'
 import { requiredRule } from '@/utils/form/valid'
 import { searchFunc } from '@/utils/search/search'
@@ -63,24 +78,39 @@ import { reactive } from 'vue'
 const form = reactive({
   materialType: '',
   mouldNumber: '',
-  pictureFile: null,
+  drawingReferenceFile: null,
   purchaseCode: '',
   singleWeight: null,
   specificationName: '',
   supplier: '',
-  unitPrice: null
+  unitPrice: null,
+  modelFile: null,
+  productCode: ''
 })
 
 
 const pictureFile = ref<File | null>(null)
 const imageUrl = ref('')
 
+const stpFile = ref<File | null>(null)
+const stpUrl = ref('')
+
 const setPictureFile = (file: File | null) => {
   pictureFile.value = file
   // 只在 file 为 null 时清空 imageUrl
   if (!file) {
     imageUrl.value = ''
-    form.pictureFile = null
+    form.drawingReferenceFile = null
+  }
+}
+
+const setStpFile = (file: File | null) => {
+  stpFile.value = file
+  if (file) {
+    form.modelFile = null
+  } else {
+    form.modelFile = null
+    stpUrl.value = ''
   }
 }
 
@@ -150,7 +180,15 @@ const formConfig = ref([
       type: 'file',
       width: 12
     }
-  ]
+  ],
+  [
+    {
+      label: '产品编码',
+      key: 'productCode',
+      type: 'input',
+      width: 12
+    }
+  ],
 ])
 
 
@@ -167,7 +205,9 @@ watch(
       singleWeight: data.singleWeight || null,
       unitPrice: data.unitPrice || null,
       mouldNumber: data.mouldNumber || '',
-      pictureFile: data.pictureFile || null
+      pictureFile: data.pictureFile || null,
+      stpReferenceFile: data.stpReferenceFile || null,
+      deleteStpReference: false
     })
 
     if (data.pictureFile) {
@@ -176,6 +216,14 @@ watch(
     } else {
       imageUrl.value = ''
       pictureFile.value = null
+    }
+
+    if (data.stpReferenceFile) {
+      stpUrl.value = getFullImageUrl(data.stpReferenceFile)
+      stpFile.value = null
+    } else {
+      stpUrl.value = ''
+      stpFile.value = null
     }
   },
   { immediate: true }
@@ -186,6 +234,8 @@ const resetForm = () => {
     materialType: '',
     mouldNumber: '',
     pictureFile: null,
+    stpReferenceFile: null,
+    deleteStpReference: false,
     purchaseCode: '',
     singleWeight: null,
     specificationName: '',
@@ -199,12 +249,18 @@ const handleClose = () => {
   resetForm()
   imageUrl.value = ''
   pictureFile.value = null
+  stpUrl.value = ''
+  stpFile.value = null
   visible.value = false
 }
 
 
 const removeImage = () => {
   setPictureFile(null)
+}
+
+const removeStp = () => {
+  setStpFile(null)
 }
 
 const handleSubmit = () => {
@@ -222,11 +278,19 @@ const handleSubmit = () => {
         }
         continue
       }
+      if (key === 'modelFile') {
+        if (stpFile.value) {
+          formData.append('modelFile', stpFile.value)
+        } else if (typeof form.modelFile === 'string') {
+          formData.append('modelFile', form.modelFile)
+        }
+        continue
+      }
 
       const value = form[key]
       if (Array.isArray(value)) {
         value.forEach(v => formData.append(key, v))
-      } else if (value !== null && value !== undefined) {
+      } else if (value !== null && value !== undefined && key !== 'deleteStpReference') {
         formData.append(key, value)
       }
     }

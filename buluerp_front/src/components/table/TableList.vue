@@ -74,6 +74,12 @@
             <span v-else-if="getType(item, row) == 'warningtags'">
               <el-tag v-for="tag in getList(row[item.value])" type="warning">{{ tag }}</el-tag>
             </span>
+            <span v-else-if="getType(item, row) === 'model'" class="modelShow">
+              <div v-if="row[item.value]" style="width: 100px; height: 100px; margin: 0 auto;">
+                <ThreeShowing :modelUrl="row.modelUrl" />
+              </div>
+              <span v-else style="color: #909399;">暂无</span>
+            </span>
           </template>
         </el-table-column>
         <el-table-column label="操作" fixed="right" v-if="operations">
@@ -103,6 +109,7 @@ import { ref } from 'vue'
 import { getFullImageUrl } from '@/utils/image/getUrl'
 import { ElCard, ElTable, ElTableColumn, ElButton, ElTag, ElImage } from 'element-plus'
 import axios from 'axios'
+import ThreeShowing from '@/views/production/component/threeShowing.vue'
 defineProps([
   'tableData',
   'operations',
@@ -141,5 +148,9 @@ const donwLoadFile = async (Fileurl, miniType = 'application/octet-stream') => {
 .card-header {
   display: flex;
   justify-content: space-between;
+}
+.modelShow {
+  display: flex;
+  justify-content: center;
 }
 </style>

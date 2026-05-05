@@ -30,15 +30,24 @@
   </el-dialog>
 
     <!-- 模具信息弹窗 -->
-  <el-dialog v-model="showDetailDialog" title="模具信息" width="600px">
-    <div v-if="currentRow" class="purchase-info-container">
-      <div class="info-item"><strong>模具ID:</strong> {{ currentRow.mouldNumber }}</div>
-      <div class="info-item"><strong>模具厂家:</strong> {{ currentRow.manufacturerName }}</div>
-      <div class="info-item"><strong>试模时间:</strong> {{ currentRow.trialDate }}</div>
-      <div class="info-item"><strong>模具状态:</strong> {{ currentRow.status }}</div>
-    </div>
-    <div v-else class="purchase-info-container">
-      <div class="info-item">此模具不存在！</div>
+  <el-dialog v-model="showDetailDialog" title="模具信息" width="1000px">
+    <div style="display: flex; gap: 20px;">
+      <!-- 左侧模具基本信息 -->
+      <div style="flex: 1; min-width: 300px;">
+        <div v-if="currentRow" class="purchase-info-container">
+          <div class="info-item"><strong>模具ID:</strong> {{ currentRow.mouldNumber }}</div>
+          <div class="info-item"><strong>模具厂家:</strong> {{ currentRow.manufacturerName }}</div>
+          <div class="info-item"><strong>试模时间:</strong> {{ currentRow.trialDate }}</div>
+          <div class="info-item"><strong>模具状态:</strong> {{ currentRow.status }}</div>
+        </div>
+        <div v-else class="purchase-info-container">
+          <div class="info-item">此模具不存在！</div>
+        </div>
+      </div>
+      <div style="flex: 1; min-width: 500px; height: 400px; border: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; background-color: #f5f7fa; overflow: hidden;">
+        <ThreeShowing v-if="currentRow.modelUrl" :modelUrl="currentRow.modelUrl"/>
+        <span v-else style="color: #909399;">暂无 3D 模型数据</span>
+      </div>
     </div>
   </el-dialog>
 
@@ -70,6 +79,7 @@ import MaterialDialog from '@/views/production/component/materialDialog.vue'
 import MaterialEditDialog from './materialEditDialog.vue'
 import Tablelist from '@/components/table/TableList.vue'
 import PurchaseDialog from './purchaseDialog.vue'
+import ThreeShowing from './threeShowing.vue'
 
 const showDialog = ref(false)
 const showDetailDialog = ref(false)
@@ -105,6 +115,7 @@ const openPurchaseDialog = (purchaseInfo: PurchaseInfo) => {
 // 定义表格列
 const tableData = [
   { value: 'drawingReference', label: '胶件图片', type: 'picture' },
+  { value: 'modelUrl', label: '3D模型', type: 'model' },
   { value: 'id', label: '物料ID', type: 'text' },
   { value: 'mouldNumber', label: '模具编号', type: 'text' },
   { value: 'specificationName', label: '规格名称', type: 'text' },
@@ -158,6 +169,7 @@ const fetchData = async () => {
 const showPurchaseDialog = ref(false)
 
 const onEdit = (row: any) => {
+  console.log(row)
   currentRow.value = { ...row }
 
   if (row.purchased) {
@@ -173,7 +185,7 @@ const handleSubmit = async (formData: any) => {
   try {
     await updateMaterial(formData)
     messageBox('success', Promise.resolve, '更新成功', '', '')
-    fetchData()
+    await fetchData()
   } catch {
     messageBox('error', () => Promise.reject(), '', '操作失败', '')
   } finally {
@@ -185,7 +197,7 @@ const onDetail = async (row: any) => {
   try {
     console.log(row.mouldNumber)
     const res = await getMouldDetail(row.mouldNumber)
-    currentRow.value = res.data  // 注意：这里才是实际数据
+    currentRow.value = res.data
     console.log(currentRow.value)
     showDetailDialog.value = true
   }

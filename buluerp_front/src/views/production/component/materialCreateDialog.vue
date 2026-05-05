@@ -5,17 +5,32 @@
     width="800px"
     @close="handleClose"
   >
-    <div style="position: relative; display: inline-block; margin-bottom: 16px;">
-      <ImageUpload v-if="visible" :initialUrl="imageUrl" :setFile="setDrawingFile" />
+    <div style="display: flex; gap: 20px; margin-bottom: 16px;">
+      <!-- 图片上传 -->
+      <div style="position: relative; display: inline-block;">
+        <ImageUpload v-if="visible" :initialUrl="imageUrl" :setFile="setDrawingFile" />
+        <el-button
+          v-if="imageUrl"
+          type="danger"
+          size="small"
+          style="position: absolute; top: 4px; right: 4px; z-index: 0;"
+          @click="removeImage"
+          circle
+        ><el-icon><Delete /></el-icon></el-button>
+      </div>
 
-      <el-button
-        v-if="imageUrl"
-        type="danger"
-        size="small"
-        style="position: absolute; top: 4px; right: 4px; z-index: 0;"
-        @click="removeImage"
-        circle
-      ><el-icon><Delete /></el-icon></el-button>
+      <!-- STP 模型上传 -->
+      <div style="position: relative; display: inline-block;">
+        <StpUpload v-if="visible" :initialUrl="stpUrl" :setFile="setStpFile" />
+        <el-button
+          v-if="stpUrl"
+          type="danger"
+          size="small"
+          style="position: absolute; top: 4px; right: 4px; z-index: 0;"
+          @click="removeStp"
+          circle
+        ><el-icon><Delete /></el-icon></el-button>
+      </div>
     </div>
 
     <CustomForm
@@ -36,6 +51,7 @@
 import { ref, watch, reactive } from 'vue'
 import CustomForm from '@/components/form/CreateForm.vue'
 import ImageUpload from '@/components/upload/editUpload.vue'
+import StpUpload from '@/components/upload/stpUpload.vue'
 import { Delete } from '@element-plus/icons-vue'
 import { searchFunc } from '@/utils/search/search'
 
@@ -50,25 +66,33 @@ const formRef = ref<any>(null)
 const formState = ref({})
 // 使用 reactive 来创建表单对象，不需要 .value
 const form = reactive({
-  cavityCount: null,
-  cycleTime: null,
-  drawingReferenceFile: null,
-  materialType: '',
-  mouldStatus: '',
-  mouldManufacturer: '',
-  mouldNumber: '',
-  sampleLocation: '',
-  remarks: '',
-  specificationName: '',
-  standardCode: '',
-  singleWeight: null,
-  spareCode: '',
+  cavityCount: null,//腔口数量
+  cycleTime: null,//生产周期
+  drawingReferenceFile: null,//样例图
+  modelFile: null,//STP文件
+  materialType: '',//料别
+  materialCode: '',//物料编码
+  materialName: '',//物料名称
+  unit: '',//单位
+  // mouldStatus: '',
+  // mouldManufacturer: '',
+  mouldNumber: '',//模具编号
+  sampleLocation: '',//样品库位,
+  remarks: '',//备注
+  specificationName: '',//规格名称
+  standardCode: '',//常规编码
+  singleWeight: null,//单重
+  // spareCode: '',
   deleteDrawingReference: false,
-  productCode: ''
+  deleteStpReference: false,
+  // productCode: ''
 })
 
 const drawingFile = ref<File | null>(null)
 const imageUrl = ref('')
+
+const stpFile = ref<File | null>(null)
+const stpUrl = ref('')
 
 const setDrawingFile = (file: File | null) => {
   drawingFile.value = file
@@ -82,7 +106,20 @@ const setDrawingFile = (file: File | null) => {
   }
 }
 
+const setStpFile = (file: File | null) => {
+  stpFile.value = file
+  if (file) {
+    form.modelFile = null
+    form.deleteStpReference = false
+  } else {
+    form.modelFile = null
+    form.deleteStpReference = true
+    stpUrl.value = ''
+  }
+}
+
 const removeImage = () => setDrawingFile(null)
+const removeStp = () => setStpFile(null)
 
 const formConfig = reactive([
   [
@@ -101,16 +138,19 @@ const formConfig = reactive([
     { label: '单重', key: 'singleWeight', type: 'number', width: 12 }
   ],
   [
+    { label: '物料编码', key: 'materialCode', type: 'input', width: 12, required: true, rules: [{ required: true, message: '请输入物料编码', trigger: 'blur' }] },
+    { label: '物料名称', key: 'materialName', type: 'input', width: 12, required: true, rules: [{ required: true, message: '请输入物料名称', trigger: 'blur' }] },
+  ],
+  [
     { label: '样品库位', key: 'sampleLocation', type: 'input', width: 12 },
     { label: '常规编码', key: 'standardCode', type: 'input', width: 12, rules: [{number: true, message: '请输入数字',trigger:'blur'}] }
   ],
   [
+    { label: '备注', key: 'remarks', type: 'textarea', width: 12 },
     { label: '生产周期', key: 'cycleTime', type: 'number', width: 12 },
-    { label: '产品ID', key: 'productCode', type: 'input', width: 12 }
   ],
   [
-    { label: '备注', key: 'remarks', type: 'textarea', width: 12 },
-    { label: '备用编码', key: 'spareCode', type: 'input', width: 12 }
+    { label: '单位', key: 'unit', type: 'number', width: 12 },
   ]
 ])
 
@@ -120,6 +160,7 @@ const handleClose = () => {
     cavityCount: null,
     cycleTime: null,
     drawingReferenceFile: null,
+    stpReferenceFile: null,
     materialType: '',
     mouldStatus: '',
     mouldManufacturer: '',
@@ -131,11 +172,14 @@ const handleClose = () => {
     singleWeight: null,
     spareCode: '',
     deleteDrawingReference: false,
+    deleteStpReference: false,
     productCode: ''
   })
 
   imageUrl.value = ''
   drawingFile.value = null
+  stpUrl.value = ''
+  stpFile.value = null
   visible.value = false
 }
 
@@ -151,10 +195,17 @@ const handleSubmit = () => {
         else if (typeof form.drawingReferenceFile === 'string') formData.append('drawingReference', form.drawingReferenceFile)
         continue
       }
-      if (form.deleteDrawingReference) formData.append('deleteDrawingReference', 'true')
-      const value = form[key]
+      if (key === 'modelFile') {
+        if (stpFile.value) formData.append('modelFile', stpFile.value)
+        else if (typeof form.modelFile === 'string') formData.append('model', form.modelFile)
+        continue
+      }
+      if (form.deleteDrawingReference && key === 'deleteDrawingReference') formData.append('deleteDrawingReference', 'true')
+      if (form.deleteStpReference && key === 'deleteStpReference') formData.append('deleteStpReference', 'true')
+      
+      const value = (form as Record<string, any>)[key]
       if (Array.isArray(value)) value.forEach(v => formData.append(key, v))
-      else if (value !== null && value !== undefined) formData.append(key, value)
+      else if (value !== null && value !== undefined && key !== 'deleteDrawingReference' && key !== 'deleteStpReference') formData.append(key, value)
     }
 
     emit('submit', formData)

@@ -7,10 +7,11 @@
     :on-exceed="handleFileExceed"
     :auto-upload="false"
     :limit="1"
+    accept="image/*"
     style="margin: 20px; width: 200px; height: 200px; text-align: center"
   >
     <img v-if="imgShowUrl" :src="imgShowUrl" class="cover" style="width: 150px; height: 150px" />
-    <div v-else class="centerText">上传样例图</div>
+    <el-button v-else class="centerText">上传样例图</el-button>
   </el-upload>
 </template>
 
